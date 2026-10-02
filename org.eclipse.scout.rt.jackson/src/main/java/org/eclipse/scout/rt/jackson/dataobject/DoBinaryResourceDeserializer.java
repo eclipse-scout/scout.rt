@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,21 +9,16 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
-
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 public class DoBinaryResourceDeserializer extends StdDeserializer<BinaryResource> {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   protected DoBinaryResourceDeserializer() {
     super(BinaryResource.class);
@@ -37,12 +32,12 @@ public class DoBinaryResourceDeserializer extends StdDeserializer<BinaryResource
     if (field == null) {
       return null;
     }
-    return field.isNull() ? null : field.asText();
+    return field.isNull() ? null : field.asString();
   }
 
   @Override
-  public BinaryResource deserialize(JsonParser jp, DeserializationContext ctxt) throws IOException {
-    JsonNode node = jp.getCodec().readTree(jp);
+  public BinaryResource deserialize(JsonParser jp, DeserializationContext ctxt) throws JacksonException {
+    JsonNode node = jp.objectReadContext().readTree(jp);
 
     // Note: the properties contentLength and fingerprint, are calculated based on the content
     // So we don't need to set it here. However they are added to the JSON, because they might

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,12 +9,13 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
+import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.util.Locale;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer.Std;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.deser.jdk.JDKFromStringDeserializer;
 
 /**
  * Custom deserializer for {@link Locale} that specifically only handles deserializing "und" into the
@@ -22,10 +23,8 @@ import com.fasterxml.jackson.databind.deser.std.FromStringDeserializer.Std;
  * <p>
  * TODO pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  */
-public class DoLocaleDeserializer extends Std {
+public class DoLocaleDeserializer extends JDKFromStringDeserializer {
 
-  @Serial
-  private static final long serialVersionUID = 2429460681017940619L;
   public static final String UNDETERMINED = "und"; // from sun.util.locale.LanguageTag.UNDETERMINED
 
   protected DoLocaleDeserializer() {
@@ -33,7 +32,7 @@ public class DoLocaleDeserializer extends Std {
   }
 
   @Override
-  protected Object _deserialize(String value, DeserializationContext ctxt) throws IOException {
+  public Object _deserialize(String value, DeserializationContext ctxt) throws JacksonException, MalformedURLException, UnknownHostException {
     if (UNDETERMINED.equals(value)) {
       return Locale.ROOT;
     }

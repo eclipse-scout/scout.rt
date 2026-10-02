@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,18 +9,15 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.Serial;
 import java.util.Locale;
 
-import com.fasterxml.jackson.databind.deser.std.StdKeyDeserializer;
+import tools.jackson.databind.deser.jdk.JDKKeyDeserializer;
 
 /**
  * Custom map key deserializer for {@link Locale} that is based upon the {@link DoLocaleDeserializer} in order to handle
  * the root locale correctly. TODO [23.0] pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
  */
-public class LocaleMapKeyDeserializer extends StdKeyDeserializer {
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class LocaleMapKeyDeserializer extends JDKKeyDeserializer {
 
   protected LocaleMapKeyDeserializer() {
     super(TYPE_LOCALE, Locale.class, new DoLocaleDeserializer());

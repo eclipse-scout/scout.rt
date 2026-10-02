@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.Collection;
 
@@ -28,24 +26,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.helpers.MessageFormatter;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.core.util.JsonParserSequence;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.fasterxml.jackson.databind.util.TokenBuffer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.JsonToken;
+import tools.jackson.core.util.JsonParserSequence;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.jsontype.TypeDeserializer;
+import tools.jackson.databind.type.TypeFactory;
+import tools.jackson.databind.util.TokenBuffer;
 
 /**
  * Deserializer for {@link DoEntity} and all sub-classes.
  */
 public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   private static final Logger LOG = LoggerFactory.getLogger(DoEntityDeserializer.class);
 
@@ -70,44 +67,44 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   @Override
-  public IDoEntity deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+  public IDoEntity deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
     return deserializeDoEntity(p, ctxt, null);
   }
 
   @Override
-  public IDoEntity deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
+  public IDoEntity deserializeWithType(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws JacksonException {
     return deserializeDoEntity(p, ctxt, typeDeserializer);
   }
 
-  protected IDoEntity deserializeDoEntity(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws IOException {
+  protected IDoEntity deserializeDoEntity(JsonParser p, DeserializationContext ctxt, TypeDeserializer typeDeserializer) throws JacksonException {
     return switch (p.nextToken()) {
-      case FIELD_NAME -> deserializeDoEntityAttributes(p, ctxt);
+      case PROPERTY_NAME -> deserializeDoEntityAttributes(p, ctxt);
       case END_OBJECT ->
         // empty object without attributes consists only of START_OBJECT and END_OBJECT token, return empty entity object
           newObject(ctxt, m_handledClass);
-      default -> throw ctxt.wrongTokenException(p, m_handledType, JsonToken.FIELD_NAME, null);
+      default -> throw ctxt.wrongTokenException(p, m_handledType, JsonToken.PROPERTY_NAME, null);
     };
   }
 
   @SuppressWarnings({"resource", "squid:S2095"})
-  protected IDoEntity deserializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt) throws IOException {
+  protected IDoEntity deserializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt) throws JacksonException {
     // search for type property within attributes of DoEntity, cache other fields within token buffer
     TokenBuffer tb = null;
-    for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
-      String attributeName = p.getCurrentName();
+    for (JsonToken t = p.currentToken(); t == JsonToken.PROPERTY_NAME; t = p.nextToken()) {
+      String attributeName = p.currentName();
       p.nextToken(); // let current token point to the value
 
       // check if found the type property
       if (m_moduleContext.getTypeAttributeName().equals(attributeName)) {
-        String entityType = p.getText();
+        String entityType = p.getString();
         IDoEntity entity = resolveEntityType(ctxt, entityType);
-        p.setCurrentValue(entity); // set current entity object as current value on parser (used for correct typing of field read after finding _type attribute)
+        p.assignCurrentValue(entity); // set current entity object as current value on parser (used for correct typing of field read after finding _type attribute)
 
         // put back the cached fields of token buffer to parser, if any fields were cached while searching type property
         if (tb != null) {
           p.clearCurrentToken();
-          JsonParser tbParser = tb.asParser(p);
-          tbParser.setCurrentValue(entity); // set current entity object as current value on parser created out of cached token buffer (used for correct typing of field read into token buffer before finding _type attribute)
+          JsonParser tbParser = tb.asParser(ctxt, p);
+          tbParser.assignCurrentValue(entity); // set current entity object as current value on parser created out of cached token buffer (used for correct typing of field read into token buffer before finding _type attribute)
           p = JsonParserSequence.createFlattened(false, tbParser, p);
         }
         p.nextToken(); // skip type field value
@@ -116,44 +113,44 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
 
       // lazy create token buffer to cache other fields
       if (tb == null) {
-        tb = new TokenBuffer(p, ctxt);
+        tb = TokenBuffer.forBuffering(p, ctxt);
       }
 
       // write current field name and value to token buffer for later parsing
-      tb.writeFieldName(attributeName);
+      tb.writeName(attributeName);
       tb.copyCurrentStructure(p);
     }
 
     // if any fields where cached, finish token buffer and move parser back to cached token buffer fields
     if (tb != null) {
       tb.writeEndObject();
-      p = tb.asParser(p);
+      p = tb.asParser(ctxt, p);
       // initialize parser pointing to first field token
       p.nextToken();
     }
 
     // no type information found within available attributes, resolve default entity type (null = use default entity type)
     IDoEntity entity = resolveEntityType(ctxt, null);
-    p.setCurrentValue(entity); // set current value after new parser instance was created out of token buffer
+    p.assignCurrentValue(entity); // set current value after new parser instance was created out of token buffer
 
     return deserializeDoEntityAttributes(p, ctxt, entity);
   }
 
-  protected IDoEntity deserializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, IDoEntity entity) throws IOException {
+  protected IDoEntity deserializeDoEntityAttributes(JsonParser p, DeserializationContext ctxt, IDoEntity entity) throws JacksonException {
     // read and deserialize all fields of entity
-    for (JsonToken t = p.currentToken(); t == JsonToken.FIELD_NAME; t = p.nextToken()) {
-      String attributeName = p.getCurrentName();
+    for (JsonToken t = p.currentToken(); t == JsonToken.PROPERTY_NAME; t = p.nextToken()) {
+      String attributeName = p.currentName();
       p.nextToken(); // let current token point to the value
 
       // check if reading the 'type version' property
       if (m_moduleContext.getTypeVersionAttributeName().equals(attributeName)) {
-        AttributeType at = AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(String.class));
+        AttributeType at = AttributeType.ofDoValue(ctxt.constructType(String.class));
         Object value = readAttributeValue(p, at, attributeName);
         deserializeDoEntityVersionAttribute(entity, attributeName, value);
       }
       else {
         // normal attribute
-        AttributeType attributeType = findResolvedAttributeType(entity, attributeName, p.currentToken());
+        AttributeType attributeType = findResolvedAttributeType(entity, attributeName, p.currentToken(), ctxt);
         if (attributeType.isDoCollection()) {
           DoNode<?> nodeValue = readAttributeValue(p, attributeType, attributeName);
 
@@ -181,9 +178,9 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     return entity;
   }
 
-  protected <T> T readAttributeValue(JsonParser p, AttributeType attributeType, String attributeName) throws IOException {
+  protected <T> T readAttributeValue(JsonParser p, AttributeType attributeType, String attributeName) throws JacksonException {
     try {
-      return p.getCodec().readValue(p, attributeType.getJavaType());
+      return p.objectReadContext().readValue(p, attributeType.getJavaType());
     }
     catch (InvalidFormatException e) {
       if (m_moduleContext.isLenientMode()) {
@@ -196,10 +193,10 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       ife.addSuppressed(e);
       throw ife;
     }
-    catch (IOException e) {
+    catch (JacksonException e) {
       // capture generic exception to add at least the attribute name and entity class to the exception message
       String msg = MessageFormatter.format("Failed to deserialize attribute '{}' of entity {}", attributeName, handledType().getName()).getMessage();
-      throw JsonMappingException.from(p, msg, e);
+      throw DatabindException.from(p, msg, e);
     }
   }
 
@@ -218,14 +215,14 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     }
   }
 
-  protected IDoEntity resolveEntityType(DeserializationContext ctxt, String entityType) throws IOException {
+  protected IDoEntity resolveEntityType(DeserializationContext ctxt, String entityType) throws JacksonException {
     if (entityType != null) {
       // try to lookup DoEntity with specified entityType
       Class<? extends IDoEntity> clazz = m_doEntityDeserializerTypeStrategy.resolveTypeName(entityType);
       if (clazz != null) {
         // (1) Class could be resolved by given entityType, validate that resolved class is assignable from class handled by this deserializer instance
         if (!m_moduleContext.isLenientMode() && !m_handledClass.isAssignableFrom(clazz)) {
-          throw JsonMappingException.from(ctxt, "Class resolved by parsed entity type is not assignable from class expected by deserializer. ["
+          throw DatabindException.from(ctxt, "Class resolved by parsed entity type is not assignable from class expected by deserializer. ["
               + "entityType=" + entityType + " resolvedClass=" + clazz.getName() + " handledClassByDeserializer=" + m_handledClass + "]");
         }
         return newObject(ctxt, clazz);
@@ -233,7 +230,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       else {
         // (2) Class could be not resolved by given entityType, validate that handled class (e.g. class expected to be created by this deserializer instance) is of raw type
         if (!m_moduleContext.isLenientMode() && !ObjectUtility.isOneOf(m_handledClass, DoEntity.class, IDoEntity.class, IDataObject.class)) {
-          throw JsonMappingException.from(ctxt, "Could not resolve a class by parsed entity type and deserializer expect a concrete class to be created. ["
+          throw DatabindException.from(ctxt, "Could not resolve a class by parsed entity type and deserializer expect a concrete class to be created. ["
               + "entityType=" + entityType + " handledClassByDeserializer=" + m_handledClass + "]");
         }
         // Use generic DoEntity instance with a type attribute to preserve the type information even if correct DoEntity class could not be resolved
@@ -246,15 +243,15 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     return newObject(ctxt, m_handledClass);
   }
 
-  protected AttributeType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken) {
-    return m_doEntityDeserializerTypeStrategy.resolveAttributeType(entityInstance.getClass(), attributeName, currentToken)
-        .orElseGet(() -> findResolvedFallbackAttributeType(entityInstance, attributeName, currentToken));
+  protected AttributeType findResolvedAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken, DeserializationContext ctxt) {
+    return m_doEntityDeserializerTypeStrategy.resolveAttributeType(entityInstance.getClass(), attributeName, currentToken, ctxt)
+        .orElseGet(() -> findResolvedFallbackAttributeType(entityInstance, attributeName, currentToken, ctxt));
   }
 
-  protected AttributeType findResolvedFallbackAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken) {
+  protected AttributeType findResolvedFallbackAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken, DeserializationContext ctxt) {
     if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
       // try to resolve DoMap generic type
-      JavaType entityType = findResolvedDoMapEntityType();
+      JavaType entityType = findResolvedDoMapEntityType(ctxt);
       // if unknown (e.g. Object) fallback to default handling according to JSON token
       if (entityType.getRawClass() != Object.class) {
         return AttributeType.ofDoValue(entityType);
@@ -264,15 +261,15 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     // resolve fallback attribute type by inspecting next JSON token
     if (currentToken == JsonToken.START_OBJECT) {
       // fallback to default handling, if no attribute definition could be found
-      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(DoEntity.class));
+      return AttributeType.ofDoValue(ctxt.constructType(DoEntity.class));
     }
     if (currentToken == JsonToken.START_ARRAY) {
       // array-like JSON structure is deserialized as raw DoList (using DoList as generic structure instead of DoSet or DoCollection)
-      return AttributeType.ofDoCollection(TypeFactory.defaultInstance().constructType(DoList.class));
+      return AttributeType.ofDoCollection(ctxt.constructType(DoList.class));
     }
     if (currentToken == JsonToken.VALUE_NUMBER_FLOAT) {
       // deserialize floating point numbers as BigDecimal
-      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(BigDecimal.class));
+      return AttributeType.ofDoValue(ctxt.constructType(BigDecimal.class));
     }
     // JSON scalar values are deserialized as raw object using default jackson typing
     return AttributeType.ofDoValue(TypeFactory.unknownType());
@@ -281,12 +278,12 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   /**
    * Lookup generic type parameter of DoMapEntity super class
    */
-  protected JavaType findResolvedDoMapEntityType() {
+  protected JavaType findResolvedDoMapEntityType(DeserializationContext ctxt) {
     JavaType type = m_handledType;
     while (type.getRawClass() != DoMapEntity.class) {
       if (type.getRawClass() == Object.class) {
         // Fallback: object-like JSON structure is deserialized as raw DoEntity
-        return TypeFactory.defaultInstance().constructType(DoEntity.class);
+        return ctxt.constructType(DoEntity.class);
       }
       type = type.getSuperClass();
     }
@@ -294,7 +291,7 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
     return type.getBindings().getBoundType(0);
   }
 
-  protected IDoEntity newObject(DeserializationContext ctxt, Class<? extends IDoEntity> entityType) throws IOException {
+  protected IDoEntity newObject(DeserializationContext ctxt, Class<? extends IDoEntity> entityType) throws JacksonException {
     if (entityType == IDoEntity.class) {
       // fallback to default DoEntity implementation, if handled entity type is IDoEntity (e.g. class instance is unspecified)
       return BEANS.get(DoEntity.class);
@@ -307,6 +304,6 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
       }
       return BEANS.get(entityType);
     }
-    throw JsonMappingException.from(ctxt, "Could not instantiate class, " + (entityType == null ? null : entityType.getName()) + " is not a Scout bean");
+    throw DatabindException.from(ctxt, "Could not instantiate class, " + (entityType == null ? null : entityType.getName()) + " is not a Scout bean");
   }
 }

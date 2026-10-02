@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,13 +9,12 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
 import java.util.Locale;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.ToStringSerializerBase;
 
 /**
  * Custom serializer for {@link Locale} using {@link Locale#toLanguageTag()} instead of {@link Locale#toString()}
@@ -25,23 +24,26 @@ import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
  *
  * @see <a href="https://github.com/FasterXML/jackson-databind/issues/1600">Issue</a>
  */
-public class DoLocaleSerializer extends ToStringSerializer {
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class DoLocaleSerializer extends ToStringSerializerBase {
 
   public DoLocaleSerializer() {
     super(Locale.class);
   }
 
   @Override
-  public boolean isEmpty(SerializerProvider prov, Object value) {
+  public boolean isEmpty(SerializationContext prov, Object value) {
     return value == null || ((Locale) value).toLanguageTag().isEmpty();
   }
 
   @Override
-  public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(Object value, JsonGenerator gen, SerializationContext provider) throws JacksonException {
     // No restriction on if current value is instance of IDoEntity because otherwise Locales used as value in a Map aren't correctly serialized.
     // Issue 1600 is fixed in 3.0, we enforce this behavior for Scout already.
     gen.writeString(((Locale) value).toLanguageTag());
+  }
+
+  @Override
+  public String valueToString(Object value) {
+    return value.toString();
   }
 }

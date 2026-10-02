@@ -160,21 +160,25 @@ import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.exc.InvalidDefinitionException;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.fasterxml.jackson.databind.exc.InvalidTypeIdException;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.exc.StreamReadException;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.DatabindException;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.MapperFeature;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.cfg.MapperBuilder;
+import tools.jackson.databind.exc.InvalidDefinitionException;
+import tools.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.databind.exc.InvalidTypeIdException;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Various test cases serializing and deserializing Scout data objects from/to JSON
@@ -215,9 +219,16 @@ public class JsonDataObjectsSerializationTest {
     s_dataObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).getObjectMapper();
     s_lenientDataObjectMapper = BEANS.get(JacksonLenientDataObjectMapper.class).getObjectMapper();
 
-    s_defaultJacksonObjectMapper = new ObjectMapper()
-        .setSerializationInclusion(Include.NON_DEFAULT)
-        .setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN))
+    s_defaultJacksonObjectMapper = createDefaultJacksonObjectMapperBuilder().build();
+  }
+
+  protected static MapperBuilder<?, ?> createDefaultJacksonObjectMapperBuilder() {
+    return JsonMapper.builder()
+        .changeDefaultPropertyInclusion(value ->
+            JsonInclude.Value.construct(
+                Include.NON_DEFAULT,
+                Include.NON_DEFAULT))
+        .defaultDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN))
         .enable(SerializationFeature.INDENT_OUTPUT)
         .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
         .enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
@@ -229,7 +240,7 @@ public class JsonDataObjectsSerializationTest {
    * POJO root class which contains a {@code DoValue<String>} element
    */
   @Test
-  public void testSerialize_DoValuePojo() throws Exception {
+  public void testSerialize_DoValuePojo() {
     TestDoValuePojo pojo = new TestDoValuePojo();
     pojo.setStringValue(DoValue.of("foo"));
     String json = s_dataObjectMapper.writeValueAsString(pojo);
@@ -253,7 +264,7 @@ public class JsonDataObjectsSerializationTest {
    * TestBigIntegerDo as root object (DoEntity), containing a {@code DoValue<BigInteger>} element
    */
   @Test
-  public void testSerialize_TestBigIntegerDo() throws Exception {
+  public void testSerialize_TestBigIntegerDo() {
     TestBigIntegerDo testDo = BEANS.get(TestBigIntegerDo.class);
     testDo.bigIntegerAttribute().set(new BigInteger("123456"));
     String json = s_dataObjectMapper.writeValueAsString(testDo);
@@ -314,7 +325,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EntityDoWithArrayDoValue() throws Exception {
+  public void testSerialize_EntityDoWithArrayDoValue() {
     TestEntityWithArrayDoValueDo testDo = BEANS.get(TestEntityWithArrayDoValueDo.class);
     testDo.stringArrayAttribute().set(new String[]{"one", "two", "three"});
     testDo.itemDoArrayAttribute().set(new TestItemDo[]{createTestItemDo("1", "foo"), createTestItemDo("2", "bar")});
@@ -382,8 +393,8 @@ public class JsonDataObjectsSerializationTest {
     assertEquals(DateUtility.truncDateToMonth(DATE_TRUNCATED), testDoMarshalled.getDateYearMonth());
   }
 
-  @Test(expected = JsonMappingException.class)
-  public void testSerialize_InvalidDateDo() throws Exception {
+  @Test(expected = DatabindException.class)
+  public void testSerialize_InvalidDateDo() {
     TestDateDo testDo = BEANS.get(TestDateDo.class).withInvalidDateFormat(DATE);
     s_dataObjectMapper.writeValueAsString(testDo);
   }
@@ -438,7 +449,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_NullDateDo() throws Exception {
+  public void testSerializeDeserialize_NullDateDo() {
     TestDateDo date = BEANS.get(TestDateDo.class).withDateDefault(null);
     String json = s_dataObjectMapper.writeValueAsString(date);
     assertJsonEquals("TestNullDateDo.json", json);
@@ -459,7 +470,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_BinaryResource() throws Exception {
+  public void testSerialize_BinaryResource() {
     TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBinaryResourceDo.json", json);
@@ -469,7 +480,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_BinaryResource_NullContent() throws Exception {
+  public void testSerialize_BinaryResource_NullContent() {
     TestBinaryResourceDo testDo = BEANS.get(TestBinaryResourceDo.class).withBrDefault(BINARY_RESOURCE_NULL_CONTENT);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestBinaryResourceDoNullContent.json", json);
@@ -556,7 +567,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_RenamedAttributeDo() throws Exception {
+  public void testSerializeDeserialize_RenamedAttributeDo() {
     TestRenamedAttributeDo testDo = BEANS.get(TestRenamedAttributeDo.class)
         .withAllAttribute(new BigDecimal("42"))
         .withDateAttribute(DATE)
@@ -574,7 +585,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_TestItemExDo() throws Exception {
+  public void testSerializeDeserialize_TestItemExDo() {
     TestItemExDo testDo = BEANS.get(TestItemExDo.class).withId("foo");
 
     String json = s_dataObjectMapper.writeValueAsString(testDo);
@@ -620,7 +631,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_Locale() throws Exception {
+  public void testSerializeDeserialize_Locale() {
     String jsonPlainLocale = s_dataObjectMapper.writeValueAsString(Locale.GERMANY);
     // All locales (whether wrapped within DoEntity structure or not) are serialized by custom Scout behavior, as they will when Jackson is upgraded to 3.0.
     // Issue 1600 (https://github.com/FasterXML/jackson-databind/issues/1600)
@@ -633,41 +644,36 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_ROOT_Locale() throws Exception {
-    try {
-      HashMap<Locale, String> localeMap = CollectionUtility.hashMap(
-          new ImmutablePair<>(Locale.ROOT, "Root"),
-          new ImmutablePair<>(Locale.forLanguageTag("de-CH"), "German, Switzerland"));
-      TestPojoWithLocaleProperties pojo = new TestPojoWithLocaleProperties();
-      pojo.setLocale1(Locale.ROOT);
-      pojo.setLocale2(Locale.forLanguageTag("de-CH"));
-      pojo.setLocaleStringMap(localeMap);
+  public void testSerializeDeserialize_ROOT_Locale() {
+    HashMap<Locale, String> localeMap = CollectionUtility.hashMap(
+        new ImmutablePair<>(Locale.ROOT, "Root"),
+        new ImmutablePair<>(Locale.forLanguageTag("de-CH"), "German, Switzerland"));
+    TestPojoWithLocaleProperties pojo = new TestPojoWithLocaleProperties();
+    pojo.setLocale1(Locale.ROOT);
+    pojo.setLocale2(Locale.forLanguageTag("de-CH"));
+    pojo.setLocaleStringMap(localeMap);
 
-      // disable ordering map entries by keys for the default jackson serializer as it expects
-      // the key object to implement java.lang.Comparable (which java.util.Locale does not).
-      s_defaultJacksonObjectMapper.disable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
+    // disable ordering map entries by keys for the default jackson serializer as it expects
+    // the key object to implement java.lang.Comparable (which java.util.Locale does not).
+    ObjectMapper defaultJacksonObjectMapper = createDefaultJacksonObjectMapperBuilder().disable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS).build();
 
-      String serializedDefaultJackson = s_defaultJacksonObjectMapper.writeValueAsString(pojo);
-      TestPojoWithLocaleProperties deserializedDefaultJackson = s_defaultJacksonObjectMapper.readValue(serializedDefaultJackson, TestPojoWithLocaleProperties.class);
-      assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_defaultJackson.json", serializedDefaultJackson);
-      assertNull(deserializedDefaultJackson.getLocale1()); // Include.NO_DEFAULT removes empty properties
-      assertThat(deserializedDefaultJackson.getLocale2(), is(Locale.forLanguageTag("de-CH")));
-      assertThat(deserializedDefaultJackson.getLocaleStringMap(), is(localeMap));
+    String serializedDefaultJackson = defaultJacksonObjectMapper.writeValueAsString(pojo);
+    TestPojoWithLocaleProperties deserializedDefaultJackson = defaultJacksonObjectMapper.readValue(serializedDefaultJackson, TestPojoWithLocaleProperties.class);
+    assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_defaultJackson.json", serializedDefaultJackson);
+    assertNull(deserializedDefaultJackson.getLocale1()); // Include.NO_DEFAULT removes empty properties
+    assertThat(deserializedDefaultJackson.getLocale2(), is(Locale.forLanguageTag("de-CH")));
+    assertThat(deserializedDefaultJackson.getLocaleStringMap(), is(localeMap));
 
-      String serializedScout = s_dataObjectMapper.writeValueAsString(pojo);
-      TestPojoWithLocaleProperties deserializedScout = s_dataObjectMapper.readValue(serializedScout, TestPojoWithLocaleProperties.class);
-      assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_scout.json", serializedScout);
-      assertThat(deserializedScout.getLocale1(), is(Locale.ROOT));
-      assertThat(deserializedScout.getLocale2(), is(Locale.forLanguageTag("de-CH")));
-      assertThat(deserializedScout.getLocaleStringMap(), is(localeMap));
-    }
-    finally {
-      s_defaultJacksonObjectMapper.enable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS);
-    }
+    String serializedScout = s_dataObjectMapper.writeValueAsString(pojo);
+    TestPojoWithLocaleProperties deserializedScout = s_dataObjectMapper.readValue(serializedScout, TestPojoWithLocaleProperties.class);
+    assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_scout.json", serializedScout);
+    assertThat(deserializedScout.getLocale1(), is(Locale.ROOT));
+    assertThat(deserializedScout.getLocale2(), is(Locale.forLanguageTag("de-CH")));
+    assertThat(deserializedScout.getLocaleStringMap(), is(localeMap));
   }
 
   @Test
-  public void testSerializeDeserialize_Currency() throws Exception {
+  public void testSerializeDeserialize_Currency() {
     String jsonPlainCurrency = s_dataObjectMapper.writeValueAsString(Currency.getInstance("CHF"));
     assertEquals("\"CHF\"", jsonPlainCurrency);
 
@@ -684,7 +690,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_CurrencyDo() throws Exception {
+  public void testSerializeDeserialize_CurrencyDo() {
     Map<Currency, String> currencyMap = new LinkedHashMap<>();
     currencyMap.put(Currency.getInstance("CHF"), "Switzerland");
     currencyMap.put(Currency.getInstance("EUR"), "Europe");
@@ -737,7 +743,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoValueOfObject() throws Exception {
+  public void testSerializeDeserialize_DoValueOfObject() {
     // String
     TestEntityWithDoValueOfObjectDo stringObj = BEANS.get(TestEntityWithDoValueOfObjectDo.class).withObject("test-string");
     String json = s_dataObjectMapper.writeValueAsString(stringObj);
@@ -832,7 +838,7 @@ public class JsonDataObjectsSerializationTest {
    * (i.e. the attribute for the inner DO entity is not defined in the outer DO entity class).
    */
   @Test
-  public void testSerializeDeserialize_TypedUntypedWithoutTypeInformation() throws Exception {
+  public void testSerializeDeserialize_TypedUntypedWithoutTypeInformation() {
     IDoEntity untyped = BEANS.get(DoEntityBuilder.class)
         .put("stringId", "string-id")
         .putList("stringIdList", "string-id-1", "string-id-2")
@@ -856,7 +862,7 @@ public class JsonDataObjectsSerializationTest {
    * (i.e. the attribute for the inner DO entity is not defined in the outer DO entity class).
    */
   @Test
-  public void testSerializeDeserialize_UntypedTypedWithoutTypeInformation() throws Exception {
+  public void testSerializeDeserialize_UntypedTypedWithoutTypeInformation() {
     TestEntityWithVariousIdsDo typed = BEANS.get(TestEntityWithVariousIdsDo.class)
         .withStringId(FixtureStringId.of("unqualified-string-id"))
         .withIId(FixtureStringId.of("qualified-string-id"));
@@ -880,7 +886,7 @@ public class JsonDataObjectsSerializationTest {
    * the attribute for the inner DO entity is defined in the outer DO entity class).
    */
   @Test
-  public void testSerializeDeserialize_TypedUntypedWithTypeInformation() throws Exception {
+  public void testSerializeDeserialize_TypedUntypedWithTypeInformation() {
     TestTypedUntypedOuterDo outer = BEANS.get(TestTypedUntypedOuterDo.class)
         .withStringId(FixtureStringId.of("unqualified-string-id"))
         .withIId(FixtureStringId.of("qualifiedid"));
@@ -907,7 +913,7 @@ public class JsonDataObjectsSerializationTest {
    * the attribute for the inner DO entity is defined in the outer DO entity class).
    */
   @Test
-  public void testSerializeDeserialize_UntypedTypedWithTypeInformation() throws Exception {
+  public void testSerializeDeserialize_UntypedTypedWithTypeInformation() {
     TestTypedUntypedOuterDo outer = BEANS.get(TestTypedUntypedOuterDo.class)
         .withStringId(FixtureStringId.of("unqualified-string-id"))
         .withIId(FixtureStringId.of("qualifiedid"));
@@ -935,7 +941,7 @@ public class JsonDataObjectsSerializationTest {
    * POJO object with two strings, using one regular setter and one with() setter method
    */
   @Test
-  public void testSerializeDeserialize_TestStringPojo() throws Exception {
+  public void testSerializeDeserialize_TestStringPojo() {
     TestStringPojo pojo = new TestStringPojo();
     pojo.withString("foo");
     pojo.setString2("bar");
@@ -949,7 +955,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_StringHolder() throws Exception {
+  public void testSerializeDeserialize_StringHolder() {
     TestStringHolderPojo pojo = new TestStringHolderPojo();
     pojo.setStringHolder(new TestStringHolder());
     pojo.getStringHolder().setString("foo");
@@ -962,11 +968,12 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_PojoWithJacksonAnnotations() throws Exception {
+  public void testSerializeDeserialize_PojoWithJacksonAnnotations() {
     // custom DoObjectMapper configured like default object mapper
-    @SuppressWarnings("deprecation") final ObjectMapper customDoObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperInstance(false)
+    final ObjectMapper customDoObjectMapper = BEANS.get(JacksonPrettyPrintDataObjectMapper.class).createObjectMapperBuilder(false)
         .enable(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY)
-        .setDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN));
+        .defaultDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN))
+        .build();
 
     TestPojoWithJacksonAnnotations pojo = new TestPojoWithJacksonAnnotations();
     pojo.setDefaultDate(DATE);
@@ -987,7 +994,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ Raw data object test cases ------------------------------------
 
   @Test
-  public void testSerialize_SimpleDoRaw() throws Exception {
+  public void testSerialize_SimpleDoRaw() {
     DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("bigIntegerAttribute", DoValue.of(new BigInteger("123456")));
     testDo.put("bigDecimalAttribute", new BigDecimal("789.0"));
@@ -1007,7 +1014,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_SimpleDoWithPojoRaw() throws Exception {
+  public void testSerialize_SimpleDoWithPojoRaw() {
     DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("bigIntegerAttribute", DoValue.of(new BigInteger("123456")));
     testDo.put("bigDecimalAttribute", new BigDecimal("789.0"));
@@ -1050,14 +1057,14 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EmptyRawDo() throws Exception {
+  public void testSerialize_EmptyRawDo() {
     DoEntity testDo = BEANS.get(DoEntity.class);
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestEmptyDoEntity.json", json);
   }
 
   @Test
-  public void testSerialize_EmptyAttributeNameDo() throws Exception {
+  public void testSerialize_EmptyAttributeNameDo() {
     DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("", "");
     String json = s_dataObjectMapper.writeValueAsString(testDo);
@@ -1065,7 +1072,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EntityWithEmptyObjectDo() throws Exception {
+  public void testSerialize_EntityWithEmptyObjectDo() {
     DoEntity testDo = BEANS.get(DoEntity.class);
     testDo.put("emptyObject", new TestEmptyObject());
     testDo.put("emptyList", Arrays.asList());
@@ -1086,7 +1093,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_MixedRawDo() throws Exception {
+  public void testSerialize_MixedRawDo() {
     TestMixedRawBigIntegerDo dataObject = new TestMixedRawBigIntegerDo();
     dataObject.withBigIntegerAttribute(new BigInteger("123456"));
     dataObject.put("bigDecimalAttribute", new BigDecimal("789.0"));
@@ -1180,7 +1187,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testDeserialze_EntityWithNestedDoNodeRaw() throws Exception {
+  public void testDeserialize_EntityWithNestedDoNodeRaw() throws Exception {
     String jsonInput = readResourceAsString("TestEntityWithNestedDoNodeRaw.json");
     TestComplexEntityDo testDo = BEANS.get(TestComplexEntityDo.class);
     testDo.itemAttribute().set(BEANS.get(TestItemDo.class).withId("1234-3").withStringAttribute("bar"));
@@ -1201,8 +1208,8 @@ public class JsonDataObjectsSerializationTest {
     List<String> valuesWithExplicitType = entity.getList("stringArrayAttribute", String.class);
     assertEquals(expected, valuesWithExplicitType);
 
-    List<String> valuesWithInferedType = entity.getList("stringArrayAttribute", String.class);
-    assertEquals(expected, valuesWithInferedType);
+    List<String> valuesWithInferredType = entity.getList("stringArrayAttribute", String.class);
+    assertEquals(expected, valuesWithInferredType);
 
     List<DoEntity> itemDoArray = entity.getList("itemDoArrayAttribute", DoEntity.class);
     assertEquals("1", itemDoArray.get(0).get("id"));
@@ -1243,7 +1250,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ Raw data object test cases with type name ------------------------
 
   @Test
-  public void testSerialize_TypedEntity() throws Exception {
+  public void testSerialize_TypedEntity() {
     DoEntity typedEntity = BEANS.get(DoEntity.class);
     typedEntity.put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestMyCustomType");
     typedEntity.put("date", DATE);
@@ -1254,7 +1261,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EmptyTypedEntity() throws Exception {
+  public void testSerialize_EmptyTypedEntity() {
     DoEntity typedEntity = BEANS.get(DoEntity.class);
     typedEntity.put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestMyCustomTypeEmpty");
     String json = s_dataObjectMapper.writeValueAsString(typedEntity);
@@ -1321,7 +1328,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EntityWithLists() throws Exception {
+  public void testSerialize_EntityWithLists() {
     TestEntityWithListsDo testDo = new TestEntityWithListsDo();
 
     List<TestItemDo> list = new ArrayList<>();
@@ -1355,7 +1362,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EntityWithEmptyLists() throws Exception {
+  public void testSerialize_EntityWithEmptyLists() {
     TestEntityWithListsDo testDo = new TestEntityWithListsDo();
     List<TestItemDo> list = new ArrayList<>();
     testDo.withItemsListAttribute(list);
@@ -1367,7 +1374,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EntityWithOneEmptyList() throws Exception {
+  public void testSerialize_EntityWithOneEmptyList() {
     TestEntityWithListsDo testDo = new TestEntityWithListsDo();
     List<TestItemDo> list = new ArrayList<>();
     testDo.withItemsListAttribute(list);
@@ -1387,21 +1394,21 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_EmptyDoList() throws Exception {
+  public void testSerialize_EmptyDoList() {
     testSerialize_EmptyDoCollection(new DoList<>());
   }
 
   @Test
-  public void testSerialize_EmptyDoSet() throws Exception {
+  public void testSerialize_EmptyDoSet() {
     testSerialize_EmptyDoCollection(new DoSet<>());
   }
 
   @Test
-  public void testSerialize_EmptyDoCollection() throws Exception {
+  public void testSerialize_EmptyDoCollection() {
     testSerialize_EmptyDoCollection(new DoCollection<>());
   }
 
-  protected void testSerialize_EmptyDoCollection(IDoCollection<String, ?> collection) throws JsonProcessingException {
+  protected void testSerialize_EmptyDoCollection(IDoCollection<String, ?> collection) throws JacksonException {
     String json = s_dataObjectMapper.writeValueAsString(collection);
     assertJsonEquals("TestEmptyDoCollection.json", json);
   }
@@ -1428,21 +1435,21 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_StringDoList() throws Exception {
+  public void testSerialize_StringDoList() {
     testSerialize_StringIDoCollection(new DoList<>());
   }
 
   @Test
-  public void testSerialize_StringDoSet() throws Exception {
+  public void testSerialize_StringDoSet() {
     testSerialize_StringIDoCollection(new DoSet<>());
   }
 
   @Test
-  public void testSerialize_StringDoCollection() throws Exception {
+  public void testSerialize_StringDoCollection() {
     testSerialize_StringIDoCollection(new DoCollection<>());
   }
 
-  protected void testSerialize_StringIDoCollection(IDoCollection<String, ?> collection) throws JsonProcessingException {
+  protected void testSerialize_StringIDoCollection(IDoCollection<String, ?> collection) throws JacksonException {
     collection.add("foo");
     String json = s_dataObjectMapper.writeValueAsString(collection);
     assertJsonEquals("TestStringDoCollection.json", json);
@@ -1471,21 +1478,21 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerialize_TestItemDoList() throws Exception {
+  public void testSerialize_TestItemDoList() {
     testSerialize_TestItemIDoCollection(new DoList<>());
   }
 
   @Test
-  public void testSerialize_TestItemDoSet() throws Exception {
+  public void testSerialize_TestItemDoSet() {
     testSerialize_TestItemIDoCollection(new DoSet<>());
   }
 
   @Test
-  public void testSerialize_TestItemDoCollection() throws Exception {
+  public void testSerialize_TestItemDoCollection() {
     testSerialize_TestItemIDoCollection(new DoCollection<>());
   }
 
-  protected void testSerialize_TestItemIDoCollection(IDoCollection<TestItemDo, ?> collection) throws JsonProcessingException {
+  protected void testSerialize_TestItemIDoCollection(IDoCollection<TestItemDo, ?> collection) throws JacksonException {
     collection.add(createTestItemDo("foo", "bar"));
     String json = s_dataObjectMapper.writeValueAsString(collection);
     assertJsonEquals("TestItemDoCollection.json", json);
@@ -1532,7 +1539,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ Complex DoEntity test cases ------------------------------------
 
   @Test
-  public void testSerialize_ComplexDoEntity() throws Exception {
+  public void testSerialize_ComplexDoEntity() {
     TestComplexEntityDo testDo = createTestDo();
     String doJson = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestComplexEntityDo.json", doJson);
@@ -1563,7 +1570,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotation() throws Exception {
+  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotation() {
     TestWithoutTypeNameDo entity = BEANS.get(TestWithoutTypeNameDo.class)
         .withId("foo")
         .withValue("bar");
@@ -1581,7 +1588,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotationSubclass() throws Exception {
+  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotationSubclass() {
     TestWithoutTypeNameDo entity = BEANS.get(TestWithoutTypeNameSubclassDo.class)
         .withId("foo")
         .withValue("bar")
@@ -1604,7 +1611,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotationSubclassWithTypeName() throws Exception {
+  public void testSerializeDeserialize_EntityWithoutTypeNameAnnotationSubclassWithTypeName() {
     TestWithoutTypeNameDo entity = BEANS.get(TestWithoutTypeNameSubclassWithTypeNameDo.class)
         .withId("foo")
         .withValue("bar")
@@ -1617,7 +1624,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithEmptyTypeName() throws Exception {
+  public void testSerializeDeserialize_EntityWithEmptyTypeName() {
     TestWithEmptyTypeNameDo entity = BEANS.get(TestWithEmptyTypeNameDo.class)
         .withId("foo2")
         .withValue("bar2");
@@ -1634,7 +1641,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_CollectionsIDoEntityDo() throws Exception {
+  public void testSerializeDeserialize_CollectionsIDoEntityDo() {
     Collection<IDoEntity> coll = new ArrayList<>();
     coll.add(createTestItemDo("collection", "1"));
     coll.add(createTestItemDo("collection", "2"));
@@ -1648,7 +1655,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_CollectionsIDoEntityDoWithoutTypename() throws Exception {
+  public void testSerializeDeserialize_CollectionsIDoEntityDoWithoutTypename() {
     List<IDoEntity> entities = List.of(
         BEANS.get(TestWithoutTypeNameDo.class).withId("foo"),
         BEANS.get(TestWithoutTypeNameSubclassDo.class).withId("bar"),
@@ -1664,7 +1671,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithAttributeWithoutTypename() throws Exception {
+  public void testSerializeDeserialize_EntityWithAttributeWithoutTypename() {
     TestEntityWithAttributesWithoutTypeNameDo entity = BEANS.get(TestEntityWithAttributesWithoutTypeNameDo.class)
         .withListAttribute(
             BEANS.get(TestWithoutTypeNameDo.class).withId("withoutName1"),
@@ -1682,14 +1689,14 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ DoEntity with collections test cases ------------------------------------
 
   @Test
-  public void testSerialize_TestCollectionsDo() throws Exception {
+  public void testSerialize_TestCollectionsDo() {
     TestCollectionsDo testDo = createTestCollectionsDo();
     String json = s_dataObjectMapper.writeValueAsString(testDo);
     assertJsonEquals("TestCollectionsDo.json", json);
   }
 
   @Test
-  public void testSerialize_TestCollectionsDoNullValues() throws Exception {
+  public void testSerialize_TestCollectionsDoNullValues() {
     TestCollectionsDo testDo = BEANS.get(TestCollectionsDo.class)
         .withItemDoAttribute(null)
         .withItemCollectionAttribute(null)
@@ -1714,48 +1721,48 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testDeserialize_TestCollectionsDo() throws Exception {
     String json = readResourceAsString("TestCollectionsDo.json");
-    TestCollectionsDo doMarhalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
+    TestCollectionsDo doMarshalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
     TestCollectionsDo expectedDo = createTestCollectionsDo();
-    assertEqualsWithComparisonFailure(expectedDo, doMarhalled);
+    assertEqualsWithComparisonFailure(expectedDo, doMarshalled);
   }
 
   @Test
   public void testDeserialize_TestCollectionsDoNullValues() throws Exception {
     String json = readResourceAsString("TestCollectionsDoNullValues.json");
-    TestCollectionsDo doMarhalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
+    TestCollectionsDo doMarshalled = s_dataObjectMapper.readValue(json, TestCollectionsDo.class);
 
-    assertNull(doMarhalled.getItemDoAttribute());
-    assertNull(doMarhalled.getItemCollectionAttribute());
-    assertNull(doMarhalled.getItemListAttribute());
-    assertNull(doMarhalled.getItemPojoAttribute());
-    assertNull(doMarhalled.getItemPojoCollectionAttribute());
-    assertNull(doMarhalled.getItemPojoListAttribute());
-    assertTrue(doMarhalled.getItemDoListAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemPojoDoListAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemPojo2DoListAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemDoSetAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemPojoDoSetAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemPojo2DoSetAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemDoCollectionAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemPojoDoCollectionAttribute().isEmpty());
-    assertTrue(doMarhalled.getItemPojo2DoCollectionAttribute().isEmpty());
+    assertNull(doMarshalled.getItemDoAttribute());
+    assertNull(doMarshalled.getItemCollectionAttribute());
+    assertNull(doMarshalled.getItemListAttribute());
+    assertNull(doMarshalled.getItemPojoAttribute());
+    assertNull(doMarshalled.getItemPojoCollectionAttribute());
+    assertNull(doMarshalled.getItemPojoListAttribute());
+    assertTrue(doMarshalled.getItemDoListAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemPojoDoListAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemPojo2DoListAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemDoSetAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemPojoDoSetAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemPojo2DoSetAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemDoCollectionAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemPojoDoCollectionAttribute().isEmpty());
+    assertTrue(doMarshalled.getItemPojo2DoCollectionAttribute().isEmpty());
 
-    json = s_dataObjectMapper.writeValueAsString(doMarhalled);
+    json = s_dataObjectMapper.writeValueAsString(doMarshalled);
     assertJsonEquals("TestCollectionsDoNullValuesEmptyDoList.json", json);
   }
 
   @Test
   public void testSerializeDeserialize_TestCollectionsDoRaw() throws Exception {
     String json = readResourceAsString("TestCollectionsDoRaw.json");
-    DoEntity doMarhalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    DoEntity doMarshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
 
     TestCollectionsDo expectedDo = createTestCollectionsDo();
-    assertEquals(expectedDo.getItemDoAttribute().getId(), doMarhalled.get("itemDoAttribute", DoEntity.class).get("id"));
+    assertEquals(expectedDo.getItemDoAttribute().getId(), doMarshalled.get("itemDoAttribute", DoEntity.class).get("id"));
 
-    List<DoEntity> list = doMarhalled.getList("itemDoListAttribute", DoEntity.class);
+    List<DoEntity> list = doMarshalled.getList("itemDoListAttribute", DoEntity.class);
     assertEquals(expectedDo.getItemDoListAttribute().get(0).getId(), list.get(0).get("id"));
 
-    String serialized = s_dataObjectMapper.writeValueAsString(doMarhalled);
+    String serialized = s_dataObjectMapper.writeValueAsString(doMarshalled);
     s_testHelper.assertJsonEquals(json, serialized);
   }
 
@@ -1797,7 +1804,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithCollectionRaw() throws Exception {
+  public void testSerializeDeserialize_EntityWithCollectionRaw() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute1", Arrays.asList("list-item-1", "list-item-2"));
     entity.put("attribute2", Arrays.asList(123, 45.69));
@@ -1842,7 +1849,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_RawEntityWithDouble() throws Exception {
+  public void testSerializeDeserialize_RawEntityWithDouble() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute", 45.69);
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -1851,7 +1858,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_RawEntityWithDoubleList() throws Exception {
+  public void testSerializeDeserialize_RawEntityWithDoubleList() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute", List.of(45.69));
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -1860,7 +1867,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_TestMapDo() throws Exception {
+  public void testSerializeDeserialize_TestMapDo() {
     TestMapDo mapDo = new TestMapDo();
     Map<String, String> stringStringMap = new HashMap<>();
     stringStringMap.put("foo1", "bar");
@@ -1946,7 +1953,7 @@ public class JsonDataObjectsSerializationTest {
    * Illegal case: using a DO entity as a key in a map.
    */
   @Test
-  public void testSerialize_illegalKeyTypeMap() throws Exception {
+  public void testSerialize_illegalKeyTypeMap() {
     DoEntity entity = BEANS.get(DoEntity.class);
     Map<TestItemDo, String> illegalKeyTypeMap = new HashMap<>();
     illegalKeyTypeMap.put(createTestItemDo("key", "value"), "foo");
@@ -1963,7 +1970,7 @@ public class JsonDataObjectsSerializationTest {
    * Illegal case: using a pojo as a key in a map.
    */
   @Test
-  public void testSerialize_illegalKeyTypeMap2() throws Exception {
+  public void testSerialize_illegalKeyTypeMap2() {
     DoEntity entity = BEANS.get(DoEntity.class);
     Map<TestStringPojo, String> illegalKeyTypeMap = new HashMap<>();
     illegalKeyTypeMap.put(new TestStringPojo().withString("id"), "foo");
@@ -1976,15 +1983,15 @@ public class JsonDataObjectsSerializationTest {
     assertNotEquals(illegalKeyTypeMap.keySet().iterator().next(), marshalledMapAttribute.allNodes().keySet().iterator().next()); // TestItemDo cannot be used as key, is serialized using toString() default serializer
   }
 
-  @Test(expected = JsonMappingException.class)
-  public void testSerialize_nullKeyMap() throws Exception {
+  @Test(expected = DatabindException.class)
+  public void testSerialize_nullKeyMap() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("mapAttribute", Collections.singletonMap(null, "foo"));
     s_dataObjectMapper.writeValueAsString(entity);
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithMapRaw() throws Exception {
+  public void testSerializeDeserialize_EntityWithMapRaw() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("mapAttribute1", Collections.singletonMap("key", "value"));
     entity.put("mapAttribute2", Collections.singletonMap(123, 45.69));
@@ -2009,7 +2016,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_TestSetDo() throws Exception {
+  public void testSerializeDeserialize_TestSetDo() {
     TestSetDo setDo = createTestSetDo();
     String json = s_dataObjectMapper.writeValueAsString(setDo);
     assertJsonEquals("TestSetDo.json", json);
@@ -2044,13 +2051,13 @@ public class JsonDataObjectsSerializationTest {
   @Test
   public void testSerializeDeserialize_TestSetDoRaw() throws Exception {
     String json = readResourceAsString("TestSetDoRaw.json");
-    DoEntity doMarhalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+    DoEntity doMarshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
 
     TestSetDo expectedDo = createTestSetDo();
-    assertTrue(CollectionUtility.equalsCollection(expectedDo.getStringSetAttribute(), doMarhalled.getList("stringSetAttribute"), false));
-    assertTrue(CollectionUtility.equalsCollection(expectedDo.getIntegerSetAttribute(), doMarhalled.getList("integerSetAttribute"), false));
+    assertTrue(CollectionUtility.equalsCollection(expectedDo.getStringSetAttribute(), doMarshalled.getList("stringSetAttribute"), false));
+    assertTrue(CollectionUtility.equalsCollection(expectedDo.getIntegerSetAttribute(), doMarshalled.getList("integerSetAttribute"), false));
 
-    String serialized = s_dataObjectMapper.writeValueAsString(doMarhalled);
+    String serialized = s_dataObjectMapper.writeValueAsString(doMarshalled);
     s_testHelper.assertJsonEquals(json, serialized);
   }
 
@@ -2084,7 +2091,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithSetRaw() throws Exception {
+  public void testSerializeDeserialize_EntityWithSetRaw() {
     DoEntity entity = BEANS.get(DoEntity.class);
     Set<String> stringSet = new LinkedHashSet<>();
     stringSet.add("foo");
@@ -2099,7 +2106,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_TestSetDoWithDuplicateValues() throws Exception {
+  public void testSerializeDeserialize_TestSetDoWithDuplicateValues() {
     // simulate JSON for TestSetDo which contains duplicated values for stringSetAttribute
     DoEntity setDo = BEANS.get(DoEntity.class);
     setDo.put(ScoutDataObjectModule.DEFAULT_TYPE_ATTRIBUTE_NAME, "TestSet");
@@ -2121,7 +2128,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ DoMapEntity test cases ------------------------------------
 
   @Test
-  public void testSerializeDeserialize_DoMapString() throws Exception {
+  public void testSerializeDeserialize_DoMapString() {
     TestDoMapStringDo mapDo = BEANS.get(TestDoMapStringDo.class);
     mapDo.put("mapAttribute1", "foo");
     mapDo.put("mapAttribute2", "bar");
@@ -2139,7 +2146,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapEntity() throws Exception {
+  public void testSerializeDeserialize_DoMapEntity() {
     TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
     mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
     mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
@@ -2159,7 +2166,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapObject_DoEntity() throws Exception {
+  public void testSerializeDeserialize_DoMapObject_DoEntity() {
     TestDoMapObjectDo mapDo = BEANS.get(TestDoMapObjectDo.class);
     mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
     mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
@@ -2182,7 +2189,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapObject_ListEntity() throws Exception {
+  public void testSerializeDeserialize_DoMapObject_ListEntity() {
     TestDoMapObjectDo mapDo = BEANS.get(TestDoMapObjectDo.class);
     mapDo.putList("mapAttribute1", List.of(createTestItemDo("id-1", "value-1"), createTestItemDo("id-2", "value-2")));
     mapDo.withCount(42);
@@ -2206,7 +2213,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapEntityRaw() throws Exception {
+  public void testSerializeDeserialize_DoMapEntityRaw() {
     DoEntity mapDo = BEANS.get(DoEntity.class);
     mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
     mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
@@ -2240,7 +2247,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapListEntity() throws Exception {
+  public void testSerializeDeserialize_DoMapListEntity() {
     TestDoMapListEntityDo mapDo = BEANS.get(TestDoMapListEntityDo.class);
     mapDo.put("mapAttribute1", CollectionUtility.arrayList(createTestItemDo("id-1a", "value-1a"), createTestItemDo("id-1b", "value-1b")));
     mapDo.put("mapAttribute2", CollectionUtility.arrayList(createTestItemDo("id-2a", "value-2a"), createTestItemDo("id-2b", "value-2b")));
@@ -2258,7 +2265,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapListEntityRaw() throws Exception {
+  public void testSerializeDeserialize_DoMapListEntityRaw() {
     DoEntity mapDo = BEANS.get(DoEntity.class);
     mapDo.put("mapAttribute1", CollectionUtility.arrayList(createTestItemDo("id-1a", "value-1a"), createTestItemDo("id-1b", "value-1b")));
     mapDo.put("mapAttribute2", CollectionUtility.arrayList(createTestItemDo("id-2a", "value-2a"), createTestItemDo("id-2b", "value-2b")));
@@ -2286,7 +2293,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapDoMapString() throws Exception {
+  public void testSerializeDeserialize_DoMapDoMapString() {
     TestDoMapStringDo mapDo = BEANS.get(TestDoMapStringDo.class);
     mapDo.put("mapAttribute1", "foo");
     mapDo.put("mapAttribute2", "bar");
@@ -2319,7 +2326,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoMapDoMapEntity() throws Exception {
+  public void testSerializeDeserialize_DoMapDoMapEntity() {
     TestDoMapEntityDo mapDo = BEANS.get(TestDoMapEntityDo.class);
     mapDo.put("mapAttribute1", createTestItemDo("id-1", "value-1"));
     mapDo.put("mapAttribute2", createTestItemDo("id-2", "value-2"));
@@ -2363,7 +2370,7 @@ public class JsonDataObjectsSerializationTest {
    * </pre>
    */
   @Test
-  public void testSerialize_TestPersonDo() throws Exception {
+  public void testSerialize_TestPersonDo() {
     TestPersonDo personDo = createTestPersonDo();
     String json = s_dataObjectMapper.writeValueAsString(personDo);
     assertJsonEquals("TestPersonDo.json", json);
@@ -2415,7 +2422,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoEntityRawWithNestedPersons() throws Exception {
+  public void testSerializeDeserialize_DoEntityRawWithNestedPersons() {
     DoEntity entity = BEANS.get(DoEntity.class);
     TestPersonDo person = createTestPersonDo();
     entity.put("person", person);
@@ -2579,32 +2586,32 @@ public class JsonDataObjectsSerializationTest {
 
   // ------------------------------------ exception handling tests ------------------------------------
 
-  @Test(expected = JsonMappingException.class)
-  public void testMappingException() throws Exception {
+  @Test(expected = DatabindException.class)
+  public void testMappingException() {
     s_dataObjectMapper.readValue("[]", DoEntity.class);
   }
 
-  @Test(expected = JsonParseException.class)
-  public void testParseException() throws Exception {
+  @Test(expected = StreamReadException.class)
+  public void testParseException() {
     s_dataObjectMapper.readValue("[", DoEntity.class);
   }
 
   @Test
-  public void testInvalidAttributeJsonMappingException() {
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": 42}", DateValueDo.class));
+  public void testInvalidAttributeDatabindException() {
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue("{\"value\": 42}", DateValueDo.class));
   }
 
   @Test
-  public void testInvalidAttributeJsonMappingExceptionMessage() {
-    JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
+  public void testInvalidAttributeDatabindExceptionMessage() {
+    DatabindException exception = assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue("{\"value\": \"abc\"}", IntegerValueDo.class));
     assertTrue(exception.getMessage().startsWith("Failed to deserialize attribute 'value' of entity org.eclipse.scout.rt.dataobject.value.IntegerValueDo, value was abc"));
   }
 
   // ------------------------------------ performance tests ------------------------------------
 
   @Test
-  public void testGeneratedLargeJsonObject() throws Exception {
+  public void testGeneratedLargeJsonObject() {
     DoEntity entity = BEANS.get(DoEntity.class);
     // generate some complex, random JSON structure
     for (int i = 0; i < 1000; i++) {
@@ -2624,7 +2631,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ generic attribute definition tests -----------------------------
 
   @Test
-  public void testSerializeDeserialize_EntityWithGenericSimpleValues() throws Exception {
+  public void testSerializeDeserialize_EntityWithGenericSimpleValues() {
     TestEntityWithGenericValuesDo genericDo = BEANS.get(TestEntityWithGenericValuesDo.class);
     TestGenericDo<String> stringValueDo = new TestGenericDo<>();
     stringValueDo.withGenericAttribute("foo");
@@ -2647,7 +2654,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_GenericDoComplexValues() throws Exception {
+  public void testSerializeDeserialize_GenericDoComplexValues() {
     TestGenericDo<TestItemDo> itemValueDo = new TestGenericDo<>();
     itemValueDo.withGenericAttribute(createTestItemDo("foo-id", "foo-attribute"));
 
@@ -2675,7 +2682,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityWithGenericDoComplexValues() throws Exception {
+  public void testSerializeDeserialize_EntityWithGenericDoComplexValues() {
     TestEntityWithGenericValuesDo genericDo = BEANS.get(TestEntityWithGenericValuesDo.class);
     TestGenericDo<TestItemDo> itemValueDo = new TestGenericDo<>();
     itemValueDo.withGenericAttribute(createTestItemDo("foo-id", "foo-attribute"));
@@ -2696,7 +2703,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_GenericDoListValues() throws Exception {
+  public void testSerializeDeserialize_GenericDoListValues() {
     TestGenericDo<List<TestItemDo>> itemsValueDo = new TestGenericDo<>();
     List<TestItemDo> items = new ArrayList<>();
     items.add(createTestItemDo("foo-id-1", "foo-attribute-1"));
@@ -2716,7 +2723,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_GenericDoListAttribute() throws Exception {
+  public void testSerializeDeserialize_GenericDoListAttribute() {
     TestGenericDo<TestItemDo> itemsDo = new TestGenericDo<>();
     List<TestItemDo> list = new ArrayList<>();
     list.add(createTestItemDo("foo-id-1", "foo-attribute-1"));
@@ -2747,7 +2754,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_GenericDoMapAttribute() throws Exception {
+  public void testSerializeDeserialize_GenericDoMapAttribute() {
     TestGenericDo<TestItemDo> itemsDo = new TestGenericDo<>();
     Map<String, TestItemDo> map = new LinkedHashMap<>();
     map.put("key1", createTestItemDo("foo-id-1", "foo-attribute-1"));
@@ -2761,11 +2768,11 @@ public class JsonDataObjectsSerializationTest {
     // read value with complete generic type definition
     // read value with incomplete generic type definition
     // read value with no generic type definition
-    // -> would all fail in comparison because TestItemDo cannot be deserialized anymore, resulting in a linked hash map instead of a concret DO
+    // -> would all fail in comparison because TestItemDo cannot be deserialized anymore, resulting in a linked hash map instead of a concrete DO
   }
 
   @Test
-  public void testSerializeDeserialize_GenericMap() throws Exception {
+  public void testSerializeDeserialize_GenericMap() {
     TestGenericDo<Map<String, TestItemDo>> itemsMapDo = new TestGenericDo<>();
 
     Map<String, TestItemDo> map = new LinkedHashMap<>();
@@ -2783,7 +2790,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_GenericDoEntityMap() throws Exception {
+  public void testSerializeDeserialize_GenericDoEntityMap() {
     TestGenericDoEntityMapDo<Map<String, TestItemDo>> itemsMapDo = new TestGenericDoEntityMapDo<>();
 
     Map<String, TestItemDo> map = new LinkedHashMap<>();
@@ -2801,7 +2808,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoEntityWithContributions() throws Exception {
+  public void testSerializeDeserialize_DoEntityWithContributions() {
     TestItemDo doEntity = BEANS.get(TestItemDo.class).withId("123456789");
     TestItemContributionOneDo contributionOne = doEntity.contribution(TestItemContributionOneDo.class).withName("one");
     TestItemContributionTwoDo contributionTwo = doEntity.contribution(TestItemContributionTwoDo.class).withName("two");
@@ -2912,23 +2919,23 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializationValidation_DoEntityWithContribution() throws JsonProcessingException {
+  public void testSerializationValidation_DoEntityWithContribution() throws JacksonException {
     serializeContribution(TestItemDo.class, TestItemContributionOneDo.class);
     serializeContribution(TestItemDo.class, TestItemContributionTwoDo.class);
 
-    assertThrows(JsonMappingException.class, () -> serializeContribution(TestItemDo.class, TestCoreExample1DoContributionFixtureDo.class));
-    assertThrows(JsonMappingException.class, () -> serializeContribution(TestItemDo.class, TestCoreExample1DoContributionFixtureDo.class));
-    assertThrows(JsonMappingException.class, () -> serializeContribution(TestItemDo.class, TestProjectExample1ContributionFixtureDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(TestItemDo.class, TestCoreExample1DoContributionFixtureDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(TestItemDo.class, TestCoreExample1DoContributionFixtureDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(TestItemDo.class, TestProjectExample1ContributionFixtureDo.class));
 
     // not using BEANS.get because bean is replaced by ProjectFixtureDo (only for validation, not a real case this way)
-    assertThrows(JsonMappingException.class, () -> serializeContribution(new TestCoreExample1Do(), TestItemContributionOneDo.class));
-    assertThrows(JsonMappingException.class, () -> serializeContribution(new TestCoreExample1Do(), TestItemContributionTwoDo.class));
-    assertThrows(JsonMappingException.class, () -> serializeContribution(new TestCoreExample1Do(), TestProjectExample1ContributionFixtureDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(new TestCoreExample1Do(), TestItemContributionOneDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(new TestCoreExample1Do(), TestItemContributionTwoDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(new TestCoreExample1Do(), TestProjectExample1ContributionFixtureDo.class));
     serializeContribution(new TestCoreExample1Do(), TestCoreExample1DoContributionFixtureDo.class);
 
     // using subclasses data object
-    assertThrows(JsonMappingException.class, () -> serializeContribution(TestProjectExample1Do.class, TestItemContributionOneDo.class));
-    assertThrows(JsonMappingException.class, () -> serializeContribution(TestProjectExample1Do.class, TestItemContributionTwoDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(TestProjectExample1Do.class, TestItemContributionOneDo.class));
+    assertThrows(DatabindException.class, () -> serializeContribution(TestProjectExample1Do.class, TestItemContributionTwoDo.class));
     serializeContribution(TestProjectExample1Do.class, TestCoreExample1DoContributionFixtureDo.class);
     serializeContribution(TestProjectExample1Do.class, TestProjectExample1ContributionFixtureDo.class);
 
@@ -2940,7 +2947,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ entity with IDoEntity interface definition tests -----------------------------
 
   @Test
-  public void testSerializeDeserialize_DoEntityWithInterface() throws Exception {
+  public void testSerializeDeserialize_DoEntityWithInterface() {
     ITestBaseEntityDo baseEntity = BEANS.get(TestEntityWithInterface1Do.class)
         .withDoubleAttribute(42.0)
         .withStringAttribute("foo")
@@ -2957,7 +2964,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_DoEntityWithInterfaceEx() throws Exception {
+  public void testSerializeDeserialize_DoEntityWithInterfaceEx() {
     ITestBaseEntityDo baseEntity = BEANS.get(TestEntityWithInterface2Do.class)
         .withDoubleAttribute(42.0)
         .withStringAttribute("foo")
@@ -2978,7 +2985,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_CustomImplementedEntity() throws Exception {
+  public void testSerializeDeserialize_CustomImplementedEntity() {
     TestCustomImplementedEntityDo entity = BEANS.get(TestCustomImplementedEntityDo.class);
     entity.put("stringAttribute", "foo");
     entity.put("doubleAttribute", new BigDecimal("1234567.89"));
@@ -2993,7 +3000,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_IDoEntity() throws Exception {
+  public void testSerializeDeserialize_IDoEntity() {
     IDoEntity entity = BEANS.get(DoEntity.class);
     entity.put("attribute", "value");
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -3006,7 +3013,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ IDataObject interface tests -----------------------------------
 
   @Test
-  public void testSerializeDeserialize_EmptyIDataObject() throws Exception {
+  public void testSerializeDeserialize_EmptyIDataObject() {
     IDataObject marshalledEntity = s_dataObjectMapper.readValue("{}", IDataObject.class);
     assertEquals(DoEntity.class, marshalledEntity.getClass());
     assertTrue(((DoEntity) marshalledEntity).allNodes().isEmpty());
@@ -3017,7 +3024,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_EntityIDataObject() throws Exception {
+  public void testSerializeDeserialize_EntityIDataObject() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put("stringAttribute", "value-string");
     entity.put("doubleAttribute", new BigDecimal("1234567.89"));
@@ -3032,7 +3039,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_StringListIDataObject() throws Exception {
+  public void testSerializeDeserialize_StringListIDataObject() {
     DoList<String> list = new DoList<>();
     list.add("foo");
     list.add("bar");
@@ -3046,7 +3053,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_ItemDoListIDataObject() throws Exception {
+  public void testSerializeDeserialize_ItemDoListIDataObject() {
     DoList<TestItemDo> list = new DoList<>();
     list.add(createTestItemDo("id-1", "string-1"));
     list.add(createTestItemDo("id-2", "string-2"));
@@ -3060,7 +3067,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_ObjectListIDataObject() throws Exception {
+  public void testSerializeDeserialize_ObjectListIDataObject() {
     DoList<Object> list = new DoList<>();
     list.add("foo");
     TestItemDo item1 = createTestItemDo("id-1", "string-1");
@@ -3085,9 +3092,10 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ tests with custom JSON type property name -----------------------------------
 
   @Test
-  public void testSerializeDeserialize_CustomTypePropertyName() throws Exception {
-    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withTypeAttributeName("_customType"));
-    mapper.disable(SerializationFeature.INDENT_OUTPUT);
+  public void testSerializeDeserialize_CustomTypePropertyName() {
+    ObjectMapper mapper = createCustomScoutDoObjectMapperBuilder(c -> c.withTypeAttributeName("_customType"))
+        .disable(SerializationFeature.INDENT_OUTPUT)
+        .build();
 
     TestComplexEntityDo entityDo = BEANS.get(TestComplexEntityDo.class);
     entityDo.withId("foo");
@@ -3100,29 +3108,31 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeComplexEntity_SuppressType() throws Exception {
-    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withSuppressTypeAttribute(true));
+  public void testSerializeDeserializeComplexEntity_SuppressType() {
+    ObjectMapper mapper = createCustomScoutDoObjectMapperBuilder(c -> c.withSuppressTypeAttribute(true)).build();
     TestComplexEntityDo entityDo = createTestDo();
     String json = mapper.writeValueAsString(entityDo);
     assertJsonEquals("TestComplexEntityDoRaw.json", json);
   }
 
   @Test
-  public void testSerializeDeserializeCollection_SuppressType() throws Exception {
-    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withSuppressTypeAttribute(true));
-    // disable Jackson typing for pojo classes (suppress flag is only for data objects)
-    mapper.addMixIn(TestItemPojo.class, NoTypes.class);
-    mapper.addMixIn(TestItemPojo2.class, NoTypes.class);
+  public void testSerializeDeserializeCollection_SuppressType() {
+    ObjectMapper mapper = createCustomScoutDoObjectMapperBuilder(c -> c.withSuppressTypeAttribute(true))
+        // disable Jackson typing for pojo classes (suppress flag is only for data objects)
+        .addMixIn(TestItemPojo.class, NoTypes.class)
+        .addMixIn(TestItemPojo2.class, NoTypes.class)
+        .build();
     TestCollectionsDo testDo = createTestCollectionsDo();
     String json = mapper.writeValueAsString(testDo);
     assertJsonEquals("TestCollectionsDoRaw.json", json);
   }
 
   @Test
-  public void testSerializeDeserializeSet_SuppressType() throws Exception {
-    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withSuppressTypeAttribute(true));
-    // disable Jackson typing for pojo classes (suppress flag is only for data objects)
-    mapper.addMixIn(TestItemPojo.class, NoTypes.class);
+  public void testSerializeDeserializeSet_SuppressType() {
+    ObjectMapper mapper = createCustomScoutDoObjectMapperBuilder(c -> c.withSuppressTypeAttribute(true))
+        // disable Jackson typing for pojo classes (suppress flag is only for data objects)
+        .addMixIn(TestItemPojo.class, NoTypes.class)
+        .build();
     TestSetDo setDo = createTestSetDo();
     String json = mapper.writeValueAsString(setDo);
     assertJsonEquals("TestSetDoRaw.json", json);
@@ -3135,7 +3145,7 @@ public class JsonDataObjectsSerializationTest {
   // ------------------------------------ tests with type version ------------------------------------
 
   @Test
-  public void testSerializeDeserialize_VersionedDo() throws Exception {
+  public void testSerializeDeserialize_VersionedDo() {
     TestVersionedDo versioned = BEANS.get(TestVersionedDo.class).withName("lorem");
     String json = s_dataObjectMapper.writeValueAsString(versioned);
     assertJsonEquals("TestVersionedDo.json", json);
@@ -3172,25 +3182,26 @@ public class JsonDataObjectsSerializationTest {
     // serializing data object to JSON causes version to be set to class-file annotated version (override value contained in type version attribute)
     String serialized = s_dataObjectMapper.writeValueAsString(doMarshalled);
     JsonNode rawTree = s_defaultJacksonObjectMapper.readTree(serialized);
-    assertEquals("jacksonFixture-1.0.0", rawTree.get(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME).asText());
+    assertEquals("jacksonFixture-1.0.0", rawTree.get(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME).asString());
   }
 
   protected TestVersionedDo runTestVersionedDo(String resourceName) throws Exception {
     String json = readResourceAsString(resourceName);
-    TestVersionedDo doMarhalled = s_dataObjectMapper.readValue(json, TestVersionedDo.class);
+    TestVersionedDo doMarshalled = s_dataObjectMapper.readValue(json, TestVersionedDo.class);
 
     // deserialized version-annotated data object contains no version attribute node (even when created by a JSON document containing any version data)
-    assertNull(doMarhalled.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
+    assertNull(doMarshalled.getString(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME));
 
-    String serialized = s_dataObjectMapper.writeValueAsString(doMarhalled);
+    String serialized = s_dataObjectMapper.writeValueAsString(doMarshalled);
     assertJsonEquals("TestVersionedDo.json", serialized);
-    return doMarhalled;
+    return doMarshalled;
   }
 
   @Test
-  public void testSerializeDeserialize_CustomTypeVersionPropertyName() throws Exception {
-    ObjectMapper mapper = createCustomScoutDoObjectMapper(c -> c.withTypeVersionAttributeName("_customTypeVersion"));
-    mapper.disable(SerializationFeature.INDENT_OUTPUT);
+  public void testSerializeDeserialize_CustomTypeVersionPropertyName() {
+    ObjectMapper mapper = createCustomScoutDoObjectMapperBuilder(c -> c.withTypeVersionAttributeName("_customTypeVersion"))
+        .disable(SerializationFeature.INDENT_OUTPUT)
+        .build();
     TestVersionedDo entityDo = BEANS.get(TestVersionedDo.class);
     entityDo.withName("foo");
     String json = mapper.writeValueAsString(entityDo);
@@ -3202,7 +3213,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_VersionedDoRaw() throws Exception {
+  public void testSerializeDeserialize_VersionedDoRaw() {
     DoEntity entity = BEANS.get(DoEntity.class);
     entity.put(ScoutDataObjectModule.DEFAULT_TYPE_VERSION_ATTRIBUTE_NAME, "123");
     String json = s_dataObjectMapper.writeValueAsString(entity);
@@ -3218,7 +3229,7 @@ public class JsonDataObjectsSerializationTest {
    * string to deserialize.
    */
   @Test
-  public void testDeserialize_Numbers() throws Exception {
+  public void testDeserialize_Numbers() {
     TestComplexEntityDo entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123.456"), TestComplexEntityDo.class);
     assertEquals(Float.valueOf(123.456f), entity.getFloatAttribute());
 
@@ -3237,20 +3248,20 @@ public class JsonDataObjectsSerializationTest {
     entity = s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123.456\""), TestComplexEntityDo.class);
     assertEquals(new BigDecimal("123.456"), entity.getBigDecimalAttribute());
 
-    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456"), TestComplexEntityDo.class));
-    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456-100"), TestComplexEntityDo.class));
+    Assert.assertThrows(StreamReadException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456"), TestComplexEntityDo.class));
+    Assert.assertThrows(StreamReadException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "123-456-100"), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123-456\""), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("floatAttribute", "\"123,456\""), TestComplexEntityDo.class));
 
-    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doublelAttribute", "123-456"), TestComplexEntityDo.class));
-    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123-456-100"), TestComplexEntityDo.class));
+    Assert.assertThrows(StreamReadException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123-456"), TestComplexEntityDo.class));
+    Assert.assertThrows(StreamReadException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "123-456-100"), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123-456\""), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("doubleAttribute", "\"123,456\""), TestComplexEntityDo.class));
 
-    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456"), TestComplexEntityDo.class));
-    Assert.assertThrows(JsonParseException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456-100"), TestComplexEntityDo.class));
+    Assert.assertThrows(StreamReadException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456"), TestComplexEntityDo.class));
+    Assert.assertThrows(StreamReadException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "123-456-100"), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123-456\""), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"10-03-2019\""), TestComplexEntityDo.class));
     Assert.assertThrows(InvalidFormatException.class, () -> s_dataObjectMapper.readValue(createTestComplexEntityJson("bigDecimalAttribute", "\"123,456\""), TestComplexEntityDo.class));
@@ -3261,7 +3272,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_collectionFormat01() throws Exception {
+  public void testSerializeDeserialize_collectionFormat01() {
     TestDateDo testDo = BEANS.get(TestDateDo.class);
     testDo.withADummySet(CollectionUtility.hashSet("1", "2"))
         .withDateWithTimestamp(DATE)
@@ -3278,7 +3289,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserialize_collectionFormat02() throws Exception {
+  public void testSerializeDeserialize_collectionFormat02() {
     TestDateDo testDo = BEANS.get(TestDateDo.class);
     testDo.withZDummySet(CollectionUtility.hashSet("1", "2"))
         .withDateWithTimestamp(DATE)
@@ -3293,7 +3304,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeLiteral() throws Exception {
+  public void testSerializeLiteral() {
     assertEquals("42", s_dataObjectMapper.writeValueAsString(42));
     assertEquals("42.12345", s_dataObjectMapper.writeValueAsString(42.12345));
     assertEquals("true", s_dataObjectMapper.writeValueAsString(true));
@@ -3311,7 +3322,7 @@ public class JsonDataObjectsSerializationTest {
    * serializing {@link Exception} or {@link Throwable} within data objects.
    */
   @Test
-  public void testSerializeDeserializeThrowable() throws Exception {
+  public void testSerializeDeserializeThrowable() {
     Throwable throwable = new Throwable("throwable-message");
     throwable.setStackTrace(new StackTraceElement[]{new StackTraceElement("mocked-throwable-class", "mocked-method-01", "mocked-file-01", 42)});
     Exception exception = new Exception("exception-message");
@@ -3340,22 +3351,23 @@ public class JsonDataObjectsSerializationTest {
         .withOptString(Optional.empty())
         .withOptStringList(Optional.empty(), Optional.of("foo"));
 
+    // FIXME rsb check these comments
     // Expect:
     // com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 optional type `java.util.Optional<java.lang.String>`
     // not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jdk8" to enable handling
-    JsonMappingException writeException = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(optional));
+    DatabindException writeException = assertThrows(DatabindException.class, () -> s_dataObjectMapper.writeValueAsString(optional));
     assertTrue("expected InvalidDefinitionException, got " + writeException, writeException instanceof InvalidDefinitionException);
 
     // Expect:
     // com.fasterxml.jackson.databind.exc.InvalidDefinitionException: Java 8 optional type `java.util.Optional<java.lang.String>`
     // not supported by default: add Module "com.fasterxml.jackson.datatype:jackson-datatype-jdk8" to enable handling
     String json = readResourceAsString("TestOptionalDo.json");
-    JsonMappingException exception = assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
+    DatabindException exception = assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, TestOptionalDo.class));
     assertTrue("expected InvalidDefinitionException, got " + exception.getCause(), exception.getCause() instanceof InvalidDefinitionException);
   }
 
   @Test
-  public void testSerializeDeserializeHierarchicalLookupCall() throws Exception {
+  public void testSerializeDeserializeHierarchicalLookupCall() {
     FixtureHierarchicalLookupRowDo parent = createRow(FixtureUuId.create());
     FixtureHierarchicalLookupRowDo rowA = createRow(FixtureUuId.create());
     FixtureHierarchicalLookupRowDo rowB = createRow(FixtureUuId.create()).withParentId(parent.getId());
@@ -3380,7 +3392,7 @@ public class JsonDataObjectsSerializationTest {
    * Serialize & deserialize entity with nested map containing unknown DO class referenced by _type.
    */
   @Test
-  public void testSerializeWithUnknownNestedEntity() throws Exception {
+  public void testSerializeWithUnknownNestedEntity() {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
         .put("_type", "UnknownType")
         .put("nr", 12345)
@@ -3395,7 +3407,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestEntityWithUnknownNestedEntity.json", serialized);
 
     // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestMapDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(serialized, TestMapDo.class));
 
     TestMapDo marshalledLenient = s_lenientDataObjectMapper.readValue(serialized, TestMapDo.class);
     IDoEntity doEntity = marshalledLenient.getStringDoTestItemMapAttribute().get("one");
@@ -3408,7 +3420,7 @@ public class JsonDataObjectsSerializationTest {
    * Serialize & deserialize entity with nested raw IDoValue containing unknown DO class referenced by _type.
    */
   @Test
-  public void testSerializeWithUnknownNestedEntity2() throws Exception {
+  public void testSerializeWithUnknownNestedEntity2() {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
         .put("_type", "UnknownType")
         .put("nr", 12345)
@@ -3431,7 +3443,7 @@ public class JsonDataObjectsSerializationTest {
    * Serialize & deserialize entity with nested TestItemDo entity containing unknown DO class referenced by _type.
    */
   @Test
-  public void testSerializeWithUnknownNestedEntity3() throws Exception {
+  public void testSerializeWithUnknownNestedEntity3() {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
         .put("_type", "UnknownType")
         .put("nr", 12345)
@@ -3447,7 +3459,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestEntityWithUnknownNestedEntity3.json", serialized);
 
     // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
 
     TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(serialized, TestItemEntityDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient.getItem());
@@ -3461,7 +3473,7 @@ public class JsonDataObjectsSerializationTest {
    * Serialize & deserialize entity with nested TestItemDo entity containing raw DO class without _type reference.
    */
   @Test
-  public void testSerializeWithUnknownNestedEntity4() throws Exception {
+  public void testSerializeWithUnknownNestedEntity4() {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
         .put("nr", 12345)
         .put("id", "myId")
@@ -3486,7 +3498,7 @@ public class JsonDataObjectsSerializationTest {
    * referenced by _type.
    */
   @Test
-  public void testSerializeWithUnknownNestedEntity5() throws Exception {
+  public void testSerializeWithUnknownNestedEntity5() {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
         .put("_type", "UnknownType")
         .put("nr", 12345)
@@ -3501,7 +3513,7 @@ public class JsonDataObjectsSerializationTest {
     assertJsonEquals("TestEntityWithUnknownNestedEntity5.json", serialized);
 
     // NOK - read unknown entity into a concrete DO class declaring nested attribute as concrete DO interface
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(serialized, TestItemEntityDo.class));
 
     TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(serialized, TestItemEntityDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient.getItemIfc());
@@ -3516,7 +3528,7 @@ public class JsonDataObjectsSerializationTest {
    * correct _type.
    */
   @Test
-  public void testSerializeWithUnknownNestedEntity6() throws Exception {
+  public void testSerializeWithUnknownNestedEntity6() {
     IDoEntity raw = BEANS.get(DoEntityBuilder.class)
         .put("_type", "TestEntityWithInterface1")
         .put("stringAttribute", "foo")
@@ -3536,45 +3548,45 @@ public class JsonDataObjectsSerializationTest {
   }
 
   /**
-   * Tests that {@link DoEntitySerializer#serializeAttribute(String, Object, JsonGenerator, SerializerProvider)} takes
+   * Tests that {@link DoEntitySerializer#serializeAttribute(String, Object, JsonGenerator, SerializationContext)} takes
    * into account {@link ScoutDataObjectModuleContext#isLenientMode()}.
    */
   @Test
-  public void testSerializeWithInvalidAttributeType() throws Exception {
+  public void testSerializeWithInvalidAttributeType() {
     TestEntityWithIIdDo doEntity = BEANS.get(TestEntityWithIIdDo.class);
     doEntity.put(doEntity.iUuId().getAttributeName(), "unknown"); // invalid format of an IUuId
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
 
     String serialized = s_lenientDataObjectMapper.writeValueAsString(doEntity);
     assertEquals("{\"_type\":\"scout.TestEntityWithIId\",\"iUuId\":\"unknown\"}", serialized);
   }
 
   /**
-   * Tests that {@link DoEntitySerializer#serializeMap(String, Map, JsonGenerator, SerializerProvider)} takes into
+   * Tests that {@link DoEntitySerializer#serializeMap(String, Map, JsonGenerator, SerializationContext)} takes into
    * account {@link ScoutDataObjectModuleContext#isLenientMode()}.
    */
   @Test
-  public void testSerializeWithInvalidMapType() throws Exception {
+  public void testSerializeWithInvalidMapType() {
     TestEntityWithIIdDo doEntity = BEANS.get(TestEntityWithIIdDo.class);
     Map<Object, Object> map = new HashMap<>();
     map.put(FixtureUuId.of("1317fd5c-82f7-451e-b1a3-9cb837081e40"), 123); // valid key, invalid value
     map.put("unknown", "a string"); // invalid key, valid value
     doEntity.put(doEntity.iUuIdMap().getAttributeName(), map);
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
 
     String serialized = s_lenientDataObjectMapper.writeValueAsString(doEntity);
     assertEquals("{\"_type\":\"scout.TestEntityWithIId\",\"iUuIdMap\":{\"scout.FixtureUuId:1317fd5c-82f7-451e-b1a3-9cb837081e40\":123,\"unknown\":\"a string\"}}", serialized);
   }
 
   /**
-   * Tests that {@link DoCollectionSerializer#serializeList(Iterable, JsonGenerator, SerializerProvider)} takes into
+   * Tests that {@link DoCollectionSerializer#serializeList(Iterable, JsonGenerator, SerializationContext)} takes into
    * account {@link ScoutDataObjectModuleContext#isLenientMode()}.
    */
   @Test
-  public void testSerializeWithInvalidCollectionType() throws Exception {
+  public void testSerializeWithInvalidCollectionType() {
     TestEntityWithIIdDo doEntity = BEANS.get(TestEntityWithIIdDo.class);
     doEntity.putList(doEntity.stringIdsAsDoList().getAttributeName(), List.of("unknown", FixtureStringId.of("known"))); // invalid format of an IUuId
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.writeValueAsString(doEntity));
 
     String serialized = s_lenientDataObjectMapper.writeValueAsString(doEntity);
     assertEquals("{\"_type\":\"scout.TestEntityWithIId\",\"stringIdsAsDoList\":[\"unknown\",\"known\"]}", serialized);
@@ -3584,7 +3596,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON without type information, expect concrete class.
    */
   @Test
-  public void testDeserializeType_ConcreteClass1() throws Exception {
+  public void testDeserializeType_ConcreteClass1() {
     String json = "{\"foo\" : \"bar\"}";
     TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
     assertEquals(TestItemEntityDo.class, marshalled.getClass());
@@ -3594,13 +3606,13 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect concrete class.
    */
   @Test
-  public void testDeserializeType_ConcreteClass2() throws Exception {
+  public void testDeserializeType_ConcreteClass2() {
     String json = "{\"_type\" : \"TestItemEntity\"}";
     // OK - read into correct class
     TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
     assertEquals(TestItemEntityDo.class, marshalled.getClass());
     // NOK - read into wrong class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
 
     s_lenientDataObjectMapper.readValue(json, TestItemDo.class);
 
@@ -3612,10 +3624,10 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect concrete class.
    */
   @Test
-  public void testDeserializeType_ConcreteClass3() throws JsonProcessingException {
+  public void testDeserializeType_ConcreteClass3() throws JacksonException {
     String json = "{\"_type\" : \"UnknownEntity\"}";
     // NOK - read into wrong class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
 
     IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemEntityDo.class);
     assertEquals(DoEntity.class, marshalledLenient.getClass()); // raw DO entity due to type mismatch
@@ -3626,21 +3638,21 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available) and nested type information (class available), expect concrete class.
    */
   @Test
-  public void testDeserializeType_ConcreteClass4() throws Exception {
+  public void testDeserializeType_ConcreteClass4() {
     String json = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"TestItem\"}}";
     // OK - read into correct class
     TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
     assertEquals(TestItemEntityDo.class, marshalled.getClass());
     assertEquals(TestItemDo.class, marshalled.getItem().getClass());
     // NOK - read into wrong class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
 
     IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemDo.class);
     assertEquals(TestItemEntityDo.class, marshalledLenient.getClass()); // different type than requested
 
     // NOK - read into wrong class
     String json2 = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"TestItem2\"}}";
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
 
     TestItemEntityDo marshalledLenient2 = s_lenientDataObjectMapper.readValue(json2, TestItemEntityDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient2.getItem());
@@ -3653,10 +3665,10 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available) and nested type information (class not known), expect concrete class.
    */
   @Test
-  public void testDeserializeType_ConcreteClass5() throws JsonProcessingException {
+  public void testDeserializeType_ConcreteClass5() throws JacksonException {
     String json = "{\"_type\" : \"TestItemEntity\", \"item\" : {\"_type\" : \"UnknownEntity\"}}";
     // NOK - read into wrong class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
 
     TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemEntityDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient.getItem());
@@ -3670,7 +3682,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON without type information, expect concrete interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc1() throws JsonProcessingException {
+  public void testDeserializeType_ConcreteIfc1() throws JacksonException {
     String json = "{\"foo\" : \"bar\"}";
     // Assertion error: multiple instances found for query: interface org.eclipse.scout.rt.jackson.dataobject.fixture.ITestBaseEntityDo
     assertThrows(AssertionException.class, () -> s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class));
@@ -3684,14 +3696,14 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect concrete interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc2() throws Exception {
+  public void testDeserializeType_ConcreteIfc2() {
     String json = "{\"_type\" : \"TestEntityWithInterface1\"}";
     // OK - read into correct interface
     ITestBaseEntityDo marshalled = s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class);
     assertTrue(marshalled instanceof ITestBaseEntityDo);
     // NOK - read into wrong interface
     String json2 = "{\"_type\" : \"TestItem\"}";
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, ITestBaseEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json2, ITestBaseEntityDo.class));
     s_lenientDataObjectMapper.readValue(json, ITestBaseEntityDo.class);
 
     IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json2, ITestBaseEntityDo.class);
@@ -3702,10 +3714,10 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect concrete interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc3() throws JsonProcessingException {
+  public void testDeserializeType_ConcreteIfc3() throws JacksonException {
     String json = "{\"_type\" : \"UnknownEntity\"}";
     // NOK - read into wrong interface
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, ITestBaseEntityDo.class));
 
     IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, ITestBaseEntityDo.class);
     assertEquals(DoEntity.class, marshalledLenient.getClass()); // raw DO entity due to type mismatch
@@ -3717,21 +3729,21 @@ public class JsonDataObjectsSerializationTest {
    * interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc4() throws Exception {
+  public void testDeserializeType_ConcreteIfc4() {
     String json = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"TestEntityWithInterface1\"}}";
     // OK - read into correct class
     TestItemEntityDo marshalled = s_dataObjectMapper.readValue(json, TestItemEntityDo.class);
     assertEquals(TestItemEntityDo.class, marshalled.getClass());
     assertEquals(TestEntityWithInterface1Do.class, marshalled.getItemIfc().getClass());
     // NOK - read into wrong class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, TestItemDo.class));
 
     IDoEntity marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemDo.class);
     assertEquals(TestItemEntityDo.class, marshalledLenient.getClass()); // different type than requested
 
     // NOK - read into wrong class
     String json2 = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"TestItem\"}}";
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json2, TestItemEntityDo.class));
 
     TestItemEntityDo marshalledLenient2 = s_lenientDataObjectMapper.readValue(json2, TestItemEntityDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient2.getItemIfc());
@@ -3744,10 +3756,10 @@ public class JsonDataObjectsSerializationTest {
    * interface.
    */
   @Test
-  public void testDeserializeType_ConcreteIfc5() throws JsonProcessingException {
+  public void testDeserializeType_ConcreteIfc5() throws JacksonException {
     String json = "{\"_type\" : \"TestItemEntity\", \"itemIfc\" : {\"_type\" : \"UnknownEntity\"}}";
     // NOK - read into wrong class
-    assertThrows(JsonMappingException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
+    assertThrows(DatabindException.class, () -> s_dataObjectMapper.readValue(json, TestItemEntityDo.class));
 
     TestItemEntityDo marshalledLenient = s_lenientDataObjectMapper.readValue(json, TestItemEntityDo.class);
     assertThrows(ClassCastException.class, () -> marshalledLenient.getItemIfc());
@@ -3760,7 +3772,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON without type information, expect generic DoEntity.
    */
   @Test
-  public void testDeserializeType_DoEntity1() throws Exception {
+  public void testDeserializeType_DoEntity1() {
     String json = "{\"foo\" : \"bar\"}";
     DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
     assertEquals(DoEntity.class, marshalled.getClass());
@@ -3771,7 +3783,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect generic DoEntity.
    */
   @Test
-  public void testDeserializeType_DoEntity2() throws Exception {
+  public void testDeserializeType_DoEntity2() {
     String json = "{\"_type\" : \"TestItem\"}";
     DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
     assertEquals(TestItemDo.class, marshalled.getClass());
@@ -3782,7 +3794,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect generic DoEntity.
    */
   @Test
-  public void testDeserializeType_DoEntity3() throws Exception {
+  public void testDeserializeType_DoEntity3() {
     String json = "{\"_type\" : \"UnknownEntity\"}";
     DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
     assertEquals(DoEntity.class, marshalled.getClass());
@@ -3793,7 +3805,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect nested generic DoEntity.
    */
   @Test
-  public void testDeserializeType_DoEntity4() throws Exception {
+  public void testDeserializeType_DoEntity4() {
     String json = "{\"_type\" : \"TestNestedRaw\", \"doEntity\" : {\"_type\" : \"TestItem\"}}";
     TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
     assertEquals(TestItemDo.class, marshalled.getDoEntity().getClass());
@@ -3804,7 +3816,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect nested generic DoEntity.
    */
   @Test
-  public void testDeserializeType_DoEntity5() throws Exception {
+  public void testDeserializeType_DoEntity5() {
     String json = "{\"_type\" : \"TestNestedRaw\", \"doEntity\" : {\"_type\" : \"UnknownEntity\"}}";
     TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
     assertEquals(DoEntity.class, marshalled.getDoEntity().getClass());
@@ -3815,7 +3827,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON without type information, expect generic IDoEntity.
    */
   @Test
-  public void testDeserializeType_IDoEntity1() throws Exception {
+  public void testDeserializeType_IDoEntity1() {
     String json = "{\"foo\" : \"bar\"}";
     IDoEntity marshalled = s_dataObjectMapper.readValue(json, IDoEntity.class);
     assertEquals(DoEntity.class, marshalled.getClass());
@@ -3826,7 +3838,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect generic IDoEntity.
    */
   @Test
-  public void testDeserializeType_IDoEntity2() throws Exception {
+  public void testDeserializeType_IDoEntity2() {
     String json = "{\"_type\" : \"TestItem\"}";
     IDoEntity marshalled = s_dataObjectMapper.readValue(json, IDoEntity.class);
     assertEquals(TestItemDo.class, marshalled.getClass());
@@ -3837,7 +3849,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect generic IDoEntity.
    */
   @Test
-  public void testDeserializeType_IDoEntity3() throws Exception {
+  public void testDeserializeType_IDoEntity3() {
     String json = "{\"_type\" : \"UnknownEntity\"}";
     IDoEntity marshalled = s_dataObjectMapper.readValue(json, IDoEntity.class);
     assertEquals(DoEntity.class, marshalled.getClass());
@@ -3848,7 +3860,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect nested generic IDoEntity.
    */
   @Test
-  public void testDeserializeType_IDoEntity4() throws Exception {
+  public void testDeserializeType_IDoEntity4() {
     String json = "{\"_type\" : \"TestNestedRaw\", \"iDoEntity\" : {\"_type\" : \"TestItem\"}}";
     TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
     assertEquals(TestItemDo.class, marshalled.getIDoEntity().getClass());
@@ -3859,7 +3871,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect nested generic IDoEntity.
    */
   @Test
-  public void testDeserializeType_IDoEntity5() throws Exception {
+  public void testDeserializeType_IDoEntity5() {
     String json = "{\"_type\" : \"TestNestedRaw\", \"iDoEntity\" : {\"_type\" : \"UnknownEntity\"}}";
     TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
     assertEquals(DoEntity.class, marshalled.getIDoEntity().getClass());
@@ -3870,7 +3882,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON without type information, expect generic IDataObject.
    */
   @Test
-  public void testDeserializeType_IDataObject1() throws Exception {
+  public void testDeserializeType_IDataObject1() {
     String json = "{\"foo\" : \"bar\"}";
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     assertEquals(DoEntity.class, marshalled.getClass());
@@ -3881,7 +3893,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect generic IDataObject.
    */
   @Test
-  public void testDeserializeType_IDataObject2() throws Exception {
+  public void testDeserializeType_IDataObject2() {
     String json = "{\"_type\" : \"TestItem\"}";
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     assertEquals(TestItemDo.class, marshalled.getClass());
@@ -3892,7 +3904,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect generic IDataObject.
    */
   @Test
-  public void testDeserializeType_IDataObject3() throws Exception {
+  public void testDeserializeType_IDataObject3() {
     String json = "{\"_type\" : \"UnknownEntity\"}";
     IDataObject marshalled = s_dataObjectMapper.readValue(json, IDataObject.class);
     assertEquals(DoEntity.class, marshalled.getClass());
@@ -3903,7 +3915,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class available), expect nested generic IDataObject.
    */
   @Test
-  public void testDeserializeType_IDataObject4() throws Exception {
+  public void testDeserializeType_IDataObject4() {
     String json = "{\"_type\" : \"TestNestedRaw\", \"iDataObject\" : {\"_type\" : \"TestItem\"}}";
     TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
     assertEquals(TestItemDo.class, marshalled.getIDataObject().getClass());
@@ -3914,7 +3926,7 @@ public class JsonDataObjectsSerializationTest {
    * JSON with type information (class not known), expect nested generic IDataObject.
    */
   @Test
-  public void testDeserializeType_IDataObject5() throws Exception {
+  public void testDeserializeType_IDataObject5() {
     String json = "{\"_type\" : \"TestNestedRaw\", \"iDataObject\" : {\"_type\" : \"UnknownEntity\"}}";
     TestNestedRawDo marshalled = s_dataObjectMapper.readValue(json, TestNestedRawDo.class);
     assertEquals(DoEntity.class, marshalled.getIDataObject().getClass());
@@ -3922,7 +3934,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testDeserializeTypedPojo() throws Exception {
+  public void testDeserializeTypedPojo() {
     TestItemPojo pojo = new TestItemPojo();
     pojo.setId("foo");
     String json = s_defaultJacksonObjectMapper.writeValueAsString(pojo);
@@ -4100,7 +4112,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_DoEntity() throws Exception {
+  public void testSerializeDeserializeDataObject_DoEntity() {
     IDataObject entity = createTestDo();
     String json = s_dataObjectMapper.writerFor(IDoEntity.class).writeValueAsString(entity);
     assertJsonEquals("TestComplexEntityDo.json", json);
@@ -4110,7 +4122,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_DoList() throws Exception {
+  public void testSerializeDeserializeDataObject_DoList() {
     DoList<TestItemDo> list = new DoList<>();
     list.add(createTestItemDo("id-1", "string-1"));
     list.add(createTestItemDo("id-2", "string-2"));
@@ -4123,7 +4135,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_String() throws Exception {
+  public void testSerializeDeserializeDataObject_String() {
     IDataObject entity = new StringDataObjectValue().withValue("stringValue");
     String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
     s_testHelper.assertJsonEquals("\"stringValue\"", json);
@@ -4133,7 +4145,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_Long() throws Exception {
+  public void testSerializeDeserializeDataObject_Long() {
     IDataObject entity = new LongDataObjectValue().withValue(12345L);
     String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
     s_testHelper.assertJsonEquals("12345", json);
@@ -4143,7 +4155,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_BigDecimal() throws Exception {
+  public void testSerializeDeserializeDataObject_BigDecimal() {
     IDataObject entity = new BigDecimalDataObjectValue().withValue(BigDecimal.valueOf(1.2345));
     String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
     s_testHelper.assertJsonEquals("1.2345", json);
@@ -4153,7 +4165,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_True() throws Exception {
+  public void testSerializeDeserializeDataObject_True() {
     IDataObject entity = new BooleanDataObjectValue().withValue(true);
     String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
     s_testHelper.assertJsonEquals("true", json);
@@ -4163,7 +4175,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_False() throws Exception {
+  public void testSerializeDeserializeDataObject_False() {
     IDataObject entity = new BooleanDataObjectValue().withValue(false);
     String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
     s_testHelper.assertJsonEquals("false", json);
@@ -4173,7 +4185,7 @@ public class JsonDataObjectsSerializationTest {
   }
 
   @Test
-  public void testSerializeDeserializeDataObject_Null() throws Exception {
+  public void testSerializeDeserializeDataObject_Null() {
     IDataObject entity = null;
     String json = s_dataObjectMapper.writerFor(IDataObjectValue.class).writeValueAsString(entity);
     s_testHelper.assertJsonEquals("null", json);
@@ -4184,15 +4196,14 @@ public class JsonDataObjectsSerializationTest {
 
   // ------------------------------------ common test helper methods ------------------------------------
 
-  protected ObjectMapper createCustomScoutDoObjectMapper(Consumer<ScoutDataObjectModuleContext> contextConsumer) {
-    //noinspection deprecation
+  protected MapperBuilder<?, ?> createCustomScoutDoObjectMapperBuilder(Consumer<ScoutDataObjectModuleContext> contextConsumer) {
     return new JacksonPrettyPrintDataObjectMapper() {
       @Override
       protected void prepareScoutDataModuleContext(ScoutDataObjectModuleContext moduleContext) {
         super.prepareScoutDataModuleContext(moduleContext);
         contextConsumer.accept(moduleContext);
       }
-    }.getObjectMapper();
+    }.createObjectMapperBuilder(false);
   }
 
   protected TestComplexEntityDo createTestDo() {
@@ -4289,11 +4300,11 @@ public class JsonDataObjectsSerializationTest {
     return JsonDataObjectsSerializationTest.class.getResource(expectedResourceName);
   }
 
-  protected void serializeContribution(Class<? extends IDoEntity> doEntityClass, Class<? extends IDoEntityContribution> contributionClass) throws JsonProcessingException {
+  protected void serializeContribution(Class<? extends IDoEntity> doEntityClass, Class<? extends IDoEntityContribution> contributionClass) throws JacksonException {
     serializeContribution(BEANS.get(doEntityClass), contributionClass);
   }
 
-  protected void serializeContribution(IDoEntity doEntity, Class<? extends IDoEntityContribution> contributionClass) throws JsonProcessingException {
+  protected void serializeContribution(IDoEntity doEntity, Class<? extends IDoEntityContribution> contributionClass) throws JacksonException {
     doEntity.contribution(contributionClass);
     s_dataObjectMapper.writeValueAsString(doEntity);
   }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,15 +12,15 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.deser.Deserializers;
-import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.ReferenceType;
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.BeanDescription.Supplier;
+import tools.jackson.databind.DeserializationConfig;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.deser.Deserializers;
+import tools.jackson.databind.jsontype.TypeDeserializer;
+import tools.jackson.databind.type.CollectionType;
+import tools.jackson.databind.type.ReferenceType;
 
 /**
  * Deserializer provider for data object deserializer for ({@code DoEntity}, {@code DoValue} and {@code DoList}.
@@ -40,48 +40,51 @@ public class DataObjectDeserializers extends Deserializers.Base {
   }
 
   @Override
-  public JsonDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+  public ValueDeserializer<?> findBeanDeserializer(JavaType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef) {
     for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
-      JsonDeserializer<?> deserializer = provider.findDeserializer(getModuleContext(), type, config, beanDesc);
+      ValueDeserializer<?> deserializer = provider.findDeserializer(getModuleContext(), type, config, beanDescRef);
       if (deserializer != null) {
         return deserializer;
       }
     }
-    return super.findBeanDeserializer(type, config, beanDesc);
+    return super.findBeanDeserializer(type, config, beanDescRef);
   }
 
   @Override
-  public JsonDeserializer<?> findReferenceDeserializer(ReferenceType refType, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer contentTypeDeserializer, JsonDeserializer<?> contentDeserializer)
-      throws JsonMappingException {
+  public ValueDeserializer<?> findReferenceDeserializer(ReferenceType refType, DeserializationConfig config, Supplier beanDescRef, TypeDeserializer contentTypeDeserializer, ValueDeserializer<?> contentDeserializer) {
     for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
-      JsonDeserializer<?> deserializer = provider.findReferenceDeserializer(getModuleContext(), refType, config, beanDesc, contentTypeDeserializer, contentDeserializer);
+      ValueDeserializer<?> deserializer = provider.findReferenceDeserializer(getModuleContext(), refType, config, beanDescRef, contentTypeDeserializer, contentDeserializer);
       if (deserializer != null) {
         return deserializer;
       }
     }
-    return super.findReferenceDeserializer(refType, config, beanDesc, contentTypeDeserializer, contentDeserializer);
+    return super.findReferenceDeserializer(refType, config, beanDescRef, contentTypeDeserializer, contentDeserializer);
   }
 
   @Override
-  public JsonDeserializer<?> findCollectionDeserializer(CollectionType type, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer elementTypeDeserializer, JsonDeserializer<?> elementDeserializer)
-      throws JsonMappingException {
+  public ValueDeserializer<?> findCollectionDeserializer(CollectionType type, DeserializationConfig config, Supplier beanDescRef, TypeDeserializer elementTypeDeserializer, ValueDeserializer<?> elementDeserializer) {
     for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
-      JsonDeserializer<?> deserializer = provider.findCollectionDeserializer(getModuleContext(), type, config, beanDesc, elementTypeDeserializer, elementDeserializer);
+      ValueDeserializer<?> deserializer = provider.findCollectionDeserializer(getModuleContext(), type, config, beanDescRef, elementTypeDeserializer, elementDeserializer);
       if (deserializer != null) {
         return deserializer;
       }
     }
-    return super.findCollectionDeserializer(type, config, beanDesc, elementTypeDeserializer, elementDeserializer);
+    return super.findCollectionDeserializer(type, config, beanDescRef, elementTypeDeserializer, elementDeserializer);
   }
 
   @Override
-  public JsonDeserializer<?> findEnumDeserializer(Class<?> type, DeserializationConfig config, BeanDescription beanDesc) throws JsonMappingException {
+  public ValueDeserializer<?> findEnumDeserializer(JavaType type, DeserializationConfig config, Supplier beanDescRef) {
     for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
-      JsonDeserializer<?> deserializer = provider.findEnumDeserializer(getModuleContext(), type, config, beanDesc);
+      ValueDeserializer<?> deserializer = provider.findEnumDeserializer(getModuleContext(), type, config, beanDescRef);
       if (deserializer != null) {
         return deserializer;
       }
     }
-    return super.findEnumDeserializer(type, config, beanDesc);
+    return super.findEnumDeserializer(type, config, beanDescRef);
+  }
+
+  @Override
+  public boolean hasDeserializerFor(DeserializationConfig config, Class<?> valueType) {
+    return false;
   }
 }

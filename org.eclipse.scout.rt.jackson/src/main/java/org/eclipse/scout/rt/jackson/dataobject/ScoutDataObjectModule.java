@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,17 +18,17 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
-import com.fasterxml.jackson.core.Version;
-import com.fasterxml.jackson.core.json.PackageVersion;
-import com.fasterxml.jackson.databind.Module;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.Version;
+import tools.jackson.core.json.PackageVersion;
+import tools.jackson.databind.JacksonModule;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Jackson {@link Module} that adds {@link ObjectMapper} support for Scout data object types like ({@code DoEntity},
  * {@code DoValue} and {@code DoList}.
  */
 @Bean
-public class ScoutDataObjectModule extends Module {
+public class ScoutDataObjectModule extends JacksonModule {
 
   private static final String NAME = "ScoutDataObjectModule";
 

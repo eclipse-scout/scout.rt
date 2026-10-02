@@ -129,7 +129,7 @@
     <jetty.version>12.1.14</jetty.version>
     <slf4j.version>2.0.20</slf4j.version>
     <logback.version>1.6.4</logback.version>
-    <jackson.version>2.22.3</jackson.version>
+    <jackson.version>3.2.3</jackson.version>
     <io.netty-version>4.2.18.Final</io.netty-version>
     <apache.tika-version>4.1.0</apache.tika-version>
     <batik.version>1.19</batik.version>
@@ -142,6 +142,7 @@
     <opentelemetry.instrumentation.alpha.version>2.31.1-alpha</opentelemetry.instrumentation.alpha.version>
     <selenium.version>4.50.0</selenium.version>
     <jaxb.version>4.0.9</jaxb.version>
+    <jersey.version>4.0.3</jersey.version> <!-- must be compatible with the jakarta.ws.rs-api version -->
 
     <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.rt/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <master_test_forkCount>1</master_test_forkCount>
@@ -217,7 +218,7 @@
       </dependency>
 
       <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
+        <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${jackson.version}</version>
         <type>pom</type>
@@ -710,14 +711,14 @@
         <!-- must be compatible with the jakarta.ws.rs-api version -->
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
-        <version>4.0.2</version>
+        <version>${jersey.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-json-jackson</artifactId>
-        <version>4.0.2</version>
+        <artifactId>jersey-media-json-jackson3</artifactId>
+        <version>${jersey.version}</version>
         <exclusions>
           <exclusion>
             <groupId>com.sun.activation</groupId>
@@ -979,11 +980,11 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <!-- enforce grpc-context version 1.70.0 since google-http-client version 2.2.0 has transitive dependencies to grpc-context 1.70.0 and 1.27.2 -->
-      <dependency> <!-- FIXME rsb check if still needed -->
+      <!-- Fix version to avoid dependency convergence between google-http-client and google-cloud-recaptchaenterprise -->
+      <dependency>
         <groupId>io.grpc</groupId>
         <artifactId>grpc-context</artifactId>
-        <version>1.70.0</version>
+        <version>1.84.1</version>
       </dependency>
       <dependency>
         <groupId>com.google.http-client</groupId>

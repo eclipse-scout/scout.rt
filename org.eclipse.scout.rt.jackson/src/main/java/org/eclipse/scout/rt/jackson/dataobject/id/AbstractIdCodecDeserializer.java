@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
-import java.io.Serial;
 import java.util.Collections;
 import java.util.Set;
 
@@ -18,16 +17,14 @@ import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.platform.BEANS;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.deser.std.StdDeserializer;
 
 /**
  * Abstract {@link StdDeserializer} with {@link ScoutDataObjectModuleContext} that provides an {@link IdCodec} and
  * information about the {@link IIdCodecFlag}s of the context.
  */
 public abstract class AbstractIdCodecDeserializer<T> extends StdDeserializer<T> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   protected final IdCodec m_idCodec = BEANS.get(IdCodec.class);
   protected final ScoutDataObjectModuleContext m_moduleContext;

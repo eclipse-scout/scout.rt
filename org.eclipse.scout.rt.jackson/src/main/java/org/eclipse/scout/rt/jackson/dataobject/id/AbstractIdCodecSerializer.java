@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,7 +11,6 @@ package org.eclipse.scout.rt.jackson.dataobject.id;
 
 import static java.util.Collections.unmodifiableSet;
 
-import java.io.Serial;
 import java.util.Set;
 
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
@@ -19,16 +18,14 @@ import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 /**
  * Abstract {@link StdSerializer} with {@link ScoutDataObjectModuleContext} that provides an {@link IdCodec} and
  * information about the {@link IIdCodecFlag}s of the context.
  */
 public abstract class AbstractIdCodecSerializer<T> extends StdSerializer<T> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   protected final ScoutDataObjectModuleContext m_moduleContext;
 
@@ -36,7 +33,7 @@ public abstract class AbstractIdCodecSerializer<T> extends StdSerializer<T> {
   protected final LazyValue<Set<IIdCodecFlag>> m_idCodecFlags = new LazyValue<>(() -> unmodifiableSet(computeIdCodecFlags()));
 
   public AbstractIdCodecSerializer(ScoutDataObjectModuleContext moduleContext, Class<?> valueClass) {
-    super(valueClass, false);
+    super(valueClass);
     m_moduleContext = moduleContext;
   }
 
