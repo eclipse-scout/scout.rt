@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,16 +9,15 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.enumeration;
 
-import java.io.IOException;
-
 import org.eclipse.scout.rt.dataobject.enumeration.EnumResolver;
 import org.eclipse.scout.rt.dataobject.enumeration.IEnum;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.KeyDeserializer;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.KeyDeserializer;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer used for map keys of type {@link IEnum}.
@@ -36,7 +35,7 @@ public class EnumMapKeyDeserializer extends KeyDeserializer {
   }
 
   @Override
-  public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+  public Object deserializeKey(String key, DeserializationContext ctxt) throws JacksonException {
     try {
       return m_enumResolver.get().resolve(m_enumClass, key);
     }

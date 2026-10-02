@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,19 +9,14 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
-
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 public class DoBinaryResourceSerializer extends StdSerializer<BinaryResource> {
-
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   protected DoBinaryResourceSerializer() {
     super(BinaryResource.class);
@@ -30,26 +25,26 @@ public class DoBinaryResourceSerializer extends StdSerializer<BinaryResource> {
   // TODO pbz check how we can do this only for DOs but not for all BinaryResources globally
 
   @Override
-  public void serialize(BinaryResource br, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(BinaryResource br, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
     gen.writeStartObject();
     writeNullsafeBinaryField(gen, "content", br.getContent());
-    gen.writeNumberField("contentLength", br.getContentLength());
-    gen.writeNumberField("lastModified", br.getLastModified());
-    gen.writeStringField("contentType", br.getContentType());
-    gen.writeStringField("filename", br.getFilename());
-    gen.writeStringField("charset", br.getCharset());
-    gen.writeNumberField("fingerprint", br.getFingerprint());
-    gen.writeBooleanField("cachingAllowed", br.isCachingAllowed());
-    gen.writeNumberField("cacheMaxAge", br.getCacheMaxAge());
+    gen.writeNumberProperty("contentLength", br.getContentLength());
+    gen.writeNumberProperty("lastModified", br.getLastModified());
+    gen.writeStringProperty("contentType", br.getContentType());
+    gen.writeStringProperty("filename", br.getFilename());
+    gen.writeStringProperty("charset", br.getCharset());
+    gen.writeNumberProperty("fingerprint", br.getFingerprint());
+    gen.writeBooleanProperty("cachingAllowed", br.isCachingAllowed());
+    gen.writeNumberProperty("cacheMaxAge", br.getCacheMaxAge());
     gen.writeEndObject();
   }
 
-  protected void writeNullsafeBinaryField(JsonGenerator gen, String fieldName, byte[] data) throws IOException {
+  protected void writeNullsafeBinaryField(JsonGenerator gen, String fieldName, byte[] data) throws JacksonException {
     if (data == null) {
-      gen.writeNullField(fieldName);
+      gen.writeNullProperty(fieldName);
     }
     else {
-      gen.writeBinaryField(fieldName, data);
+      gen.writeBinaryProperty(fieldName, data);
     }
   }
 }

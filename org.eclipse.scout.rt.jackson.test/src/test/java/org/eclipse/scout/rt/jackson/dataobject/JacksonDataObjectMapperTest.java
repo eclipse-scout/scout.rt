@@ -56,10 +56,10 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.core.StreamReadConstraints;
-import com.fasterxml.jackson.core.StreamReadConstraints.Builder;
-import com.fasterxml.jackson.core.StreamWriteConstraints;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import tools.jackson.core.StreamReadConstraints;
+import tools.jackson.core.StreamReadConstraints.Builder;
+import tools.jackson.core.StreamWriteConstraints;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Various test cases with requires a real jackson serializer/deserializer for testing
@@ -216,13 +216,14 @@ public class JacksonDataObjectMapperTest {
   @Test
   @SuppressWarnings("deprecation")
   public void testDisabledDefaultTyping() {
-    assertNull(m_mapper.getObjectMapper().getSerializationConfig().getDefaultTyper(null));
-    assertNull(m_mapper.getObjectMapper().getSerializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(DoEntity.class)));
-    assertNull(m_mapper.getObjectMapper().getSerializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(Object.class)));
+    ObjectMapper objectMapper = m_mapper.getObjectMapper();
+    assertNull(objectMapper.serializationConfig().getDefaultTyper(null));
+    assertNull(objectMapper.serializationConfig().getDefaultTyper(objectMapper.constructType(DoEntity.class)));
+    assertNull(objectMapper.serializationConfig().getDefaultTyper(objectMapper.constructType(Object.class)));
 
-    assertNull(m_mapper.getObjectMapper().getDeserializationConfig().getDefaultTyper(null));
-    assertNull(m_mapper.getObjectMapper().getDeserializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(DoEntity.class)));
-    assertNull(m_mapper.getObjectMapper().getDeserializationConfig().getDefaultTyper(TypeFactory.defaultInstance().constructType(Object.class)));
+    assertNull(objectMapper.deserializationConfig().getDefaultTyper(null));
+    assertNull(objectMapper.deserializationConfig().getDefaultTyper(objectMapper.constructType(DoEntity.class)));
+    assertNull(objectMapper.deserializationConfig().getDefaultTyper(objectMapper.constructType(Object.class)));
   }
 
   protected final String m_longStringValue = IntStream.range(1, 10_0000).mapToObj(Integer::toString).collect(Collectors.joining());
@@ -332,7 +333,7 @@ public class JacksonDataObjectMapperTest {
     BigDecimal value = new BigDecimal("1").setScale(100_001, RoundingMode.UNNECESSARY);
 
     // reading a big integer attribute which is given as very large decimal value in JSON
-    // See com.fasterxml.jackson.core.StreamReadConstraints#validateBigIntegerScale for fixed scale limit of 100k
+    // See tools.jackson.core.StreamReadConstraints#validateBigIntegerScale for fixed scale limit of 100k
     String json = m_mapper.writeValue(BEANS.get(DoEntityBuilder.class).put("bigIntegerAttribute", value).build());
     assertThrows(PlatformException.class, () -> runTestStreamReadConstraints(b -> b.maxNumberLength(100_002), json, TestComplexEntityDo.class));
   }

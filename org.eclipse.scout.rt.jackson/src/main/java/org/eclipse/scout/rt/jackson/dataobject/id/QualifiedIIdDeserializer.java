@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,25 +12,21 @@ package org.eclipse.scout.rt.jackson.dataobject.id;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
 import static org.eclipse.scout.rt.platform.util.ObjectUtility.isOneOf;
 
-import java.io.IOException;
-import java.io.Serial;
-
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.dataobject.id.IdCodec.IdCodecFlag;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer for {@link IId} instances - like {@link TypedIdDeserializer} it uses {@link IdCodec} for
  * serialization. It may be used as a replacement for {@link UnqualifiedIIdDeserializer}.
  */
 public class QualifiedIIdDeserializer extends AbstractIdCodecDeserializer<IId> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   protected final Class<? extends IId> m_idClass;
 
@@ -40,7 +36,7 @@ public class QualifiedIIdDeserializer extends AbstractIdCodecDeserializer<IId> {
   }
 
   @Override
-  public IId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+  public IId deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
     String rawValue = p.getText();
     try {
       IId id = idCodec().fromQualified(rawValue, idCodecFlags());

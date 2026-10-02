@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,8 @@ import org.eclipse.scout.rt.platform.namespace.NamespaceVersion;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.core.JsonToken;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DatabindContext;
 
 @Bean
 public class DefaultDoEntityDeserializerTypeStrategy implements IDoEntityDeserializerTypeStrategy {
@@ -39,9 +40,9 @@ public class DefaultDoEntityDeserializerTypeStrategy implements IDoEntityDeseria
   }
 
   @Override
-  public Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken) {
+  public Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken, DatabindContext ctxt) {
     return m_dataObjectInventory.get().getAttributeDescription(entityClass, attributeName)
-        .map(a -> TypeFactoryUtility.toAttributeType(a.getType(), currentToken))
+        .map(a -> TypeFactoryUtility.toAttributeType(a.getType(), currentToken, ctxt))
         .filter(AttributeType::isKnown);
   }
 

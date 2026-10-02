@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,7 +18,7 @@ import org.eclipse.scout.rt.dataobject.id.IdCodec.IIdCodecFlag;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.databind.KeyDeserializer;
+import tools.jackson.databind.KeyDeserializer;
 
 /**
  * Abstract {@link KeyDeserializer} with {@link ScoutDataObjectModuleContext} that provides an {@link IdCodec} and

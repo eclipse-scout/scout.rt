@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,9 +20,9 @@ import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 
-import com.fasterxml.jackson.core.JsonToken;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DatabindContext;
+import tools.jackson.databind.JavaType;
 
 public final class TypeFactoryUtility {
 
@@ -30,10 +30,10 @@ public final class TypeFactoryUtility {
   }
 
   /**
-   * @see #toAttributeType(ParameterizedType, JsonToken)
+   * @see #toAttributeType(ParameterizedType, JsonToken, DatabindContext)
    */
-  public static AttributeType toAttributeType(ParameterizedType parametrizedType) {
-    return toAttributeType(parametrizedType, null);
+  public static AttributeType toAttributeType(ParameterizedType parametrizedType, DatabindContext ctxt) {
+    return toAttributeType(parametrizedType, null, ctxt);
   }
 
   /**
@@ -45,10 +45,10 @@ public final class TypeFactoryUtility {
    * @param currentToken
    *     optional {@link JsonToken} of the deserialization in progress
    */
-  public static AttributeType toAttributeType(ParameterizedType parametrizedType, JsonToken currentToken) {
+  public static AttributeType toAttributeType(ParameterizedType parametrizedType, JsonToken currentToken, DatabindContext ctxt) {
     if (ObjectUtility.isOneOf(parametrizedType.getRawType(), DoList.class, DoSet.class, DoCollection.class)) {
-      JavaType listItemsType = TypeFactory.defaultInstance().constructType(parametrizedType.getActualTypeArguments()[0]);
-      return AttributeType.ofDoCollection(TypeFactory.defaultInstance().constructParametricType((Class<?>) parametrizedType.getRawType(), listItemsType));
+      JavaType listItemsType = ctxt.constructType(parametrizedType.getActualTypeArguments()[0]);
+      return AttributeType.ofDoCollection(ctxt.getTypeFactory().constructParametricType((Class<?>) parametrizedType.getRawType(), listItemsType));
     }
     else if (DoValue.class == parametrizedType.getRawType()) {
       Type typeArg = parametrizedType.getActualTypeArguments()[0];
@@ -56,7 +56,7 @@ public final class TypeFactoryUtility {
         // special case: declared DoNode<Object> with list-typed value
         typeArg = DoList.class;
       }
-      return AttributeType.ofDoValue(TypeFactory.defaultInstance().constructType(typeArg));
+      return AttributeType.ofDoValue(ctxt.constructType(typeArg));
     }
     throw new PlatformException("Could not convert type {}, only DoValue<?>, DoList<?>, DoSet<?> and DoCollection<?> supported", parametrizedType);
   }

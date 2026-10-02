@@ -129,7 +129,7 @@
     <jetty.version>12.1.13</jetty.version>
     <slf4j.version>2.0.20</slf4j.version>
     <logback.version>1.6.4</logback.version>
-    <jackson.version>2.22.3</jackson.version>
+    <jackson.version>3.2.3</jackson.version>
     <io.netty-version>4.2.18.Final</io.netty-version>
     <apache.tika-version>4.1.0</apache.tika-version>
     <batik.version>1.19</batik.version>
@@ -216,7 +216,7 @@
       </dependency>
 
       <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
+        <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${jackson.version}</version>
         <type>pom</type>
@@ -701,14 +701,14 @@
         <!-- must be compatible with the jakarta.ws.rs-api version -->
         <groupId>org.glassfish.jersey</groupId>
         <artifactId>jersey-bom</artifactId>
-        <version>4.0.2</version>
+        <version>4.0.3</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
       <dependency>
         <groupId>org.glassfish.jersey.media</groupId>
-        <artifactId>jersey-media-json-jackson</artifactId>
-        <version>4.0.2</version>
+        <artifactId>jersey-media-json-jackson3</artifactId>
+        <version>4.0.3</version>
         <exclusions>
           <exclusion>
             <groupId>com.sun.activation</groupId>

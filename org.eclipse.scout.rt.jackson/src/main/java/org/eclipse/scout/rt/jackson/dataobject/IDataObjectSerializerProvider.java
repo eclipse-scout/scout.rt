@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,19 +11,21 @@ package org.eclipse.scout.rt.jackson.dataobject;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.KeyDeserializer;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.deser.Deserializers;
-import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.databind.ser.Serializers;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.ReferenceType;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.DeserializationConfig;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.KeyDeserializer;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.deser.Deserializers;
+import tools.jackson.databind.jsontype.TypeDeserializer;
+import tools.jackson.databind.jsontype.TypeSerializer;
+import tools.jackson.databind.ser.Serializers;
+import tools.jackson.databind.type.CollectionType;
+import tools.jackson.databind.type.ReferenceType;
 
 /**
  * Provider for own Jackson serializers and deserializers.
@@ -34,31 +36,31 @@ public interface IDataObjectSerializerProvider {
   /**
    * Finds a serializer.
    * <p>
-   * Called from Jackson by {@link Serializers.Base#findSerializer(SerializationConfig, JavaType, BeanDescription)}.
+   * Called from Jackson by {@link Serializers.Base#findSerializer(SerializationConfig, JavaType, BeanDescription.Supplier, JsonFormat.Value)}.
    *
    * @return <code>null</code> if no matching serializer can be provided.
    */
-  JsonSerializer<?> findSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc);
+  ValueSerializer<?> findSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides);
 
   /**
    * Finds a deserializer.
    * <p>
    * Called from Jackson by
-   * {@link Deserializers.Base#findBeanDeserializer(JavaType, DeserializationConfig, BeanDescription)}.
+   * {@link Deserializers.Base#findBeanDeserializer(JavaType, DeserializationConfig, BeanDescription.Supplier)}.
    *
    * @return <code>null</code> if no matching deserializer can be provided.
    */
-  JsonDeserializer<?> findDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription beanDesc);
+  ValueDeserializer<?> findDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef);
 
   /**
    * Finds a key serializer.
    * <p>
-   * Called from Jackson by {@link Serializers.Base#findSerializer(SerializationConfig, JavaType, BeanDescription)} for
+   * Called from Jackson by {@link Serializers.Base#findSerializer(SerializationConfig, JavaType, BeanDescription.Supplier, JsonFormat.Value)} for
    * key serializers.
    *
    * @return <code>null</code> if no matching serializer can be provided.
    */
-  default JsonSerializer<?> findKeySerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc) {
+  default ValueSerializer<?> findKeySerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides) {
     return null;
   }
 
@@ -66,12 +68,12 @@ public interface IDataObjectSerializerProvider {
    * Finds a key deserializer.
    * <p>
    * Called from Jackson by
-   * {@link Deserializers.Base#findBeanDeserializer(JavaType, DeserializationConfig, BeanDescription)} for key
+   * {@link Deserializers.Base#findBeanDeserializer(JavaType, DeserializationConfig, BeanDescription.Supplier)} for key
    * deserializers.
    *
    * @return <code>null</code> if no matching deserializer can be provided.
    */
-  default KeyDeserializer findKeyDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
+  default KeyDeserializer findKeyDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef) {
     return null;
   }
 
@@ -79,12 +81,12 @@ public interface IDataObjectSerializerProvider {
    * Finds a reference serializer.
    * <p>
    * Called from Jackson by
-   * {@link Serializers.Base#findReferenceSerializer(SerializationConfig, ReferenceType, BeanDescription, TypeSerializer, JsonSerializer)}.
+   * {@link Serializers.Base#findReferenceSerializer(SerializationConfig, ReferenceType, BeanDescription.Supplier, JsonFormat.Value, TypeSerializer, ValueSerializer)}.
    *
    * @return <code>null</code> if no matching serializer can be provided.
    */
-  default JsonSerializer<?> findReferenceSerializer(ScoutDataObjectModuleContext moduleContext, ReferenceType refType, SerializationConfig config, BeanDescription beanDesc, TypeSerializer contentTypeSerializer,
-      JsonSerializer<Object> contentValueSerializer) {
+  default ValueSerializer<?> findReferenceSerializer(ScoutDataObjectModuleContext moduleContext, ReferenceType refType, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides, TypeSerializer contentTypeSerializer,
+      ValueSerializer<Object> contentValueSerializer) {
     return null;
   }
 
@@ -92,12 +94,12 @@ public interface IDataObjectSerializerProvider {
    * Finds a reference deserializer.
    * <p>
    * Called from Jackson by
-   * {@link Deserializers.Base#findReferenceDeserializer(ReferenceType, DeserializationConfig, BeanDescription, TypeDeserializer, JsonDeserializer)}.
+   * {@link Deserializers.Base#findReferenceDeserializer(ReferenceType, DeserializationConfig, BeanDescription.Supplier, TypeDeserializer, ValueDeserializer)}.
    *
    * @return <code>null</code> if no matching deserializer can be provided.
    */
-  default JsonDeserializer<?> findReferenceDeserializer(ScoutDataObjectModuleContext moduleContext, ReferenceType refType, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer contentTypeDeserializer,
-      JsonDeserializer<?> contentDeserializer) {
+  default ValueDeserializer<?> findReferenceDeserializer(ScoutDataObjectModuleContext moduleContext, ReferenceType refType, DeserializationConfig config, BeanDescription.Supplier beanDescRef, TypeDeserializer contentTypeDeserializer,
+      ValueDeserializer<?> contentDeserializer) {
     return null;
   }
 
@@ -105,12 +107,12 @@ public interface IDataObjectSerializerProvider {
    * Finds a collection serializer.
    * <p>
    * Called from Jackson by
-   * {@link Serializers.Base#findCollectionSerializer(SerializationConfig, CollectionType, BeanDescription, TypeSerializer, JsonSerializer)}.
+   * {@link Serializers.Base#findCollectionSerializer(SerializationConfig, CollectionType, BeanDescription.Supplier, JsonFormat.Value, TypeSerializer, ValueSerializer)}.
    *
    * @return <code>null</code> if no matching serializer can be provided.
    */
-  default JsonSerializer<?> findCollectionSerializer(ScoutDataObjectModuleContext moduleContext, CollectionType type, SerializationConfig config, BeanDescription beanDesc, TypeSerializer elementTypeSerializer,
-      JsonSerializer<Object> elementValueSerializer) {
+  default ValueSerializer<?> findCollectionSerializer(ScoutDataObjectModuleContext moduleContext, CollectionType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides, TypeSerializer elementTypeSerializer,
+      ValueSerializer<Object> elementValueSerializer) {
     return null;
   }
 
@@ -118,12 +120,24 @@ public interface IDataObjectSerializerProvider {
    * Finds a collection deserializer.
    * <p>
    * Called from Jackson by
-   * {@link Deserializers.Base#findCollectionDeserializer(CollectionType, DeserializationConfig, BeanDescription, TypeDeserializer, JsonDeserializer)}.
+   * {@link Deserializers.Base#findCollectionDeserializer(CollectionType, DeserializationConfig, BeanDescription.Supplier, TypeDeserializer, ValueDeserializer)}.
    *
    * @return <code>null</code> if no matching deserializer can be provided.
    */
-  default JsonDeserializer<?> findCollectionDeserializer(ScoutDataObjectModuleContext moduleContext, CollectionType type, DeserializationConfig config, BeanDescription beanDesc, TypeDeserializer elementTypeDeserializer,
-      JsonDeserializer<?> elementDeserializer) {
+  default ValueDeserializer<?> findCollectionDeserializer(ScoutDataObjectModuleContext moduleContext, CollectionType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef, TypeDeserializer elementTypeDeserializer,
+      ValueDeserializer<?> elementDeserializer) {
+    return null;
+  }
+
+  /**
+   * Finds an enum serializer.
+   * <p>
+   * Called from Jackson by
+   * {@link Serializers.Base#findEnumSerializer(SerializationConfig, JavaType, BeanDescription.Supplier, JsonFormat.Value)}.
+   *
+   * @return <code>null</code> if no matching serializer can be provided.
+   */
+  default ValueSerializer<?> findEnumSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides) {
     return null;
   }
 
@@ -131,12 +145,11 @@ public interface IDataObjectSerializerProvider {
    * Finds an enum deserializer.
    * <p>
    * Called from Jackson by
-   * {@link Deserializers.Base#findEnumDeserializer(Class, DeserializationConfig, BeanDescription)}.
+   * {@link Deserializers.Base#findEnumDeserializer(JavaType, DeserializationConfig, BeanDescription.Supplier)}.
    *
    * @return <code>null</code> if no matching deserializer can be provided.
    */
-  // no counterpart findEnumSerializer because not supported by Serializers.Base
-  default JsonDeserializer<?> findEnumDeserializer(ScoutDataObjectModuleContext moduleContext, Class<?> type, DeserializationConfig config, BeanDescription beanDesc) {
+  default ValueDeserializer<?> findEnumDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef) {
     return null;
   }
 }

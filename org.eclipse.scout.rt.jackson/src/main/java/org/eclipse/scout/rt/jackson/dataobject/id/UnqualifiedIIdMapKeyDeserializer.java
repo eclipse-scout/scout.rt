@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,13 +9,12 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
-import java.io.IOException;
-
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.exc.InvalidFormatException;
 
 /**
  * Custom deserializer used for map keys of type {@link IId}.
@@ -30,7 +29,7 @@ public class UnqualifiedIIdMapKeyDeserializer extends AbstractIdCodecMapKeyDeser
   }
 
   @Override
-  public Object deserializeKey(String key, DeserializationContext ctxt) throws IOException {
+  public Object deserializeKey(String key, DeserializationContext ctxt) throws JacksonException {
     try {
       return idCodec().fromUnqualified(m_idClass, key, idCodecFlags());
     }

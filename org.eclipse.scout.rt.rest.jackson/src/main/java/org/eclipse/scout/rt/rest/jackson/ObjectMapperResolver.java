@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.rest.RestApplication;
 import org.eclipse.scout.rt.rest.RestApplicationContributors.ContextResolverContributor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Provides an {@link ObjectMapper} instance produced by {@link JacksonDataObjectMapper}.

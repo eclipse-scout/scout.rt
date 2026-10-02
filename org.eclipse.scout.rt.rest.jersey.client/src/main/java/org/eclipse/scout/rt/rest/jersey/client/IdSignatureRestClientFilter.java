@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,17 +22,16 @@ import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.rest.client.IGlobalRestRequestFilter;
 import org.eclipse.scout.rt.rest.client.IGlobalRestResponseFilter;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.EndpointConfigBase;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.ObjectReaderInjector;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.ObjectReaderModifier;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.ObjectWriterInjector;
-import org.glassfish.jersey.jackson.internal.jackson.jaxrs.cfg.ObjectWriterModifier;
+import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.cfg.EndpointConfigBase;
+import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.cfg.ObjectReaderInjector;
+import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.cfg.ObjectReaderModifier;
+import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.cfg.ObjectWriterInjector;
+import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.cfg.ObjectWriterModifier;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.ObjectWriter;
 
 /**
  * Filter that adds an object mapper supporting signature creation for serialization/deserialization of request and
@@ -90,10 +89,11 @@ public class IdSignatureRestClientFilter implements IGlobalRestRequestFilter, IG
 
     @Override
     public ObjectReader modify(EndpointConfigBase<?> endpoint, MultivaluedMap<String, String> httpHeaders, JavaType resultType, ObjectReader r, JsonParser p) {
+      // FIXME rsb check this
       //noinspection deprecation
-      var objectMapper = BEANS.get(JacksonIdSignatureDataObjectMapper.class).getObjectMapper();
-      p.setCodec(objectMapper);
-      return objectMapper.readerFor(r.getValueType());
+      return BEANS.get(JacksonIdSignatureDataObjectMapper.class)
+          .getObjectMapper()
+          .readerFor(resultType);
     }
   }
 
@@ -101,11 +101,12 @@ public class IdSignatureRestClientFilter implements IGlobalRestRequestFilter, IG
   public static class IdSignatureObjectWriterModifier extends ObjectWriterModifier {
 
     @Override
-    public ObjectWriter modify(EndpointConfigBase<?> endpoint, MultivaluedMap<String, Object> responseHeaders, Object valueToWrite, ObjectWriter w, JsonGenerator g) {
+    public ObjectWriter modify(EndpointConfigBase<?> endpoint, MultivaluedMap<String, Object> responseHeaders, Object valueToWrite, ObjectWriter w) {
+      // FIXME rsb check this
       //noinspection deprecation
-      var objectMapper = BEANS.get(JacksonIdSignatureDataObjectMapper.class).getObjectMapper();
-      g.setCodec(objectMapper);
-      return objectMapper.writer();
+      return BEANS.get(JacksonIdSignatureDataObjectMapper.class)
+          .getObjectMapper()
+          .writer();
     }
   }
 }
