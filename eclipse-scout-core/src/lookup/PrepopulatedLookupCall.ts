@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,7 +43,7 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByAll() {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }
@@ -68,7 +68,7 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByText(text: string) {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }
@@ -96,7 +96,7 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByKey(key: TKey) {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }
@@ -124,7 +124,7 @@ export class PrepopulatedLookupCall<TKey> extends LookupCall<TKey> {
   }
 
   protected _queryByRec(rec: TKey) {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }

@@ -7,14 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
+import {App, BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing';
 
 describe('Session', () => {
 
   beforeEach(() => {
     jasmine.Ajax.install();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
@@ -65,7 +64,7 @@ describe('Session', () => {
 
   describe('send', () => {
 
-    it('sends multiple async events in one call', () => {
+    it('sends multiple async events in one call', async () => {
       let session = createSession();
       // initially there should be no request at all
       expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -79,7 +78,7 @@ describe('Session', () => {
       send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -89,7 +88,9 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('sends multiple async events in one call over multiple user interactions if sending was delayed', () => {
+    it('sends multiple async events in one call over multiple user interactions if sending was delayed', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let session = createSession();
 
       // send first event delayed (in 500 ms)
@@ -97,7 +98,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls(null, 100);
+      await sleep(100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
       send(session, '1', 'nodeSelected');
@@ -106,7 +107,7 @@ describe('Session', () => {
       send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls(null, 1000);
+      await sleep(1000);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -116,7 +117,9 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('does not await the full delay if a subsequent send call has a smaller delay', () => {
+    it('does not await the full delay if a subsequent send call has a smaller delay', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let session = createSession();
 
       // send first event delayed (in 500 ms)
@@ -124,7 +127,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls(null, 100);
+      await sleep(100);
 
       // since 500 ms are not passed yet, the request has not been sent and following events should be added
       send(session, '1', 'nodeSelected');
@@ -133,7 +136,7 @@ describe('Session', () => {
       send(session, '1', 'nodeExpanded');
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls(null, 0);
+      await sleep(0);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -143,7 +146,9 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected', 'nodeExpanded']);
     });
 
-    it('does not await the full delay if a previous send call has a smaller delay', () => {
+    it('does not await the full delay if a previous send call has a smaller delay', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let session = createSession();
 
       // send first event with 300ms delay
@@ -155,13 +160,13 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 100 ms
-      sendQueuedAjaxCalls(null, 100);
+      await sleep(100);
 
       // since 300 ms are not passed yet, the request has not been sent
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // tick 250 ms --> both events should now have been sent
-      sendQueuedAjaxCalls(null, 250);
+      await sleep(250);
 
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
@@ -170,7 +175,7 @@ describe('Session', () => {
       expect(requestData).toContainEventTypesExactly(['nodeClick', 'nodeSelected']);
     });
 
-    it('coalesces events if event provides a coalesce function', () => {
+    it('coalesces events if event provides a coalesce function', async () => {
       let session = createSession();
 
       let coalesce = function(previous) {
@@ -218,7 +223,7 @@ describe('Session', () => {
       session.sendEvent(event5);
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       // after executing setTimeout there must be exactly one ajax request
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -229,7 +234,6 @@ describe('Session', () => {
     });
 
     it('sends requests consecutively', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
 
       // send first request
@@ -268,7 +272,6 @@ describe('Session', () => {
     });
 
     it('sends requests consecutively and respects delay', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
 
       // send first request
@@ -317,7 +320,6 @@ describe('Session', () => {
     });
 
     it('splits events into separate requests if an event requires a new request', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
 
       let event0 = new RemoteEvent('1', 'eventType0');
@@ -372,7 +374,7 @@ describe('Session', () => {
       receiveResponseForAjaxCall(request);
     });
 
-    it('does not split events into separate requests if only first request requires a new request', () => {
+    it('does not split events into separate requests if only first request requires a new request', async () => {
       let session = createSession();
 
       let event0 = new RemoteEvent('1', 'eventType0', {
@@ -390,7 +392,7 @@ describe('Session', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
 
       // Send request
-      jasmine.clock().tick(0);
+      await sleep();
       let request = jasmine.Ajax.requests.at(0);
       expect(JSON.parse(request.params)).toContainEvents([event0, event1, event2]);
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -399,7 +401,6 @@ describe('Session', () => {
     });
 
     it('queues ?poll results when user requests are pending', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -441,7 +442,6 @@ describe('Session', () => {
     });
 
     it('resumes polling after successful responses', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -472,7 +472,6 @@ describe('Session', () => {
     });
 
     it('does not resume polling after JS errors', async () => {
-      jasmine.clock().uninstall()
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -491,7 +490,8 @@ describe('Session', () => {
         status: 200,
         responseText: '{"events": [ { "target": "invalidTarget" } ]}' // <-- causes a JS error
       });
-      await expectAsync(promise).toBeRejected();
+      spyOn(App.get().errorHandler, 'handle'); // don't show message box
+      await expectAsync(promise).toBeResolved();
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
@@ -502,7 +502,6 @@ describe('Session', () => {
     });
 
     it('does not resume polling after UI server errors', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -533,7 +532,6 @@ describe('Session', () => {
     });
 
     it('does not resume polling after HTTP errors', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -564,7 +562,6 @@ describe('Session', () => {
     });
 
     it('does not resume polling after session terminated', async () => {
-      jasmine.clock().uninstall();
       let session = createSession();
       session.backgroundJobPollingSupport.enabled = true;
       spyOn(session, '_processSuccessResponse').and.callThrough();
@@ -597,37 +594,37 @@ describe('Session', () => {
 
   describe('init', () => {
 
-    it('sends startup parameter', () => {
+    it('sends startup parameter', async () => {
       let session = createSession();
       session.start();
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       let requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBe(true);
 
       // don't send it on subsequent requests
       send(session, '1', 'nodeClick');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       requestData = mostRecentJsonRequest();
       expect(requestData.startup).toBeUndefined();
     });
 
-    it('sends user agent on startup', () => {
+    it('sends user agent on startup', async () => {
       let session = createSession(new UserAgent({
         deviceType: Device.Type.MOBILE
       }));
       session.start();
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       let requestData = mostRecentJsonRequest();
       expect(requestData.userAgent.deviceType).toBe('MOBILE');
 
       // don't send it on subsequent requests
       send(session, '1', 'nodeClick');
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       requestData = mostRecentJsonRequest();
       expect(requestData.userAgent).toBeUndefined();

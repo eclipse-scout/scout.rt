@@ -602,6 +602,7 @@ describe('ValueField', () => {
     });
 
     it('does not catch async errors that are not caught by setValue', async () => {
+      jasmine.clock().uninstall();
       let field = helper.createField(StringField);
       field.addValidator(value => $.resolvedPromise(value += ' async'));
       field.on('propertyChange:value', () => {
@@ -609,7 +610,7 @@ describe('ValueField', () => {
       });
       spyOn(App.get().errorHandler, 'handleErrorInfo');
       field.parseAndSetValue('Foo');
-      await flushMicrotasks();
+      await sleep();
       expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalled();
       expect(field.errorStatus).toBe(null);
     });

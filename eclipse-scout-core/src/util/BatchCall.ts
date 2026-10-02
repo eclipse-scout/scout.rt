@@ -136,11 +136,11 @@ export class BatchCall<TKey, TValue> {
 
   protected _doBatchCall(keys: TKey[]): Promise<BatchCallResult<TKey, TValue>> {
     if (arrays.empty(keys)) {
-      return $.resolvedPromise(new Map());
+      return $.resolvedPromise();
     }
 
     try {
-      return this._batchCall(keys) ?? $.resolvedPromise(new Map());
+      return this._batchCall(keys) ?? $.resolvedPromise();
     } catch (error) {
       return $.rejectedPromise(error);
     }

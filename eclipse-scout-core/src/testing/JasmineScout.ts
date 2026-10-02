@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout, Session,
-  SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
+  AdapterData, AjaxError, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout,
+  Session, SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
 import 'jasmine-jquery';
@@ -32,7 +32,7 @@ declare global {
 
     override _processErrorJsonResponse(jsonError: JsonErrorResponse);
 
-    override _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string, request: RemoteRequest);
+    override _processErrorResponse(error: AjaxError, request: RemoteRequest);
 
     override _setBusy(busy: boolean);
   }
@@ -271,9 +271,7 @@ export const JasmineScout = {
     // Await full completion here, before any describe()/it() blocks are registered and before the spec files
     // are loaded (see context.keys().forEach(context) below): some specs access globally bootstrapped state
     // (e.g. HtmlEnvironment.get()) directly in their describe() body, which runs synchronously as soon as the
-    // spec module is loaded. With jQuery Deferred, App.init() used to complete synchronously within the same
-    // call (assisted by jasmine.clock().tick()); with native promises every then() is a microtask hop, so the
-    // completion must actually be awaited before proceeding.
+    // spec module is loaded.
     await this.startApp(TestingApp);
 
     beforeAll(() => {

@@ -305,28 +305,30 @@ $.pxToNumber = pixel => {
   return parseFloat(pixel);
 };
 
-// a native promise only supports a single resolved/rejected value, so 0 args resolve to undefined,
-// 1 arg is passed through as-is, and 2+ args are collapsed into a single array
-// TODO CGU the explanation makes no sense to me, implementation returns value of [0] or undefined if array has one or none values, otherwise it returns the array
-function _singleValue(args) {
-  return args.length <= 1 ? args[0] : args;
+/**
+ * If the given `array` has a length > 1, the array is returned.
+ * If the length is 1, the first element is returned.
+ * Otherwise, it returns `undefined.
+ */
+function singleValue(array) {
+  return array.length <= 1 ? array[0] : array;
 }
 
 $.resolvedDeferred = (...args) => {
   let deferred = new Deferred();
-  deferred.resolve(_singleValue(args));
+  deferred.resolve(singleValue(args));
   return deferred;
 };
 
 $.resolvedPromise = (...args) => {
   let deferred = new Deferred();
-  deferred.resolve(_singleValue(args));
+  deferred.resolve(singleValue(args));
   return deferred.promise();
 };
 
 $.rejectedPromise = (...args) => {
   let deferred = new Deferred();
-  deferred.reject(_singleValue(args));
+  deferred.reject(singleValue(args));
   return deferred.promise();
 };
 
@@ -337,7 +339,7 @@ $.promiseAll = (promises, asArray) => {
     if (asArray) {
       return results;
     }
-    return _singleValue(results);
+    return singleValue(results);
   });
 };
 

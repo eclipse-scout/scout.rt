@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,7 +42,7 @@ describe('BasicField', () => {
 
   describe('acceptInput must always be sent to server at the end of input, if at least one change has been made', () => {
     it('updateDisplayTextOnModify = true, with changed text', async () => {
-      jasmine.clock().uninstall();
+      jasmine.clock().autoTick();
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test1');
@@ -125,7 +125,7 @@ describe('BasicField', () => {
     });
 
     it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with changed text', async () => {
-      jasmine.clock().uninstall();
+      jasmine.clock().autoTick();
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');
@@ -151,7 +151,7 @@ describe('BasicField', () => {
     });
 
     it('updateDisplayTextOnModify = true, then property change to updateDisplayTextOnModify = false, with *pending* changed text', async () => {
-      jasmine.clock().uninstall();
+      jasmine.clock().autoTick();
       field.updateDisplayTextOnModify = true;
       field.render();
       field.$field.val('Test3');

@@ -1223,7 +1223,7 @@ describe('Tree', () => {
       jasmine.clock().uninstall();
 
       tree.collapseNode(node1);
-      tree.deleteAllChildNodes(node1);
+      expect(() => tree.deleteAllChildNodes(node1)).not.toThrowError();
     });
   });
 
