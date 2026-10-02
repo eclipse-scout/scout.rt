@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
 
@@ -18,17 +17,18 @@ import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.type.WritableTypeId;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.SerializationConfig;
-import com.fasterxml.jackson.databind.jsontype.NamedType;
-import com.fasterxml.jackson.databind.jsontype.TypeDeserializer;
-import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.databind.jsontype.impl.AsPropertyTypeSerializer;
-import com.fasterxml.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.core.type.WritableTypeId;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.jsontype.NamedType;
+import tools.jackson.databind.jsontype.TypeDeserializer;
+import tools.jackson.databind.jsontype.TypeIdResolver;
+import tools.jackson.databind.jsontype.TypeSerializer;
+import tools.jackson.databind.jsontype.impl.AsPropertyTypeSerializer;
+import tools.jackson.databind.jsontype.impl.StdTypeResolverBuilder;
 
 @Bean
 public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
@@ -36,12 +36,12 @@ public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
   private final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
   @Override
-  public TypeDeserializer buildTypeDeserializer(DeserializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
-    return useForType(baseType) ? super.buildTypeDeserializer(config, baseType, subtypes) : null;
+  public TypeDeserializer buildTypeDeserializer(DeserializationContext ctxt, JavaType baseType, Collection<NamedType> subtypes) {
+    return useForType(baseType) ? super.buildTypeDeserializer(ctxt, baseType, subtypes) : null;
   }
 
   @Override
-  public TypeSerializer buildTypeSerializer(SerializationConfig config, JavaType baseType, Collection<NamedType> subtypes) {
+  public TypeSerializer buildTypeSerializer(SerializationContext ctxt, JavaType baseType, Collection<NamedType> subtypes) {
     return useForType(baseType) ? new DataObjectAsPropertyTypeSerializer(_customIdResolver, getTypeProperty()) : null;
   }
 
@@ -61,12 +61,12 @@ public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
   protected static class DataObjectAsPropertyTypeSerializer extends AsPropertyTypeSerializer {
 
     public DataObjectAsPropertyTypeSerializer(TypeIdResolver idRes, String propName) {
-      super(idRes, null, propName);
+      super(idRes, null, propName, null);
     }
 
     @Override
-    public WritableTypeId writeTypePrefix(JsonGenerator g, WritableTypeId idMetadata) throws IOException {
-      _generateTypeId(idMetadata);
+    public WritableTypeId writeTypePrefix(JsonGenerator g, SerializationContext ctxt, WritableTypeId idMetadata) throws JacksonException {
+      _generateTypeId(ctxt, idMetadata);
       if (idMetadata.id != null) {
         return g.writeTypePrefix(idMetadata);
       }
