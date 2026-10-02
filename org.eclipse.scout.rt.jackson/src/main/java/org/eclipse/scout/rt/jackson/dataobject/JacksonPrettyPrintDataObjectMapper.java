@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,20 +14,19 @@ import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import tools.jackson.databind.SerializationFeature;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
- * {@link IDataObjectMapper} implementation based on jackson {@link ObjectMapper} with output indentation enabled (e.g.
+ * {@link IDataObjectMapper} implementation based on jackson {@link JsonMapper} with output indentation enabled (e.g.
  * pretty formatted JSON output).
  */
 @Order(IBean.DEFAULT_BEAN_ORDER + 100)
 public class JacksonPrettyPrintDataObjectMapper extends JacksonDataObjectMapper implements IPrettyPrintDataObjectMapper {
 
   @Override
-  protected ObjectMapper createObjectMapperInstance(boolean ignoreTypeAttribute) {
-    ObjectMapper om = super.createObjectMapperInstance(ignoreTypeAttribute);
-    om.enable(SerializationFeature.INDENT_OUTPUT);
-    return om;
+  protected JsonMapper.Builder createObjectMapperBuilder(boolean ignoreTypeAttribute) {
+    return super.createObjectMapperBuilder(ignoreTypeAttribute)
+        .enable(SerializationFeature.INDENT_OUTPUT);
   }
 }

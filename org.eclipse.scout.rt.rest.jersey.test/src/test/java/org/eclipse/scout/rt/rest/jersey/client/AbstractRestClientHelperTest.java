@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ import org.eclipse.scout.rt.rest.multipart.MultipartMessageBodyWriter;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Various test cases for {@link AbstractRestClientHelper}.
@@ -96,9 +96,9 @@ public class AbstractRestClientHelperTest {
     }
   }
 
-  protected static class ObjectMapperResolver2 implements ContextResolver<ObjectMapper> {
+  protected static class ObjectMapperResolver2 implements ContextResolver<JsonMapper> {
     @Override
-    public ObjectMapper getContext(Class<?> type) {
+    public JsonMapper getContext(Class<?> type) {
       return null;
     }
   }

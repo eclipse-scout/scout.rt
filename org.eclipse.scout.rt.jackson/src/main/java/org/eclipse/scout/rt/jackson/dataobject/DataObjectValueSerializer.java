@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,35 +9,31 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
-
 import org.eclipse.scout.rt.dataobject.IDataObjectValue;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.jsontype.TypeSerializer;
+import tools.jackson.databind.ser.std.StdSerializer;
 
 /**
  * Serializer for {@link IDataObjectValue}.
  */
 public class DataObjectValueSerializer extends StdSerializer<IDataObjectValue> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   public DataObjectValueSerializer(JavaType type) {
     super(type);
   }
 
   @Override
-  public void serialize(IDataObjectValue entity, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(IDataObjectValue entity, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
     gen.writePOJO(entity.getValue());
   }
 
   @Override
-  public void serializeWithType(IDataObjectValue entity, JsonGenerator gen, SerializerProvider provider, TypeSerializer typeSer) throws IOException {
+  public void serializeWithType(IDataObjectValue entity, JsonGenerator gen, SerializationContext ctxt, TypeSerializer typeSer) throws JacksonException {
     gen.writePOJO(entity.getValue());
   }
 }

@@ -35,15 +35,22 @@ import org.eclipse.scout.rt.platform.exception.VetoException;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestApplication;
 import org.eclipse.scout.rt.rest.jersey.JerseyTestRestClientHelper;
+import org.eclipse.scout.rt.rest.jersey.client.IdSignatureRestClientFilter;
 import org.eclipse.scout.rt.rest.jersey.fixture.SerializationRequest;
 import org.eclipse.scout.rt.rest.jersey.fixture.SerializationResponse;
 import org.eclipse.scout.rt.rest.jersey.fixture.SingleIdDo;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.glassfish.jersey.jackson3.internal.jackson.jakarta.rs.cfg.ObjectReaderModifier;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import tools.jackson.core.JsonParser;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.MappingIterator;
+import tools.jackson.databind.ObjectReader;
 
 @RunWith(PlatformTestRunner.class)
 public class IdSignatureRestFilterTest {
@@ -160,6 +167,38 @@ public class IdSignatureRestFilterTest {
             .withSerialized("{\"_type\":\"scout.SingleId\",\"id\":\"scout.FixtureIntegerId:42\"}"),
         request()
             .post(Entity.json(request), SerializationResponse.class));
+  }
+
+  @Test
+  public void testClientMappingIterator() {
+    testMappingIterator(BEANS.get(IdSignatureRestClientFilter.IdSignatureObjectReaderModifier.class));
+  }
+
+  @Test
+  public void testContainerMappingIterator() {
+    testMappingIterator(BEANS.get(IdSignatureRestContainerFilter.IdSignatureObjectReaderModifier.class));
+  }
+
+  @SuppressWarnings("deprecation")
+  protected void testMappingIterator(ObjectReaderModifier modifier) {
+    var first = BEANS.get(SingleIdDo.class).withId(FixtureIntegerId.of(42));
+    var second = BEANS.get(SingleIdDo.class).withId(FixtureIntegerId.of(43));
+    var signedMapper = BEANS.get(JacksonIdSignatureDataObjectMapper.class).getObjectMapper();
+    String json = signedMapper.writeValueAsString(first) + "\n" + signedMapper.writeValueAsString(second);
+    var mapper = BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
+    var resultType = mapper.constructType(new TypeReference<MappingIterator<SingleIdDo>>() {
+    });
+    // Jersey narrows the reader to the element type before calling the modifier.
+    ObjectReader reader = mapper.readerFor(SingleIdDo.class);
+    try (JsonParser parser = mapper.createParser(json)) {
+      parser.nextToken();
+      ObjectReader modified = modifier.modify(null, null, resultType, reader, parser);
+      try (MappingIterator<SingleIdDo> values = modified.readValues(parser)) {
+        assertEquals(first, values.nextValue());
+        assertEquals(second, values.nextValue());
+        assertFalse(values.hasNextValue());
+      }
+    }
   }
 
   protected static class P_IdCodec extends IdCodec {
