@@ -361,10 +361,8 @@ describe('PageWithTable', () => {
       }
     }
 
-    let lookupCall = new DummyLookupCall();
-    lookupCall.init({session: session});
-    let samplePage = new SamplePageWithTable();
-    samplePage.init({
+    let lookupCall = scout.create(DummyLookupCall, {session});
+    let samplePage = scout.create(SamplePageWithTable, {
       parent: outline,
       detailTable: {
         objectType: Table,
@@ -883,7 +881,7 @@ describe('PageWithTable', () => {
     deferredSmartColumn.lastCellTextDeferred.resolve();
     // lastCellTextPromise only covers the deferred cell text lookup itself; the update buffer's own
     // then(_onSetCellTextDeferredDone) reaction (which finally clears loading) settles a few microtasks later.
-    // Wait for the update buffer's own 'complete' event instead of guessing the exact number of hops.
+    // -> Wait for the update buffer's own 'complete' event
     await table.updateBuffer.when('complete');
     expect(table.loading).toBeFalse();
 
@@ -924,7 +922,7 @@ describe('PageWithTable', () => {
 
     deferredSmartColumn.lastCellTextDeferred.resolve();
     cellText2Resolved = true;
-    // see comment above: wait for the update buffer's own 'complete' event instead of guessing hops
+    // see comment above: wait for the update buffer's own 'complete' event
     await table.updateBuffer.when('complete');
     expect(table.loading).toBeFalse();
   });

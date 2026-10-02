@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,18 +13,10 @@ export class ChartTableControlConfigHelper implements ObjectWithType {
 
   objectType: string;
 
-  exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
-    return this._exportConfig(page);
-  }
-// TODO CGU remove method and replace overrides
-  protected async _exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
+  async exportConfig(page: Page): Promise<IChartTableControlConfigDo> {
     return null;
   }
 
-  importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {
-    return this._importConfig(page, config);
-  }
-// TODO CGU remove method and replace overrides
-  protected async _importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {
+  async importConfig(page: Page, config: IChartTableControlConfigDo): Promise<void> {
   }
 }

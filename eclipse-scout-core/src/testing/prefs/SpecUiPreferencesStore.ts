@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,17 +25,17 @@ export class SpecUiPreferencesStore extends UiPreferencesStore {
   storeCount = 0;
   subscribers: UiPreferencesUpdateHandler[] = [];
 
-  protected override async _load(): Promise<UiPreferencesDo> {
+  override async load(): Promise<UiPreferencesDo> {
     this.loadCount++;
     return this.preferences;
   }
 
-  protected override async _store(preferences: UiPreferencesDo): Promise<void> {
+  override async store(preferences: UiPreferencesDo): Promise<void> {
     this.storeCount++;
     this.preferences = preferences;
   }
 
-  protected override async _subscribeForUpdates(handler: UiPreferencesUpdateHandler): Promise<void> {
+  override async subscribeForUpdates(handler: UiPreferencesUpdateHandler): Promise<void> {
     this.subscribers.push(handler);
   }
 

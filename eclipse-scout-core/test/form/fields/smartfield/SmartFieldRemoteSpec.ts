@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -188,10 +188,10 @@ describe('SmartFieldRemote', () => {
 
     beforeEach(() => {
       smartField = createSmartFieldWithAdapter();
+      jasmine.clock().uninstall();
     });
 
     async function resolveLookupCall(lookupCall) {
-      let lookupDone = smartField.when('lookupCallDone');
       lookupCall.resolveLookup({
         queryBy: QueryBy.ALL,
         lookupRows: [scout.create(LookupRow, {
@@ -199,8 +199,7 @@ describe('SmartFieldRemote', () => {
           text: 'foo'
         })]
       });
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await smartField.when('lookupCallDone');
     }
 
     it('opens a touch popup when smart field gets touched', async () => {
@@ -246,7 +245,5 @@ describe('SmartFieldRemote', () => {
       expect(smartField.popup._field.$field.val()).toBe(smartField.displayText);
       smartField.popup.close();
     });
-
   });
-
 });

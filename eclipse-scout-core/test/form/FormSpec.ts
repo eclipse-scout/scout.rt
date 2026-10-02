@@ -2166,19 +2166,6 @@ describe('Form', () => {
       form.rootGroupBox.insertField(numberField);
     });
 
-    /**
-     * Native promises don't expose a synchronous state() like a JQuery.Promise, so track it ourselves.
-     */
-    function trackState(promise: Promise<any>): { value: string } {
-      let state = {value: 'pending'};
-      promise.then(() => {
-        state.value = 'resolved';
-      }, () => {
-        state.value = 'rejected';
-      });
-      return state;
-    }
-
     it('returns true if all fields are valid', async () => {
       mandatoryStringField.setValue('whatever');
       numberField.setValue(42);
@@ -2224,8 +2211,7 @@ describe('Form', () => {
         expect(status.isValid()).toBeFalse();
       });
 
-      // Let the validate chain reach the invalid-form message box, then close it
-      await sleep(10);
+      await session.desktop.when('propertyChange:messageBoxes');
       helper.closeMessageBoxes();
 
       await validatePromise;
@@ -2239,16 +2225,13 @@ describe('Form', () => {
         expect(status.isValid()).toBeFalse();
       });
 
-      // Let the validate chain reach the invalid-form message box, then close it
-      await sleep(10);
+      await session.desktop.when('propertyChange:messageBoxes');
       helper.closeMessageBoxes();
 
       await validatePromise;
     });
 
     it('waits for all validators to complete and returns true if all are valid', async () => {
-      jasmine.clock().install();
-
       mandatoryStringField.setValue('whatever');
       numberField.setValue(42);
 
@@ -2259,34 +2242,26 @@ describe('Form', () => {
       form.setValidators([f => deferred1.promise(), f => deferred2.promise(), f => deferred3.promise()]);
 
       const validate = form.validate();
-      const state = trackState(validate);
       const resultPromise = validate.then(status => {
         expect(status.isValid()).toBeTrue();
       });
 
-      jasmine.clock().tick(1000);
       await Promise.resolve();
-      expect(state.value).toBe('pending');
+      await expectAsync(validate).toBePending();
 
       deferred1.resolve(Status.ok());
       deferred2.resolve(Status.ok());
-      jasmine.clock().tick(1000);
       await Promise.resolve();
-      expect(state.value).toBe('pending');
+      await expectAsync(validate).toBePending();
 
       deferred3.resolve(Status.ok());
-      jasmine.clock().tick(1000);
       // resultPromise is chained off the same "validate" promise, registered after trackState()'s own .then() -> by
       // the time resultPromise settles, state.value has already been updated (promise reactions run in registration order).
       await resultPromise;
-      expect(state.value).toBe('resolved');
-
-      jasmine.clock().uninstall();
+      await expectAsync(validate).toBeResolved();
     });
 
     it('waits for all validators to complete and returns false if at least one is invalid', async () => {
-      jasmine.clock().install();
-
       mandatoryStringField.setValue('whatever');
       numberField.setValue(42);
 
@@ -2297,34 +2272,26 @@ describe('Form', () => {
       form.setValidators([f => deferred1.promise(), f => deferred2.promise(), f => deferred3.promise()]);
 
       const validate = form.validate();
-      const state = trackState(validate);
       const resultPromise = validate.then(status => {
         expect(status.isValid()).toBeFalse();
       });
 
-      jasmine.clock().tick(1000);
       await Promise.resolve();
-      expect(state.value).toBe('pending');
+      await expectAsync(validate).toBePending();
 
       deferred1.resolve(Status.ok());
       deferred2.resolve(Status.error());
-      jasmine.clock().tick(1000);
       await Promise.resolve();
-      expect(state.value).toBe('pending');
+      await expectAsync(validate).toBePending();
 
       deferred3.resolve(Status.ok());
-      jasmine.clock().tick(1000);
       await Promise.resolve();
-      expect(state.value).toBe('pending');
+      await expectAsync(validate).toBePending();
 
-      // Let the invalid-form message box actually render before trying to close it
-      await flushMicrotasks(10);
+      await session.desktop.when('propertyChange:messageBoxes');
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
-      await flushMicrotasks(10);
-      expect(state.value).toBe('resolved');
+      await expectAsync(validate).toBeResolved();
 
-      jasmine.clock().uninstall();
       await resultPromise;
     });
 
@@ -2428,7 +2395,6 @@ describe('Form', () => {
     }
 
     beforeEach(() => {
-      jasmine.clock().install();
       catchCalled = false;
       form = scout.create(FixtureErrorForm, {
         parent: session.desktop,
@@ -2445,7 +2411,6 @@ describe('Form', () => {
     afterEach(() => {
       // reset session of the error handler
       App.get().errorHandler.session = originalErrorHandlerSession;
-      jasmine.clock().uninstall();
     });
 
     it('is automatically handled in load', async () => {
@@ -2459,10 +2424,7 @@ describe('Form', () => {
           catchCalled = true;
         });
 
-      jasmine.clock().tick(1000);
-      // Let the load-error message box actually render before looking for it
-      await flushMicrotasks(10);
-
+      await sleep(); // Wait for ErrorHandler to display message box
       const messageBoxes = helper.findMessageBoxes();
       expect(messageBoxes.size).toBe(1);
       expect(session.desktop.busy).toBe(false);
@@ -2471,7 +2433,6 @@ describe('Form', () => {
       expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
 
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
       await loadPromise;
       expect(catchCalled).toBe(true);
       expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
@@ -2486,11 +2447,9 @@ describe('Form', () => {
       });
       form.load()
         .catch(fail); // error in postLoad does not reject the load promise
-      jasmine.clock().tick(1000);
     });
 
     it('is automatically handled in save', async () => {
-      jasmine.clock().uninstall();
       expect(session.desktop.busy).toBe(false);
 
       form.throwInSave = true;
@@ -2503,7 +2462,7 @@ describe('Form', () => {
           expect(e).toEqual('save');
         });
 
-      await sleep(); // Wait for error handler to show message box
+      await sleep(); // Wait for ErrorHandler to display message box
       const messageBoxes = helper.findMessageBoxes();
       expect(messageBoxes.size).toBe(1);
       expect(session.desktop.busy).toBe(false);
@@ -2538,7 +2497,6 @@ describe('Form', () => {
           expect(App.get().errorHandler.handleErrorInfo).not.toHaveBeenCalled();
           done();
         });
-      jasmine.clock().tick(1000);
     });
 
     it('save error handling can be exchanged', done => {
@@ -2567,7 +2525,6 @@ describe('Form', () => {
             });
         })
         .catch(fail);
-      jasmine.clock().tick(1000);
     });
   });
 

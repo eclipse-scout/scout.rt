@@ -161,8 +161,10 @@ export class LoginBox extends Box {
       data: data
     });
     ajax.call(options)
-      .then(this._onPostDone.bind(this))
-      .catch(this._onPostFail.bind(this));
+      .then(
+        data => this._onPostDone(data),
+        error => this._onPostFail(error)
+      );
   }
 
   checkTwoFactorResponse(data: Record<string, any>) {

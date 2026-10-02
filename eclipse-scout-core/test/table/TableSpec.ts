@@ -919,6 +919,7 @@ describe('Table', () => {
     });
 
     it('selects none if all are selected', async () => {
+      jasmine.clock().uninstall();
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
@@ -931,14 +932,12 @@ describe('Table', () => {
 
       table.toggleSelection();
       helper.assertSelection(table, []);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       helper.assertSelectionEvent(model.id, []);
 
       table.toggleSelection();
       helper.assertSelection(table, table.rows);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
       helper.assertSelectionEvent(model.id, helper.getRowIds(table.rows));
     });
   });
@@ -2047,6 +2046,7 @@ describe('Table', () => {
     });
 
     it('sends only click if row already is selected', async () => {
+      jasmine.clock().uninstall();
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
@@ -2054,8 +2054,7 @@ describe('Table', () => {
 
       let $row = table.$rows().first();
       clickRowAndAssertSelection(table, $row);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
 
@@ -2065,8 +2064,7 @@ describe('Table', () => {
 
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClick']);
     });
@@ -2629,6 +2627,7 @@ describe('Table', () => {
     });
 
     async function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
+      jasmine.clock().uninstall();
       table.render();
 
       let $rows = table.$data.children('.table-row');
@@ -2652,8 +2651,7 @@ describe('Table', () => {
         }
       }
 
-      sendQueuedAjaxCalls();
-      await flushMicrotasks(5);
+      await sendQueuedAjaxCallsAsync(session);
 
       let requestData = mostRecentJsonRequest();
       let event = new RemoteEvent(table.id, 'rowsSelected', {

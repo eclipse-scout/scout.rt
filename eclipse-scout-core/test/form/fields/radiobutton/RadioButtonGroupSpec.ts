@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,11 +18,6 @@ describe('RadioButtonGroup', () => {
     setFixtures(sandbox());
     session = sandboxSession();
     helper = new FormSpecHelper(session);
-    jasmine.clock().install();
-  });
-
-  afterEach(() => {
-    jasmine.clock().uninstall();
   });
 
   function expectEnabled(field: FormField, expectedEnabled: boolean, expectedEnabledComputed: boolean, hasClass?: string) {
@@ -147,7 +142,6 @@ describe('RadioButtonGroup', () => {
       let lookupPrepared = group.when('prepareLookupCall');
       let lookupDone = group.when('lookupCallDone');
       group.render(); // triggers the execution of the lookup call
-      jasmine.clock().tick(500);
 
       // Promise.all resolves to an array of results since 2 promises are passed
       const [prepareEvent] = await Promise.all([lookupPrepared, lookupDone]);
@@ -164,7 +158,6 @@ describe('RadioButtonGroup', () => {
       let lookupPrepared = group.when('prepareLookupCall');
       let lookupDone = group.when('lookupCallDone');
       group.setValue(2);
-      jasmine.clock().tick(500);
 
       // Promise.all resolves to an array of results since 2 promises are passed
       const [prepareEvent] = await Promise.all([lookupPrepared, lookupDone]);
@@ -177,10 +170,8 @@ describe('RadioButtonGroup', () => {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
-      let lookupDone = radioButtonGroup.when('lookupCallDone');
       radioButtonGroup.render();
-      jasmine.clock().tick(300);
-      await lookupDone;
+      await radioButtonGroup.when('lookupCallDone');
       expect(radioButtonGroup.radioButtons.length).toBe(3);
       expect(radioButtonGroup.lookupCall).not.toBe(null);
       expect(radioButtonGroup.errorStatus).toBe(null);
@@ -192,10 +183,8 @@ describe('RadioButtonGroup', () => {
         lookupCall: 'DummyLookupCall',
         value: 1
       });
-      let lookupDone = radioButtonGroup.when('lookupCallDone');
       radioButtonGroup.render(); // triggers the execution of the lookup call
-      jasmine.clock().tick(300);
-      await lookupDone;
+      await radioButtonGroup.when('lookupCallDone');
       expect(radioButtonGroup.radioButtons.length).toBe(3);
       expect(radioButtonGroup.errorStatus).toBe(null);
       expect(radioButtonGroup.lookupCall).not.toBe(null);
@@ -220,11 +209,8 @@ describe('RadioButtonGroup', () => {
         parent: session.desktop,
         lookupCall: 'DummyLookupCall'
       });
-      let lookupDone = radioButtonGroup.when('lookupCallDone');
       radioButtonGroup.render(); // triggers the execution of the lookup call
-
-      jasmine.clock().tick(300);
-      await lookupDone;
+      await radioButtonGroup.when('lookupCallDone');
       radioButtonGroup.setValue(2);
       expect(radioButtonGroup.value).toBe(2);
       expect(radioButtonGroup.errorStatus).toBe(null);

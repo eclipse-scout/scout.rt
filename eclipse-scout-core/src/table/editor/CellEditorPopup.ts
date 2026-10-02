@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,7 +24,7 @@ export class CellEditorPopup<TValue> extends Popup implements CellEditorPopupMod
   protected _pendingCompleteCellEdit: Promise<void>;
   /**
    * Tracks synchronously whether {@link _pendingCompleteCellEdit} has already resolved, since a native promise
-   * (unlike a JQuery.Promise) cannot be inspected synchronously for its state.
+   * cannot be inspected synchronously for its state.
    */
   protected _completeCellEditResolved: boolean;
   protected _rowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;

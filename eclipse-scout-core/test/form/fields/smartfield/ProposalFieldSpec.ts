@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,11 +25,9 @@ describe('ProposalField', () => {
       key: '123',
       text: 'Foo'
     });
-    jasmine.clock().install();
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     removePopups(session);
     removePopups(session, '.touch-popup');
   });
@@ -134,7 +132,7 @@ describe('ProposalField', () => {
    * this.lookupOnAcceptByText.
    * # 2345061
    */
-  it('when lookupOnAcceptByText=true the value is not deleted when aboutToBlurByMouseDown is called', () => {
+  it('when lookupOnAcceptByText=true the value is not deleted when aboutToBlurByMouseDown is called', async () => {
     field.render();
     field.lookupOnAcceptByText = true;
 
@@ -142,7 +140,7 @@ describe('ProposalField', () => {
     field.$field.val('Foo');
     field._userWasTyping = true;
     field.aboutToBlurByMouseDown(undefined);
-    jasmine.clock().tick(300);
+    await sleep();
     expect(field.displayText).toBe('Foo');
     expect(field.$field.val()).toBe('Foo');
   });
@@ -151,7 +149,6 @@ describe('ProposalField', () => {
     let expectedLookupRow;
 
     beforeEach(() => {
-      jasmine.clock().uninstall();
       field.render();
       field.lookupOnAcceptByText = true;
 
@@ -225,11 +222,9 @@ describe('ProposalField', () => {
     it('has a non empty status container that lists count of available options', async () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
       expect(field.$screenReaderStatus).toHaveClass('sr-only');
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
@@ -240,25 +235,20 @@ describe('ProposalField', () => {
       field.render();
       expect(field.$field).toHaveAttr('aria-expanded', 'false');
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$field).toHaveAttr('aria-expanded', 'true');
       field.closePopup();
     });
 
     it('has a aria-controls set correctly if pop up is open/closed', async () => {
-
       field.render();
       expect(field.$field.attr('aria-controls')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$field.attr('aria-controls')).toBe(field.popup.$container.attr('id'));
       field.closePopup();
     });
@@ -267,11 +257,9 @@ describe('ProposalField', () => {
       field.render();
       expect(field.$field.attr('aria-activedescendant')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       JQueryTesting.triggerKeyDown(field.$field, keys.DOWN);
       expect(field.$field.attr('aria-activedescendant')).toBeTruthy();
       field.closePopup();
@@ -281,7 +269,6 @@ describe('ProposalField', () => {
   describe('displayText, value, errorStatus and lookupRow are always in a consistent state', () => {
 
     beforeEach(() => {
-      jasmine.clock().uninstall();
       field = scout.create(SpecProposalField, {
         parent: session.desktop,
         lookupCall: {

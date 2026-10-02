@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,8 +79,10 @@ export class Reconnector {
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ' + pingAjaxOptions.method + ' "' + pingAjaxOptions.url + '"');
     this.pingStartTimestamp = Date.now();
     ajax.call(pingAjaxOptions)
-      .then(this._onPingDone.bind(this))
-      .catch(this._onPingFail.bind(this));
+      .then(
+        () => this._onPingDone(),
+        error => this._onPingFail(error)
+      );
   }
 
   protected _onPingDone() {
@@ -90,11 +92,11 @@ export class Reconnector {
   }
 
   protected _onPingFail(error: AjaxError) {
-    let handleFailedPing = function handleFailedPing() {
+    let handleFailedPing = () => {
       $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
       this.session.onReconnectingFailed();
       this._schedulePing(this.interval);
-    }.bind(this);
+    };
 
     let pingDuration = Date.now() - this.pingStartTimestamp;
     if (pingDuration < this.minPingDuration) {

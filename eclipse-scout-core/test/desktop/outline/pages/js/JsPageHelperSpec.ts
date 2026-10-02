@@ -483,7 +483,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages([scout.create(MyPageParamDo, {id: 'foo'}), scout.create(MyPageParamDo, {id: 'bar'})]);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -509,7 +508,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages([scout.create(MyPageParamDo, {id: 'foo'}), scout.create(MyPageParamDo, {id: 'bar'}), scout.create(MyPageParamDo, {id: 'foo'})]);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -539,7 +537,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages(['foo']);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -564,7 +561,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages(['foo', 'bar']);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -590,7 +586,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages(['foo', 'bar', 'foo']);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -620,7 +615,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages(['foo', scout.create(MyPageParamDo, {id: 'bar'})]);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -650,7 +644,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages(['foo'], false);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -675,7 +668,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages(['foo'], true);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -708,7 +700,6 @@ describe('JsPageHelper', () => {
       const callLoadChildPagesPromise = helper.callLoadChildPages(['foo']);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',
@@ -738,7 +729,6 @@ describe('JsPageHelper', () => {
       helper.callLoadChildPages(['foo']);
 
       await hybridManager.when('hybridAction');
-      await sleep(0); // let Session's real send debounce timer fire before checking the sent request
 
       expect(await sendQueuedCallsAndGetMostRecentRequest(session)).toContainEvents(new RemoteEvent(hybridManagerAdapter.id, 'hybridAction', {
         actionType: 'scout.LoadChildPages',

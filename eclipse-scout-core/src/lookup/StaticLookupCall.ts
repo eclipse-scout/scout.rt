@@ -61,7 +61,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByAll() {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }
@@ -136,10 +136,6 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
           text: text,
           lookupRows: lookupRows
         });
-      })
-      .catch(error => {
-        // TODO CGU did this make any sense previously? now it doesn't
-        throw error;
       });
   }
 
@@ -184,7 +180,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByKey(key: TKey) {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }
@@ -206,7 +202,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByKeys(keys: TKey[]) {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }
@@ -236,7 +232,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
   }
 
   protected _queryByRec(rec: TKey) {
-    if (this.session.destroyed) {
+    if (this.session?.destroyed) {
       // May cause unhandled rejection errors if session is destroyed
       return;
     }

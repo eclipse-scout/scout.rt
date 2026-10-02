@@ -187,7 +187,7 @@ declare global {
      *
      * @returns a {@link Promise} for an already resolved {@link Deferred} object.
      */
-    resolvedPromise(): Promise<undefined>;
+    resolvedPromise(): Promise<undefined>; // TODO CGU discuss in team whether to prefer Promise<void>, or even remove and also $.rejectedPromise, $.promiseAll, $.re
 
     /**
      * Use this function as shorthand of this:

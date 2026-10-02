@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,11 +20,9 @@ describe('TagField', () => {
     field = new TagField();
     field.session = session;
     helper = new FormSpecHelper(session);
-    jasmine.clock().install();
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     removePopups(session);
   });
 
@@ -111,11 +109,7 @@ describe('TagField', () => {
       // select the returned lookup row
       field.render();
       typeProposal(field, 'fo', keys.O);
-      jasmine.clock().tick(500);
-      // The lookup call's result is processed via a microtask chain (promise.then(_onLookupDone)) which the fake
-      // clock cannot flush, unlike the JQuery.Deferred this used to be.
-      await Promise.resolve();
-      await Promise.resolve();
+      await field.when('lookupCallDone');
 
       expect(field.popup instanceof TagChooserPopup).toBe(true);
 
@@ -163,11 +157,7 @@ describe('TagField', () => {
 
       field.render();
       typeProposal(field, 'ba', keys.A);
-      jasmine.clock().tick(500);
-      // The lookup call's result is processed via a microtask chain (promise.then(_onLookupDone)) which the fake
-      // clock cannot flush, unlike the JQuery.Deferred this used to be.
-      await Promise.resolve();
-      await Promise.resolve();
+      await field.when('lookupCallDone');
 
       // expect popup is open and has 2 lookup rows (Bar, Baz)
       expect(field.popup instanceof TagChooserPopup).toBe(true);

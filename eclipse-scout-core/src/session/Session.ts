@@ -14,7 +14,6 @@ import {
   UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
-import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
 export class Session extends EventEmitter implements SessionModel, ModelAdapterLike, ObjectWithType {
   declare model: SessionModel;
@@ -391,8 +390,8 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
 
     function onAjaxFail(ajaxError: AjaxError): Promise<any> {
-      this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
-      return $.rejectedPromise(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown);
+      this._processErrorResponse(ajaxError, request);
+      return $.rejectedPromise(ajaxError);
     }
   }
 
@@ -762,48 +761,36 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
     this.setRequestPending(true);
 
-    let jsError = null,
-      success = false,
-      responseData: RemoteResponse = null;
+    let success = false;
+    let responseData: RemoteResponse = null;
 
-    // Attach independent reactions (rather than chaining them) so that onAjaxAlways is not delayed by an extra
-    // microtask relative to onAjaxDone/onAjaxFail, just like the done/fail/always callbacks of a JQuery.Promise
-    // would have fired together (see Call.ts for the same pattern).
-    // TODO CGU test this, I don't think this is really necessary
-    let callPromise = this._callAjax({
+    this._callAjax({
       ajaxOptions: ajaxOptions,
       name: this._getRequestName(request, 'user request')
-    });
-    callPromise.then(onAjaxDone.bind(this), onAjaxFail.bind(this));
-    callPromise.finally(onAjaxAlways.bind(this));
+    })
+      .then(onAjaxDone.bind(this), onAjaxFail.bind(this))
+      .finally(onAjaxAlways.bind(this))
+      .catch(error => App.get().errorHandler.handle(error)); // show message box on error
 
     // ----- Helper methods -----
 
     function onAjaxDone(data: RemoteResponse) {
-      try {
-        // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
-        // correctly, because the glasspane of the busy indicator is still visible.
-        // The second check prevents flickering of the busy indicator if there is a scheduled request
-        // that will be sent immediately afterward (see onAjaxAlways).
-        if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
-          this._setBusy(false);
-        }
-        responseData = data;
-        success = this.responseQueue.process(data);
-      } catch (err) {
-        jsError = jsError || err;
+      // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
+      // correctly, because the glasspane of the busy indicator is still visible.
+      // The second check prevents flickering of the busy indicator if there is a scheduled request
+      // that will be sent immediately afterward (see onAjaxAlways).
+      if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
+        this._setBusy(false);
       }
+      responseData = data;
+      success = this.responseQueue.process(data);
     }
 
     function onAjaxFail(ajaxError: AjaxError) {
-      try {
-        if (busyHandling) {
-          this._setBusy(false);
-        }
-        this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
-      } catch (err) {
-        jsError = jsError || err;
+      if (busyHandling) {
+        this._setBusy(false);
       }
+      this._processErrorResponse(ajaxError, request);
     }
 
     function onAjaxAlways() {
@@ -843,11 +830,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         this._setBusy(false);
       }
       this.layoutValidator.validate();
-
-      // Throw previously caught error
-      if (jsError) {
-        throw jsError;
-      }
     }
   }
 
@@ -912,7 +894,8 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       ajaxOptions: ajaxOptions,
       name: this._getRequestName(request, 'request')
     })
-      .then(onAjaxDone.bind(this), onAjaxFail.bind(this));
+      .then(onAjaxDone.bind(this), onAjaxFail.bind(this))
+      .catch(error => App.get().errorHandler.handle(error).then(errorInfo => undefined)); // show message box on error, ignore result);
 
     // --- Helper methods ---
 
@@ -964,7 +947,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
     function onAjaxFail(ajaxError: AjaxError) {
       this.backgroundJobPollingSupport.setFailed();
-      this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
+      this._processErrorResponse(ajaxError, request);
     }
   }
 
@@ -1022,10 +1005,11 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
   }
 
-  protected _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, request: RemoteRequest) {
+  protected _processErrorResponse(error: AjaxError, request: RemoteRequest) {
+    let {jqXHR, textStatus, errorThrown} = error;
     $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
+    let offlineError = AjaxCall.isOfflineError(error);
     if (offlineError) {
       if (this.ready) {
         this.goOffline();

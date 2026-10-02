@@ -36,6 +36,7 @@ describe('SmartField', () => {
   afterEach(() => {
     removePopups(session);
     removePopups(session, '.touch-popup');
+    jasmine.clock().uninstall();
   });
 
   function createFieldWithLookupCall(model?: SmartFieldModel<number>, lookupCallModel?: ObjectOrModel<LookupCall<number>> | string): SpecSmartField {
@@ -102,9 +103,9 @@ describe('SmartField', () => {
     });
 
     it('load proposals for the current displayText', async () => {
-      // Use a real (deterministic) fake clock here to verify the loading indicator delay; the lookup call
-      // resolution itself still needs to be awaited afterward since that always settles via a microtask.
+      // Use a fake clock here to verify the loading indicator delay
       jasmine.clock().install();
+      jasmine.clock().autoTick();
       field = createFieldWithLookupCall();
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
@@ -112,10 +113,9 @@ describe('SmartField', () => {
       let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(300);
+      await sleep(300);
       expect(field.$container.hasClass('loading')).toBe(false); // loading indicator is not shown before 400 ms
-      jasmine.clock().tick(300);
-      jasmine.clock().uninstall();
+      await sleep(300);
       await lookupDone;
       // expect we have 2 table rows
       expect(field.popup).not.toBe(null);
@@ -182,6 +182,8 @@ describe('SmartField', () => {
     });
 
     it('clears the value, also in embedded mode', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let field = createFieldWithLookupCall({
         touchMode: true
       });
@@ -236,10 +238,9 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('b');
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await lookupDone;
+      await field.when('lookupCallDone');
 
       // do not animate the removal of the SmartFieldPopup. Otherwise it will not be removed yet, when the new one should be opened. Then nothing is updated.
       field.popup.animateRemoval = false;
@@ -302,14 +303,15 @@ describe('SmartField', () => {
       popup._field.lookupCall['data'] = [];
       popup._field.$field.focus();
       JQueryTesting.triggerKeyDown(popup._field.$field, keys.BACKSPACE);
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       popup._field._onFieldKeyUp({});
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(popup).not.toBe(null);
     });
 
     it('removes tooltip from original field on open and displays it again when closed', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       let field = createFieldWithLookupCall({
         touchMode: true,
         errorStatus: Status.error({
@@ -613,7 +615,7 @@ describe('SmartField', () => {
     it('lookupByKey should set a validation warning status if there was an error during processing', async () => {
       let field = createFieldWithNoDataKeyLookupCall(true);
       field.setValue(4 /* non-existing key */); // triggers lookup by key
-      await sleep(500);
+      await sleep();
       expect(field.errorStatus).toBeInstanceOf(ValidationFailedStatus);
       expect(field.errorStatus.isWarning()).toBeTrue();
     });
@@ -621,7 +623,7 @@ describe('SmartField', () => {
     it('lookupByKey should set a validation warning status if the lookup call returns no lookup row', async () => {
       let field = createFieldWithNoDataKeyLookupCall(false);
       field.setValue(0); // triggers lookup by key
-      await sleep(500);
+      await field.when('lookupCallDone');
       expect(field.errorStatus).toBeInstanceOf(ValidationFailedStatus);
       expect(field.errorStatus.isWarning()).toBeTrue();
     });
@@ -1240,9 +1242,8 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
-      let lookupDone = field.when('lookupCallDone');
       field._onFieldKeyUp($.Event('keyup', {}) as JQuery.KeyUpEvent);
-      await lookupDone;
+      await field.when('lookupCallDone');
       let popup = field.popup as SmartFieldPopup<any>;
       expect(popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar');
       expect(popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar column1');
@@ -1268,10 +1269,9 @@ describe('SmartField', () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
       field.$field.val('Bar');
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await lookupDone;
+      await field.when('lookupCallDone');
       let popup = field.popup as SmartFieldPopup<any>;
       expect(popup.proposalChooser.content.rows[0].cells[0].text).toBe('Bar column1');
       expect(popup.proposalChooser.content.rows[0].cells[1].text).toBe('Bar');
@@ -1333,10 +1333,9 @@ describe('SmartField', () => {
       });
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
       expect(field.$screenReaderStatus).toHaveClass('sr-only');
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
@@ -1359,10 +1358,9 @@ describe('SmartField', () => {
       field.render();
       expect(field.$field).toHaveAttr('aria-expanded', 'false');
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$field).toHaveAttr('aria-expanded', 'true');
       field.closePopup();
     });
@@ -1374,10 +1372,9 @@ describe('SmartField', () => {
       field.render();
       expect(field.$field.attr('aria-controls')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$field.attr('aria-controls')).toBe(field.popup.$container.attr('id'));
       field.closePopup();
     });
@@ -1389,10 +1386,9 @@ describe('SmartField', () => {
       field.render();
       expect(field.$field.attr('aria-activedescendant')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      await lookupDone;
+      await field.when('lookupCallDone');
       JQueryTesting.triggerKeyDown(field.$field, keys.DOWN);
       expect(field.$field.attr('aria-activedescendant')).toBeTruthy();
       field.closePopup();
