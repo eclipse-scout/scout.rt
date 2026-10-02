@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,6 +9,7 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import java.io.Serial;
 import java.util.stream.Collectors;
 
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
@@ -16,11 +17,12 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
-import com.fasterxml.jackson.databind.DatabindContext;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
-import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
-import com.fasterxml.jackson.databind.type.SimpleType;
+
+import tools.jackson.databind.DatabindContext;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.jsontype.TypeIdResolver;
+import tools.jackson.databind.jsontype.impl.TypeIdResolverBase;
+import tools.jackson.databind.type.SimpleType;
 
 /**
  * {@link TypeIdResolver} implementation handling type resolution of data objects.
@@ -29,6 +31,9 @@ import com.fasterxml.jackson.databind.type.SimpleType;
  */
 @Bean
 public class DataObjectTypeIdResolver extends TypeIdResolverBase {
+
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   private final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
@@ -45,22 +50,22 @@ public class DataObjectTypeIdResolver extends TypeIdResolverBase {
   }
 
   @Override
-  public String idFromValue(Object obj) {
-    return idFromClass(obj.getClass());
+  public String idFromValue(DatabindContext ctxt, Object value) {
+    return idFromClass(value.getClass());
   }
 
   @Override
-  public String idFromBaseType() {
+  public String idFromBaseType(DatabindContext ctxt) {
     return idFromClass(m_baseType.getRawClass());
   }
 
   @Override
-  public String idFromValueAndType(Object value, Class<?> clazz) {
+  public String idFromValueAndType(DatabindContext ctxt, Object value, Class<?> suggestedType) {
     if (value != null) {
       return idFromClass(value.getClass());
     }
     else {
-      return idFromClass(clazz);
+      return idFromClass(suggestedType);
     }
   }
 

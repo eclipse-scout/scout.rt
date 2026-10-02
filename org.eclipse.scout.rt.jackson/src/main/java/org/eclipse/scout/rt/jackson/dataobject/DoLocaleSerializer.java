@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,39 +9,31 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
 import java.util.Locale;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.jdk.JDKStringLikeSerializer;
+import tools.jackson.databind.ser.std.ToStringSerializerBase;
 
 /**
- * Custom serializer for {@link Locale} using {@link Locale#toLanguageTag()} instead of {@link Locale#toString()}
- * default Jackson behavior.
- * <p>
- * TODO pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
- *
- * @see <a href="https://github.com/FasterXML/jackson-databind/issues/1600">Issue</a>
+ * Custom serializer for {@link Locale} that always serializes to {@link Locale#toLanguageTag()}
+ * instead of default Jackson behavior which serializes the {@link Locale#ROOT} to an empty string.
  */
-public class DoLocaleSerializer extends ToStringSerializer {
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class DoLocaleSerializer extends ToStringSerializerBase {
 
   public DoLocaleSerializer() {
     super(Locale.class);
   }
 
+  /**
+   * Always use the language tag, so that {@link Locale#ROOT} is serialized to "und".
+   * Jackson uses empty string for the {@link Locale#ROOT}.
+   *
+   * @see JDKStringLikeSerializer#serialize(Object, JsonGenerator, SerializationContext)
+   */
   @Override
-  public boolean isEmpty(SerializerProvider prov, Object value) {
-    return value == null || ((Locale) value).toLanguageTag().isEmpty();
-  }
-
-  @Override
-  public void serialize(Object value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-    // No restriction on if current value is instance of IDoEntity because otherwise Locales used as value in a Map aren't correctly serialized.
-    // Issue 1600 is fixed in 3.0, we enforce this behavior for Scout already.
-    gen.writeString(((Locale) value).toLanguageTag());
+  public String valueToString(Object value) {
+    return ((Locale) value).toLanguageTag();
   }
 }

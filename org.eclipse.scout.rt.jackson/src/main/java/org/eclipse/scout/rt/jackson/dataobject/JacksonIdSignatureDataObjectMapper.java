@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,10 +14,10 @@ import org.eclipse.scout.rt.dataobject.IIdSignatureDataObjectMapper;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.Order;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
- * {@link IDataObjectMapper} implementation based on jackson {@link ObjectMapper} with id signed
+ * {@link IDataObjectMapper} implementation based on jackson {@link JsonMapper} with id signed
  * serialization/deserialization.
  */
 @Order(IBean.DEFAULT_BEAN_ORDER + 100)

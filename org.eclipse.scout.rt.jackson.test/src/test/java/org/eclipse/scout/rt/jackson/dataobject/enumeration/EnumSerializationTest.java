@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -108,6 +108,12 @@ public class EnumSerializationTest {
     String json = "{\"_type\" : \"scout.TestEntityWithEnumMapKey\", \"map\" : { \"unknown\" : \"value\" } }";
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithEnumMapKeyDo.class));
 
+    // FIXME rsb check with pbz: Map<ENUMTYPE,V> is now directly mapped to EnumMap and Set<ENUMTYPE> to EnumSet<EnumType>
+    //  The special EnumMapDeserializer directly casts to Enum<?>
+    //  tools.jackson.databind.deser.jdk.EnumMapDeserializer.deserialize(tools.jackson.core.JsonParser, tools.jackson.databind.DeserializationContext, java.util.EnumMap)
+    //  https://github.com/FasterXML/jackson-databind/issues/1883
+    //  this means we cannot just return the string representation anymore in lenient mode (org.eclipse.scout.rt.jackson.dataobject.enumeration.EnumMapKeyDeserializer.deserializeKey)
+    //  what should we do instead?
     TestEntityWithEnumMapKeyDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithEnumMapKeyDo.class);
     Map<FixtureEnum, String> map = marshalledLenient.getMap(); // accessing this way works due to missing checks for generics at runtime
     assertEquals(1, map.size());

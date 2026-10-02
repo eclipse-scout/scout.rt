@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,18 +9,17 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.id;
 
-import java.io.IOException;
-
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IdCodec;
 import org.eclipse.scout.rt.jackson.dataobject.ScoutDataObjectModuleContext;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
 
 /**
- * Custom serializer for {@link IId} instances - like {@link TypedIdSerializer} it uses {@link IdCodec} for
- * serialization. It may be used as a replacement for {@link UnqualifiedIIdMapKeySerializer}.
+ * Custom serializer for {@link IId} instances - uses {@link IdCodec} for serialization.
+ * It may be used as a replacement for {@link UnqualifiedIIdMapKeySerializer}.
  */
 public class QualifiedIIdMapKeySerializer extends AbstractIdCodecMapKeySerializer<IId> {
 
@@ -29,7 +28,7 @@ public class QualifiedIIdMapKeySerializer extends AbstractIdCodecMapKeySerialize
   }
 
   @Override
-  public void serialize(IId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-    gen.writeFieldName(idCodec().toQualified(value, idCodecFlags()));
+  public void serialize(IId value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
+    gen.writeName(idCodec().toQualified(value, idCodecFlags()));
   }
 }

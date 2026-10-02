@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,23 +9,23 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
 import java.util.Locale;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
 /**
  * Custom serializer for map keys of type {@link Locale} using {@link Locale#toLanguageTag()} instead of
  * {@link Locale#toString()} default Jackson behavior.
  * <p>
- * TODO pbz: Remove this class when Jackson is upgraded to 3.0 (issue 1600)
+ * TODO rsb: Check if this class is still needed when Jackson is upgraded (issue 6320)
  */
-public class LocaleMapKeySerializer extends JsonSerializer<Locale> {
+public class LocaleMapKeySerializer extends ValueSerializer<Locale> {
 
   @Override
-  public void serialize(Locale value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-    gen.writeFieldName(value.toLanguageTag());
+  public void serialize(Locale value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
+    gen.writeName(value.toLanguageTag());
   }
 }
