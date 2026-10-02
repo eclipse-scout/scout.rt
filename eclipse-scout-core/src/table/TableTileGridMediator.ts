@@ -47,6 +47,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   protected _isUpdatingTiles: boolean;
   protected _tableHierarchyFilter: TileTableHierarchyFilter;
   protected _tileFilters: MediatedTableTileFilter[];
+  protected _updateTilesFromMappingsTimeoutId: number;
   protected _destroyHandler: () => void;
   protected _tileAccordionPropertyChangeHandler: EventHandler<PropertyChangeEvent<any, TileAccordion>>;
   protected _tileAccordionActionHandler: EventHandler<TileActionEvent<TileAccordion>>;
@@ -61,6 +62,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   protected _tableAllRowsDeletedHandler: EventHandler<TableAllRowsDeletedEvent>;
   protected _tableRowOrderChangedHandler: EventHandler<TableRowOrderChangedEvent>;
   protected _tablePropertyChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _tableRowTileMappingTileChangeHandler = this._onTableRowTileMappingTileChange.bind(this);
 
   constructor() {
     super();
@@ -100,7 +102,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     this._addWidgetProperties(['tileAccordion', 'tiles', 'tileMappings']);
   }
 
-  override init(model: InitModelOf<this>) {
+  protected override _init(model: InitModelOf<this>) {
     super._init(model);
 
     this.table = this.parent;
@@ -181,10 +183,12 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
   }
 
   protected _setTileMappings(tableRowTileMappings: TableRowTileMapping[]) {
+    arrays.ensure(this.tileMappings).forEach(mapping => mapping.off('propertyChange:tile', this._tableRowTileMappingTileChangeHandler));
     this._setProperty('tileMappings', tableRowTileMappings);
     if (!tableRowTileMappings) {
       return;
     }
+    tableRowTileMappings.forEach(mapping => mapping.on('propertyChange:tile', this._tableRowTileMappingTileChangeHandler));
     let tiles = tableRowTileMappings.map(this.resolveMapping, this);
     this._setTiles(tiles);
   }
@@ -704,6 +708,17 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
     if (this.tileAccordion.rendered) {
       this.tileAccordion.remove();
     }
+  }
+
+  protected _onTableRowTileMappingTileChange(event: PropertyChangeEvent<Tile, TableRowTileMapping>) {
+    if (this._updateTilesFromMappingsTimeoutId) {
+      return;
+    }
+    this._updateTilesFromMappingsTimeoutId = setTimeout(() => {
+      const tiles = this.tileMappings.map(this.resolveMapping, this);
+      this.setTiles(tiles);
+      this._updateTilesFromMappingsTimeoutId = null;
+    });
   }
 }
 
