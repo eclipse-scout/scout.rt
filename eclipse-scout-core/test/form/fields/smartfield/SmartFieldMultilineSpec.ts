@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,11 +19,6 @@ describe('SmartFieldMultiline', () => {
   beforeEach(() => {
     setFixtures(sandbox());
     session = sandboxSession();
-    jasmine.clock().install();
-  });
-
-  afterEach(() => {
-    jasmine.clock().uninstall();
   });
 
   class SpecSmartFieldMultiline extends SmartFieldMultiline<number> {
@@ -84,11 +79,9 @@ describe('SmartFieldMultiline', () => {
     it('has a non empty status container that lists count of available options', async () => {
       field.render();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$screenReaderStatus).toHaveAttr('role', 'status');
       expect(field.$screenReaderStatus).toHaveClass('sr-only');
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
@@ -99,11 +92,9 @@ describe('SmartFieldMultiline', () => {
       field.render();
       expect(field.$field).toHaveAttr('aria-expanded', 'false');
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$field).toHaveAttr('aria-expanded', 'true');
       field.closePopup();
     });
@@ -113,11 +104,9 @@ describe('SmartFieldMultiline', () => {
       field.render();
       expect(field.$field.attr('aria-controls')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       expect(field.$field.attr('aria-controls')).toBe(field.popup.$container.attr('id'));
       field.closePopup();
     });
@@ -126,11 +115,9 @@ describe('SmartFieldMultiline', () => {
       field.render();
       expect(field.$field.attr('aria-activedescendant')).toBeFalsy();
       field.$field.focus(); // must be focused, otherwise popup will not open
-      let lookupDone = field.when('lookupCallDone');
       // @ts-expect-error
       field._onFieldKeyUp({});
-      jasmine.clock().tick(500);
-      await lookupDone;
+      await field.when('lookupCallDone');
       JQueryTesting.triggerKeyDown(field.$field, keys.DOWN);
       expect(field.$field.attr('aria-activedescendant')).toBeTruthy();
       field.closePopup();

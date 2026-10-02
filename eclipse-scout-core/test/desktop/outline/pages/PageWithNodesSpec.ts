@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,24 +31,46 @@ describe('PageWithNodes', () => {
     jasmine.clock().uninstall();
   });
 
+  class SpecPageWithNodes extends PageWithNodes {
+    declare _loadChildrenPromise: Promise<any>;
+  }
+
+  class SamplePageWithNodes extends SpecPageWithNodes {
+    counter = 100;
+
+    protected override _createChildPages(): Promise<Page[]> {
+      let pages = [
+        scout.create(PageWithNodes, {
+          parent: outline,
+          text: 'Page ' + this.counter++
+        }),
+        scout.create(PageWithNodes, {
+          parent: outline,
+          text: 'Page ' + this.counter++
+        })
+      ];
+      return $.resolvedPromise(pages);
+    }
+  }
+
   it('updates the detail table when child pages are changed', async () => {
-    let page1 = scout.create(PageWithNodes, {
+    let page1 = scout.create(SpecPageWithNodes, {
       parent: outline,
       text: 'Page 1'
     });
     outline.insertNode(page1);
     outline.selectNode(page1);
-    await page1.ensureLoadChildren();
+    await page1._loadChildrenPromise;
 
     expect(page1.detailTable).toBeTruthy();
     expect(page1.detailTable.rows.length).toBe(0);
 
     // Check that pages are linked with table rows
-    let page2 = scout.create(PageWithNodes, {
+    let page2 = scout.create(SpecPageWithNodes, {
       parent: outline,
       text: 'Page 2'
     });
-    let page3 = scout.create(PageWithNodes, {
+    let page3 = scout.create(SpecPageWithNodes, {
       parent: outline,
       text: 'Pag 3'
     });
@@ -70,7 +92,7 @@ describe('PageWithNodes', () => {
 
     // Check that selected node pages cause the selection in the detail table of the parent node to be updated
     outline.selectNode(page3);
-    await page3.ensureLoadChildren();
+    await page3._loadChildrenPromise;
     expect(page3.detailTable).toBeTruthy();
     expect(page3.detailTable.rows.length).toBe(0);
     expect(page1.detailTable.selectedRows.length).toBe(1); // <--
@@ -79,9 +101,9 @@ describe('PageWithNodes', () => {
     // Check that detail table is also updated if node is not selected
     expect(page2.detailTable).toBeFalsy();
     outline.selectNode(page2); // select to create outline content
-    await page2.ensureLoadChildren();
+    await page2._loadChildrenPromise;
     outline.selectNode(page3);
-    await page3.ensureLoadChildren();
+    await page3._loadChildrenPromise;
     expect(page2.detailTable.rows.length).toBe(0);
     let page4 = scout.create(PageWithNodes, {
       parent: outline,
@@ -101,7 +123,7 @@ describe('PageWithNodes', () => {
   });
 
   it('updates childrenLoaded flag', async () => {
-    let page = scout.create(PageWithNodes, {
+    let page = scout.create(SpecPageWithNodes, {
       parent: outline,
       text: 'Page 1',
       reloadable: true,
@@ -118,7 +140,7 @@ describe('PageWithNodes', () => {
     });
     outline.insertNode(page);
     outline.selectNode(page);
-    await page.ensureLoadChildren();
+    await page._loadChildrenPromise;
     let detailTable = page.detailTable;
     expect(detailTable).toBeTruthy();
 
@@ -137,7 +159,7 @@ describe('PageWithNodes', () => {
   describe('reloadPage', () => {
 
     it('does not reload child pages if pages are static, even when reloadable=true', async () => {
-      let page = scout.create(PageWithNodes, {
+      let page = scout.create(SpecPageWithNodes, {
         parent: outline,
         text: 'Page 1',
         reloadable: true,
@@ -154,7 +176,7 @@ describe('PageWithNodes', () => {
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      await page.ensureLoadChildren();
+      await page._loadChildrenPromise;
       let detailTable = page.detailTable;
       expect(detailTable).toBeTruthy();
 
@@ -178,31 +200,13 @@ describe('PageWithNodes', () => {
     });
 
     it('does not reload child pages if reloadable=false', async () => {
-      let counter = 100;
-
-      class SpecPageWithNodes extends PageWithNodes {
-        protected override _createChildPages(): Promise<Page[]> {
-          let pages = [
-            scout.create(PageWithNodes, {
-              parent: outline,
-              text: 'Page ' + counter++
-            }),
-            scout.create(PageWithNodes, {
-              parent: outline,
-              text: 'Page ' + counter++
-            })
-          ];
-          return $.resolvedPromise(pages);
-        }
-      }
-
-      let page = scout.create(SpecPageWithNodes, {
+      let page = scout.create(SamplePageWithNodes, {
         parent: outline,
         reloadable: false
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      await page.ensureLoadChildren();
+      await page._loadChildrenPromise;
       let detailTable = page.detailTable;
       expect(detailTable).toBeTruthy();
 
@@ -315,30 +319,12 @@ describe('PageWithNodes', () => {
     });
 
     it('reloads child pages if reloadable=true', async () => {
-      let counter = 100;
-
-      class SpecPageWithNodes extends PageWithNodes {
-        protected override _createChildPages(): Promise<Page[]> {
-          let pages = [
-            scout.create(PageWithNodes, {
-              parent: outline,
-              text: 'Page ' + counter++
-            }),
-            scout.create(PageWithNodes, {
-              parent: outline,
-              text: 'Page ' + counter++
-            })
-          ];
-          return $.resolvedPromise(pages);
-        }
-      }
-
-      let page = scout.create(SpecPageWithNodes, {
+      let page = scout.create(SamplePageWithNodes, {
         parent: outline
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      await page.ensureLoadChildren();
+      await page._loadChildrenPromise;
       let detailTable = page.detailTable;
       expect(detailTable).toBeTruthy();
 
@@ -385,7 +371,7 @@ describe('PageWithNodes', () => {
     });
 
     it('collapses lazy expanded nodes on reload', async () => {
-      class LazyPageWithNodes extends PageWithNodes {
+      class LazyPageWithNodes extends SpecPageWithNodes {
         constructor() {
           super();
           this.lazyExpandingEnabled = true;
@@ -414,7 +400,7 @@ describe('PageWithNodes', () => {
       });
       outline.insertNode(page);
       outline.selectNode(page);
-      await page.ensureLoadChildren();
+      await page._loadChildrenPromise;
 
       expect(page.childNodes.length).toBe(3);
       expect(page.expanded).toBe(false);
@@ -461,7 +447,7 @@ describe('PageWithNodes', () => {
   });
 
   describe('detail table', () => {
-    class SpecPageWithNodes extends PageWithNodes {
+    class MyPageWithNodes extends SpecPageWithNodes {
       protected override _createChildPages(): Promise<Page[]> {
         return $.resolvedPromise([
           scout.create(PageWithNodes, {
@@ -477,7 +463,7 @@ describe('PageWithNodes', () => {
     }
 
     it('creates rows after child pages have been loaded', async () => {
-      let page = scout.create(SpecPageWithNodes, {
+      let page = scout.create(MyPageWithNodes, {
         parent: outline
       });
       outline.insertNode(page);
@@ -485,7 +471,7 @@ describe('PageWithNodes', () => {
       expect(page.detailTable).toBe(null); // not yet initialized
 
       outline.selectNode(page);
-      await page.ensureLoadChildren();
+      await page._loadChildrenPromise;
       expect(page.childrenLoaded).toBe(true);
       expect(page.childNodes.length).toBe(2);
       expect(page.detailTable).toBeTruthy();
@@ -493,7 +479,7 @@ describe('PageWithNodes', () => {
     });
 
     it('creates rows after initializing the detail table if the child nodes were already loaded', async () => {
-      let page = scout.create(SpecPageWithNodes, {
+      let page = scout.create(MyPageWithNodes, {
         parent: outline
       });
       outline.insertNode(page);
@@ -506,7 +492,7 @@ describe('PageWithNodes', () => {
       expect(page.detailTable).toBe(null); // still not initialized
 
       outline.selectNode(page);
-      await page.ensureLoadChildren();
+      await page._loadChildrenPromise;
       expect(page.detailTable).toBeTruthy();
       expect(page.detailTable.rows.length).toBe(2);
     });

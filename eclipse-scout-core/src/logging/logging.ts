@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -96,7 +96,7 @@ export const logging = {
   /***
    * Loads log4javascript.min.js if logging is enabled.
    */
-  bootstrap(options?: LoggingOptions): Promise<JQuery | void> {
+  bootstrap(options?: LoggingOptions): Promise<JQuery> {
     let location = new URL(),
       loggingParam = location.getParameter('logging'),
       logLevelParam = location.getParameter('logLevel') as string;

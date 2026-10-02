@@ -28,7 +28,6 @@ describe('FormLifecycle', () => {
     form.lifecycle = scout.create(SpecLifecycle, {widget: form});
     field = form.rootGroupBox.fields[0] as StringField;
     form.render();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
@@ -48,13 +47,12 @@ describe('FormLifecycle', () => {
       expectMessageBox(true);
     });
 
-    it('triggers close event after cancel', () => {
+    it('triggers close event after cancel', async () => {
       let disposed = false;
       form.lifecycle.on('close', () => {
         disposed = true;
       });
-      form.lifecycle.cancel();
-      jasmine.clock().tick(0);
+      await form.lifecycle.cancel();
       expect(disposed).toBe(true);
     });
   });
@@ -65,10 +63,7 @@ describe('FormLifecycle', () => {
       field.setMandatory(true);
       field.setValue(null);
       form.lifecycle.ok();
-      jasmine.clock().tick(10);
-      // Lifecycle.ok()'s validate/invalid chain is microtask-based (native Promise) and the fake clock cannot flush it.
-      await Promise.resolve();
-      await Promise.resolve();
+      await session.desktop.when('propertyChange:messageBoxes');
       expectMessageBox(true);
     });
 
@@ -80,9 +75,7 @@ describe('FormLifecycle', () => {
         saved = true;
         return $.resolvedPromise();
       });
-      form.lifecycle.ok();
-      jasmine.clock().tick(1000);
-      await flushMicrotasks(10);
+      await form.lifecycle.ok();
       expectMessageBox(false);
       expect(saved).toBe(true);
     });
@@ -118,19 +111,14 @@ describe('FormLifecycle', () => {
         form2.render();
       }
       form2.lifecycle.ok();
-      jasmine.clock().tick(10);
-      // Lifecycle.ok()'s validate/invalid chain is microtask-based (native Promise) and the fake clock cannot flush it.
-      await Promise.resolve();
-      await Promise.resolve();
+      await session.desktop.when('propertyChange:messageBoxes');
       expectMessageBox(true);
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
-      await flushMicrotasks(10);
+      await sleep();
       expect(lifecycleComplete).toBe(expected);
     }
 
     it('should call _lifecycleValidate function on form', async () => {
-      jasmine.clock().uninstall();
       // validate should always be called, even when there is not a single touched field in the form
       let form2 = helper.createFormWithOneField();
       form2.lifecycle = scout.create(SpecLifecycle, {
@@ -232,20 +220,12 @@ describe('FormLifecycle', () => {
       cell.field.setValue('something');
       tableFieldB5Table.completeCellEdit();
 
-      formWithFieldsAndTabBoxes.lifecycle.ok();
-      jasmine.clock().tick(0);
-      // Lifecycle.ok()'s validate/invalid chain is microtask-based (native Promise) and the fake clock cannot flush it.
-      await Promise.resolve();
-      await Promise.resolve();
+      await formWithFieldsAndTabBoxes.lifecycle.ok();
       expectMessageBox(false);
     });
   });
 
   describe('load', () => {
-
-    beforeEach(() => {
-      jasmine.clock().uninstall(); // we don't need a mock-clock for this test
-    });
 
     it('should handle errors that occur in promise', done => {
       let form = helper.createFormWithOneField();
@@ -373,7 +353,6 @@ describe('FormLifecycle', () => {
   describe('validation result', () => {
 
     it('has widget status if element status is only warning', async () => {
-      jasmine.clock().uninstall();
       const form = scout.create(SpecForm, {
         parent: session.desktop,
         rootGroupBox: {
@@ -565,8 +544,6 @@ describe('FormLifecycle', () => {
     });
 
     it('has severity ERROR if mandatory field is missing', async () => {
-      jasmine.clock().uninstall();
-
       field.setMandatory(true);
       field.setValue(null);
 
@@ -591,8 +568,6 @@ describe('FormLifecycle', () => {
     });
 
     it('has max severity of all invalid fields', async () => {
-      jasmine.clock().uninstall();
-
       const field2 = helper.createField(StringField, form.rootGroupBox);
       form.rootGroupBox.insertField(field2);
 
@@ -630,6 +605,14 @@ describe('FormLifecycle', () => {
   });
 
   describe('statusMessageBox', () => {
+
+    beforeEach(() => {
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
 
     it('converts WARNING to OK on yes', done => {
       form._showFormInvalidMessageBox(Status.warning())

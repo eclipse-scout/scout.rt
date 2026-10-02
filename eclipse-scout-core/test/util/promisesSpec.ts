@@ -56,14 +56,7 @@ describe('promises', () => {
     setTimeout(deferredArray[0].reject.bind(deferredArray[0], 'Bar'));
   });
 
-  // TODO CGU check if this refactoring makes sense
   it('parallel stops executing after failed promise', async () => {
-    // native promises settle asynchronously (unlike jQuery's synchronous done/fail), so drive the pool
-    // with real waits between steps instead of chaining off each deferred's own resolution
-    function wait(ms = 20) {
-      return new Promise(resolve => setTimeout(resolve, ms));
-    }
-
     let deferredArray = createDeferredArray(9);
     let promiseCreator = createPromiseCreatorForDeferredArray(deferredArray);
     let rejectReason;
@@ -80,22 +73,22 @@ describe('promises', () => {
     expect(deferredArray[3]).toBeNull();
 
     deferredArray[1].resolve(1);
-    await wait();
+    await sleep(10);
     expect(deferredArray[3]).not.toBeNull();
     expect(deferredArray[4]).toBeNull();
 
     deferredArray[0].resolve(2);
-    await wait();
+    await sleep(10);
     expect(deferredArray[4]).not.toBeNull();
     expect(deferredArray[5]).toBeNull();
 
     deferredArray[3].resolve(3);
-    await wait();
+    await sleep(10);
     expect(deferredArray[5]).not.toBeNull();
     expect(deferredArray[6]).toBeNull();
 
     deferredArray[4].reject(4);
-    await wait();
+    await sleep(10);
 
     expect(rejectReason).toBe(4);
     expect(deferredArray[0].state()).toBe('resolved');

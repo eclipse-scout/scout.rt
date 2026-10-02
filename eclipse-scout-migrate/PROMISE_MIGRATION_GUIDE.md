@@ -62,6 +62,23 @@ patterns above.
   `Promise<Editor>` does. Fix the implementation (`return editor;`), not the declared type, after checking which consumers rely on the value.
 - **Loosen parameter types that accept promises from not-yet-migrated callers.** For example, change a loader parameter typed `() => JQuery.jqXHR` to `() => PromiseLike<T>`, and wrap its result with `Promise.resolve(loader())`. That way
   downstream repositories that still pass a jqXHR keep compiling and working.
+- **Collapse jQuery bridge methods.** A common pre-migration pattern was a public method returning a jQuery promise that only wrapped a protected `async` implementation:
+  `activate(): JQuery.Promise<void> { return $.when(this._activateAsync()); }`. Now the
+  public method can simply be `async` itself; drop the protected `…Async` variant and move its overrides to the public method. Scout did this for `BookmarkSupport` and `ChartTableControlConfigHelper` (see below).
+
+### Scout APIs whose shape changed
+
+Besides `JQuery.Promise<T>` → `Promise<T>`, these `@eclipse-scout/core` APIs changed in a way that project overrides and callers must follow:
+
+| API                               | Before                                                                                                                          | Now                                                                                                                                                                                                                        |
+|-----------------------------------|---------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `Call` (base of `AjaxCall`)       | `_setResultDone(...args)`, `_setResultFail(...args)`, `_onCallDone(...args)`, `_onCallFail(...args)`, `_nextRetryImpl(...args)` | `_setResultDone`/`_setResultFail` removed (the result is set by `_call()`); `_onCallDone(result)`, `_onCallFail(error)`, `_nextRetryImpl(error)` receive a single value                                                    |
+| `AjaxCall`                        | rejected with `(jqXHR, textStatus, errorThrown)`; `pendingCall` was the jqXHR                                                   | rejected with a single `AjaxError` (created in `_callImpl()`); `pendingCall` is a native promise; the jqXHR of the current or most recent request is available as `xhr` (e.g. for the HTTP status of a successful request) |
+| `AjaxCall.isOfflineError()`       | `isOfflineError(jqXHR, textStatus, errorThrown)`                                                                                | `isOfflineError(error: AjaxError)`                                                                                                                                                                                         |
+| `Session._processErrorResponse()` | `(jqXHR, textStatus, errorThrown, request)`                                                                                     | `(error: AjaxError, request)`                                                                                                                                                                                              |
+| `BookmarkSupport`                 | `activateBookmark()`, `activateBookmarkPath()`, `applyBookmarkToPageAndReload()` wrapping protected `_…Async()` methods         | the public methods are `async`, the `_…Async()` methods are removed: override the public methods                                                                                                                           |
+| `ChartTableControlConfigHelper`   | `exportConfig()`/`importConfig()` wrapping protected `_exportConfig()`/`_importConfig()`                                        | `exportConfig()`/`importConfig()` are `async`, the protected variants are removed                                                                                                                                          |
+| `Page`                            | –                                                                                                                               | new `when(type)`, like `Widget.when()`                                                                                                                                                                                     |
 
 ## 3. `.done()/.fail()/.always()` vs. `.then()/.catch()/.finally()` — the semantic differences
 
@@ -129,6 +146,18 @@ return promise.then(...);
 Under jQuery the discarded branch was harmless. Natively, `promise.finally(...)` returns a *new* promise that rejects whenever `promise` rejects. Nobody observes that new promise, so it surfaces as an unhandled rejection even though the
 caller handles the main chain. Fold the cleanup into the chain that is actually returned, stored or awaited (`return promise.finally(() => this.setBusy(false)).then(...)`) instead of translating the statement one-to-one.
 
+**c3) `.then(onDone).catch(onFail)` is not the same as `.done(onDone).fail(onFail)`.** The chained `.catch()` also catches errors thrown by `onDone`, e.g. a bug in the success handler then gets reported as "request failed". If the
+failure handler is meant for the original promise only, use the two-argument form:
+
+```ts
+// catches errors of the request AND of _onPostDone:
+ajax.call(options).then(data => this._onPostDone(data)).catch(error => this._onPostFail(error));
+// catches errors of the request only (like .done()/.fail()); an error in _onPostDone stays unhandled and is reported:
+ajax.call(options).then(data => this._onPostDone(data), error => this._onPostFail(error));
+```
+
+Use the chained form only if the handler should really cover both.
+
 **d) A `.done()` callback throwing does not invoke `.fail()`/`.always()` — it's just an uncaught exception.** A `.then()` callback throwing correctly invokes the chain's `.catch()`. If migrated code seems to have swallowed errors that used to escape loudly (or vice versa), check whether the original relied on this asymmetry.
 
 ## 4. Multi-argument resolve/reject has no native equivalent
@@ -166,7 +195,8 @@ There is no synchronous way to query whether a native `Promise` is pending/resol
 When the promise comes from somewhere else (e.g. an ajax call), track the state explicitly. Guard the update with an identity check (§8) so a superseded promise can't overwrite the state of the current one:
 
 ```ts
-protected_trackState(promise
+protected
+_trackState(promise
 :
 Promise<void>
 )
@@ -176,7 +206,9 @@ Promise<void>
     () => this._updateState(promise, 'resolved'),
     () => this._updateState(promise, 'rejected')); // error is reported by the main chain
 }
-protected_updateState(promise
+
+protected
+_updateState(promise
 :
 Promise<void>, state
 :
@@ -191,7 +223,8 @@ Promise<void>, state
 
 Keep in mind that the tracked state flips one microtask *after* settlement, while jQuery flipped it synchronously. Code that checks the state immediately after resolving (in the same tick) sees `'pending'`.
 
-In specs, `expect(promise.state()).toBe('pending')` can become a settled flag, e.g. `promise.then(() => settled = true, () => settled = true)`, while still awaiting the original promise for the real assertion.
+In specs, don't track the state yourself. Use Jasmine's async matchers: `expect(promise.state()).toBe('pending')` becomes `await expectAsync(promise).toBePending()`, and `toBe('resolved')` / `toBe('rejected')` become
+`await expectAsync(promise).toBeResolved()` / `toBeRejected()`. Note that `toBeResolved()` waits for the promise, so it also replaces the wait that used to precede the state check.
 
 **Framework `Deferred` is not a thenable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
 `spyOn(x, 'load').and.callFake(() => deferred.promise())` and `await deferred.promise()`. Awaiting the `Deferred` object itself resolves immediately with the object and doesn't wait for anything. Give it a precise type parameter (
@@ -224,9 +257,14 @@ console.log('after');
 - `.done()/.fail()/.always()` fire **synchronously**, even on an already-settled deferred — this has never changed.
 - `.then()/.catch()` on a jQuery Deferred (jQuery ≥ 3, Promises/A+ compliance) are **always deferred via `window.setTimeout`** — a real macrotask, not a microtask. (Verify in `node_modules/jquery/dist/jquery.js` if in doubt — search for `window.setTimeout( process )` inside `Deferred.then`.)
 
-Consequence: once `jasmine.clock().install()` is active, any code that still calls `.then()/.catch()` on a raw jQuery Deferred/jqXHR has that reaction turned into a **fake timer**, invisible to `flushMicrotasks()` (which only drains microtasks). A single ajax response's full processing can require alternating fake-timer hops (jQuery's internal `.then()`) and native-microtask hops (the rest of your Promise chain), sometimes several rounds deep if success also schedules a *new* timer (e.g. a poller re-arming itself). Manually guessing `await flushMicrotasks(N); jasmine.clock().tick(M);` combinations is fragile and was the source of most of the flakiness in the reference migration.
+Consequence: once `jasmine.clock().install()` is active, any code that still calls `.then()/.catch()` on a raw jQuery Deferred/jqXHR has that reaction turned into a **fake timer**, invisible to a microtask flush like
+`await Promise.resolve()` (which only drains microtasks). A single ajax response's full processing can require alternating fake-timer hops (jQuery's internal `.then()`) and native-microtask hops (the rest of your Promise chain), sometimes
+several rounds deep if success also schedules a *new* timer (e.g. a poller re-arming itself). Manually guessing combinations of N microtask flushes and `jasmine.clock().tick(M)` is fragile and was the source of most of the flakiness in the
+reference migration.
 
-**Fix: use `jasmine.clock().autoTick()`** (jasmine-core ≥ 5.7) instead of manual `tick()`/`flushMicrotasks()` pairs. Call it once, right after `install()`:
+**Fix: use `jasmine.clock().autoTick()`** (jasmine-core ≥ 5.7) instead of manual `tick()`/microtask-flush pairs. Only install the fake clock in the specs that really need fake time (e.g. a debounce or retry delay), not in a `beforeEach` for
+a whole file. Most specs don't need it at all once they
+await the right promise or event. Call `autoTick()` once, right after `install()`:
 ```ts
 beforeEach(() => {
   jasmine.clock().install();
@@ -267,13 +305,17 @@ Similar hidden deferrals in core widgets:
 - Widgets that expose a busy counter or a `whenReady()` method give an exact "the async processing is done" signal, e.g. a widget that calls `setBusy(true)` synchronously when it starts processing a change and `setBusy(false)` in the
   chain's `.finally()`, with `whenReady()` resolving once the counter is back to 0. After an action that changes such a widget (e.g. closing a sub-form that writes a value into it), add `.then(() => widget.whenReady())` before asserting.
 
-**Audit your own test helpers for the same disease.** Any shared test utility that "flushes" queued ajax calls or their responses using `jasmine.clock().tick()` alone (implicitly assuming synchronous jQuery-Deferred resolution — e.g. a `sendQueuedAjaxCalls()`-style helper) will likely stop working once the production code it drives switches from `.done()` to `.then()`. `tick()` cannot flush the resulting native-Promise chain. Write an `async` equivalent that awaits a real completion signal instead (e.g. the framework's `session.whenRequestsDone()`), convert every caller from the sync helper to the async one, and mark those tests `async`.
+**Audit your own test helpers for the same disease.** Any shared test utility that "flushes" queued ajax calls or their responses using `jasmine.clock().tick()` alone (implicitly assuming synchronous jQuery-Deferred resolution — e.g. a
+`sendQueuedAjaxCalls()`-style helper) will likely stop working once the production code it drives switches from `.done()` to `.then()`. `tick()` cannot flush the resulting native-Promise chain. Write an `async` equivalent that awaits a real
+completion signal instead (e.g. the framework's `session.whenRequestsDone()`), convert every caller from the sync helper to the async one, and mark those tests `async`. Scout's own
+spec helpers now offer `sendQueuedAjaxCallsAsync(session)` for this.
 
 ## 7. The other big class of bug: fire-and-forget promises and unhandled rejections
 
 Native Promises trigger a global "unhandled rejection" error when nothing ever attaches a `.catch()`/`.then(_, onRejected)`/`.finally()`-with-rethrow to them — Karma/Jasmine treats this as a failing test. jQuery has no such mechanism at all, so every place a Promise-returning call's result was neither returned, stored, nor awaited was **silently swallowed under jQuery** and is now a genuine, loud failure. This is not a new bug you're introducing — it's a pre-existing gap the migration makes visible. Concrete places this shows up:
 
-- **Expected errors need explicit handling.** E.g. aborting an in-flight lookup/search call is expected to reject — make sure the abort path has a real `.catch()`, not just an assumption that nobody's listening (see any `LookupBox`/search-abort style code as an example of the pattern to check).
+- **Expected cancellations don't need local handling.** Aborting an in-flight lookup call rejects with `{abort: true}`, and widgets cancel chains with `AbortError`. Both are ignored by the global handler (§7a), so don't add local `.catch()`
+  filters for them.
 - **Stray timers firing after a test (or the object) is gone.** A `setTimeout` scheduled by, say, a debounced "send" method can fire after the test ends and hit a partially torn-down mock, producing an unhandled rejection in an unrelated later test's `afterAll`. Any `destroy()`-style method should explicitly `clearTimeout` whatever it scheduled (check the base framework's own `Session.destroy()`/`HybridManager.destroy()`-equivalents for the pattern, and make sure your test teardown actually calls `destroy()`/cancels those timers between tests).
 - **A leftover ajax call executing after the test ends.** Make sure `jasmine.Ajax.install()`/`uninstall()` bracket every test that can trigger a request, so a request that fires later doesn't escape as a real network call.
 - **A spec that doesn't return (or await) its promise chain.** E.g. `.then(() => { ...; SpecUtil.checkReimport(widget, expected); })` without `return`. Under jQuery the chain ran on and nobody noticed. Natively the spec finishes
@@ -324,6 +366,9 @@ Real errors are unaffected and still fail the spec.
 Two related patterns to get right while you're in this territory:
 
 - **Cleanup that must run regardless of success/failure, without swallowing the error:** don't write `promise.then(cleanup, cleanup)` — if `cleanup` doesn't rethrow, that silently turns a rejected chain into a resolved one. Use `promise.finally(cleanup)` instead: it still runs unconditionally, but the rejection (if any) propagates to the promise `.finally()` returns, so it can still be caught further up or surface as unhandled if nobody's watching.
+- **Drop "catch now, rethrow later" constructs.** jQuery code sometimes caught errors in `.done()`/`.fail()` callbacks (`try { ... } catch (err) { jsError = err; }`) so that the `.always()` cleanup still ran, and rethrew them at the end.
+  With native promises, `.finally()` already runs after a failing `.then()`. Chain `.then(onDone, onFail).finally(onAlways)` and let errors propagate. Where nobody else can ever see the promise (e.g. a central request queue), end the chain
+  with one terminal `.catch(error => App.get().errorHandler.handle(error))` instead of a per-callback try/catch.
 - **A `.then(fn).catch(fn)` used only to avoid an unhandled rejection on the returned promise** (rather than for genuine multi-stage handling) is usually a sign the fire-and-forget question above wasn't asked yet — resolve it the same way rather than defaulting to that shape.
 
 If you do end up adding a no-op guard for the "already reported elsewhere" case, keep it a plain `.catch(() => {})` / `.then(fn, () => {})` with a comment — don't wrap it in a shared helper function; that's exactly the clutter a future global handler is meant to remove.
@@ -372,7 +417,10 @@ request.finally(() => {
   uninstall. Replace them with:
   - an `await` on the returned promise or on an event the framework already fires. There usually is one, so look for it before inventing a mechanism:
     - message box opened: `await session.desktop.when('propertyChange:messageBoxes')`, or `await form.when('propertyChange:messageBoxes')` if the form is the message box's display parent;
+    - the promise the action itself returns: `await form.lifecycle.ok()`, `await form.lifecycle.cancel()`, `await form.load()`, instead of calling it and then waiting for a guessed number of ticks;
     - form lifecycle: `form.whenClose()`, `form.whenLoad()`, `form.whenSave()`;
+    - page child loading: `await page._loadChildrenPromise` of the page whose children are being loaded (it's only set while a load is in progress). Calling `ensureLoadChildren()` would trigger a load itself;
+    - pending/resolved checks: `await expectAsync(promise).toBePending()` / `.toBeResolved()` (§5);
     - any property: `widget.when('propertyChange:xyz')`. This also works on non-widgets that are a `PropertyEventEmitter`, e.g. a table `Column` (`column.when('propertyChange:text')`);
     - the property a lookup finally writes: `smartField.when('propertyChange:displayText')`, `column.when('propertyChange:text')`;
     - custom widget events the production code triggers at the end of a flow, e.g. `widget.when('valueApplied')`; or the value a flow restores, e.g. `field.when('propertyChange:value')`;

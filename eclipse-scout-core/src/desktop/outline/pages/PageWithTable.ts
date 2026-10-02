@@ -9,8 +9,8 @@
  */
 import {
   abortableContext, AbortablePromise, AbortError, arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, Deferred, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo,
-  ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper,
-  TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl,
+  TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -536,11 +536,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    *
    * @example implementation of `_loadTableData(searchFilter)` using multiple and asynchronously created rest calls
    * ```ts
-   * protected override _loadTableData(searchFilter: any): Promise<any> {
-   *   return this._loadTableDataAsync(searchFilter);
-   * }
-   *
-   * protected async _loadTableDataAsync(searchFilter: any): Promise<any> {
+   * protected override async _loadTableData(searchFilter: any): Promise<any> {
    *   const abortController = this._abortController;
    *   const searchRestrictions = await ajax.postDataObject('search-api/util/build-search-restrictions', this._withMaxRowCountContribution(searchFilter));
    *   const foos = await abortableContext.runInContext(

@@ -28,18 +28,25 @@ describe('uiNotifications', () => {
 
   afterEach(() => {
     jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
   });
 
   function mostRecentRequestData() {
     return jasmine.Ajax.requests.mostRecent().data();
   }
 
+  async function respondToMostRecentRequestAndWaitForNext(responseText: string) {
+    let requestCount = jasmine.Ajax.requests.count();
+    jasmine.Ajax.requests.mostRecent().respondWith({
+      status: 200,
+      responseText
+    });
+    await waitForRequestCount(requestCount + 1);
+  }
+
   /**
    * Waits until the poller has actually issued its next request (see UiNotificationPoller#_schedulePoll), instead
-   * of guessing a fixed delay with sleep(): the poller schedules the next poll via a *real* setTimeout(0), which
-   * races unpredictably against an independently scheduled sleep(1) (and can additionally be superseded by a
-   * restart() triggered from within the same test, e.g. when subscribing to another topic right after awaiting).
-   * Waiting for the observable effect (a new request exists) instead of a fixed duration avoids that race.
+   * of guessing a fixed delay with sleep().
    */
   async function waitForRequestCount(count: number): Promise<void> {
     for (let i = 0; jasmine.Ajax.requests.count() < count; i++) {
@@ -134,13 +141,8 @@ describe('uiNotifications', () => {
           } as JsonObject
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
 
-      await sleep(1);
-
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(receivedMsgAaa['a']).toBe('aaa');
       expect(receivedMsgBbb['b']).toBe('bbb');
       expect(receivedMsgCcc).toBeUndefined();
@@ -164,12 +166,7 @@ describe('uiNotifications', () => {
           } as JsonObject
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
       expect(receivedMessages.length).toBe(1);
 
@@ -192,12 +189,7 @@ describe('uiNotifications', () => {
           } as JsonObject
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(poller.notifications.get('aaa').get('node1').length).toBe(2);
       expect(receivedMessages.length).toBe(2);
       expect(receivedMessages[0].id).toBe('1');
@@ -219,12 +211,7 @@ describe('uiNotifications', () => {
           subscriptionStart: true
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       // New request started with lastNotifications set
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
@@ -267,12 +254,7 @@ describe('uiNotifications', () => {
           } as JsonObject
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
 
       expect(receivedMessages.length).toBe(2);
       expect(receivedMessages[0]['a']).toBe('1');
@@ -316,12 +298,8 @@ describe('uiNotifications', () => {
           subscriptionStart: true
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
 
-      await sleep(50);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(called).toBe(false); // Still false
     });
 
@@ -436,13 +414,7 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
-      let requestCount = jasmine.Ajax.requests.count();
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await waitForRequestCount(requestCount + 1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa',
@@ -478,13 +450,7 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
-      requestCount = jasmine.Ajax.requests.count();
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response2)
-      });
-
-      await waitForRequestCount(requestCount + 1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response2));
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{
@@ -513,13 +479,7 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
-      requestCount = jasmine.Ajax.requests.count();
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response3)
-      });
-
-      await waitForRequestCount(requestCount + 1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response3));
       expect(mostRecentRequestData()['topics']).toEqual([{
         _type: 'scout.Topic',
         name: 'aaa', lastNotifications: [{
@@ -537,7 +497,6 @@ describe('uiNotifications', () => {
     });
 
     it('stores the notifications in a history sorted by creation time and grouped by node', async () => {
-      jasmine.clock().uninstall();
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       expect(poller.notifications.get('aaa').get('node1')).toBeUndefined();
@@ -551,12 +510,7 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(10);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('1');
 
@@ -581,12 +535,7 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response2)
-      });
-
-      await sleep(10);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response2));
       expect(poller.notifications.get('aaa').get('node1').length).toBe(2);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('2');
       expect(poller.notifications.get('aaa').get('node1')[1].id).toBe('1'); // 1 is newer
@@ -596,7 +545,6 @@ describe('uiNotifications', () => {
     });
 
     it('restrains the size of the notification history', async () => {
-      jasmine.clock().uninstall();
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       expect(poller.notifications.get('aaa').get('node1')).toBeUndefined();
@@ -604,12 +552,7 @@ describe('uiNotifications', () => {
       let response = scout.create(UiNotificationResponse, {
         notifications: (createNotifications(1, UiNotificationPoller.HISTORY_COUNT + 5))
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(poller.notifications.get('aaa').get('node1').length).toBe(UiNotificationPoller.HISTORY_COUNT);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('6');
       expect(poller.notifications.get('aaa').get('node1')[9].id).toBe('15');
@@ -617,12 +560,7 @@ describe('uiNotifications', () => {
       response = scout.create(UiNotificationResponse, {
         notifications: (createNotifications(UiNotificationPoller.HISTORY_COUNT + 6, 3))
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(poller.notifications.get('aaa').get('node1').length).toBe(UiNotificationPoller.HISTORY_COUNT);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('9');
       expect(poller.notifications.get('aaa').get('node1')[9].id).toBe('18');
@@ -776,12 +714,7 @@ describe('uiNotifications', () => {
           message: {}
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: dataObjects.stringify(response)
-      });
-
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(dataObjects.stringify(response));
       expect(poller.notifications.get('aaa').get('node1').length).toBe(1);
       expect(poller.notifications.get('aaa').get('node1')[0].id).toBe('1');
       expect(poller.notifications.get('aaa').get('node2').length).toBe(2);
@@ -840,10 +773,6 @@ describe('uiNotifications', () => {
       jasmine.clock().autoTick();
     });
 
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
-
     it('automatically restarts on connection error', async () => {
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
@@ -869,14 +798,9 @@ describe('uiNotifications', () => {
           subscriptionStart: true
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: JSON.stringify(response.toPojo())
-      });
+      await respondToMostRecentRequestAndWaitForNext(JSON.stringify(response.toPojo()));
 
       // Subscription was successful, start polling
-      await sleep(1);
-
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 500
@@ -900,14 +824,9 @@ describe('uiNotifications', () => {
           subscriptionStart: true
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: JSON.stringify(response.toPojo())
-      });
+      await respondToMostRecentRequestAndWaitForNext(JSON.stringify(response.toPojo()));
 
       // Subscription was successful; wait for the next poll request to actually be sent.
-      await sleep(1);
-
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
         status: 200
@@ -932,11 +851,7 @@ describe('uiNotifications', () => {
           subscriptionStart: true
         }]
       });
-      jasmine.Ajax.requests.mostRecent().respondWith({
-        status: 200,
-        responseText: JSON.stringify(response.toPojo())
-      });
-      await sleep(1);
+      await respondToMostRecentRequestAndWaitForNext(JSON.stringify(response.toPojo()));
 
       let subscribePromise = uiNotifications.subscribe('bbb', () => undefined);
       let poller = pollers().get('main');
@@ -1037,6 +952,7 @@ describe('uiNotifications', () => {
 
     it('stops every poller even if tearDown was called during retries', () => {
       jasmine.clock().install();
+      jasmine.clock().autoTick();
       uiNotifications.subscribe('aaa', () => undefined);
       let poller = pollers().get('main');
       jasmine.Ajax.requests.mostRecent().respondWith({
@@ -1053,7 +969,6 @@ describe('uiNotifications', () => {
       // Assert UiNotificationPoller._onError did not schedule poll again
       jasmine.clock().tick(UiNotificationPoller.RESPONSE_ERROR_RETRY_INTERVAL);
       expect(poller.status).toBe(BackgroundJobPollingStatus.STOPPED);
-      jasmine.clock().uninstall();
     });
   });
 });

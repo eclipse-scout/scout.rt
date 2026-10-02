@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,29 +16,15 @@ import {UiPreferences, UiPreferencesDo, UiPreferencesUpdateDo} from '../index';
  */
 export class UiPreferencesStore { // cannot technically be abstract, because we use scout.create() to create an instance of the implementation
 
-  load(): Promise<UiPreferencesDo> {
-    return this._load();
-  }
-
-  store(preferences: UiPreferencesDo): Promise<void> {
-    return this._store(preferences);
-  }
-
-  subscribeForUpdates(handler: UiPreferencesUpdateHandler): Promise<void> {
-    return this._subscribeForUpdates(handler);
-  }
-
-  // --------------------------------------
-
-  protected async _load(): Promise<UiPreferencesDo> {
+  async load(): Promise<UiPreferencesDo> {
     throw new Error('Not implemented');
   }
 
-  protected async _store(preferences: UiPreferencesDo): Promise<void> {
+  async store(preferences: UiPreferencesDo): Promise<void> {
     throw new Error('Not implemented');
   }
 
-  protected async _subscribeForUpdates(handler: UiPreferencesUpdateHandler): Promise<void> {
+  async subscribeForUpdates(handler: UiPreferencesUpdateHandler): Promise<void> {
     // (implementation optional)
   }
 }

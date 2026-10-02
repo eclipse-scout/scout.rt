@@ -167,31 +167,23 @@ export abstract class Call implements CallModel, ObjectWithType {
     this.callCounter++;
     this._updateLogPrefix();
 
-    let call = this._callImpl();
-    this.pendingCall = call;
-    let clearPendingCall = () => {
-      this.pendingCall = null;
-    };
-    // TODO CGU review, can maybe simplified
-    // Note: attach independent reactions (rather than chaining them) so that each one is executed for the original
-    // result/reason of _callImpl(), just like the done/fail/always callbacks of a JQuery.Promise would have been.
-    call.then(clearPendingCall, clearPendingCall);
-    call.then(this._setResultDone.bind(this), this._setResultFail.bind(this));
-    call.then(this._onCallDone.bind(this), this._onCallFail.bind(this));
+    this.pendingCall = this._callImpl().then(
+      result => {
+        this.pendingCall = null;
+        this._setResult(result);
+        this._onCallDone(result);
+      }, error => {
+        this.pendingCall = null;
+        this._setResult(error);
+        this._onCallFail(error);
+      }
+    );
   }
 
   /**
    * Performs the actual request.
    */
   protected abstract _callImpl(): PromiseLike<any>;
-
-  protected _setResultDone(result?: any) {
-    this._setResult(result);
-  }
-
-  protected _setResultFail(result?: any) {
-    this._setResult(result);
-  }
 
   protected _onCallDone(result?: any) {
     // Call successful -> RESOLVE

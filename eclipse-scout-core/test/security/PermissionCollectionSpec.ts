@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,31 +22,9 @@ describe('PermissionCollection', () => {
     }
   }
 
-  /**
-   * Native promises don't expose a synchronous state() like a JQuery.Promise, so track it ourselves.
-   */
-  function trackState(promise: Promise<any>): { value: string } {
-    let state = {value: 'pending'};
-    promise.then(() => {
-      state.value = 'resolved';
-    }, () => {
-      state.value = 'rejected';
-    });
-    return state;
-  }
-
   describe('implies', () => {
 
-    beforeEach(() => {
-      jasmine.clock().install();
-    });
-
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
-
     it('all permissions if type is ALL', async () => {
-      jasmine.clock().uninstall();
       const collection = scout.create(PermissionCollection, {type: PermissionCollectionType.ALL});
 
       expect(collection.implies(null, true)).toBeFalse();
@@ -59,7 +37,6 @@ describe('PermissionCollection', () => {
     });
 
     it('no permission if type is NONE', async () => {
-      jasmine.clock().uninstall();
       const collection = scout.create(PermissionCollection, {type: PermissionCollectionType.NONE});
 
       expect(collection.implies(null, true)).toBeFalse();
@@ -72,7 +49,6 @@ describe('PermissionCollection', () => {
     });
 
     it('only permission contained in the collection if type is DEFAULT', async () => {
-      jasmine.clock().uninstall();
       const collection = scout.create(PermissionCollection, {
         permissions: {
           some: [Permission.quick('some')]
@@ -89,9 +65,6 @@ describe('PermissionCollection', () => {
     });
 
     it('resolves if first check is succeeds', async () => {
-      // this test drives native promises via real microtask/macrotask waits, jasmine's fake clock is not needed
-      jasmine.clock().uninstall();
-
       let evalDeferred1: Deferred<boolean>;
       let evalDeferred2: Deferred<boolean>;
       const permission1 = scout.create(SpecPermission, {id: 'test'});
@@ -107,35 +80,29 @@ describe('PermissionCollection', () => {
         return evalDeferred2.promise();
       };
 
-      let state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
-      expect(state.value).toBe('pending');
+      let promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
+      await expectAsync(promise).toBePending();
       evalDeferred1.resolve(true);
-      await flushMicrotasks(8);
-      expect(state.value).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
 
-      state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
-      expect(state.value).toBe('pending');
+      promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
+      await expectAsync(promise).toBePending();
       evalDeferred2.resolve(false);
-      await flushMicrotasks(8);
-      expect(state.value).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred1.resolve(true);
-      await flushMicrotasks(8);
-      expect(state.value).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
 
-      state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue()));
-      expect(state.value).toBe('pending');
+      promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeTrue());
+      await expectAsync(promise).toBePending();
       evalDeferred2.resolve(true);
-      await flushMicrotasks(8);
-      expect(state.value).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
 
-      state = trackState(collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeFalse()));
-      expect(state.value).toBe('pending');
+      promise = collection.implies(Permission.quick('test')).then(implies => expect(implies).toBeFalse());
+      await expectAsync(promise).toBePending();
       evalDeferred2.resolve(false);
-      await flushMicrotasks(8);
-      expect(state.value).toBe('pending');
+      await expectAsync(promise).toBePending();
       evalDeferred1.resolve(false);
-      await flushMicrotasks(8);
-      expect(state.value).toBe('resolved');
+      await expectAsync(promise).toBeResolved();
     });
   });
 

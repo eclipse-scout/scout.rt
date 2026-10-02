@@ -186,13 +186,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    *
    * @param options Optional settings to change the behavior of this method
    */
-  activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
-    return this._activateBookmarkAsync(bookmark, options);
-  }
-
-  // Native-promise version of activateBookmark()
-  // TODO CGU remove method and replace overrides
-  protected async _activateBookmarkAsync(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
+  async activateBookmark(bookmark: IBookmarkDo, options?: ActivateBookmarkOptions): Promise<void> {
     try {
       if (!(bookmark?.definition instanceof OutlineBookmarkDefinitionDo)) {
         // noinspection ExceptionCaughtLocallyJS
@@ -236,13 +230,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * @param options Optional settings to change the behavior of this method
    * @return the result of the activation, or `null` if activation failed and the error was already handled by this method
    */
-  activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
-    return this._activateBookmarkPathAsync(param, options);
-  }
-
-  // Native-promise version of activateBookmarkPath()
-  // TODO CGU remove method and replace overrides
-  protected async _activateBookmarkPathAsync(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
+  async activateBookmarkPath(param: ActivateBookmarkPathParam, options?: ActivateBookmarkOptions): Promise<ActivateBookmarkPathResult> {
     try {
       if (this.loading) {
         // noinspection ExceptionCaughtLocallyJS
@@ -462,13 +450,7 @@ export class BookmarkSupport implements ObjectWithType, BookmarkSupportModel {
    * Same as {@link applyBookmarkToPage}, but also reloads the page. The returned promise is not resolved until the
    * reload is done.
    */
-  applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveState = true): Promise<void> {
-    return this._applyBookmarkToPageAndReloadAsync(page, bookmark, saveState);
-  }
-
-  // Native-promise version of applyBookmarkToPageAndReload()
-  // TODO CGU remove method and replace overrides
-  protected async _applyBookmarkToPageAndReloadAsync(page: Page, bookmark: IBookmarkDo, saveState = true): Promise<void> {
+  async applyBookmarkToPageAndReload(page: Page, bookmark: IBookmarkDo, saveState = true): Promise<void> {
     if (!page || !bookmark || !bookmark.definition) {
       return;
     }

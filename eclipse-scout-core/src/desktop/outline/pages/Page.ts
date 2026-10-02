@@ -700,6 +700,14 @@ export class Page extends TreeNode implements PageModel, ObjectWithUuid {
   off<K extends string & keyof EventMapOf<this>>(type: K, handler?: EventHandler<EventMapOf<this>[K]>) {
     this.events.off(type, handler);
   }
+
+  /**
+   * Adds an event handler using {@link one} and returns a promise.
+   * The promise is resolved as soon as the event is triggered.
+   */
+  when<K extends string & keyof EventMapOf<this>>(type: K): Promise<EventMapOf<this>[K] & Event<this>> {
+    return this.events.when(type) as Promise<EventMapOf<this>[K] & Event<this>>;
+  }
 }
 
 export type NodeType = EnumObject<typeof Page.NodeType>;

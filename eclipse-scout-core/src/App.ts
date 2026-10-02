@@ -18,7 +18,6 @@ let instance: App = null;
 let listeners: EventListener[] = [];
 let bootstrappers: (() => Promise<void>)[] = [];
 
-// TODO CGU for the final commit -> squash, reset, ensure commit hooks are ready (format, inspection), commit
 export interface AppModel {
   /**
    * Object to configure the session, see {@link Session.init} for the available options.
@@ -203,7 +202,7 @@ export class App extends EventEmitter {
     $.log.isDebugEnabled() && $.log.debug('App prepared');
   }
 
-  protected _prepareLogging(options: AppModel): Promise<JQuery | void> {
+  protected _prepareLogging(options: AppModel): Promise<JQuery> {
     return logging.bootstrap();
   }
 
@@ -268,9 +267,13 @@ export class App extends EventEmitter {
     // Sometimes the JavaScript and therefore the ajax calls won't be executed in case the page is loaded from that cache, but sometimes they will nevertheless (we don't know the reasons).
     // So, if it that happens, the server will either return a session timeout or a status 401 (Unauthorized) and the best thing we can do is to reload the page hoping a request for the index.html
     // will be done which eventually will be forwarded to the login page.
-    // Additionally, requests may fail due to other various reasons, e.g. Chrome may report ERR_NETWORK_CHANGED or ERR_CERT_VERIFER_CHANGED.
+    // Additionally, requests may fail due to other various reasons, e.g. Chrome may report ERR_NETWORK_CHANGED or ERR_CERT_VERIFIER_CHANGED.
     // Since a page reload normally solves these issues as well, the reload is done on any error not just session timeouts.
     let {url, message} = this._analyzeBootstrapError(error);
+    if (!url && !message) {
+      // If there is no url and no message it is not an ajax call error but a regular JavaScript error -> just pass it through to ensure it can be handled by this._fail (logging stacktrace etc.)
+      throw error;
+    }
     $.log.isInfoEnabled() && $.log.info(`Error for resource ${url}. Reloading page...`);
     if (webstorage.getItemFromSessionStorage('scout:bootstrapErrorPageReload')) {
       // Prevent loop in case reloading did not solve the problem

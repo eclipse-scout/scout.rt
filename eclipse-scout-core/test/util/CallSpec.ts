@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,6 @@ import {Call, Deferred} from '../../src/index';
 import {InitModelOf, scout} from '../../src/scout';
 
 describe('Call', () => {
-
-  beforeEach(() => {
-    jasmine.clock().install();
-  });
 
   afterEach(() => {
     jasmine.clock().uninstall();
@@ -116,6 +112,8 @@ describe('Call', () => {
   });
 
   it('retries on failure', async () => {
+    jasmine.clock().install();
+    jasmine.clock().autoTick();
     let call = new FailOnFirstTryCall();
     call.init();
     let done = false;
@@ -128,13 +126,9 @@ describe('Call', () => {
         failed = true;
       });
 
-    // let the first (failing) attempt's rejection propagate through Call's internal promise chain
-    // so that the retry gets scheduled via setTimeout before the clock is ticked
-    await Promise.resolve();
+    await sleep(1000);
 
-    jasmine.clock().tick(1000);
-
-    // wait for the retried call (started by the tick above) to settle
+    // wait for the retried call (started by the sleep above) to settle
     await promise;
 
     expect(done).toBe(true);

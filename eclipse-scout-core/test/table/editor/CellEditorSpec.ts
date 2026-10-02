@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,7 @@ describe('CellEditor', () => {
   afterEach(() => {
     session = null;
     jasmine.Ajax.uninstall();
+    jasmine.clock().uninstall();
     findPopup()?.destroy();
   });
 
@@ -376,6 +377,8 @@ describe('CellEditor', () => {
     });
 
     it('postpones opening if update buffer is buffering', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       table.insertColumn({
         objectType: SmartColumn,
         lookupCall: {objectType: DummyLookupCall},
@@ -462,6 +465,8 @@ describe('CellEditor', () => {
     });
 
     it('ends existing cell edit if an editor is open', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       table.columns[0].setEditable(true);
       table.insertColumn({
         objectType: SmartColumn,
@@ -471,7 +476,7 @@ describe('CellEditor', () => {
       table.insertRows({cells: ['a', 'b', 'key0']});
       let field = table.columns[2].createEditor(table.rows[0]);
       table.startCellEdit(table.columns[2], table.rows[0], field);
-      await sleep(500); // TODO CGU check sleep() with a timeout > 0 across all specs and use autotick or smaller timeout
+      await sleep(500);
       assertCellEditorIsOpen(table, table.columns[2], table.rows[0]);
       let popup = table.cellEditorPopup;
       expect(popup.cell.field).toBe(field);
@@ -692,8 +697,7 @@ describe('CellEditor', () => {
     let lookupCall: DummyLookupCall;
 
     beforeEach(() => {
-      lookupCall = new DummyLookupCall();
-      lookupCall.init({session: session});
+      lookupCall = scout.create(DummyLookupCall, {session});
 
       table = helper.createTable({
         columns: [{
@@ -736,6 +740,8 @@ describe('CellEditor', () => {
     });
 
     it('triggers update row event containing row with correct state', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       table.columns[0].setEditable(true);
       table.markRowsAsNonChanged();
       table.prepareCellEdit(table.columns[0], table.rows[0], true);
@@ -755,6 +761,8 @@ describe('CellEditor', () => {
     });
 
     it('updates the value even if the table has been removed in the meantime', async () => {
+      jasmine.clock().install();
+      jasmine.clock().autoTick();
       table.columns[0].setEditable(true);
       table.markRowsAsNonChanged();
       table.prepareCellEdit(table.columns[0], table.rows[0], true);

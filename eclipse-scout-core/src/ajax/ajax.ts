@@ -104,7 +104,7 @@ export const ajax = {
    * Prepares an {@link AjaxCall}, but does not execute it yet.
    *
    * Use this (instead of e.g. {@link ajax.get}) when access to the HTTP status code of the response is required:
-   * the shorthand functions only ever resolve with the response body, but {@link AjaxCall.lastXhr} is available
+   * the shorthand functions only ever resolve with the response body, but {@link AjaxCall.xhr} is available
    * on the returned {@link AjaxCall} once its promise has settled.
    *
    * @param options additional settings for the request.
@@ -218,7 +218,7 @@ export const ajax = {
    * The default HTTP method is POST.
    *
    * Use this (instead of e.g. {@link ajax.getJson}) when access to the HTTP status code of the response is required:
-   * the shorthand functions only ever resolve with the response body, but {@link AjaxCall.lastXhr} is available
+   * the shorthand functions only ever resolve with the response body, but {@link AjaxCall.xhr} is available
    * on the returned {@link AjaxCall} once its promise has settled.
    *
    * @param options additional settings for the request.

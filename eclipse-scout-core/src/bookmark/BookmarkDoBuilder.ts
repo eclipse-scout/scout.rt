@@ -61,12 +61,7 @@ export class BookmarkDoBuilder implements ObjectWithType, BookmarkDoBuilderModel
 
   // --------------------------------------
 
-  build(): Promise<IBookmarkDo> {
-    return this._build();
-  }
-
-  // TODO CGU remove method and replace overrides
-  protected async _build(): Promise<IBookmarkDo> {
+  async build(): Promise<IBookmarkDo> {
     let bookmarkDefinition = await this._createBookmarkDefinition();
     return this._createBookmark(bookmarkDefinition);
   }

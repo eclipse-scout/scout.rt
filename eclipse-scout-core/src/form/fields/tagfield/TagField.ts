@@ -309,11 +309,12 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
     this.trigger('prepareLookupCall', {
       lookupCall: this._currentLookupCall
     });
-    let promise = this._currentLookupCall.execute();
-    promise.finally(() => {
-      this._currentLookupCall = null;
-    });
-    promise.then(this._onLookupDone.bind(this));
+    this._currentLookupCall
+      .execute()
+      .finally(() => {
+        this._currentLookupCall = null;
+      })
+      .then(this._onLookupDone.bind(this));
   }
 
   protected _onLookupDone(result: LookupResult<string>) {

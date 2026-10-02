@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2686,6 +2686,10 @@ describe('Desktop', () => {
 
   describe('overlays', () => {
 
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
     it('displays tooltips behind popups', () => {
       jasmine.clock().install();
       let desktop = session.desktop;
@@ -2735,7 +2739,6 @@ describe('Desktop', () => {
       expect(scout.widget($overlays.eq(1))).toBeInstanceOf(Tooltip);
       expect($overlays.eq(1).text()).toBe('Tooltip 2');
       expect(scout.widget($overlays.eq(2))).toBeInstanceOf(DatePickerPopup);
-      jasmine.clock().uninstall();
     });
 
     it('orders overlays relative to their context', async () => {

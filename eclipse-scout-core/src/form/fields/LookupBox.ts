@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -111,14 +111,6 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
       .then(result => {
         this._lookupByAllDone(result);
         deferred.resolve(result);
-      })
-      .catch(e => {
-        if (objects.isPojo(e) && e.abort) {
-          // Ignore: happens when this lookup call is aborted because a newer one superseded it (see abortExisting above).
-          // The newer lookup call's own promise chain resolves the field, so nothing else needs to be done here.
-          return;
-        }
-        throw e;
       });
 
     return deferred.promise();
