@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,7 +20,7 @@ import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 import org.eclipse.scout.rt.platform.util.date.StrictSimpleDateFormat;
 
-import com.fasterxml.jackson.core.JsonStreamContext;
+import tools.jackson.core.TokenStreamContext;
 
 /**
  * Common helper for {@link DoDateSerializer} and {@link DoDateDeserializer}
@@ -30,15 +30,15 @@ public class DoDateSerializationHelper {
 
   protected final LazyValue<DataObjectInventory> m_dataObjectInventory = new LazyValue<>(DataObjectInventory.class);
 
-  public SimpleDateFormat findFormatter(JsonStreamContext ctx) {
+  public SimpleDateFormat findFormatter(TokenStreamContext ctx) {
     // if current element is a DoList, switch to parent context (which is defining the DoList attribute)
-    if (ctx != null && ctx.getCurrentValue() instanceof DoList) {
+    if (ctx != null && ctx.currentValue() instanceof DoList) {
       ctx = ctx.getParent();
     }
     // if current value is a IDoEntity, and the current field has a name, try to find an annotated custom formatter
-    if (ctx != null && ctx.getCurrentValue() != null && ctx.getCurrentName() != null && ctx.getCurrentValue() instanceof IDoEntity) {
-      Class<? extends IDoEntity> entityClass = ctx.getCurrentValue().getClass().asSubclass(IDoEntity.class);
-      return lookupFormatter(entityClass, ctx.getCurrentName());
+    if (ctx != null && ctx.currentValue() != null && ctx.currentName() != null && ctx.currentValue() instanceof IDoEntity) {
+      Class<? extends IDoEntity> entityClass = ctx.currentValue().getClass().asSubclass(IDoEntity.class);
+      return lookupFormatter(entityClass, ctx.currentName());
     }
     return null;
   }

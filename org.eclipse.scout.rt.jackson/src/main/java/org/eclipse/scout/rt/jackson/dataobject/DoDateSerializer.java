@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.IOException;
-import java.io.Serial;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,17 +17,16 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.ValueFormat;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.std.DateSerializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ser.jdk.JavaUtilDateSerializer;
 
 /**
- * Custom {@link DateSerializer} handling date values within {@link IDoEntity} which are annotated with custom
+ * Custom {@link JavaUtilDateSerializer} handling date values within {@link IDoEntity} which are annotated with custom
  * {@link ValueFormat} format.
  */
-public class DoDateSerializer extends DateSerializer {
-  @Serial
-  private static final long serialVersionUID = 1L;
+public class DoDateSerializer extends JavaUtilDateSerializer {
 
   protected final LazyValue<DoDateSerializationHelper> m_helper = new LazyValue<>(DoDateSerializationHelper.class);
 
@@ -42,8 +39,8 @@ public class DoDateSerializer extends DateSerializer {
   }
 
   @Override
-  public void serialize(Date value, JsonGenerator g, SerializerProvider provider) throws IOException {
-    SimpleDateFormat formatter = m_helper.get().findFormatter(g.getOutputContext());
+  public void serialize(Date value, JsonGenerator g, SerializationContext ctxt) throws JacksonException {
+    SimpleDateFormat formatter = m_helper.get().findFormatter(g.streamWriteContext());
     if (formatter != null) {
       // TODO [23.0] bsh, pbz: Set the time zone of the formatter to the time zone of Jackson here
       // This would allow setting a custom time zone on the ObjectMapper. However, we should also set the default time zone
@@ -56,12 +53,12 @@ public class DoDateSerializer extends DateSerializer {
       g.writeString(formatter.format(value));
     }
     else {
-      super.serialize(value, g, provider);
+      super.serialize(value, g, ctxt);
     }
   }
 
   @Override
-  public DateSerializer withFormat(Boolean timestamp, DateFormat customFormat) {
-    return new DoDateSerializer(timestamp, customFormat);
+  public JavaUtilDateSerializer withFormat(Boolean timestamp, DateFormat customFormat) {
+    return new JavaUtilDateSerializer(timestamp, customFormat);
   }
 }
