@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
-  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
-  GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
-  OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
+  AbstractLayout, Action, arrays, BenchColumnDisplayViewId, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout,
+  DesktopModel, DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
+  FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel,
+  objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -33,6 +33,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   navigationHandleVisible: boolean;
   logoActionEnabled: boolean;
   benchVisible: boolean;
+  maximizedBenchColumn: BenchColumnDisplayViewId;
   headerVisible: boolean;
   geolocationServiceAvailable: boolean;
   benchLayoutData: BenchColumnLayoutData;
@@ -95,6 +96,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this.navigationHandleVisible = true;
     this.logoActionEnabled = false;
     this.benchVisible = true;
+    this.maximizedBenchColumn = null;
     this.headerVisible = true;
     this.geolocationServiceAvailable = Device.get().supportsGeolocation();
     this.benchLayoutData = null;
@@ -810,6 +812,11 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   setBenchVisible(visible: boolean) {
     this.setProperty('benchVisible', visible);
     this.updateSplitterVisibility();
+  }
+
+  /** @see DesktopModel.maximizedBenchColumn */
+  setMaximizedBenchColumn(maximizedBenchColumn: BenchColumnDisplayViewId) {
+    this.setProperty('maximizedBenchColumn', maximizedBenchColumn);
   }
 
   /** @see DesktopModel.headerVisible */

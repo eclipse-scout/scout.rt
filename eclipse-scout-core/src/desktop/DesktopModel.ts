@@ -7,7 +7,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, DisplayParentModel, DisplayViewId, Form, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel} from '../index';
+import {
+  Action, BenchColumnDisplayViewId, BenchColumnLayoutData, DesktopDisplayStyle, DesktopNotification, DisplayParentModel, DisplayViewId, Form, Menu, NativeNotificationDefaults, ObjectOrChildModel, Outline, ViewButton, Widget, WidgetModel
+} from '../index';
 
 export interface DesktopModel extends WidgetModel, DisplayParentModel {
   /**
@@ -50,6 +52,13 @@ export interface DesktopModel extends WidgetModel, DisplayParentModel {
    * Default is true.
    */
   benchVisible?: boolean;
+  /**
+   * The {@link DesktopBench} column that takes the whole bench. All other columns are hidden.
+   * Reset to null as soon as a view in another column is activated.
+   *
+   * Default is null (all columns are shown).
+   */
+  maximizedBenchColumn?: BenchColumnDisplayViewId;
   /**
    * Configures the layout data used by the {@link FlexboxLayout} to arrange the view areas in the {@link DesktopBench}.
    *

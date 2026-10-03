@@ -7,9 +7,11 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Device, Event, EventHandler, GlassPaneContribution, InitModelOf, ObjectIdProvider, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, TabbableItem, tooltips, Widget} from '../index';
+import {aria, Event, EventHandler, GlassPaneContribution, InitModelOf, ObjectIdProvider, PropertyChangeEvent, SimpleTabEventMap, SimpleTabModel, Status, strings, TabbableItem, tooltips, Widget} from '../index';
 
 export type DisplayViewId = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW' | 'C' | 'OUTLINE' | 'OUTLINE_SELECTOR' | 'PAGE_DETAIL' | 'PAGE_SEARCH' | 'PAGE_TABLE';
+
+export type BenchColumnDisplayViewId = Extract<DisplayViewId, 'W' | 'C' | 'E'>;
 
 export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widget implements SimpleTabModel<TView>, TabbableItem {
   declare model: SimpleTabModel<TView>;
@@ -136,6 +138,13 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
   protected override _remove() {
     this.$close = null;
     super._remove();
+  }
+
+  protected override _destroy() {
+    if (this.view) {
+      this._uninstallViewListeners();
+    }
+    super._destroy();
   }
 
   setTitle(title: string) {
@@ -357,7 +366,6 @@ export class SimpleTab<TView extends SimpleTabView = SimpleTabView> extends Widg
    * and thus the _remove function is never called.
    */
   protected _onViewRemove(event: Event<TView>) {
-    this._uninstallViewListeners();
     if (this.rendered) {
       this.remove();
     } else {

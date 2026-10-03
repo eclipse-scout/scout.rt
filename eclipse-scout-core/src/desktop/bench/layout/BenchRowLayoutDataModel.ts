@@ -11,4 +11,5 @@ import {FlexboxLayoutData, FlexboxLayoutDataModel, ObjectOrModel} from '../../..
 
 export interface BenchRowLayoutDataModel extends FlexboxLayoutDataModel {
   rows?: ObjectOrModel<FlexboxLayoutData>[];
+  alwaysRendered?: boolean;
 }
