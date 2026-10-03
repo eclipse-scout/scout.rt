@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Desktop, Form} from '../../../src/index';
+import {BenchColumn, Desktop, DesktopBench, Form} from '../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '../../../src/testing/index';
 
 describe('DesktopBench', () => {
@@ -149,6 +149,72 @@ describe('DesktopBench', () => {
     it('has aria-label set', () => {
       expect(desktop.bench.$container.attr('aria-label')).toBeTruthy();
       expect(desktop.bench.$container.attr('aria-labelledby')).toBeFalsy();
+    });
+  });
+
+  describe('alwaysRendered', () => {
+    let bench: DesktopBench, column: BenchColumn;
+
+    beforeEach(() => {
+      bench = desktop.bench;
+      column = bench.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.CENTER];
+    });
+
+    function setAlwaysRendered(alwaysRendered: boolean) {
+      desktop.setProperty('benchLayoutData', {columns: [null, {alwaysRendered}, null]});
+    }
+
+    function createView(): Form {
+      let form = formHelper.createFormWithOneField();
+      form.displayViewId = 'C';
+      return form;
+    }
+
+    it('removes an empty column by default', () => {
+      let view = createView();
+      bench.addView(view);
+      expect(column.rendered).toBe(true);
+
+      bench.removeView(view);
+      expect(column.rendered).toBe(false);
+      expect(bench.visibleColumns()).not.toContain(column);
+    });
+
+    it('renders an empty column when alwaysRendered is set', () => {
+      expect(column.rendered).toBe(false);
+
+      setAlwaysRendered(true);
+      expect(column.rendered).toBe(true);
+      expect(column.viewCount()).toBe(0);
+      expect(column.hasViews()).toBe(false);
+      expect(bench.visibleColumns()).toContain(column);
+    });
+
+    it('keeps the column rendered when its last view is removed', () => {
+      setAlwaysRendered(true);
+      let view = createView();
+      bench.addView(view);
+      expect(column.viewCount()).toBe(1);
+
+      bench.removeView(view);
+      expect(column.viewCount()).toBe(0);
+      expect(column.rendered).toBe(true);
+    });
+
+    it('removes the empty column when alwaysRendered is reset', () => {
+      setAlwaysRendered(true);
+      expect(column.rendered).toBe(true);
+
+      setAlwaysRendered(false);
+      expect(column.rendered).toBe(false);
+    });
+
+    it('keeps a column with views rendered when alwaysRendered is reset', () => {
+      setAlwaysRendered(true);
+      bench.addView(createView());
+
+      setAlwaysRendered(false);
+      expect(column.rendered).toBe(true);
     });
   });
 });

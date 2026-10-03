@@ -198,7 +198,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   }
 
   visibleColumns(): BenchColumn[] {
-    return this.columns.filter(column => column.hasViews());
+    return this.columns.filter(column => column.needsRendering());
   }
 
   protected _renderColumns() {
@@ -335,12 +335,30 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       c.updateLayoutData(columnDatas[i], cacheKey);
     });
     if (this.rendered) {
+      this._updateRenderedColumns();
       let layout = this.htmlComp.layout as FlexboxLayout;
       layout.setCacheKey(this.layoutCacheKey);
       layout.reset();
       this.htmlComp.invalidateLayoutTree();
     }
     this._updateSplitterMovable();
+  }
+
+  protected _updateRenderedColumns() {
+    let changed = false;
+    this.columns.forEach(c => {
+      if (c.isAlwaysRendered() && !c.rendered) {
+        c.render();
+        changed = true;
+      } else if (!c.needsRendering() && c.rendered) {
+        c.remove();
+        changed = true;
+      }
+    });
+    if (changed) {
+      this._revalidateSplitters();
+      this.updateFirstLastMarker();
+    }
   }
 
   override setLayoutData(layoutData: BenchColumnLayoutData) {
@@ -677,7 +695,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     column.addView(view, activate);
 
     if (this.rendered) {
-      if (column.viewCount() === 1) {
+      if (column.viewCount() === 1 && !column.isAlwaysRendered()) {
         this._renderColumn(column);
         this._revalidateSplitters();
         this.updateFirstLastMarker();
@@ -730,8 +748,8 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       column.removeView(view, showSiblingView);
       this._removeViewInProgress--;
       delete this.tabBoxMap[view.id];
-      // remove if empty
-      if (this.rendered && column.viewCount() === 0 && this._removeViewInProgress === 0) {
+      // remove if empty and not kept visible
+      if (this.rendered && !column.needsRendering() && this._removeViewInProgress === 0) {
         column.remove();
         this._revalidateSplitters();
         this.updateFirstLastMarker();

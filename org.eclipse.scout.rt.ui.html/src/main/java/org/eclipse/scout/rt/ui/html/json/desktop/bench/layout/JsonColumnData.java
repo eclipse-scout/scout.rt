@@ -36,6 +36,7 @@ public class JsonColumnData extends JsonLayoutData {
     for (FlexboxLayoutData rowData : getLayoutData().getRows()) {
       json.append("rows", JsonLayoutData.toJson(rowData));
     }
+    json.put("alwaysRendered", getLayoutData().isAlwaysRendered());
     return json;
   }
 

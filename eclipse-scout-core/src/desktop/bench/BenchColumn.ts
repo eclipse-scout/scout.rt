@@ -337,6 +337,14 @@ export class BenchColumn extends Widget implements BenchColumnModel {
     }, []);
   }
 
+  isAlwaysRendered(): boolean {
+    return !!this.layoutData?.alwaysRendered;
+  }
+
+  needsRendering(): boolean {
+    return this.layoutData?.alwaysRendered || this.hasViews();
+  }
+
   getComponents(): (SimpleTabBox<OutlineContent> | Splitter)[] {
     return this.components;
   }

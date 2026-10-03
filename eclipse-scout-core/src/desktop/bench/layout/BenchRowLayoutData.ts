@@ -13,12 +13,14 @@ export class BenchRowLayoutData extends FlexboxLayoutData implements BenchRowLay
   declare model: BenchRowLayoutDataModel;
 
   rows: FlexboxLayoutData[];
+  alwaysRendered: boolean;
 
   constructor(model?: InitModelOf<BenchRowLayoutData>) {
     super(model);
     model = model || {};
     this.rows = scout.nvl(model.rows, [null, null, null]);
     this._ensureRows();
+    this.alwaysRendered = !!model.alwaysRendered;
   }
 
   getRows(): FlexboxLayoutData[] {
