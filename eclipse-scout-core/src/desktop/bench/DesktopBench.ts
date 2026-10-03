@@ -198,7 +198,16 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   }
 
   visibleColumns(): BenchColumn[] {
-    return this.columns.filter(column => column.hasViews());
+    return this.columns.filter(column => this._needsRendering(column));
+  }
+
+  protected _needsRendering(column: BenchColumn): boolean {
+    return column.needsRendering() && !this._isHiddenByMaximizedColumn(column);
+  }
+
+  protected _isHiddenByMaximizedColumn(column: BenchColumn): boolean {
+    let maximizedColumnId = this.desktop.maximizedBenchColumn;
+    return !!maximizedColumnId && column !== this._getColumn(maximizedColumnId);
   }
 
   protected _renderColumns() {
@@ -211,6 +220,9 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       return;
     }
     column.render();
+    if (this.headerTabAreaController && column === this._getColumn('C')) {
+      this.headerTabAreaController.renderTabs();
+    }
   }
 
   protected override _remove() {
@@ -335,12 +347,41 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       c.updateLayoutData(columnDatas[i], cacheKey);
     });
     if (this.rendered) {
+      this._updateRenderedColumns();
       let layout = this.htmlComp.layout as FlexboxLayout;
       layout.setCacheKey(this.layoutCacheKey);
       layout.reset();
       this.htmlComp.invalidateLayoutTree();
     }
     this._updateSplitterMovable();
+  }
+
+  protected _updateRenderedColumns(): boolean {
+    let changed = false;
+    this.columns.forEach(c => {
+      let needsRendering = this._needsRendering(c);
+      if (needsRendering && !c.rendered) {
+        this._renderColumn(c);
+        changed = true;
+      } else if (!needsRendering && c.rendered) {
+        c.remove();
+        changed = true;
+      }
+    });
+    if (changed) {
+      this._revalidateSplitters();
+      this.updateFirstLastMarker();
+    }
+    return changed;
+  }
+
+  protected _syncRenderedColumns() {
+    if (!this.rendered) {
+      return;
+    }
+    if (this._updateRenderedColumns()) {
+      this._invalidateColumnLayout();
+    }
   }
 
   override setLayoutData(layoutData: BenchColumnLayoutData) {
@@ -557,6 +598,9 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     if (event.propertyName === 'benchLayoutData') {
       this._onBenchLayoutDataChange();
     }
+    if (event.propertyName === 'maximizedBenchColumn') {
+      this._syncRenderedColumns();
+    }
   }
 
   protected _onNavigationHandleAction(event: CollapseHandleActionEvent) {
@@ -639,6 +683,16 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     event.preventDefault();
   }
 
+  protected _invalidateColumnLayout() {
+    if (this.changingCounter > 0) {
+      this.changed = true;
+      return;
+    }
+    let layout = this.htmlComp.layout as FlexboxLayout;
+    layout.reset();
+    this.htmlComp.invalidateLayoutTree();
+  }
+
   protected _onViewAdd(event: BenchColumnViewAddEvent) {
     this.trigger('viewAdd', {
       view: event.view
@@ -655,6 +709,9 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     let view = event.view;
     if (this.outlineContent === view) {
       this.desktop.bringOutlineToFront();
+    }
+    if (this.desktop.rendered && !this.desktop.initialFormRendering && this._isHiddenByMaximizedColumn(event.source)) {
+      this.desktop.setMaximizedBenchColumn(null);
     }
     this.trigger('viewActivate', {
       view: view
@@ -675,21 +732,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     let column = this._getColumn(view.displayViewId);
     this.tabBoxMap[view.id] = column;
     column.addView(view, activate);
-
-    if (this.rendered) {
-      if (column.viewCount() === 1) {
-        this._renderColumn(column);
-        this._revalidateSplitters();
-        this.updateFirstLastMarker();
-        if (this.changingCounter > 0) {
-          this.changed = true;
-        } else {
-          let layout = this.htmlComp.layout as FlexboxLayout;
-          layout.reset();
-          this.htmlComp.invalidateLayoutTree();
-        }
-      }
-    }
+    this._syncRenderedColumns();
   }
 
   activateView(view: OutlineContent) {
@@ -730,18 +773,8 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       column.removeView(view, showSiblingView);
       this._removeViewInProgress--;
       delete this.tabBoxMap[view.id];
-      // remove if empty
-      if (this.rendered && column.viewCount() === 0 && this._removeViewInProgress === 0) {
-        column.remove();
-        this._revalidateSplitters();
-        this.updateFirstLastMarker();
-        if (this.changingCounter > 0) {
-          this.changed = true;
-        } else {
-          let layout = this.htmlComp.layout as FlexboxLayout;
-          layout.reset();
-          this.htmlComp.invalidateLayoutTree();
-        }
+      if (this._removeViewInProgress === 0) {
+        this._syncRenderedColumns();
       }
     }
   }

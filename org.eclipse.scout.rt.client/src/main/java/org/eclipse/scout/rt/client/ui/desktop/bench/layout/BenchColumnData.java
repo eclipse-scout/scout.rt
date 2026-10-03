@@ -27,6 +27,7 @@ public class BenchColumnData extends FlexboxLayoutData {
       new FlexboxLayoutData(),
       new FlexboxLayoutData()
   };
+  private boolean m_alwaysRendered = false;
 
   public FlexboxLayoutData[] getRows() {
     return m_rows;
@@ -83,6 +84,15 @@ public class BenchColumnData extends FlexboxLayoutData {
     return m_rows[SOUTH];
   }
 
+  public BenchColumnData withAlwaysRendered(boolean alwaysRendered) {
+    m_alwaysRendered = alwaysRendered;
+    return this;
+  }
+
+  public boolean isAlwaysRendered() {
+    return m_alwaysRendered;
+  }
+
   @Override
   public BenchColumnData withInitial(double initial) {
     return (BenchColumnData) super.withInitial(initial);
@@ -132,6 +142,7 @@ public class BenchColumnData extends FlexboxLayoutData {
     if (getNorth() != null) {
       copy.withNorth(getNorth().copy());
     }
+    copy.withAlwaysRendered(isAlwaysRendered());
     return copy;
   }
 
@@ -140,6 +151,7 @@ public class BenchColumnData extends FlexboxLayoutData {
     final int prime = 31;
     int result = super.hashCode();
     result = prime * result + Arrays.hashCode(m_rows);
+    result = prime * result + (m_alwaysRendered ? 1231 : 1237);
     return result;
   }
 
@@ -156,6 +168,9 @@ public class BenchColumnData extends FlexboxLayoutData {
     }
     BenchColumnData other = (BenchColumnData) obj;
     if (!Arrays.equals(m_rows, other.m_rows)) {
+      return false;
+    }
+    if (m_alwaysRendered != other.m_alwaysRendered) {
       return false;
     }
     return true;
