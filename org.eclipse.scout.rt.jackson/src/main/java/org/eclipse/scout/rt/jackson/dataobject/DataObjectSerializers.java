@@ -22,6 +22,7 @@ import tools.jackson.databind.SerializationConfig;
 import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.jsontype.TypeSerializer;
 import tools.jackson.databind.ser.Serializers;
+import tools.jackson.databind.type.CollectionLikeType;
 import tools.jackson.databind.type.CollectionType;
 import tools.jackson.databind.type.ReferenceType;
 
@@ -84,5 +85,16 @@ public class DataObjectSerializers extends Serializers.Base {
       }
     }
     return super.findCollectionSerializer(config, type, beanDescRef, formatOverrides, elementTypeSerializer, elementValueSerializer);
+  }
+
+  @Override
+  public ValueSerializer<?> findCollectionLikeSerializer(SerializationConfig config, CollectionLikeType type, Supplier beanDescRef, Value formatOverrides, TypeSerializer elementTypeSerializer, ValueSerializer<Object> elementValueSerializer) {
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      ValueSerializer<?> serializer = provider.findCollectionLikeSerializer(getModuleContext(), type, config, beanDescRef, formatOverrides, elementTypeSerializer, elementValueSerializer);
+      if (serializer != null) {
+        return serializer;
+      }
+    }
+    return super.findCollectionLikeSerializer(config, type, beanDescRef, formatOverrides, elementTypeSerializer, elementValueSerializer);
   }
 }

@@ -19,6 +19,7 @@ import tools.jackson.databind.JavaType;
 import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.deser.Deserializers;
 import tools.jackson.databind.jsontype.TypeDeserializer;
+import tools.jackson.databind.type.CollectionLikeType;
 import tools.jackson.databind.type.CollectionType;
 import tools.jackson.databind.type.ReferenceType;
 
@@ -70,6 +71,17 @@ public class DataObjectDeserializers extends Deserializers.Base {
       }
     }
     return super.findCollectionDeserializer(type, config, beanDescRef, elementTypeDeserializer, elementDeserializer);
+  }
+
+  @Override
+  public ValueDeserializer<?> findCollectionLikeDeserializer(CollectionLikeType type, DeserializationConfig config, Supplier beanDescRef, TypeDeserializer elementTypeDeserializer, ValueDeserializer<?> elementDeserializer) {
+    for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
+      ValueDeserializer<?> deserializer = provider.findCollectionLikeDeserializer(getModuleContext(), type, config, beanDescRef, elementTypeDeserializer, elementDeserializer);
+      if (deserializer != null) {
+        return deserializer;
+      }
+    }
+    return super.findCollectionLikeDeserializer(type, config, beanDescRef, elementTypeDeserializer, elementDeserializer);
   }
 
   @Override

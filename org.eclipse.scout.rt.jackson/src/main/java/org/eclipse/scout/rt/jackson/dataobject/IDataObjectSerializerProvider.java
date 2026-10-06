@@ -24,6 +24,7 @@ import tools.jackson.databind.deser.Deserializers;
 import tools.jackson.databind.jsontype.TypeDeserializer;
 import tools.jackson.databind.jsontype.TypeSerializer;
 import tools.jackson.databind.ser.Serializers;
+import tools.jackson.databind.type.CollectionLikeType;
 import tools.jackson.databind.type.CollectionType;
 import tools.jackson.databind.type.ReferenceType;
 
@@ -126,6 +127,28 @@ public interface IDataObjectSerializerProvider {
    */
   default ValueDeserializer<?> findCollectionDeserializer(ScoutDataObjectModuleContext moduleContext, CollectionType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef, TypeDeserializer elementTypeDeserializer,
       ValueDeserializer<?> elementDeserializer) {
+    return null;
+  }
+
+  /**
+   * Finds a collection-like serializer.
+   * <p>
+   * Called from Jackson by {@link Serializers.Base#findCollectionLikeSerializer(SerializationConfig, CollectionLikeType, BeanDescription.Supplier, JsonFormat.Value, TypeSerializer, ValueSerializer)}.
+   *
+   * @return <code>null</code> if no matching serializer can be provided.
+   */
+  default ValueSerializer<?> findCollectionLikeSerializer(ScoutDataObjectModuleContext moduleContext, CollectionLikeType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides, TypeSerializer elementTypeSerializer, ValueSerializer<Object> elementValueSerializer) {
+    return null;
+  }
+
+  /**
+   * Finds a collection-like deserializer.
+   * <p>
+   * Called from Jackson by {@link Deserializers.Base#findCollectionLikeDeserializer(CollectionLikeType, DeserializationConfig, BeanDescription.Supplier, TypeDeserializer, ValueDeserializer)}.
+   *
+   * @return <code>null</code> if no matching deserializer can be provided.
+   */
+  default ValueDeserializer<?> findCollectionLikeDeserializer(ScoutDataObjectModuleContext moduleContext, CollectionLikeType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef, TypeDeserializer elementTypeDeserializer, ValueDeserializer<?> elementDeserializer) {
     return null;
   }
 
