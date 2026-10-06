@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, SpecForm, SpecLifecycle} from '../../../src/testing/index';
-import {FormField, FormLifecycle, GroupBox, MessageBox, scout, Status, StringField, TabBox, TabItem, TableField, TreeVisitResult, ValidationResult} from '../../../src/index';
+import {ElementsValidationStatus, FormField, FormLifecycle, GroupBox, MessageBox, scout, Status, StringField, TabBox, TabItem, TableField, TreeVisitResult, ValidationResult} from '../../../src/index';
 import $ from 'jquery';
 
 describe('FormLifecycle', () => {
@@ -228,6 +228,80 @@ describe('FormLifecycle', () => {
       jasmine.clock().tick(0);
       expectMessageBox(false);
     });
+
+    it('finds invalid fields in nested Status', () => {
+      const lifecycle = new SpecLifecycle();
+      const form = scout.create(SpecForm, {
+        parent: session.desktop,
+        rootGroupBox: {
+          id: 'MainBox',
+          objectType: GroupBox,
+          mainBox: true,
+          fields: [{
+            id: 'GroupBox',
+            objectType: GroupBox,
+            fields: [{
+              id: 'Field1',
+              objectType: StringField
+            }]
+          }]
+        }
+      });
+      const field1Result = createValidationResult(form.widget('Field1', StringField), false);
+      const groupBoxResult = createValidationResult(form.widget('GroupBox', GroupBox), false);
+      const createElementsValidationStatus = (missing?: { errorStatus?: Status }[], invalid?: { errorStatus?: Status }[]) =>
+        scout.create(ElementsValidationStatus, {
+          severity: Status.Severity.WARNING,
+          message: 'msg',
+          elementsValidationResult: {
+            missingElements: missing,
+            invalidElements: invalid,
+            pendingElements: []
+          }
+        });
+
+      expect(lifecycle._findElementToReveal(Status.error())).toBeFalsy();
+      expect(lifecycle._findElementToReveal(Status.warning())).toBeFalsy();
+
+      // finds the validationResult of the nested ElementsValidationStatus which contains a missing element
+      expect(lifecycle._findElementToReveal(Status.ensure({
+        children: [
+          Status.ok(),
+          {
+            severity: Status.Severity.ERROR,
+            children: [createElementsValidationStatus([field1Result])]
+          },
+          Status.error()
+        ]
+      }))).toBe(field1Result);
+
+      // finds the validationResult of the nested ElementsValidationStatus which contains a missing element (takes precedence over invalid element)
+      expect(lifecycle._findElementToReveal(Status.ensure({
+        children: [
+          Status.ok(),
+          createElementsValidationStatus([field1Result], [groupBoxResult]),
+          Status.error()
+        ]
+      }))).toBe(field1Result);
+
+      // finds the validationResult of the nested ElementsValidationStatus which contains an invalid element
+      expect(lifecycle._findElementToReveal(Status.ensure({
+        children: [
+          Status.ok(),
+          createElementsValidationStatus([], [field1Result]),
+          Status.error()
+        ]
+      }))).toBe(field1Result);
+
+      // no elements available
+      expect(lifecycle._findElementToReveal(Status.ensure({
+        children: [
+          Status.ok(),
+          createElementsValidationStatus([], []),
+          Status.error()
+        ]
+      }))).toBeFalsy();
+    });
   });
 
   describe('load', () => {
@@ -364,7 +438,6 @@ describe('FormLifecycle', () => {
   });
 
   describe('validation result', () => {
-
     it('has widget status if element status is only warning', async () => {
       jasmine.clock().uninstall();
       const form = scout.create(SpecForm, {
