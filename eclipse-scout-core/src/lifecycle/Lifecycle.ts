@@ -220,9 +220,10 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   }
 
   protected _handleValidationResult(status: Status): JQuery.Promise<Status> {
-    // 1. reveal first invalid element
-    if (status instanceof ElementsValidationStatus && (status.elementsValidationResult.missingElements.length || status.elementsValidationResult.invalidElements.length)) {
-      this._revealInvalidElement(arrays.first(status.elementsValidationResult.missingElements) || arrays.first(status.elementsValidationResult.invalidElements));
+    // 1. reveal first invalid element if available
+    const elementToReveal = this._findElementToReveal(status);
+    if (elementToReveal) {
+      this._revealInvalidElement(elementToReveal);
     }
 
     // 2. trigger event (allow modification of status)
@@ -234,6 +235,20 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
 
     // 3. handle if warning or error
     return this._handleInvalid(status);
+  }
+
+  protected _findElementToReveal(status: Status): TValidationResult {
+    const elementValidationStatusList = status.asFlatList()
+      .filter(s => s instanceof ElementsValidationStatus)
+      .map(s => s as ElementsValidationStatus<TValidationResult>);
+
+    const missingElementsStatus = elementValidationStatusList.find(s => s.elementsValidationResult.missingElements.length);
+    if (missingElementsStatus) {
+      return missingElementsStatus.elementsValidationResult.missingElements[0];
+    }
+
+    const invalidElementsStatus = elementValidationStatusList.find(s => s.elementsValidationResult.invalidElements.length);
+    return invalidElementsStatus?.elementsValidationResult.invalidElements[0];
   }
 
   protected _handleInvalid(status: Status): JQuery.Promise<Status> {

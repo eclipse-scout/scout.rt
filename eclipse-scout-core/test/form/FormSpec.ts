@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormSpecHelper, OutlineSpecHelper, SpecForm} from '../../src/testing/index';
+import {FormSpecHelper, OutlineSpecHelper, SpecForm, SpecLifecycle} from '../../src/testing/index';
 import {
   App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormLifecycle, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup,
   PopupBlockerHandler, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WidgetModel, WrappedFormField
@@ -2896,7 +2896,4 @@ describe('Form', () => {
       expect(form.lifecycle.invalidElementsWarningText).toBe('sit');
     });
   });
-
-  class SpecLifecycle extends FormLifecycle {
-  }
 });

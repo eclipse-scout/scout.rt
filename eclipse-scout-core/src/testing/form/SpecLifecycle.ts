@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,6 +10,10 @@
 import {FormLifecycle, Status, ValidationResult} from '../../index';
 
 export class SpecLifecycle extends FormLifecycle {
+  override _findElementToReveal(status: Status): ValidationResult {
+    return super._findElementToReveal(status);
+  }
+
   override _validate(): JQuery.Promise<Status> {
     return super._validate();
   }
