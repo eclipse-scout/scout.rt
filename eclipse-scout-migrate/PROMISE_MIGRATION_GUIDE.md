@@ -47,6 +47,9 @@ If `node_modules` symlinks are broken in your environment (e.g. they point to a 
 
 Errors for missing third-party modules (TS2307) are expected in that setup and can be ignored.
 
+Besides `tsc`, lint with `@eclipse-scout/no-floating-promises` (enabled as a warning in `@eclipse-scout/eslint-config`). It finds asynchronous work nobody waits for, a class of bug the migration can expose in code that itself
+needs no change (§7b).
+
 The compiler cannot see everything. Callbacks typed `any` or annotated with the wrong shape (e.g. `.then((result: ResultDo) => result)` on a `Promise<any>`) type-check fine but are wrong at runtime. So always combine tsc with the grep
 patterns above.
 
@@ -363,6 +366,50 @@ a per-site abort filter to every chain end.** The framework handles this central
 
 Real errors are unaffected and still fail the spec.
 
+### 7b. Async work started in a synchronous lifecycle step
+
+A floating promise is not only an error-handling problem. It also means **nobody can wait for that work**. This is dangerous in synchronous lifecycle hooks like `Form.importData()`, `exportData()` or `_postLoad()`, when they start
+asynchronous work (a lookup, a table reload, `_applyValue()`) and drop its promise. The lifecycle then continues, e.g. `FormLifecycle` calls `markAsSaved()` after loading, while the work is still running. When it finishes, it changes
+field values again, and the form ends up with a wrong `saveNeeded` state (or a missing value, a wrong enabled state, …).
+
+Such code often worked **by accident** before the migration: the lifecycle's own jQuery `.then()` steps each cost a `setTimeout` step, so a `StaticLookupCall` (whose `setTimeout(…, delay)` was scheduled earlier) had always finished first.
+Natively, the lifecycle continues as microtasks and overtakes the lookup. Nothing in the migrated code looks wrong; the bug is in the code that was never changed.
+
+**How to find these cases:**
+
+- **Lint for floating promises.** `@eclipse-scout/eslint-config` enables the rule `@eclipse-scout/no-floating-promises` as a warning (with type information via `projectService`). It is
+  `@typescript-eslint/no-floating-promises`, which reports every promise that is neither returned, awaited nor handled, with all its options, but it ignores
+  - promises in event handlers (methods named `_onXyz`, callbacks passed to `on()`/`one()`): nobody waits for them anyway;
+  - calls of known safe methods, whose promise rarely needs to be awaited: `ValueField.setValue()`, `ErrorHandler.handle()` and `Form.open()`, including subclasses. A project can add its own with the option
+    `allowForKnownSafeMethods`; the entries are added to the defaults:
+    ```js
+    '@eclipse-scout/no-floating-promises': ['warn', {allowForKnownSafeMethods: [{className: 'MyForm', methods: ['reload']}]}]
+    ```
+    (The original option `allowForKnownSafeCalls` only matches the method name, regardless of the class.)
+
+  Triage the remaining findings by the method they are in:
+  - inside a lifecycle hook, or a method called from one → the lifecycle can't wait for it: fix it (see below);
+  - other intended fire-and-forget code → mark it as intended with `void this._doSomethingAsync();`. Errors still reach the global handler (§7a).
+- **Make deferred work slower in specs.** Ordering bugs stay hidden as long as the deferred work happens to finish first. Raise `StaticLookupCall.delay` (e.g. to 50 ms) and slow down stubbed ajax responses in a test setup hook. Then run
+  a generic check for each form: open it in edit mode, `await form.load()` and `expect(form.saveNeeded).toBeFalse()`. A form whose lifecycle doesn't wait for its asynchronous work now fails reliably.
+
+**How to fix them:** make the work part of the lifecycle. Return or await the promise where the hook allows it (e.g. in `_load()`). If the hook is synchronous by contract (like `importData()`), collect the promises, signal
+completion and wait for that signal in an asynchronous lifecycle step:
+
+```ts
+override importData() {
+  let importPromise = this._importValues();     // previously called without using the returned promise
+  let tablePromise = this._loadLookupTable();   // previously called without using the returned promise
+  // finally: trigger the event even if the import fails, otherwise the lifecycle would wait forever (the error is still reported by the global handler)
+  Promise.all([importPromise, tablePromise]).finally(() => this.trigger('importDataDone'));
+}
+
+protected override async _onLifecycleLoad(): Promise<void> {
+  await super._onLifecycleLoad();
+  await this.when('importDataDone'); // importData() is asynchronous, wait for it before the form is marked as saved
+}
+```
+
 Two related patterns to get right while you're in this territory:
 
 - **Cleanup that must run regardless of success/failure, without swallowing the error:** don't write `promise.then(cleanup, cleanup)` — if `cleanup` doesn't rethrow, that silently turns a rejected chain into a resolved one. Use `promise.finally(cleanup)` instead: it still runs unconditionally, but the rejection (if any) propagates to the promise `.finally()` returns, so it can still be caught further up or surface as unhandled if nobody's watching.
@@ -454,6 +501,7 @@ request.finally(() => {
 4. For each file: bulk-swap pure type annotations, then hand-review every `$.Deferred()`/`$.when`/`$.promiseAll`/`.done/.fail/.always`/`.state()` site using the rules in §3–§5 and §8.
 5. Grep again after each module with the same full pattern to catch anything missed (do this even for modules you think are "done" — re-run the wider pattern, not just what caught your eye), and diff the tsc output against the baseline,
    including downstream modules.
-6. Modules reported as "already migrated" are not necessarily done. Re-check them with tsc and the full pattern. Leftovers there tend to be exactly the cases a narrow first pass misses (`$.when`, `$.promiseAll` arity, `.state()` in specs,
+6. Lint every module with `@eclipse-scout/no-floating-promises` (§7b) and triage the findings. Floating promises in lifecycle hooks are bugs even if the code itself didn't need a migration change.
+7. Modules reported as "already migrated" are not necessarily done. Re-check them with tsc and the full pattern. Leftovers there tend to be exactly the cases a narrow first pass misses (`$.when`, `$.promiseAll` arity, `.state()` in specs,
    indexed ajax results).
-7. Report a clear diff summary; you likely can't run this project's test suite yourself, so flag anything you're less than fully confident about rather than asserting it's correct.
+8. Report a clear diff summary; you likely can't run this project's test suite yourself, so flag anything you're less than fully confident about rather than asserting it's correct.
