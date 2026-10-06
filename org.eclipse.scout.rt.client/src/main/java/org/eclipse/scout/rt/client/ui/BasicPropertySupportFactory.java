@@ -12,6 +12,7 @@ package org.eclipse.scout.rt.client.ui;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.scout.rt.client.ui.action.AbstractAction;
 import org.eclipse.scout.rt.client.ui.action.IAction;
@@ -55,7 +56,7 @@ import org.eclipse.scout.rt.platform.util.TriState;
 @ApplicationScoped
 public class BasicPropertySupportFactory {
 
-  public Map<Class<? extends AbstractPropertyObserver>, Map<String, Object>> m_defaultValuesByClass = new HashMap<>();
+  protected final Map<Class<? extends AbstractPropertyObserver>, Map<String, Object>> m_defaultValuesByClass = new ConcurrentHashMap<>();
 
   public BasicPropertySupport createFor(AbstractPropertyObserver holder) {
     // order matters
