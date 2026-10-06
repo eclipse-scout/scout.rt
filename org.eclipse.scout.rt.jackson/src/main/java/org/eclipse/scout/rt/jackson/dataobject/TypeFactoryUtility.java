@@ -48,7 +48,7 @@ public final class TypeFactoryUtility {
   public static AttributeType toAttributeType(ParameterizedType parametrizedType, JsonToken currentToken, DatabindContext ctxt) {
     if (ObjectUtility.isOneOf(parametrizedType.getRawType(), DoList.class, DoSet.class, DoCollection.class)) {
       JavaType listItemsType = ctxt.constructType(parametrizedType.getActualTypeArguments()[0]);
-      return AttributeType.ofDoCollection(ctxt.getTypeFactory().constructParametricType((Class<?>) parametrizedType.getRawType(), listItemsType));
+      return AttributeType.ofDoCollection(ctxt.getTypeFactory().constructCollectionLikeType((Class<?>) parametrizedType.getRawType(), listItemsType));
     }
     else if (DoValue.class == parametrizedType.getRawType()) {
       Type typeArg = parametrizedType.getActualTypeArguments()[0];

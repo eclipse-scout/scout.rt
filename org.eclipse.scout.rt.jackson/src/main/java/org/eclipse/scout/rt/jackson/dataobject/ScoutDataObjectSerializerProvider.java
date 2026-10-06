@@ -53,6 +53,7 @@ import tools.jackson.databind.ValueDeserializer;
 import tools.jackson.databind.ValueSerializer;
 import tools.jackson.databind.jsontype.TypeDeserializer;
 import tools.jackson.databind.jsontype.TypeSerializer;
+import tools.jackson.databind.type.CollectionLikeType;
 import tools.jackson.databind.type.CollectionType;
 import tools.jackson.databind.type.ReferenceType;
 
@@ -64,9 +65,6 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
     Class<?> rawClass = type.getRawClass();
     if (IDoEntity.class.isAssignableFrom(rawClass)) {
       return new DoEntitySerializer(moduleContext, type);
-    }
-    else if (ObjectUtility.isOneOf(rawClass, DoList.class, DoSet.class, DoCollection.class)) {
-      return new DoCollectionSerializer<>(moduleContext, type);
     }
     if (IDataObjectValue.class.isAssignableFrom(rawClass)) {
       return new DataObjectValueSerializer(type);
@@ -96,16 +94,6 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
     Class<?> rawClass = type.getRawClass();
     if (IDoEntity.class.isAssignableFrom(rawClass)) {
       return new DoEntityDeserializer(moduleContext, type);
-    }
-    else if (DoList.class.isAssignableFrom(rawClass)) {
-      return new DoCollectionDeserializer<>(type, DoList::new);
-    }
-    else if (DoSet.class.isAssignableFrom(rawClass)) {
-      return new DoCollectionDeserializer<>(type, DoSet::new);
-    }
-    // using default collection deserializer, no handling as for serialization required in deserialization
-    else if (DoCollection.class.isAssignableFrom(rawClass)) {
-      return new DoCollectionDeserializer<>(type, DoCollection::new);
     }
     else if (Date.class.isAssignableFrom(rawClass)) {
       return new DoDateDeserializer();
@@ -209,6 +197,29 @@ public class ScoutDataObjectSerializerProvider implements IDataObjectSerializerP
   public ValueSerializer<?> findCollectionSerializer(ScoutDataObjectModuleContext moduleContext, CollectionType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides, TypeSerializer elementTypeSerializer, ValueSerializer<Object> elementValueSerializer) {
     if (Collection.class.isAssignableFrom(type.getRawClass())) {
       return new DoCollectionSerializer<>(moduleContext, type);
+    }
+    return null;
+  }
+
+  @Override
+  public ValueSerializer<?> findCollectionLikeSerializer(ScoutDataObjectModuleContext moduleContext, CollectionLikeType type, SerializationConfig config, Supplier beanDescRef, Value formatOverrides, TypeSerializer elementTypeSerializer, ValueSerializer<Object> elementValueSerializer) {
+    if (ObjectUtility.isOneOf(type.getRawClass(), DoList.class, DoSet.class, DoCollection.class)) {
+      return new DoCollectionSerializer<>(moduleContext, type);
+    }
+    return null;
+  }
+
+  @Override
+  public ValueDeserializer<?> findCollectionLikeDeserializer(ScoutDataObjectModuleContext moduleContext, CollectionLikeType type, DeserializationConfig config, Supplier beanDescRef, TypeDeserializer elementTypeDeserializer, ValueDeserializer<?> elementDeserializer) {
+    if (DoList.class.isAssignableFrom(type.getRawClass())) {
+      return new DoCollectionDeserializer<>(type, DoList::new);
+    }
+    else if (DoSet.class.isAssignableFrom(type.getRawClass())) {
+      return new DoCollectionDeserializer<>(type, DoSet::new);
+    }
+    // using default collection deserializer, no handling as for serialization required in deserialization
+    else if (DoCollection.class.isAssignableFrom(type.getRawClass())) {
+      return new DoCollectionDeserializer<>(type, DoCollection::new);
     }
     return null;
   }
