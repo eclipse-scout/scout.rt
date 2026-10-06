@@ -852,7 +852,7 @@ describe('PageWithTable', () => {
         });
       }
 
-      protected override _buildCellTextUpdatePromise(promise: Promise<BatchCallResult<number, unknown>>): JQuery.Promise<void> {
+      protected override _buildCellTextUpdatePromise(promise: Promise<BatchCallResult<number, unknown>>): Promise<void> {
         this.lastCellTextDeferred = new Deferred();
         this.lastCellTextPromise = super._buildCellTextUpdatePromise(promise).then(async result => {
           await this.lastCellTextDeferred.promise();

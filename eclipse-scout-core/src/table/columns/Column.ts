@@ -798,7 +798,7 @@ export class Column<TValue = string> extends PropertyEventEmitter implements Col
     }
   }
 
-  protected _buildCellTextUpdatePromise(promise: JQuery.Promise<BatchCallResult<TValue, unknown>>): JQuery.Promise<void> {
+  protected _buildCellTextUpdatePromise(promise: Promise<BatchCallResult<TValue, unknown>>): Promise<void> {
     return promise
       .then(result => this._onSetCellTextDeferredDone(result))
       .catch(error => this._onSetCellTextDeferredFail(error));

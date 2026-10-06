@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Desktop,
-  DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DraggableTableRowElement, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable, FilterOrFunction,
-  Deferred, FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultInfoContributionDo, LimitedResultTableStatus, LoadingSupport,
-  Menu, MenuBar,
-  MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate, PropertyChangeEvent, Range,
-  scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke, TableCustomizer,
-  TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableLoadingSupport, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke,
+  Action, AggregateTableControl, Alignment, AppLinkKeyStroke, aria, arrays, BooleanColumn, Cell, CellEditorPopup, clipboard, Column, ColumnModel, CompactColumn, Comparator, ContextMenuKeyStroke, ContextMenuPopup, dataObjects, Deferred,
+  Desktop, DesktopPopupOpenEvent, Device, DisplayViewId, DoubleClickSupport, dragAndDrop, DragAndDropHandler, DraggableTableRowElement, DropType, EnumObject, ErrorHandler, EventHandler, EventModel, events, Filter, Filterable,
+  FilterOrFunction, FilterResult, FilterSupport, FullModelOf, graphics, GridAriaRules, HtmlComponent, IconColumn, InitModelOf, Insets, IUserFilterStateDo, keys, KeyStrokeContext, LimitedResultInfoContributionDo, LimitedResultTableStatus,
+  LoadingSupport, Menu, MenuBar, MenuDestinations, MenuItemsOrder, menus as menuUtil, menus, NumberColumn, NumberColumnAggregationFunction, NumberColumnBackgroundEffect, ObjectOrChildModel, ObjectOrModel, objects, Predicate,
+  PropertyChangeEvent, Range, scout, scrollbars, ScrollToAlignment, ScrollToOptions, Status, StatusOrModel, strings, styles, TabbableCoordinator, TableClientUiPreferenceProfileDo, TableCompactHandler, TableControl, TableCopyKeyStroke,
+  TableCustomizer, TableDefaultRowActionKeyStroke, TableEventMap, TableFooter, TableGroupEvent, TableHeader, TableLayout, TableLoadingSupport, TableModel, TableMoveSupport, TableNavigationCollapseKeyStroke, TableNavigationDownKeyStroke,
   TableNavigationEndKeyStroke, TableNavigationExpandKeyStroke, TableNavigationHomeKeyStroke, TableNavigationPageDownKeyStroke, TableNavigationPageUpKeyStroke, TableNavigationUpKeyStroke, TableOrganizer, TableRefreshKeyStroke, TableRow,
   TableRowDropPosition, TableRowModel, TableSelectAllKeyStroke, TableSelectionHandler, TableSelectKeyStroke, TableStartCellEditKeyStroke, TableTextUserFilter, TableTileGridMediator, TableToggleRowKeyStroke, TableTooltip, TableUiPreferences,
   tableUiPreferences, TableUpdateBuffer, TableUserFilter, TableUserFilterModel, Tile, TileTableHeaderBox, tooltips, TooltipSupport, TreeGridAriaRules, UiPreferences, UpdateFilteredElementsOptions, UserFilterStateMappers, ValueField, Widget
