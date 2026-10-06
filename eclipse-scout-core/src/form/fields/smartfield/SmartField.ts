@@ -654,7 +654,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   /**
    * Validates the given lookup row is enabled and matches the current activeFilter settings.
    */
-  protected _isLookupRowActive(lookupRow: LookupRow<TValue>): boolean {
+  // FIXME [gst]: Naming (remove _), really public?
+  _isLookupRowActive(lookupRow: LookupRow<TValue>): boolean {
     if (!lookupRow.enabled) {
       return false;
     }
@@ -1492,7 +1493,8 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
   /**
    * A wrapper function around lookup calls used to display the state in the UI.
    */
-  protected _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): JQuery.Promise<SmartFieldLookupResult<TValue>> {
+  // FIXME [gst]: Naming (remove _), really public?
+  _executeLookup(lookupCall: LookupCall<TValue>, abortExisting?: boolean): JQuery.Promise<SmartFieldLookupResult<TValue>> {
     this.lookupSeqNo++;
     this.setLoading(true);
 
