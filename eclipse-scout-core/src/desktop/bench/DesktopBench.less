@@ -22,14 +22,18 @@
   position: absolute;
   top: 0;
   background-color: @desktop-bench-background-color;
-  border-left: @desktop-bench-border-left-width solid @border-color;
 
-  .navigation-invisible > & {
-    border-left: none;
+  &:not(.drop-shadow):not(.navigation-invisible)::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 0;
+    border-left: @desktop-bench-border-left-width solid @border-color;
   }
 
   &.drop-shadow {
-    border-left: none;
     .desktop-bench-drop-shadow();
 
     .desktop:not(.first-tab-selected):not(.navigation-invisible):not(.view-tab-area-in-bench) > & {
