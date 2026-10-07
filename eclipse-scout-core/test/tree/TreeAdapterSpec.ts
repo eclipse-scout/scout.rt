@@ -350,7 +350,7 @@ describe('TreeAdapter', () => {
   });
 
   describe('expandAll', () => {
-    it('sends nodeCollapsed for every expanded node', () => {
+    it('sends nodeExpanded for every expanded node', () => {
       let model = helper.createModelFixture(3, 2, false);
       let adapter = helper.createTreeAdapter(model);
       let tree = adapter.createWidget(model, session.desktop) as Tree;
@@ -362,7 +362,7 @@ describe('TreeAdapter', () => {
       });
 
       tree.expandAll();
-      // A nodeCollapsed event must be sent for every node because all nodes were initially collapsed
+      // A nodeExpanded event must be sent for every node because all nodes were initially collapsed
       sendQueuedAjaxCalls();
       expect(mostRecentJsonRequest().events).toHaveSize(allNodes.length);
     });
