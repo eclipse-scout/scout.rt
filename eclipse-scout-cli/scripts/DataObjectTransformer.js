@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,6 +26,7 @@ module.exports = class DataObjectTransformer {
     this.context = context;
     this.moduleDetector = null; // created on first use
     this.doInventoryAddStatements = [];
+    this.currentClassTypeParams = null;
     this.namespaceResolver = namespaceResolver;
   }
 
@@ -46,11 +47,20 @@ module.exports = class DataObjectTransformer {
       const typeNameDecorator = node.modifiers?.find(m => ts.isDecorator(m) && m.expression?.expression?.escapedText === 'typeName');
       if (typeNameDecorator) {
         // it is a data object: remember DataObjectInventory.add statement to add at the end to the source file
-        const className = node.localSymbol.escapedName;
-        const typeName = this._getTypeNameFromDecorator(typeNameDecorator);
+        const className = node.symbol.escapedName;
+        const classConstants = node.members
+          .filter(n => ts.isPropertyDeclaration(n))
+          .filter(n => n.modifiers?.some(m => m.kind === ts.SyntaxKind.StaticKeyword));
+        const typeName = this._getTypeNameFromDecorator(typeNameDecorator, className, classConstants);
         const namespace = this._detectExportInfoFor(node).namespace; // detectExportInfoOf() will not find anything because a ClassDeclaration node is passed here. But this is fine as the namespace of the own module is required here.
         this.doInventoryAddStatements.push(this._createDoInventoryAddStatement(className, typeName, namespace));
-        return this._visitChildren(node); // step into DO with typeName decorator
+
+        try {
+          this.currentClassTypeParams = this._buildTypeParamMap(node);
+          return this._visitChildren(node); // step into DO with typeName decorator
+        } finally {
+          this.currentClassTypeParams = null; // reset for next class
+        }
       }
       return node; // no need to step into
     }
@@ -62,9 +72,13 @@ module.exports = class DataObjectTransformer {
     }
 
     if (ts.isPropertyDeclaration(node) && !this._isSkipProperty(node)) {
+      const metaDataDecorators = this._createMetaDataDecoratorsFor(node);
+      if (!metaDataDecorators?.length) {
+        return node; // nothing to add
+      }
       const newModifiers = [
         ...(node.modifiers || []), // existing
-        ...this._createMetaDataDecoratorsFor(node) // newly added
+        ...metaDataDecorators // newly added
       ];
       return ts.factory.replaceDecoratorsAndModifiers(node, newModifiers);
     }
@@ -72,18 +86,43 @@ module.exports = class DataObjectTransformer {
   }
 
   /**
+   * @param node {ts.ClassDeclaration}
+   * @returns Map<string, TypeReferenceNode>
+   */
+  _buildTypeParamMap(node) {
+    const mappings = node.typeParameters
+      ?.map(typeParameter => [typeParameter?.name?.escapedText, typeParameter.constraint])
+      ?.filter(mapping => !!mapping[0] && !!mapping[1]);
+    return new Map(mappings);
+  }
+
+  /**
    * Reads the value passed to the typeName decorator. Supports direct string literals and references to constants
    * @param typeNameDecorator {ts.Decorator}
+   * @param className {string} The name of the containing class. Currently only references to the same own class are supported
+   * @param classConstants {ts.PropertyDeclaration[]} All static property declarations of the containing class.
    * @returns {string|null}
    */
-  _getTypeNameFromDecorator(typeNameDecorator) {
+  _getTypeNameFromDecorator(typeNameDecorator, className, classConstants) {
     const decoratorArgument = typeNameDecorator.expression?.arguments?.[0];
-    if (decoratorArgument && ts.isStringLiteral(decoratorArgument)) {
+    if (!decoratorArgument) {
+      return null;
+    }
+
+    if (ts.isStringLiteral(decoratorArgument)) {
       return decoratorArgument.text;
     }
 
-    // might be a reference to a constant
-    let constant = decoratorArgument?.flowNode?.node;
+    // might be a reference to a static constant inside the current class (like @typeName(ThirdInSameFileDo.TYPE_NAME))
+    if (ts.isPropertyAccessExpression(decoratorArgument) && decoratorArgument.expression?.escapedText === className) {
+      const constantRef = classConstants.find(c => c.name?.escapedText === decoratorArgument.name?.escapedText);
+      if (constantRef) {
+        return constantRef.initializer?.text;
+      }
+    }
+
+    // might be a reference to a constant (like export const TYPE_NAME = 'my.TestDo');
+    let constant = decoratorArgument.flowNode?.node;
     if (constant && ts.isVariableDeclaration(constant)) {
       const initializer = constant.initializer;
       if (initializer && ts.isStringLiteral(initializer)) {
@@ -100,15 +139,19 @@ module.exports = class DataObjectTransformer {
    */
   _createMetaDataDecoratorsFor(node) {
     if (!node.type) {
-      return [];
+      return null;
     }
-    return [this._createMetaDataDecorator(this._createTypeNode(node.type))];
+    const typeNode = this._createTypeNode(node.type);
+    if (!typeNode) {
+      return null; // unsupported types like union-types or any or unknown
+    }
+    return [this._createMetaDataDecorator(typeNode)];
   }
 
   /**
    * Creates the value node to be added to the @Reflect.metadata('scout.m.t', valueNode) decorator.
    * @param typeNode {ts.TypeNode} The data type node of a DO property.
-   * @returns {ts.StringLiteral|ts.Identifier|ts.ObjectLiteralExpression}
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression}
    *   A constructor reference identifier for primitives like number, string, boolean, object, unknown, any, void, etc.
    *   A constructor reference identifier for built-in types like Map, Set, Date.
    *   A RawFieldMetaData object literal for arrays (having Array type and the element type as type arguments: Array<ElementType>).
@@ -134,7 +177,10 @@ module.exports = class DataObjectTransformer {
     if (ts.isArrayTypeNode(typeNode)) {
       // treat Obj[] like Array<Obj>
       const objectType = ts.factory.createIdentifier('Array');
-      const elementType = this._createTypeNode(typeNode.elementType);
+      let elementType = this._createTypeNode(typeNode.elementType);
+      if (!elementType) {
+        elementType = ts.factory.createNull(); // e.g. union types ((string | number)[]) or any (any[])
+      }
       return this._createFieldMetaData(objectType, [elementType]);
     }
 
@@ -146,7 +192,7 @@ module.exports = class DataObjectTransformer {
       }
 
       // types with typeArguments like Map<string, number> or Array<MyObject>
-      const typeArgsNodes = typeNode.typeArguments.map(typeArg => this._createTypeNode(typeArg));
+      const typeArgsNodes = typeNode.typeArguments.map(typeArg => this._createTypeNode(typeArg) ?? ts.factory.createNull());
       return this._createFieldMetaData(objectType, typeArgsNodes);
     }
 
@@ -157,7 +203,7 @@ module.exports = class DataObjectTransformer {
       }
     }
 
-    return ts.factory.createIdentifier('Object'); // e.g. any, void, unknown
+    return null; // e.g. any, void, unknown, union-types
   }
 
   /**
@@ -187,7 +233,11 @@ module.exports = class DataObjectTransformer {
    * @returns {ts.StringLiteral|ts.Identifier}
    */
   _createTypeReferenceNode(node) {
-    const name = node.typeName.escapedText;
+    let name = node.typeName.escapedText;
+    const typeParam = this.currentClassTypeParams?.get(name);
+    if (typeParam) {
+      return this._createTypeNode(typeParam);
+    }
     if (global[name]) {
       return ts.factory.createIdentifier(name); // Use directly the constructor for known types like Date, Number, String, Boolean, Map, Set, Array
     }

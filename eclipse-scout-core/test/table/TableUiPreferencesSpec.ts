@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BooleanColumn, Column, DateColumn, DateGroupType, NumberColumn, ObjectIdProvider, scout, Table, TableClientUiPreferenceProfileDo, TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableRow, TableTextUserFilter,
-  tableUiPreferences, TableUiPreferences, TextColumnUserFilter, Tile, uiPreferences, UiPreferencesDo, WidgetModel
+  BooleanColumn, Column, DateColumn, DateGroupType, NumberColumn, ObjectIdProvider, scout, Table, TableClientUiPreferenceProfileDo, TableRow, TableTextUserFilter, tableUiPreferences, TableUiPreferences, TextColumnUserFilter, Tile,
+  uiPreferences, UiPreferencesDo, WidgetModel
 } from '../../src/index';
 import {SpecUiPreferencesStore} from '../../src/testing';
 
@@ -225,24 +225,24 @@ describe('TableUiPreferences', () => {
       let prefStore = SpecUiPreferencesStore.get();
       prefStore.preferences = scout.create(UiPreferencesDo, {
         tablePreferences: [
-          scout.create(TableClientUiPreferencesDo, {
+          {
             tableId: 't1',
             tileMode: true,
             tablePreferenceProfiles: new Map([
               [TableUiPreferences.PROFILE_ID_GLOBAL, scout.create(TableClientUiPreferenceProfileDo, {
                 columns: [
-                  scout.create(TableColumnClientUiPreferenceDo, {
+                  {
                     columnId: 'c2',
                     width: 302
-                  }),
-                  scout.create(TableColumnClientUiPreferenceDo, {
+                  },
+                  {
                     columnId: 'c3',
                     width: 303
-                  })
+                  }
                 ]
               })]
             ])
-          })
+          }
         ]
       });
       jasmine.clock().uninstall();
@@ -455,14 +455,14 @@ describe('TableUiPreferences', () => {
 
       let profile = scout.create(TableClientUiPreferenceProfileDo, {
         columns: [
-          scout.create(TableColumnClientUiPreferenceDo, {
+          {
             columnId: 'c1',
             width: 201
-          }),
-          scout.create(TableColumnClientUiPreferenceDo, {
+          },
+          {
             columnId: 'c2',
             width: 202
-          })
+          }
         ]
       });
       tableUiPreferences.applyProfile(table, profile);
@@ -573,24 +573,24 @@ describe('TableUiPreferences', () => {
       // Apply a profile without information about some columns:
       let profile = scout.create(TableClientUiPreferenceProfileDo, {
         columns: [
-          scout.create(TableColumnClientUiPreferenceDo, {
+          {
             columnId: 'c4',
             viewIndex: 444,
             visible: true,
             width: 204
-          }),
-          scout.create(TableColumnClientUiPreferenceDo, {
+          },
+          {
             columnId: 'c6',
             viewIndex: 666,
             visible: true,
             width: 206
-          }),
-          scout.create(TableColumnClientUiPreferenceDo, {
+          },
+          {
             columnId: 'c8',
             viewIndex: 8,
             visible: true,
             width: 208
-          })
+          }
         ]
       });
       tableUiPreferences.applyProfile(table, profile);

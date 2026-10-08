@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  abortableContext, AbortablePromise, AbortError, arrays, AutoLeafPageWithNodes, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, DoEntity, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo, ObjectOrModel,
-  Page, PageWithTableEventMap, PageWithTableModel, PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl, TableMaxResultsHelper,
-  TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
+  abortableContext, AbortablePromise, AbortError, arrays, AutoLeafPageWithNodes, BaseDoEntity, BookmarkSupport, BookmarkTableRowIdentifierDo, dataObjects, Event, EventHandler, Form, InitModelOf, LimitedResultInfoContributionDo,
+  ObjectOrModel, Page, PageWithTableEventMap, PageWithTableModel, PropertyChangeEvent, scout, SearchFilterTextBuilder, SearchFormTableControl, SearchRequiredTableStatus, Status, Table, TableAllRowsDeletedEvent, TableControl,
+  TableMaxResultsHelper, TableOrganizerMenu, TableReloadEvent, TableReloadReason, TableRow, TableRowActionEvent, TableRowOrderChangedEvent, TableRowsDeletedEvent, TableRowsInsertedEvent, TableRowsUpdatedEvent
 } from '../../../index';
 import $ from 'jquery';
 
@@ -415,7 +415,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
    *   });
    *   return ajax.postDataObject(url, this._withMaxRowCountContribution(request));
    * }
-   * @param dataObject The {@link DoEntity} to which the contribution should be added.
+   * @param dataObject The {@link BaseDoEntity} to which the contribution should be added.
    * @returns the resulting request with the added contribution.
    */
   protected _withMaxRowCountContribution<T>(dataObject: T): T {
@@ -589,7 +589,14 @@ export class PageWithTable extends Page implements PageWithTableModel {
   }
 
   protected _getLimitedResultInfoDo(tableData: any): LimitedResultInfoContributionDo {
-    return dataObjects.getContribution('scout.LimitedResultInfoContribution', tableData) as LimitedResultInfoContributionDo;
+    const contribution = dataObjects.getContribution(LimitedResultInfoContributionDo.TYPE_NAME, tableData);
+    if (!contribution) {
+      return null;
+    }
+    if (contribution instanceof LimitedResultInfoContributionDo) {
+      return contribution;
+    }
+    return scout.create(LimitedResultInfoContributionDo, contribution);
   }
 
   protected _onLoadTableDataFail(error: any, restoreSelectionInfo?: RestoreSelectionInfo) {
