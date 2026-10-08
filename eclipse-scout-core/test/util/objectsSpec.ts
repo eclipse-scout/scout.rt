@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, arrays, dataObjects, dates, FormField, LookupRow, Menu, NullLayout, ObjectFactory, objects, Point, scout, Widget} from '../../src/index';
+import {Action, arrays, BaseDoEntity, CodeDo, dataObjects, dates, FormField, LookupRow, Menu, NullLayout, ObjectFactory, objects, Point, scout, Widget} from '../../src/index';
 
 describe('objects', () => {
 
@@ -1060,6 +1060,13 @@ describe('objects', () => {
       expect(objects.isEmpty('test')).toBe(undefined);
       expect(objects.isEmpty(42)).toBe(undefined);
       expect(objects.isEmpty(false)).toBe(undefined);
+    });
+
+    it('can handle data objects', () => {
+      expect(objects.isEmpty(scout.create(BaseDoEntity))).toBe(true);
+      expect(objects.isEmpty(scout.create(CodeDo, {enabled: undefined}))).toBe(true);
+      expect(objects.isEmpty(scout.create(CodeDo, {iconId: '1234'}))).toBe(false);
+      expect(objects.isEmpty(scout.create(CodeDo))).toBe(true);
     });
   });
 

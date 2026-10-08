@@ -765,6 +765,9 @@ export const objects = {
     if (obj instanceof Set) {
       return obj.size === 0;
     }
+    if (obj instanceof BaseDoEntity) {
+      return Object.keys(obj).every(key => key === '_type' || obj[key] === undefined);
+    }
     return Object.keys(obj).length === 0;
   },
 

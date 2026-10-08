@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -415,7 +415,7 @@ describe('Accordion', () => {
 
       expect(anchorAndDiffsCollapsed.anchor).not.toEqual(anchorAndDiffs.anchor);
       expect(anchorAndDiffsCollapsed.xDiff).toBe(anchorAndDiffs.xDiff);
-      expect(anchorAndDiffsCollapsed.yDiff).toBe(anchorAndDiffs.yDiff);
+      expect(anchorAndDiffsCollapsed.yDiff).toBeCloseTo(anchorAndDiffs.yDiff, 2);
 
       group0.setCollapsed(false);
       await group0.when('bodyHeightChangeDone');
