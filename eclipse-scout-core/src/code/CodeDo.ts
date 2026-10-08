@@ -27,7 +27,6 @@ export class CodeDo extends BaseDoEntity implements CodeModel<any> {
   partitionId: number;
   sortCode: number;
   fieldName: string;
-  text: string;
   texts: Record<string, string>;
   children: CodeDo[];
 }

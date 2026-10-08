@@ -42,5 +42,16 @@ export class SecondInSameFileDo<T> extends BaseDoEntity {
   recordType: Record<string, Test2Do>;
 }
 
+@typeName(ThirdInSameFileDo.TYPE_NAME)
+export class ThirdInSameFileDo extends BaseDoEntity {
+  num: number;
+  static TYPE_NAME = 'test.ThirdInSameFile';
+}
+
+@typeName('test.WithGenericDoProperty')
+export class WithGenericDoPropertyDo<T extends ThirdInSameFileDo> extends BaseDoEntity {
+  items: T[];
+}
+
 export interface DoInterface {
 }
