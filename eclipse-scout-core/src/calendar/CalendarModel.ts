@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {CalendarComponent, CalendarDisplayMode, CalendarResourceDo, GroupBox, Menu, ObjectOrChildModel, WidgetModel} from '../index';
+import {CalendarComponent, CalendarDisplayMode, CalendarResourceDo, GroupBox, Menu, ObjectOrChildModel, ObjectOrModel, WidgetModel} from '../index';
 
 export interface CalendarModel extends WidgetModel {
   monthViewNumberOfWeeks?: number;
@@ -25,7 +25,7 @@ export interface CalendarModel extends WidgetModel {
   /**
    * This property enables support for multiple resources on the calendar widget
    */
-  resources?: CalendarResourceDo[];
+  resources?: ObjectOrModel<CalendarResourceDo>[];
   /**
    * Indicates which resources is currently selected
    */

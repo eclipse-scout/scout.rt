@@ -7,9 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoEntity} from '../index';
+import {BaseDoEntity, ObjectOrModel, scout, typeName} from '../index';
 
-export interface CalendarResourceDo extends DoEntity {
+@typeName('scout.CalendarResource')
+export class CalendarResourceDo extends BaseDoEntity {
   resourceId: string;
   name?: string;
   parentId?: string;
@@ -17,4 +18,14 @@ export interface CalendarResourceDo extends DoEntity {
   selectable?: boolean;
   cssClass?: string;
   order?: number;
+
+  static ensure(objectOrModel: ObjectOrModel<CalendarResourceDo>): CalendarResourceDo {
+    if (!objectOrModel) {
+      return objectOrModel as CalendarResourceDo;
+    }
+    if (objectOrModel instanceof CalendarResourceDo) {
+      return objectOrModel;
+    }
+    return scout.create(CalendarResourceDo, objectOrModel);
+  }
 }

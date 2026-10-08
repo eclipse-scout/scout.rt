@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxError, AjaxSettings, App, arrays, DoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity,
-  strings, texts
+  AjaxError, AjaxSettings, App, arrays, BaseDoEntity, icons, InitModelOf, LogLevel, MessageBox, MessageBoxActionEvent, ModelOf, NullLogger, NullWidget, numbers, ObjectModel, objects, ObjectWithType, scout, Session, Status, StatusSeverity,
+  strings, texts, typeName
 } from './index';
 import $ from 'jquery';
 import * as sourcemappedStacktrace from 'sourcemapped-stacktrace';
@@ -90,7 +90,8 @@ export interface ErrorInfo {
 /**
  * See org.eclipse.scout.rt.rest.error.ErrorDo
  */
-export interface ErrorDo extends DoEntity {
+@typeName('scout.Error')
+export class ErrorDo extends BaseDoEntity {
   httpStatus?: number;
   errorCode?: string;
   title?: string;
@@ -307,8 +308,10 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       errorThrown = args[2];
       requestOptions = args[3]; // scout extension
       let errorDoCandidate = jqXHR?.responseJSON?.error;
-      if (AjaxError.isErrorDo(errorDoCandidate)) {
+      if (errorDoCandidate instanceof ErrorDo) {
         errorDo = errorDoCandidate;
+      } else if (AjaxError.isErrorDo(errorDoCandidate)) {
+        errorDo = scout.create(ErrorDo, errorDoCandidate);
       }
     }
 

@@ -7,23 +7,26 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Constructor, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
+import {Constructor, DataObjectDeserializer, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, DoEntity, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
 import $ from 'jquery';
 
 /**
  * Base class for all data objects.
  */
 @objectFactoryHints({ensureObjectType: false})
-export class BaseDoEntity {
-  declare model: DeepPartial<Omit<this, 'init' | 'getContribution' | 'addContribution' | 'removeContribution' | 'toPojo' | 'clone' | 'equals' | 'model'>>;
+export class BaseDoEntity implements DoEntity {
+  declare model: DeepPartial<Omit<this, 'model' | 'init' | 'getContribution' | 'getContributions' | 'addContribution' | 'removeContribution' | 'contribution' | 'toPojo' | 'clone' | 'equals' | 'visit'>>;
 
   _type?: string;
+  _typeVersion?: string;
   _contributions?: BaseDoEntity[];
 
   init(model: InitModelOf<this>) {
     if (objects.isPojo(model)) {
       const tmpInstance = dataObjects.deserialize(model, this.constructor as ObjectType<this>);
       $.extend(this, tmpInstance);
+    } else if (model instanceof BaseDoEntity) {
+      $.extend(this, model);
     }
   }
 
@@ -102,7 +105,34 @@ export class BaseDoEntity {
    * @returns true if the two are deeply equal.
    */
   equals(obj: any) {
-    return objects.equalsRecursive(this, obj, true /* prevent stackoverflow as this is called in equals */);
+    if (obj === this) {
+      return true;
+    }
+    if (!objects.isObject(obj)) {
+      return false;
+    }
+    if (Object.getPrototypeOf(obj) !== Object.getPrototypeOf(this)) {
+      return false;
+    }
+
+    const propertiesToCompare = new Set(Object.keys(this).concat(Object.keys(obj)));
+
+    // special handling for _typeVersion
+    const hasTypeVersion = propertiesToCompare.delete(DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME);
+    if (hasTypeVersion) {
+      const otherTypeVersion = obj[DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME];
+      if (otherTypeVersion && this._typeVersion && otherTypeVersion !== this._typeVersion) {
+        // must only match if both have a version, otherwise it should be ignored
+        return false;
+      }
+    }
+
+    for (const key of propertiesToCompare) {
+      if (!objects.equalsRecursive(obj[key], this[key])) {
+        return false;
+      }
+    }
+    return true;
   }
 
   /**

@@ -31,25 +31,25 @@ describe('TableMaxResultsHelper', () => {
     it('allows loading more data if result is limited', () => {
       expect(scout.create(TableMaxResultsHelper).isLoadMoreDataPossible(null)).toBeFalse();
 
-      expect(isLoadMoreDataPossible({limitedResult: false})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: true})).toBeTrue();
-      expect(isLoadMoreDataPossible({limitedResult: true, estimatedRowCount: 100})).toBeTrue();
-      expect(isLoadMoreDataPossible({limitedResult: false, estimatedRowCount: 100})).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true}))).toBeTrue();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true, estimatedRowCount: 100}))).toBeTrue();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false, estimatedRowCount: 100}))).toBeFalse();
     });
 
     it('does not allow loading more data if maxRowCount is reached', () => {
-      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 10})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 5})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 11})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 10})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 5})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 11})).toBeTrue();
-      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 10, estimatedRowCount: 100})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 5, estimatedRowCount: 100})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: false, maxRowCount: 11, estimatedRowCount: 100})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 10, estimatedRowCount: 100})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 5, estimatedRowCount: 100})).toBeFalse();
-      expect(isLoadMoreDataPossible({limitedResult: true, maxRowCount: 11, estimatedRowCount: 100})).toBeTrue();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false, maxRowCount: 10}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false, maxRowCount: 5}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false, maxRowCount: 11}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true, maxRowCount: 10}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true, maxRowCount: 5}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true, maxRowCount: 11}))).toBeTrue();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false, maxRowCount: 10, estimatedRowCount: 100}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false, maxRowCount: 5, estimatedRowCount: 100}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: false, maxRowCount: 11, estimatedRowCount: 100}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true, maxRowCount: 10, estimatedRowCount: 100}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true, maxRowCount: 5, estimatedRowCount: 100}))).toBeFalse();
+      expect(isLoadMoreDataPossible(scout.create(LimitedResultInfoContributionDo, {limitedResult: true, maxRowCount: 11, estimatedRowCount: 100}))).toBeTrue();
     });
   });
 

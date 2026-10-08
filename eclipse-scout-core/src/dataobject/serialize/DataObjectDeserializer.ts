@@ -13,7 +13,7 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
 
   declare model: DataObjectDeserializerModel;
 
-  protected static _TYPE_VERSION_ATTRIBUTE_NAME = '_typeVersion';
+  static _TYPE_VERSION_ATTRIBUTE_NAME = '_typeVersion';
 
   id: string;
   objectType: string;
@@ -22,9 +22,10 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
 
   constructor(model?: InitModelOf<DataObjectDeserializer>) {
     this.createPojoIfDoIsUnknown = !!model?.createPojoIfDoIsUnknown;
-    this.retainTypeVersion = scout.nvl(model?.retainTypeVersion, (obj: object) => !(obj instanceof BaseDoEntity));
-    if (!objects.isFunction(this.retainTypeVersion)) {
-      const retain = !!this.retainTypeVersion;
+    if (objects.isFunction(model?.retainTypeVersion)) {
+      this.retainTypeVersion = model.retainTypeVersion;
+    } else {
+      const retain = scout.nvl(model?.retainTypeVersion, true);
       this.retainTypeVersion = () => retain;
     }
   }
@@ -105,8 +106,7 @@ export interface DataObjectDeserializerModel extends ObjectModel<DataObjectDeser
   /**
    * Controls whether the '_typeVersion' property is retained when deserializing DataObjects.
    * The property can be given as a {@link boolean} or a {@link Predicate}, whose input is the deserialized DataObject.
-   * If `true`, the '_typeVersion' will be set on the deserialized DataObject. If `false`, it will be ignored.
-   * Default is a {@link Predicate} that ignores the '_typeVersion' if the deserialized DataObject is instance of {@link BaseDoEntity}.
+   * If `true`, the '_typeVersion' will be set on the deserialized DataObject. If `false`, it will be ignored. Default is `true`.
    */
   retainTypeVersion?: boolean | Predicate<object>;
 }

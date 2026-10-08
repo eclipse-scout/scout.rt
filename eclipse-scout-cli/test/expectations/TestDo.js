@@ -5,7 +5,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -96,5 +96,28 @@ SecondInSameFileDo = __decorate([
     typeName(SECOND_TYPE_NAME)
 ], SecondInSameFileDo);
 export { SecondInSameFileDo };
+let ThirdInSameFileDo = class ThirdInSameFileDo extends BaseDoEntity {
+    num;
+    static TYPE_NAME = 'test.ThirdInSameFile';
+};
+__decorate([
+    Reflect.metadata("scout.m.t", Number)
+], ThirdInSameFileDo.prototype, "num", void 0);
+ThirdInSameFileDo = __decorate([
+    typeName(ThirdInSameFileDo.TYPE_NAME)
+], ThirdInSameFileDo);
+export { ThirdInSameFileDo };
+let WithGenericDoPropertyDo = class WithGenericDoPropertyDo extends BaseDoEntity {
+    items;
+};
+__decorate([
+    Reflect.metadata("scout.m.t", { objectType: Array, typeArgs: ["test.ThirdInSameFileDo"] })
+], WithGenericDoPropertyDo.prototype, "items", void 0);
+WithGenericDoPropertyDo = __decorate([
+    typeName('test.WithGenericDoProperty')
+], WithGenericDoPropertyDo);
+export { WithGenericDoPropertyDo };
 window["scout"]["DataObjectInventory"].get().add(TestDo, "test.Test", "test.TestDo");
 window["scout"]["DataObjectInventory"].get().add(SecondInSameFileDo, "test.SecondInSameFile", "test.SecondInSameFileDo");
+window["scout"]["DataObjectInventory"].get().add(ThirdInSameFileDo, "test.ThirdInSameFile", "test.ThirdInSameFileDo");
+window["scout"]["DataObjectInventory"].get().add(WithGenericDoPropertyDo, "test.WithGenericDoProperty", "test.WithGenericDoPropertyDo");

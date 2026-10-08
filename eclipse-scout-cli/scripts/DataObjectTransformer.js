@@ -26,6 +26,7 @@ module.exports = class DataObjectTransformer {
     this.context = context;
     this.moduleDetector = null; // created on first use
     this.doInventoryAddStatements = [];
+    this.currentClassTypeParams = null;
     this.namespaceResolver = namespaceResolver;
   }
 
@@ -47,10 +48,19 @@ module.exports = class DataObjectTransformer {
       if (typeNameDecorator) {
         // it is a data object: remember DataObjectInventory.add statement to add at the end to the source file
         const className = node.localSymbol.escapedName;
-        const typeName = this._getTypeNameFromDecorator(typeNameDecorator);
+        const classConstants = node.members
+          .filter(n => ts.isPropertyDeclaration(n))
+          .filter(n => n.modifiers?.some(m => m.kind === ts.SyntaxKind.StaticKeyword));
+        const typeName = this._getTypeNameFromDecorator(typeNameDecorator, className, classConstants);
         const namespace = this._detectExportInfoFor(node).namespace; // detectExportInfoOf() will not find anything because a ClassDeclaration node is passed here. But this is fine as the namespace of the own module is required here.
         this.doInventoryAddStatements.push(this._createDoInventoryAddStatement(className, typeName, namespace));
-        return this._visitChildren(node); // step into DO with typeName decorator
+
+        try {
+          this.currentClassTypeParams = this._buildTypeParamMap(node);
+          return this._visitChildren(node); // step into DO with typeName decorator
+        } finally {
+          this.currentClassTypeParams = null; // reset for next class
+        }
       }
       return node; // no need to step into
     }
@@ -72,18 +82,43 @@ module.exports = class DataObjectTransformer {
   }
 
   /**
+   * @param node {ts.ClassDeclaration}
+   * @returns Map<string, TypeReferenceNode>
+   */
+  _buildTypeParamMap(node) {
+    const mappings = node.typeParameters
+      ?.map(typeParameter => [typeParameter?.name?.escapedText, typeParameter.constraint])
+      ?.filter(mapping => !!mapping[0] && !!mapping[1]);
+    return new Map(mappings);
+  }
+
+  /**
    * Reads the value passed to the typeName decorator. Supports direct string literals and references to constants
    * @param typeNameDecorator {ts.Decorator}
+   * @param className {string} The name of the containing class. Currently only references to the same own class are supported
+   * @param classConstants {ts.PropertyDeclaration[]} All static property declarations of the containing class.
    * @returns {string|null}
    */
-  _getTypeNameFromDecorator(typeNameDecorator) {
+  _getTypeNameFromDecorator(typeNameDecorator, className, classConstants) {
     const decoratorArgument = typeNameDecorator.expression?.arguments?.[0];
-    if (decoratorArgument && ts.isStringLiteral(decoratorArgument)) {
+    if (!decoratorArgument) {
+      return null;
+    }
+
+    if (ts.isStringLiteral(decoratorArgument)) {
       return decoratorArgument.text;
     }
 
-    // might be a reference to a constant
-    let constant = decoratorArgument?.flowNode?.node;
+    // might be a reference to a static constant inside the current class (like @typeName(ThirdInSameFileDo.TYPE_NAME))
+    if (ts.isPropertyAccessExpression(decoratorArgument) && decoratorArgument.expression?.escapedText === className) {
+      const constantRef = classConstants.find(c => c.name?.escapedText === decoratorArgument.name?.escapedText);
+      if (constantRef) {
+        return constantRef.initializer?.text;
+      }
+    }
+
+    // might be a reference to a constant (like export const TYPE_NAME = 'my.TestDo');
+    let constant = decoratorArgument.flowNode?.node;
     if (constant && ts.isVariableDeclaration(constant)) {
       const initializer = constant.initializer;
       if (initializer && ts.isStringLiteral(initializer)) {
@@ -187,7 +222,12 @@ module.exports = class DataObjectTransformer {
    * @returns {ts.StringLiteral|ts.Identifier}
    */
   _createTypeReferenceNode(node) {
-    const name = node.typeName.escapedText;
+    let name = node.typeName.escapedText;
+    const typeParam = this.currentClassTypeParams?.get(name);
+    if (typeParam) {
+      node = typeParam;
+      name = node.typeName?.escapedText;
+    }
     if (global[name]) {
       return ts.factory.createIdentifier(name); // Use directly the constructor for known types like Date, Number, String, Boolean, Map, Set, Array
     }

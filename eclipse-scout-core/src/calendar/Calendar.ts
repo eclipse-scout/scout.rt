@@ -9,7 +9,7 @@
  */
 import {
   arrays, CalendarComponent, CalendarDirection, CalendarDisplayMode, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarMoveData, CalendarResourceDo, CalendarSidebar, ContextMenuPopup,
-  DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, objects, Point, PropertyChangeEvent, ResourcePanel, scout, scrollbars, strings, UuidPool,
+  DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, ObjectOrModel, objects, Point, PropertyChangeEvent, ResourcePanel, scout, scrollbars, strings, UuidPool,
   ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
@@ -215,11 +215,11 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _createDefaultResource(): CalendarResourceDo {
-    return {
+    return scout.create(CalendarResourceDo, {
       resourceId: UuidPool.ZERO_UUID,
       selectable: true,
       visible: true
-    };
+    });
   }
 
   protected override _init(model: InitModelOf<this>) {
@@ -500,12 +500,15 @@ export class Calendar extends Widget implements CalendarModel {
     this._renderDisplayMode();
   }
 
-  setResources(resources: CalendarResourceDo[]) {
+  setResources(resources: ObjectOrModel<CalendarResourceDo>[]) {
     this.setProperty('resources', resources);
   }
 
-  protected _setResources(resources: CalendarResourceDo[]) {
-    this._setProperty('resources', resources);
+  protected _setResources(resources: ObjectOrModel<CalendarResourceDo>[]) {
+    const resourceDos = arrays.ensure(resources)
+      .map(r => CalendarResourceDo.ensure(r))
+      .filter(Boolean);
+    this._setProperty('resources', resourceDos);
     this._updateLeafResources();
     this._updateResourcePanelDisplayable();
     this._updateResourcePanel();
@@ -932,9 +935,9 @@ export class Calendar extends Widget implements CalendarModel {
     // Set selected resource
     let newSelectedResource = this.selectedResource;
     if (objects.isString(selectedResource)) {
-      newSelectedResource = this.findResourceForId(selectedResource as string);
+      newSelectedResource = this.findResourceForId(selectedResource);
     } else if (selectedResource) {
-      newSelectedResource = selectedResource as CalendarResourceDo;
+      newSelectedResource = selectedResource;
     }
     if (newSelectedResource !== this.selectedResource && newSelectedResource.selectable) {
       changed = true;

@@ -11,6 +11,9 @@ import {DoEntity} from './../index';
 
 /**
  * Wrapper data object for a generic value.
+ *
+ * Implementation detail: Is no BaseDoEntity as there are several corresponding implementations on Java side.
+ * This would require a specific ValueDoDeserializer/Serializer which could handle all the different typeNames that might come from the server (extensible list)
  */
 export interface ValueDo<T> extends DoEntity {
   value: T;

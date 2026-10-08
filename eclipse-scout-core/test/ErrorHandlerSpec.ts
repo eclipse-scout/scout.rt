@@ -185,15 +185,14 @@ describe('ErrorHandler', () => {
     });
 
     it('can handle ErrorDos in AJAX response', done => {
-      let errorDo: ErrorDo = {
-        _type: 'scout.Error',
+      let errorDo = scout.create(ErrorDo, {
         httpStatus: 404,
         errorCode: 'T1234',
         message: 'test message',
         correlationId: 'Corr1234',
         title: 'test title',
         severity: 'warning'
-      };
+      });
       let fakeXHR = {
         readyState: 4,
         status: 404,
@@ -210,7 +209,7 @@ describe('ErrorHandler', () => {
     });
 
     it('can handle ErrorDo logLevel', done => {
-      let errorDo: ErrorDo = {
+      let errorDo: ModelOf<ErrorDo> = {
         _type: 'scout.Error',
         httpStatus: 404,
         errorCode: 'T1234',
@@ -229,7 +228,7 @@ describe('ErrorHandler', () => {
         }
       };
       errorHandler.analyzeError(fakeXHR).then(errorInfo => {
-        expect(errorInfo.errorDo).toBe(errorDo);
+        expect(errorInfo.errorDo.toPojo()).toEqual(errorDo);
         expect(errorInfo.message).toBe(errorDo.message);
         expect(errorInfo.level).toBe(LogLevel.INFO);
       }).always(done);
@@ -330,14 +329,14 @@ describe('ErrorHandler', () => {
         httpStatus: 404,
         code: 'X1234',
         log: 'log',
-        errorDo: {
+        errorDo: scout.create(ErrorDo, {
           _type: 'scout.Error',
           title: 'title',
           severity: 'warning',
           errorCode: 'Y789',
           message: 'message',
           correlationId: 'Corr567'
-        }
+        })
       }) as MessageBoxModel;
       expect(msgBoxModel).toEqual({
         header: 'title',
@@ -355,11 +354,11 @@ describe('ErrorHandler', () => {
 
       let msgBoxModel = handler._buildErrorMessageBoxModel(session, {
         log: 'log',
-        errorDo: {
+        errorDo: scout.create(ErrorDo, {
           _type: 'scout.Error',
           severity: 'error',
           message: 'undefined'
-        }
+        })
       }) as MessageBoxModel;
       expect(msgBoxModel).toEqual({
         body: 'Unexpected problem', // provided message from errorDo is not used
