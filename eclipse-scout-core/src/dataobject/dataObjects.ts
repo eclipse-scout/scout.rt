@@ -39,7 +39,7 @@ export const dataObjects = {
    *
    * The list may be modified to add a custom resolver. This may be useful for example in the following scenario:
    * Normally, a {@link BaseDoEntity} is created if the data object class cannot be resolved, unless {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} is set to true.
-   * To use a specific {@link BaseDoEntity} class for unknown {@link DoEntity._type} values, a custom resolver can be added.
+   * To use a specific {@link BaseDoEntity} class for unknown {@link BaseDoEntity._type} values, a custom resolver can be added.
    */
   doTypeResolvers: [new DefaultDoTypeResolver()] as DoTypeResolver[],
 

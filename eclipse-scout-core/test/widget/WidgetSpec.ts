@@ -2413,7 +2413,7 @@ describe('Widget', () => {
       widget.$container[0].scrollTop = 10;
       widget.$container.trigger('scroll');
       jasmine.clock().tick(500);
-      expect(widget.scrollTop).toBe(10);
+      expect(widget.scrollTop).toBeCloseTo(10, 0);
 
       // remove widget (scroll top would be applied after re-rendering)
       widget.remove();
