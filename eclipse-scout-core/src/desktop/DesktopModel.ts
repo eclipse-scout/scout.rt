@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -121,6 +121,12 @@ export interface DesktopModel extends WidgetModel, DisplayParentModel {
    * Default is false.
    */
   dense?: boolean;
+  /**
+   * Defines for which device type the page is rendered.
+   *
+   * With this flag it is possible to enforce another device type when the automatic recognition does not choose the desired type
+   */
+  deviceType?: string;
   /**
    * Configures whether the keystrokes to select {@link DesktopTab}s should be enabled.
    *
