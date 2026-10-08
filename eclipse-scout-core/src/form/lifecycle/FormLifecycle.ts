@@ -41,7 +41,7 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     this.widget.setData(this.widget.exportData());
   }
 
-  protected override _okAfterAskIfSaveNeeded(): JQuery.Promise<void> {
+  protected override _okAfterAskIfSaveNeeded(): Promise<void> {
     return this.widget.ok();
   }
 
@@ -88,11 +88,11 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     return strings.plainText(element.label);
   }
 
-  protected override _validateWidget(): Status | JQuery.Promise<Status> {
+  protected override _validateWidget(): Status | Promise<Status> {
     return this.widget._lifecycleValidate();
   }
 
-  protected override _handleInvalid(status: Status): JQuery.Promise<Status> {
+  protected override _handleInvalid(status: Status): Promise<Status> {
     return this.widget._handleInvalid(status);
   }
 

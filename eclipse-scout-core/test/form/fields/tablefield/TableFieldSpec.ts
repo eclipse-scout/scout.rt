@@ -193,13 +193,14 @@ describe('TableField', () => {
       expect(tableField.saveNeeded).toBe(false);
     });
 
-    it('is set to true after a cell edit', () => {
+    it('is set to true after a cell edit', async () => {
       tableField.render();
       tableField.table.columns[0].setEditable(true);
       tableField.markAsSaved();
       expect(tableField.saveNeeded).toBe(false);
-      tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
-      jasmine.clock().tick(0);
+      // prepareCellEdit() creates cellEditorPopup asynchronously (even though the underlying promise is already
+      // resolved) since native promises always defer .then() by a microtask, unlike the old JQuery.Deferred.
+      await tableField.table.prepareCellEdit(tableField.table.columns[0], tableField.table.rows[0]);
       tableField.table.cellEditorPopup.cell.field.setValue('my new value');
       tableField.table.completeCellEdit();
       expect(tableField.saveNeeded).toBe(true);

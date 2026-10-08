@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,22 +14,20 @@ describe('AccessControl', () => {
 
   beforeEach(() => {
     jasmine.Ajax.install();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   });
 
   class SpecAccessControl extends AccessControl {
     declare _permissionCollection: PermissionCollection;
 
-    override _load(): JQuery.Promise<void> {
+    override _load(): Promise<void> {
       return super._load();
     }
 
-    protected override _subscribeForNotifications(): JQuery.Promise<string> {
+    protected override _subscribeForNotifications(): Promise<string> {
       return $.resolvedPromise();
     }
 
@@ -43,8 +41,7 @@ describe('AccessControl', () => {
     it('creates a PermissionCollection for the returned model', async () => {
       const accessControl = scout.create(SpecAccessControl, {permissionsUrl: 'permissions'});
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
+      const promise = accessControl._load();
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
@@ -63,8 +60,7 @@ describe('AccessControl', () => {
           }
         })
       });
-      jasmine.clock().tick(1000);
-      jasmine.clock().uninstall();
+      await promise;
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -78,11 +74,10 @@ describe('AccessControl', () => {
       expect(await accessControl.check(Permission.quick('test'))).toBeFalse();
     });
 
-    it('keeps last collection if request fails', () => {
+    it('keeps last collection if request fails', async () => {
       const accessControl = scout.create(SpecAccessControl, {permissionsUrl: 'permissions'});
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
+      let promise = accessControl._load();
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(0), {
         status: 200,
         responseText: JSON.stringify({
@@ -101,7 +96,7 @@ describe('AccessControl', () => {
           }
         })
       });
-      jasmine.clock().tick(1);
+      await promise;
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -110,16 +105,19 @@ describe('AccessControl', () => {
       expect(accessControl.check(Permission.quick('other'), true)).toBeTrue();
       expect(accessControl.check(Permission.quick('test'), true)).toBeFalse();
 
-      accessControl.check(Permission.quick('some')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('test')).then(result => expect(result).toBeFalse());
+      await expectAsync(accessControl.check(Permission.quick('some'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(false);
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
-      receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1), {
-        status: 500
-      });
-      jasmine.clock().tick(1);
+      try {
+        promise = accessControl._load();
+        receiveResponseForAjaxCall(jasmine.Ajax.requests.at(1), {
+          status: 500
+        });
+        await promise;
+      } catch (e) {
+        // nop
+      }
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.DEFAULT);
@@ -128,19 +126,18 @@ describe('AccessControl', () => {
       expect(accessControl.check(Permission.quick('other'), true)).toBeTrue();
       expect(accessControl.check(Permission.quick('test'), true)).toBeFalse();
 
-      accessControl.check(Permission.quick('some')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('test')).then(result => expect(result).toBeFalse());
+      await expectAsync(accessControl.check(Permission.quick('some'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(false);
 
-      accessControl._load();
-      jasmine.clock().tick(1000);
+      promise = accessControl._load();
       receiveResponseForAjaxCall(jasmine.Ajax.requests.at(2), {
         status: 200,
         responseText: JSON.stringify({
           type: 'ALL'
         })
       });
-      jasmine.clock().tick(1);
+      await promise;
 
       expect(accessControl._permissionCollection).not.toBeNull();
       expect(accessControl._permissionCollection.type).toBe(PermissionCollectionType.ALL);
@@ -149,10 +146,9 @@ describe('AccessControl', () => {
       expect(accessControl.check(Permission.quick('other'), true)).toBeTrue();
       expect(accessControl.check(Permission.quick('test'), true)).toBeTrue();
 
-      accessControl.check(Permission.quick('some')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('other')).then(result => expect(result).toBeTrue());
-      accessControl.check(Permission.quick('test')).then(result => expect(result).toBeTrue());
-      jasmine.clock().tick(1);
+      await expectAsync(accessControl.check(Permission.quick('some'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('other'))).toBeResolvedTo(true);
+      await expectAsync(accessControl.check(Permission.quick('test'))).toBeResolvedTo(true);
     });
 
     it('creates NONE collection by default', () => {

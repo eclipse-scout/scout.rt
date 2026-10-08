@@ -28,7 +28,6 @@ describe('FormLifecycle', () => {
     form.lifecycle = scout.create(SpecLifecycle, {widget: form});
     field = form.rootGroupBox.fields[0] as StringField;
     form.render();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
@@ -48,28 +47,27 @@ describe('FormLifecycle', () => {
       expectMessageBox(true);
     });
 
-    it('triggers close event after cancel', () => {
+    it('triggers close event after cancel', async () => {
       let disposed = false;
       form.lifecycle.on('close', () => {
         disposed = true;
       });
-      form.lifecycle.cancel();
-      jasmine.clock().tick(0);
+      await form.lifecycle.cancel();
       expect(disposed).toBe(true);
     });
   });
 
   describe('ok', () => {
 
-    it('should validate fields and display message box when form is saved', () => {
+    it('should validate fields and display message box when form is saved', async () => {
       field.setMandatory(true);
       field.setValue(null);
       form.lifecycle.ok();
-      jasmine.clock().tick(10);
+      await session.desktop.when('propertyChange:messageBoxes');
       expectMessageBox(true);
     });
 
-    it('should call save handler when form is saved and all fields are valid', () => {
+    it('should call save handler when form is saved and all fields are valid', async () => {
       let saved = false;
       field.setMandatory(true);
       field.setValue('Foo');
@@ -77,13 +75,12 @@ describe('FormLifecycle', () => {
         saved = true;
         return $.resolvedPromise();
       });
-      form.lifecycle.ok();
-      jasmine.clock().tick(1000);
+      await form.lifecycle.ok();
       expectMessageBox(false);
       expect(saved).toBe(true);
     });
 
-    it('stops lifecycle if severity is ERROR', () => {
+    it('stops lifecycle if severity is ERROR', async () => {
       let form2 = helper.createFormWithOneField() as SpecForm;
       form2.lifecycle = scout.create(SpecLifecycle, {
         widget: form
@@ -91,10 +88,10 @@ describe('FormLifecycle', () => {
       form2.lifecycle._validate = () => $.resolvedPromise(Status.error({
         message: 'This is a fatal error'
       }));
-      runTestWithLifecycleOk(form2, false);
+      await runTestWithLifecycleOk(form2, false);
     });
 
-    it('continues lifecycle if severity is WARNING', () => {
+    it('continues lifecycle if severity is WARNING', async () => {
       let form2 = helper.createFormWithOneField() as SpecForm;
       form2.lifecycle = scout.create(SpecLifecycle, {
         widget: form
@@ -102,10 +99,10 @@ describe('FormLifecycle', () => {
       form2.lifecycle._validate = () => $.resolvedPromise(Status.warning({
         message: 'This is only a warning'
       }));
-      runTestWithLifecycleOk(form2, true);
+      await runTestWithLifecycleOk(form2, true);
     });
 
-    function runTestWithLifecycleOk(form2, expected, render = true) {
+    async function runTestWithLifecycleOk(form2, expected, render = true) {
       let lifecycleComplete = false;
       form2.lifecycle.on('close', () => {
         lifecycleComplete = true;
@@ -114,15 +111,14 @@ describe('FormLifecycle', () => {
         form2.render();
       }
       form2.lifecycle.ok();
-      jasmine.clock().tick(10);
+      await session.desktop.when('propertyChange:messageBoxes');
       expectMessageBox(true);
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000); // <- important, otherwise the promise will not be resolved somehow (?)
+      await sleep();
       expect(lifecycleComplete).toBe(expected);
     }
 
     it('should call _lifecycleValidate function on form', async () => {
-      jasmine.clock().uninstall();
       // validate should always be called, even when there is not a single touched field in the form
       let form2 = helper.createFormWithOneField();
       form2.lifecycle = scout.create(SpecLifecycle, {
@@ -146,7 +142,7 @@ describe('FormLifecycle', () => {
       expect(validateCalled).toBe(false);
     });
 
-    it('should focus first invalid element', () => {
+    it('should focus first invalid element', async () => {
       let formWithFieldsAndTabBoxes = helper.createFormWithFieldsAndTabBoxes();
       formWithFieldsAndTabBoxes.lifecycle = scout.create(FormLifecycle, {
         widget: formWithFieldsAndTabBoxes
@@ -180,7 +176,7 @@ describe('FormLifecycle', () => {
       expect(tabBox.selectedTab).toBe(tabA);
       expect(tabBoxA.selectedTab).toBe(tabAA);
 
-      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false);
+      await runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false);
 
       expect(field4.focused).toBe(true);
       expect(tabBox.selectedTab).toBe(tabA);
@@ -188,7 +184,7 @@ describe('FormLifecycle', () => {
 
       field4.setValue('something');
 
-      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+      await runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
 
       expect(fieldA2.focused).toBe(true);
       expect(tabBox.selectedTab).toBe(tabA);
@@ -196,7 +192,7 @@ describe('FormLifecycle', () => {
 
       fieldA2.setValue('something');
 
-      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+      await runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
 
       expect(fieldAB2.focused).toBe(true);
       expect(tabBox.selectedTab).toBe(tabA);
@@ -204,7 +200,7 @@ describe('FormLifecycle', () => {
 
       fieldAB2.setValue('something');
 
-      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+      await runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
 
       expect(fieldB4.focused).toBe(true);
       expect(tabBox.selectedTab).toBe(tabB);
@@ -212,7 +208,7 @@ describe('FormLifecycle', () => {
 
       fieldB4.setValue('something');
 
-      runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
+      await runTestWithLifecycleOk(formWithFieldsAndTabBoxes, false, false);
 
       let cell = tableFieldB5Table.cell(columnB52, tableFieldB5TableRows[1]);
       expect(cell.value).toBeNull();
@@ -224,17 +220,12 @@ describe('FormLifecycle', () => {
       cell.field.setValue('something');
       tableFieldB5Table.completeCellEdit();
 
-      formWithFieldsAndTabBoxes.lifecycle.ok();
-      jasmine.clock().tick(0);
+      await formWithFieldsAndTabBoxes.lifecycle.ok();
       expectMessageBox(false);
     });
   });
 
   describe('load', () => {
-
-    beforeEach(() => {
-      jasmine.clock().uninstall(); // we don't need a mock-clock for this test
-    });
 
     it('should handle errors that occur in promise', done => {
       let form = helper.createFormWithOneField();
@@ -247,15 +238,14 @@ describe('FormLifecycle', () => {
       form.render();
       form.load().catch(error => {
         expect(form.destroyed).toBe(true);
-      }).always(done);
+      }).finally(done);
     });
 
     /**
      * Errors that are thrown directly in the _load function should be wrapped into a Promise
      * so that the catch() of the Promise is called in all error cases. Otherwise, custom error handling is not possible.
      */
-    it('should handle errors that occur in _load function', done => {
-      jasmine.clock().install();
+    it('should handle errors that occur in _load function', async () => {
       let form = helper.createFormWithOneField();
       let error = null;
       form._load = () => {
@@ -263,7 +253,7 @@ describe('FormLifecycle', () => {
       };
       form.render();
       try {
-        form.load()
+        await form.load()
           .catch(e => {
             error = e;
           });
@@ -271,11 +261,8 @@ describe('FormLifecycle', () => {
         // should not happen
         fail();
       }
-      jasmine.clock().tick(10);
       expect(form.destroyed).toBe(true);
       expect(error).toBe('Something went wrong');
-      jasmine.clock().uninstall();
-      done();
     });
 
   });
@@ -366,7 +353,6 @@ describe('FormLifecycle', () => {
   describe('validation result', () => {
 
     it('has widget status if element status is only warning', async () => {
-      jasmine.clock().uninstall();
       const form = scout.create(SpecForm, {
         parent: session.desktop,
         rootGroupBox: {
@@ -558,8 +544,6 @@ describe('FormLifecycle', () => {
     });
 
     it('has severity ERROR if mandatory field is missing', async () => {
-      jasmine.clock().uninstall();
-
       field.setMandatory(true);
       field.setValue(null);
 
@@ -584,8 +568,6 @@ describe('FormLifecycle', () => {
     });
 
     it('has max severity of all invalid fields', async () => {
-      jasmine.clock().uninstall();
-
       const field2 = helper.createField(StringField, form.rootGroupBox);
       form.rootGroupBox.insertField(field2);
 
@@ -624,6 +606,14 @@ describe('FormLifecycle', () => {
 
   describe('statusMessageBox', () => {
 
+    beforeEach(() => {
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
     it('converts WARNING to OK on yes', done => {
       form._showFormInvalidMessageBox(Status.warning())
         .then(status => {
@@ -631,7 +621,7 @@ describe('FormLifecycle', () => {
           expect(status.severity).toBe(Status.Severity.OK);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
       helper.closeMessageBoxes(MessageBox.Buttons.YES);
@@ -645,7 +635,7 @@ describe('FormLifecycle', () => {
           expect(status.severity).toBe(Status.Severity.WARNING);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
       helper.closeMessageBoxes(MessageBox.Buttons.NO);
@@ -659,7 +649,7 @@ describe('FormLifecycle', () => {
           expect(status.severity).toBe(Status.Severity.ERROR);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(0);
       expectMessageBox(true);
       helper.closeMessageBoxes(MessageBox.Buttons.YES);

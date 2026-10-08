@@ -701,7 +701,6 @@ scout:
     karma-chrome-launcher>which: 1.3.1
     karma-jasmine: 5.1.0
     karma-jasmine-ajax>jasmine-ajax: 3.4.0
-    karma-jasmine>jasmine-core: 4.6.1
     karma-webpack>minimatch: 9.0.9
     karma>mime: 2.6.0
     karma>yargs: 16.2.2
@@ -1190,3 +1189,4 @@ scout:
     yocto-queue: 0.1.0
 overrides:
   <<: *scout-overrides
+  jasmine-core: "5.13.0"

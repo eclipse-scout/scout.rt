@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,11 +20,9 @@ describe('TagField', () => {
     field = new TagField();
     field.session = session;
     helper = new FormSpecHelper(session);
-    jasmine.clock().install();
   });
 
   afterEach(() => {
-    jasmine.clock().uninstall();
     removePopups(session);
   });
 
@@ -99,7 +97,7 @@ describe('TagField', () => {
    */
   describe('key-strokes', () => {
 
-    it('ENTER', () => {
+    it('ENTER', async () => {
       field = scout.create(TagField, {
         parent: session.desktop,
         lookupCall: {
@@ -111,7 +109,7 @@ describe('TagField', () => {
       // select the returned lookup row
       field.render();
       typeProposal(field, 'fo', keys.O);
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       expect(field.popup instanceof TagChooserPopup).toBe(true);
 
@@ -136,7 +134,7 @@ describe('TagField', () => {
 
   describe('tag lookup', () => {
 
-    it('start and prepare a lookup call clone when typing', () => {
+    it('start and prepare a lookup call clone when typing', async () => {
       let templatePropertyValue = 11;
       let eventCounter = 0;
       field = scout.create(TagField, {
@@ -159,7 +157,7 @@ describe('TagField', () => {
 
       field.render();
       typeProposal(field, 'ba', keys.A);
-      jasmine.clock().tick(500);
+      await field.when('lookupCallDone');
 
       // expect popup is open and has 2 lookup rows (Bar, Baz)
       expect(field.popup instanceof TagChooserPopup).toBe(true);

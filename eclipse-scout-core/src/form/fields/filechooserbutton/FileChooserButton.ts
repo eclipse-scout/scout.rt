@@ -140,12 +140,12 @@ export class FileChooserButton extends ValueField<File> implements FileChooserBu
     this.setValue(arrays.first(event.files));
   }
 
-  protected override _validateValue(value: File): File | JQuery.Promise<File> {
+  protected override _validateValue(value: File): File | Promise<File> {
     this.fileInput.validateMaximumUploadSize(value);
     return value;
   }
 
-  protected override _formatValue(value: File): string | JQuery.Promise<string> {
+  protected override _formatValue(value: File): string | Promise<string> {
     return !value ? '' : value.name;
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,7 @@ import $ from 'jquery';
 
 export const accessSpecHelper = {
 
-  install(permissionCollectionModel?: PermissionCollectionModel): JQuery.Promise<any> {
+  install(permissionCollectionModel?: PermissionCollectionModel): Promise<any> {
     permissionCollectionModel = permissionCollectionModel || accessSpecHelper.allPermissionCollectionModel();
     ObjectFactory.get().register(AccessControl, () => new StaticAccessControl(permissionCollectionModel));
     return access.bootstrap('permissions');
@@ -55,11 +55,11 @@ class StaticAccessControl extends AccessControl {
     this._permissionCollection = PermissionCollection.ensure(permissionCollectionModel);
   }
 
-  protected override _load(): JQuery.Promise<void> {
+  protected override _load(): Promise<void> {
     return $.resolvedPromise();
   }
 
-  protected override _subscribeForNotifications(): JQuery.Promise<string> {
+  protected override _subscribeForNotifications(): Promise<string> {
     return $.resolvedPromise();
   }
 

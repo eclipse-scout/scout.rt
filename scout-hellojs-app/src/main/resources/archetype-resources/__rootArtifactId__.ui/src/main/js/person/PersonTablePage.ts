@@ -41,7 +41,7 @@ export class PersonTablePage extends PageWithTable {
     }
   }
 
-  protected override _loadTableData(restriction: PersonRestrictionDo): JQuery.Promise<PersonDo[]> {
+  protected override _loadTableData(restriction: PersonRestrictionDo): Promise<PersonDo[]> {
     return scout.create(PersonRestClient).list(this._withMaxRowCountContribution(restriction));
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import $ from 'jquery';
-import {Session} from '../index';
+import {ajax, AjaxError, Session} from '../index';
 
 export class Reconnector {
   session: Session;
@@ -78,23 +78,25 @@ export class Reconnector {
 
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ' + pingAjaxOptions.method + ' "' + pingAjaxOptions.url + '"');
     this.pingStartTimestamp = Date.now();
-    $.ajax(pingAjaxOptions)
-      .done(this._onPingDone.bind(this))
-      .fail(this._onPingFail.bind(this));
+    ajax.call(pingAjaxOptions)
+      .then(
+        () => this._onPingDone(),
+        error => this._onPingFail(error)
+      );
   }
 
-  protected _onPingDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
+  protected _onPingDone() {
     $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping success -> connection re-established!');
     this.session.onReconnectingSucceeded();
     this.stop();
   }
 
-  protected _onPingFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
-    let handleFailedPing = function handleFailedPing() {
+  protected _onPingFail(error: AjaxError) {
+    let handleFailedPing = () => {
       $.log.isTraceEnabled() && $.log.trace('[ajax reconnector] ping failed');
       this.session.onReconnectingFailed();
       this._schedulePing(this.interval);
-    }.bind(this);
+    };
 
     let pingDuration = Date.now() - this.pingStartTimestamp;
     if (pingDuration < this.minPingDuration) {

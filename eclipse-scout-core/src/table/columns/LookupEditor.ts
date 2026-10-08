@@ -37,7 +37,7 @@ export class LookupEditor<TValue> extends ValueField<TValue[]> implements Lookup
     this.$field.addClass('input-field focused');
   }
 
-  protected override _formatValue(value: TValue[]): string | JQuery.Promise<string> {
+  protected override _formatValue(value: TValue[]): string | Promise<string> {
     if (this._popup) {
       return this._popup.content.displayText;
     }
@@ -48,7 +48,7 @@ export class LookupEditor<TValue> extends ValueField<TValue[]> implements Lookup
       .then(lookupRows => strings.join(', ', ...lookupRows.map(r => r.text)));
   }
 
-  static formatValues<TValue>(values: TValue[], lookupCall: LookupCall<TValue>, prepareLookupCall?: (lookupCall: LookupCall<TValue>) => void): JQuery.Promise<LookupRow<TValue>[]> {
+  static formatValues<TValue>(values: TValue[], lookupCall: LookupCall<TValue>, prepareLookupCall?: (lookupCall: LookupCall<TValue>) => void): Promise<LookupRow<TValue>[]> {
     lookupCall = lookupCall.cloneForKeys(values);
     prepareLookupCall?.(lookupCall);
     return lookupCall.execute().then(result => result?.lookupRows || []);

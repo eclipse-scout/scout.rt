@@ -7,11 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {LookupResult, StaticLookupCall} from '../../index';
-import $ from 'jquery';
+import {Deferred, LookupResult, StaticLookupCall} from '../../index';
 
 export class DelayedStaticLookupCall<TKey> extends StaticLookupCall<TKey> {
-  protected _delayDeferred: JQuery.Deferred<any>;
+  protected _delayDeferred: Deferred<any>;
 
   override abort() {
     this._delayDeferred?.reject({
@@ -20,23 +19,23 @@ export class DelayedStaticLookupCall<TKey> extends StaticLookupCall<TKey> {
     super.abort();
   }
 
-  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._delayDeferred = $.Deferred();
+  protected override _getByKey(key: TKey): Promise<LookupResult<TKey>> {
+    this._delayDeferred = new Deferred();
     return this._delayDeferred.promise().then(() => super._getByKey(key));
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
-    this._delayDeferred = $.Deferred();
+  protected override _getAll(): Promise<LookupResult<TKey>> {
+    this._delayDeferred = new Deferred();
     return this._delayDeferred.promise().then(() => super._getAll());
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
-    this._delayDeferred = $.Deferred();
+  protected override _getByText(text: string): Promise<LookupResult<TKey>> {
+    this._delayDeferred = new Deferred();
     return this._delayDeferred.promise().then(() => super._getByText(text));
   }
 
-  protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._delayDeferred = $.Deferred();
+  protected override _getByRec(rec: TKey): Promise<LookupResult<TKey>> {
+    this._delayDeferred = new Deferred();
     return this._delayDeferred.promise().then(() => super._getByRec(rec));
   }
 

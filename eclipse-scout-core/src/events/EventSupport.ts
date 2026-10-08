@@ -7,8 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Event, EventHandler, EventListener, scout, strings} from '../index';
-import $ from 'jquery';
+import {Deferred, Event, EventHandler, EventListener, scout, strings} from '../index';
 
 export class EventSupport {
   protected _eventListenersByType = new Map<string, Set<EventListenerWithSortIndex>>();
@@ -141,8 +140,8 @@ export class EventSupport {
    * Adds an event handler using {@link one} and returns a promise.
    * The promise is resolved as soon as the event is triggered.
    */
-  when(type: string): JQuery.Promise<Event> {
-    let deferred = $.Deferred();
+  when(type: string): Promise<Event> {
+    let deferred = new Deferred<Event>();
     this.one(type, deferred.resolve.bind(deferred));
     return deferred.promise();
   }

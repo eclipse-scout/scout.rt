@@ -11,7 +11,9 @@ import globals from 'globals';
 import eslint from '@eslint/js';
 import {defineConfig} from 'eslint/config';
 import tseslint from 'typescript-eslint';
+import path from 'path';
 import common from './common.mjs';
+import noFloatingPromises from './noFloatingPromises.mjs';
 
 export default defineConfig(
   // Base config for JavaScript files
@@ -32,10 +34,28 @@ export default defineConfig(
   {
     extends: [tseslint.configs.recommended],
     plugins: {
-      '@typescript-eslint': tseslint.plugin
+      '@typescript-eslint': tseslint.plugin,
+      '@eclipse-scout': {
+        rules: {
+          'no-floating-promises': noFloatingPromises
+        }
+      }
     },
     files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parserOptions: {
+        projectService: true, // Type information is required by rules like no-floating-promises. Uses the nearest tsconfig.json of each file.
+        // The nearest tsconfig.json is only searched up to tsconfigRootDir, which defaults to the working directory.
+        // Use the file system root so the tsconfig.json of the module is found even if ESLint is run in a subfolder of the module.
+        tsconfigRootDir: path.parse(process.cwd()).root
+      }
+    },
     rules: {
+      // A promise that is neither returned, awaited nor handled cannot be waited for, e.g. by a form lifecycle (load -> markAsSaved) or a spec.
+      // Event handlers (_onXyz methods, callbacks passed to on()/one()) are ignored, nobody waits for them anyway.
+      // Other intended fire-and-forget calls can be marked with the void operator: void this._doSomethingAsync();
+      // Calls of known safe methods are ignored as well, e.g. ValueField.setValue() (see noFloatingPromises.mjs, projects can add more with the option allowForKnownSafeMethods).
+      '@eclipse-scout/no-floating-promises': 'warn',
       'spaced-comment': ['error', 'always', {'exceptions': ['*'], 'markers': ['/']}], // Allow triple slash directives
       'prefer-const': 'off', // Enabled by TS ESLint, but we do not want to enforce it for now
       '@typescript-eslint/no-empty-object-type': 'off',
