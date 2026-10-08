@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo,
+  ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, Event, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo,
   UiNotificationDo, UiNotificationPollerEventMap, UiNotificationRequest, UiNotificationResponse, UiNotificationSystem
 } from '../index';
 import $ from 'jquery';
@@ -195,7 +195,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
 
     if (notifications.length) {
       $.log.isInfoEnabled() && $.log.info(`Dispatching UI notifications with ids ${notifications.map(n => n.id)}.`);
-      this.trigger('notifications', {notifications});
+      this.trigger('notifications', new Event({notifications, source: this}));
     }
 
     this._schedulePoll();

@@ -7,14 +7,79 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BaseDoEntity, Constructor, DataObjectDeserializer, dataObjects, dates, DefaultDoTypeResolver, DoEntity, DoValueMetaData, ObjectFactory, objects, scout, typeName} from '../../src/index';
+import {
+  arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectInventory, dataObjects, dates, DefaultDoTypeResolver, DoValueMetaData, LookupResponse, LookupRowDo, ObjectFactory, objects, scout, typeName
+} from '../../src/index';
 
 describe('DataObjectDeserializer', () => {
 
   beforeAll(() => {
     ObjectFactory.get().registerNamespace('scout', {
-      Fixture01Do, Fixture02Do, Fixture03Do, Fixture03SubDo
-    }, {allowedReplacements: ['scout.Fixture01Do', 'scout.Fixture02Do', 'scout.Fixture03Do', 'scout.Fixture03SubDo']});
+      Fixture01Do, Fixture02Do, Fixture03Do, Fixture03SubDo, FixtureLookupRowDo
+    }, {allowedReplacements: ['scout.Fixture01Do', 'scout.Fixture02Do', 'scout.Fixture03Do', 'scout.Fixture03SubDo', 'scout.FixtureLookupRowDo']});
+  });
+
+  it('can deserialize LookupResponse', () => {
+    const json = `{
+      "_type": "scout.LookupResponse",
+      "rows": [
+        {"id": "id1","text": "text1"},
+        {"id": "id2","text": "text2"},
+        {"_type": "scout.FixtureLookupRow", "id": "id3","text": "text3"}
+      ]
+    }
+    `;
+    const lookupResponse = dataObjects.parse(json, (LookupResponse<LookupRowDo<any>>));
+    expect(lookupResponse).toBeInstanceOf(LookupResponse);
+    expect(lookupResponse.rows).toHaveSize(3);
+    expect(lookupResponse.rows[0]).toBeInstanceOf(LookupRowDo); // type is extracted from default TypeParameter of LookupResponse.
+    expect(lookupResponse.rows[2]).toBeInstanceOf(FixtureLookupRowDo); // type is extracted from _type which takes precedence.
+  });
+
+  it('can deserialize a BaseDoEntity again', () => {
+    class NestedSpecDo extends BaseDoEntity {
+      num: number;
+      nested: NestedSpecDo;
+    }
+
+    const json = `{
+      "_type": "scout.NestedSpec",
+      "nested": {"_type": "scout.NestedSpec", "num": 2},
+      "num": 1
+    }
+    `;
+    const firstPass = dataObjects.parse(json);
+    expect(firstPass).toBeInstanceOf(BaseDoEntity);
+    expect(firstPass['num']).toBe(1);
+    expect(firstPass['nested']).toBeInstanceOf(BaseDoEntity);
+    expect(firstPass['nested']['_type']).toBe('scout.NestedSpec');
+    expect(firstPass['nested']['num']).toBe(2);
+    expect(firstPass._type).toBe('scout.NestedSpec');
+
+    DataObjectInventory.get().add(NestedSpecDo, 'scout.NestedSpec', 'scout.scout.NestedSpecDo');
+
+    // deserialize an already deserialized BaseDoEntity, but now the _type is known
+    const secondPass = dataObjects.deserialize(firstPass) as NestedSpecDo;
+    expect(secondPass).toBeInstanceOf(NestedSpecDo);
+    expect(secondPass.num).toBe(1);
+    expect(secondPass.nested).toBeInstanceOf(NestedSpecDo);
+    expect(secondPass.nested._type).toBe('scout.NestedSpec');
+    expect(secondPass.nested.num).toBe(2);
+    expect(secondPass._type).toBe('scout.NestedSpec');
+
+    // deserialize nested DOs: creates a deep copy by default -> nested differ
+    const thirdPass = dataObjects.deserialize(secondPass) as NestedSpecDo;
+    expect(thirdPass.nested).not.toBe(secondPass.nested);
+    expect(thirdPass).toBeInstanceOf(NestedSpecDo);
+    expect(thirdPass.nested).toBeInstanceOf(NestedSpecDo);
+
+    // don't deserialize nested DOs nested are same
+    const fourthPass = dataObjects.deserialize(thirdPass, null, {deserializeBaseDoEntity: false}) as NestedSpecDo;
+    expect(fourthPass.nested).toBe(thirdPass.nested);
+    expect(fourthPass).toBeInstanceOf(NestedSpecDo);
+    expect(fourthPass.nested).toBeInstanceOf(NestedSpecDo);
+
+    DataObjectInventory.get().remove(NestedSpecDo);
   });
 
   it('can deserialize based on _type', () => {
@@ -61,7 +126,7 @@ describe('DataObjectDeserializer', () => {
     expect(dataobject.propDate).toBeInstanceOf(Date);
     expect(dataobject.propDate).toEqual(dates.parseJsonDate('2024-07-15 13:51:39.708Z'));
     expect(Array.isArray(dataobject.propArr)).toBeTrue();
-    expect(dataobject.propArr.length).toBe(2);
+    expect(dataobject.propArr).toHaveSize(2);
     expect(dataobject._type).toBe('scout.Fixture01'); // does not come from deserialize but from the instance creation
     expect(dataobject.propNull).toBeNull();
 
@@ -153,12 +218,10 @@ describe('DataObjectDeserializer', () => {
     const baseDoEntity = dataObjects.parse(json) as any;
     expect(baseDoEntity).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
     expect(baseDoEntity._type).toBe('whatever'); // is kept
-    // retainTypeVersion is false if object is instance of BaseDoEntity -> _typeVersion is skipped when deserializing
-    expect(baseDoEntity._typeVersion).toBeUndefined();
+    expect(baseDoEntity._typeVersion).toBe('1.2.3'); // retainTypeVersion is true by default
     expect(baseDoEntity.value).toBe(1234);
     expect(baseDoEntity.nestedObj).toBeInstanceOf(Fixture01Do);
-    // retainTypeVersion is false if object is instance of BaseDoEntity -> _typeVersion is skipped when deserializing
-    expect(baseDoEntity.nestedObj._typeVersion).toBeUndefined();
+    expect(baseDoEntity.nestedObj._typeVersion).toBe('3.2.1'); // retainTypeVersion is true by default
 
     const baseDoEntityWithTypeVersion = dataObjects.parse(json, null, {retainTypeVersion: true}) as any;
     expect(baseDoEntityWithTypeVersion).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
@@ -180,7 +243,7 @@ describe('DataObjectDeserializer', () => {
     // _typeVersion is skipped when deserializing
     expect(baseDoEntityWithoutTypeVersion.nestedObj._typeVersion).toBeUndefined();
 
-    const baseDoEntityWithTypeVersionPredicate = dataObjects.parse(json, null, {retainTypeVersion: (obj: DoEntity) => obj._type !== 'whatever'}) as any;
+    const baseDoEntityWithTypeVersionPredicate = dataObjects.parse(json, null, {retainTypeVersion: (obj: any) => obj._type !== 'whatever'}) as any;
     expect(baseDoEntityWithTypeVersionPredicate).toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
     expect(baseDoEntityWithTypeVersionPredicate._type).toBe('whatever'); // is kept
     // _typeVersion is skipped when deserializing
@@ -197,8 +260,7 @@ describe('DataObjectDeserializer', () => {
     expect(pojo._typeVersion).toBe('1.2.3');
     expect(pojo.value).toBe(1234);
     expect(pojo.nestedObj).toBeInstanceOf(Fixture01Do);
-    // retainTypeVersion is false if object is instance of BaseDoEntity -> _typeVersion is skipped when deserializing
-    expect(pojo.nestedObj._typeVersion).toBeUndefined();
+    expect(pojo.nestedObj._typeVersion).toBe('3.2.1'); // retainTypeVersion is true by default
 
     const pojoWithTypeVersion = dataObjects.parse(json, null, {createPojoIfDoIsUnknown: true, retainTypeVersion: true}) as any;
     expect(pojoWithTypeVersion).not.toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
@@ -220,7 +282,7 @@ describe('DataObjectDeserializer', () => {
     // _typeVersion is skipped when deserializing
     expect(pojoWithoutTypeVersion.nestedObj._typeVersion).toBeUndefined();
 
-    const pojoWithTypeVersionPredicate = dataObjects.parse(json, null, {createPojoIfDoIsUnknown: true, retainTypeVersion: (obj: DoEntity) => obj._type !== 'whatever'}) as any;
+    const pojoWithTypeVersionPredicate = dataObjects.parse(json, null, {createPojoIfDoIsUnknown: true, retainTypeVersion: (obj: any) => obj._type !== 'whatever'}) as any;
     expect(pojoWithTypeVersionPredicate).not.toBeInstanceOf(BaseDoEntity); // as _type cannot be found.
     expect(pojoWithTypeVersionPredicate._type).toBe('whatever'); // is kept
     // _typeVersion is skipped when deserializing
@@ -252,7 +314,7 @@ describe('DataObjectDeserializer', () => {
     `;
     const arr = dataObjects.parse(json) as unknown as Fixture03Do[];
     expect(Array.isArray(arr)).toBeTrue();
-    expect(arr.length).toBe(2);
+    expect(arr).toHaveSize(2);
 
     const first = arr[0];
     expect(first).toBeInstanceOf(Fixture03Do);
@@ -383,4 +445,9 @@ export class Fixture03Do extends BaseDoEntity implements FixtureDoIfc {
 @typeName('scout.Fixture03Sub')
 export class Fixture03SubDo extends Fixture03Do {
   nestedNestedDateSub: Date;
+}
+
+@typeName('scout.FixtureLookupRow')
+export class FixtureLookupRowDo extends LookupRowDo<string> {
+  extraProperty: number;
 }

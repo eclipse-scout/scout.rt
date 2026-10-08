@@ -43,21 +43,21 @@ describe('dataObjects', () => {
 
       const contrib = new DoContrib();
       dataObjects.addContribution(contrib, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib);
 
       dataObjects.addContribution(contrib, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib);
 
       const contrib2 = new AnotherDoContrib();
       dataObjects.addContribution(contrib2, doEntity);
-      expect(doEntity._contributions.length).toBe(2);
+      expect(doEntity._contributions).toHaveSize(2);
       expect(doEntity._contributions[0]).toBe(contrib);
       expect(doEntity._contributions[1]).toBe(contrib2);
 
       dataObjects.addContribution(contrib2, null);
-      expect(doEntity._contributions.length).toBe(2);
+      expect(doEntity._contributions).toHaveSize(2);
       expect(() => dataObjects.addContribution(null, doEntity)).toThrow();
     });
 
@@ -65,12 +65,12 @@ describe('dataObjects', () => {
       const doEntity: DoEntityWithContributions = {};
       const contrib = new DoContrib();
       dataObjects.addContribution(contrib, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib);
 
       const contrib2 = new DoContrib();
       dataObjects.addContribution(contrib2, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib2);
     });
 
@@ -80,11 +80,11 @@ describe('dataObjects', () => {
         _type: 'PojoContrib'
       };
       dataObjects.addContribution(contrib, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib);
 
       dataObjects.addContribution(contrib, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib);
 
       // Replaces first
@@ -92,14 +92,14 @@ describe('dataObjects', () => {
         _type: 'PojoContrib'
       };
       dataObjects.addContribution(contrib2, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib2);
 
       const contrib3: DoEntity = {
         _type: 'PojoContrib2'
       };
       dataObjects.addContribution(contrib3, doEntity);
-      expect(doEntity._contributions.length).toBe(2);
+      expect(doEntity._contributions).toHaveSize(2);
       expect(doEntity._contributions[0]).toBe(contrib2);
       expect(doEntity._contributions[1]).toBe(contrib3);
     });
@@ -113,7 +113,7 @@ describe('dataObjects', () => {
 
       expect(dataObjects.getContribution(DoContrib, doEntity)).toBe(contrib);
       expect(dataObjects.getContribution(AnotherDoContrib, doEntity)).toBeUndefined();
-      expect(dataObjects.getContribution(AnotherDoContrib, null)).toBe(null);
+      expect(dataObjects.getContribution(AnotherDoContrib, null)).toBeNull();
       expect(() => dataObjects.getContribution(null, doEntity)).toThrow();
     });
 
@@ -158,12 +158,12 @@ describe('dataObjects', () => {
       const contrib2 = new AnotherDoContrib();
       dataObjects.addContribution(contrib, doEntity);
       dataObjects.addContribution(contrib2, doEntity);
-      expect(doEntity._contributions.length).toBe(2);
+      expect(doEntity._contributions).toHaveSize(2);
       expect(doEntity._contributions[0]).toBe(contrib);
       expect(doEntity._contributions[1]).toBe(contrib2);
 
       dataObjects.removeContribution(DoContrib, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib2);
 
       dataObjects.removeContribution(AnotherDoContrib, doEntity);
@@ -184,12 +184,12 @@ describe('dataObjects', () => {
       };
       dataObjects.addContribution(contrib, doEntity);
       dataObjects.addContribution(contrib2, doEntity);
-      expect(doEntity._contributions.length).toBe(2);
+      expect(doEntity._contributions).toHaveSize(2);
       expect(doEntity._contributions[0]).toBe(contrib);
       expect(doEntity._contributions[1]).toBe(contrib2);
 
       dataObjects.removeContribution(contrib._type, doEntity);
-      expect(doEntity._contributions.length).toBe(1);
+      expect(doEntity._contributions).toHaveSize(1);
       expect(doEntity._contributions[0]).toBe(contrib2);
 
       dataObjects.removeContribution(contrib2._type, doEntity);
@@ -200,7 +200,7 @@ describe('dataObjects', () => {
   describe('contribution', () => {
     it('adds a new one or returns the existing contribution', () => {
       const doEntity = scout.create(BaseDoEntityFixtureDo);
-      expect(doEntity.getContributions().length).toBe(0);
+      expect(doEntity.getContributions()).toHaveSize(0);
 
       const contrib = dataObjects.contribution(BaseDoEntityContribDo, doEntity);
       expect(contrib).toBeInstanceOf(BaseDoEntityContribDo);
@@ -239,7 +239,7 @@ describe('dataObjects', () => {
     });
     it('null and undefined', () => {
       expect(dataObjects.stringify(null)).toBe('null');
-      expect(dataObjects.stringify(undefined)).toBe(undefined);
+      expect(dataObjects.stringify(undefined)).toBeUndefined();
     });
   });
 
@@ -262,8 +262,8 @@ describe('dataObjects', () => {
       expect(dataObjects.serialize('')).toBe('');
     });
     it('null and undefined', () => {
-      expect(dataObjects.serialize(null)).toBe(null);
-      expect(dataObjects.serialize(undefined)).toBe(undefined);
+      expect(dataObjects.serialize(null)).toBeNull();
+      expect(dataObjects.serialize(undefined)).toBeUndefined();
     });
   });
 
@@ -274,11 +274,11 @@ describe('dataObjects', () => {
         '}') as any;
       expect(parsedObject).toBeInstanceOf(BaseDoEntity);
       expect(parsedObject.value).toBe(13);
-      expect(dataObjects.parse('')).toBe(null);
+      expect(dataObjects.parse('')).toBeNull();
     });
     it('null and undefined', () => {
-      expect(dataObjects.parse(null)).toBe(null);
-      expect(dataObjects.parse(undefined)).toBe(undefined);
+      expect(dataObjects.parse(null)).toBeNull();
+      expect(dataObjects.parse(undefined)).toBeUndefined();
     });
   });
 
@@ -289,11 +289,11 @@ describe('dataObjects', () => {
       }) as any;
       expect(deserializedObject).toBeInstanceOf(BaseDoEntity);
       expect(deserializedObject.value).toBe(13);
-      expect(dataObjects.deserialize('')).toEqual(null);
+      expect(dataObjects.deserialize('')).toBeNull();
     });
     it('null and undefined', () => {
-      expect(dataObjects.deserialize(null)).toBe(null);
-      expect(dataObjects.deserialize(undefined)).toBe(undefined);
+      expect(dataObjects.deserialize(null)).toBeNull();
+      expect(dataObjects.deserialize(undefined)).toBeUndefined();
     });
   });
 });
