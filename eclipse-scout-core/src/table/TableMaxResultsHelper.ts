@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataObjects, DoEntity, scout, Table, TableReloadReason, typeName} from '../index';
+import {BaseDoEntity, dataObjects, DoEntityWithContributions, scout, Table, TableReloadReason, typeName} from '../index';
 
 export class TableMaxResultsHelper {
 
@@ -26,7 +26,7 @@ export class TableMaxResultsHelper {
    * @param table The table for which the {@link MaxRowCountContributionDo} should be added.
    * @param reloadReason The reason of the reload for which the {@link MaxRowCountContributionDo} should be added.
    */
-  withMaxRowCountContribution<T extends { _contributions?: DoEntity[] }>(dataObject: T, table: Table, reloadReason?: TableReloadReason): T {
+  withMaxRowCountContribution<T extends DoEntityWithContributions>(dataObject: T, table: Table, reloadReason?: TableReloadReason): T {
     const maxRowCountContribution = this.buildMaxRowCountContribution(table, reloadReason);
     if (maxRowCountContribution) {
       dataObject = dataObject || {} as T;
@@ -70,10 +70,14 @@ export class TableMaxResultsHelper {
 export class MaxRowCountContributionDo extends BaseDoEntity {
   override: number;
   hint: number;
+  estimateRowCountHint: boolean;
 }
 
-export interface LimitedResultInfoContributionDo extends DoEntity {
+@typeName(LimitedResultInfoContributionDo.TYPE_NAME)
+export class LimitedResultInfoContributionDo extends BaseDoEntity {
+  static TYPE_NAME = 'scout.LimitedResultInfoContribution';
+
   limitedResult: boolean;
-  maxRowCount?: number;
-  estimatedRowCount?: number;
+  maxRowCount: number;
+  estimatedRowCount: number;
 }

@@ -328,7 +328,7 @@ export const arrays = {
   /**
    * @returns true if the given argument is an array and has a length > 0, false in any other case.
    */
-  hasElements<T>(arr: T[] | T): boolean {
+  hasElements<T extends readonly unknown[] | unknown>(arr: T): boolean {
     return !arrays.empty(arr);
   },
 
