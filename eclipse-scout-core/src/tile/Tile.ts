@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,6 +30,9 @@ export class Tile extends Widget implements TileModel {
   resizable: boolean;
   resizableProducer: () => Resizable;
   plainText: string;
+  autoReloadRate: number;
+
+  protected _pollTimeout: number;
 
   constructor() {
     super();
@@ -46,6 +49,7 @@ export class Tile extends Widget implements TileModel {
     this.plainText = null;
     // Null to let TileGrid decide whether to enable animation
     this.animateRemoval = null;
+    this.autoReloadRate = null;
     this._addPropertyDimensionAlias('visible', 'filterAccepted');
   }
 
@@ -79,6 +83,7 @@ export class Tile extends Widget implements TileModel {
     this._renderSelectable();
     this._renderSelected();
     this._renderDisplayStyle();
+    this._renderAutoReloadRate();
   }
 
   protected override _renderEnabled() {
@@ -289,5 +294,42 @@ export class Tile extends Widget implements TileModel {
       });
     }
     this.invalidateParentLogicalGrid();
+  }
+
+  setAutoReloadRate(autoReloadRate: number) {
+    this.setProperty('autoReloadRate', autoReloadRate);
+  }
+
+  protected _renderAutoReloadRate() {
+    if (this.autoReloadRate > 0) {
+      if (!this.isLoading()) {
+        this.trigger('load');
+      }
+      this._pollTimeout = setTimeout(() => this._renderAutoReloadRate(), this.autoReloadRate * 1000);
+    } else {
+      this._removePollTimeout();
+    }
+  }
+
+  protected override _renderOnAttach() {
+    super._renderOnAttach();
+    this._renderAutoReloadRate();
+  }
+
+  protected override _renderOnDetach() {
+    super._renderOnDetach();
+    this._removePollTimeout();
+  }
+
+  protected override _remove() {
+    super._remove();
+    this._removePollTimeout();
+  }
+
+  private _removePollTimeout() {
+    if (this._pollTimeout) {
+      clearTimeout(this._pollTimeout);
+      this._pollTimeout = null;
+    }
   }
 }

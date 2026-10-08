@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -88,6 +88,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     setCssClass(getConfiguredCssClass());
     setDisplayStyle(getConfiguredDisplayStyle());
     setGridDataHints(getConfiguredGridDataHints());
+    setAutoReloadRate(getConfiguredAutoReloadRate());
   }
 
   @Override
@@ -193,6 +194,18 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   }
 
   /**
+   * Configures the auto reload rate in seconds of the tile. When set to a valid value ({@code > 0}) the tile will start a
+   * polling and will refresh its data every specified seconds as long as it is visible in the browser.
+   * <p>
+   * Be careful when using this feature, as it generates additional network traffic and puts extra strain on the server.
+   */
+  @ConfigProperty(ConfigProperty.INTEGER)
+  @Order(150)
+  protected int getConfiguredAutoReloadRate() {
+    return -1;
+  }
+
+  /**
    * Configures the grid data for this tile.
    * <p>
    * The typical approach to configure it is to get the default object by calling
@@ -283,6 +296,16 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @Override
   public void setColorScheme(IColorScheme colorScheme) {
     propertySupport.setProperty(PROP_COLOR_SCHEME, colorScheme);
+  }
+
+  @Override
+  public Integer getAutoReloadRate() {
+    return (Integer) propertySupport.getProperty(PROP_AUTO_RELOAD_RATE);
+  }
+
+  @Override
+  public void setAutoReloadRate(Integer autoReloadRate) {
+    propertySupport.setProperty(PROP_AUTO_RELOAD_RATE, autoReloadRate);
   }
 
   @Override
@@ -431,6 +454,13 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
     });
   }
 
+  public void reloadDataInAutoReloadMode() {
+    ITileDataLoader dataLoader = createDataLoader();
+    if (dataLoader != null) {
+      dataLoader.loadData(true);
+    }
+  }
+
   protected void beforeLoadData() {
     // NOP
   }
@@ -441,7 +471,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   protected void execLoadData() {
     ITileDataLoader dataLoader = createDataLoader();
     if (dataLoader != null) {
-      dataLoader.loadData();
+      dataLoader.loadData(false);
     }
   }
 
@@ -478,7 +508,7 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
   @FunctionalInterface
   public interface ITileDataLoader {
 
-    void loadData();
+    void loadData(boolean autoReloadMode);
   }
 
   /**
@@ -503,11 +533,11 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
 
     @SuppressWarnings("squid:S1181")
     @Override
-    public void loadData() {
-      if (isLoading()) {
+    public void loadData(boolean autoReloadMode) {
+      if (isLoading(autoReloadMode)) {
         return;
       }
-      setLoading(true);
+      ensureLoading(autoReloadMode);
       try {
         ITileGrid tileGridParent = getParentOfType(ITileGrid.class);
         IForm formParent = getParentOfType(IForm.class);
@@ -515,15 +545,13 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
           try {
             final DATA data = doLoadData();
             BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
-              m_loadJobFuture = null;
-              setLoading(false);
+              releaseLoading(autoReloadMode);
               updateModelData(data);
             });
           }
           catch (final Throwable e) { // Catch Throwable so we can handle all AbstractInterruptionError accordingly
             BEANS.get(TileDataLoadManager.class).runInModelJob(() -> {
-              m_loadJobFuture = null; // Needs to be done before setLoading(false) because setLoading(false) may re-schedule another load job, see reloadData()
-              setLoading(false);
+              releaseLoading(autoReloadMode);
               handleLoadDataException(e);
             });
           }
@@ -533,8 +561,29 @@ public abstract class AbstractTile extends AbstractWidget implements ITile {
             .withForm(formParent != null ? formParent : IForm.CURRENT.get())));
       }
       catch (RuntimeException e) {
-        setLoading(false);
+        releaseLoading(autoReloadMode);
         handleLoadDataException(e);
+      }
+    }
+
+    protected boolean isLoading(boolean autoReloadMode) {
+      if (!autoReloadMode) {
+        return AbstractTile.super.isLoading();
+      }
+      return m_loadJobFuture != null && !m_loadJobFuture.isFinished();
+    }
+
+    protected void ensureLoading(boolean autoReloadMode) {
+      // don't call setLoading(true) in autoReloadMode to suppress loading indicator during long-running loading cycles
+      if (!autoReloadMode) {
+        setLoading(true);
+      }
+    }
+
+    protected void releaseLoading(boolean autoReloadMode) {
+      m_loadJobFuture = null; // Needs to be done before setLoading(false) because setLoading(false) may re-schedule another load job, see reloadData()
+      if (!autoReloadMode) {
+        setLoading(false);
       }
     }
 

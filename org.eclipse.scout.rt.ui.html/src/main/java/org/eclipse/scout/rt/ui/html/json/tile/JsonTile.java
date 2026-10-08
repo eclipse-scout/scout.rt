@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,12 +10,14 @@
 package org.eclipse.scout.rt.ui.html.json.tile;
 
 import org.eclipse.scout.rt.client.ui.form.fields.GridData;
+import org.eclipse.scout.rt.client.ui.tile.AbstractTile;
 import org.eclipse.scout.rt.client.ui.tile.IFormFieldTile;
 import org.eclipse.scout.rt.client.ui.tile.ITile;
 import org.eclipse.scout.rt.shared.data.colorscheme.IColorScheme;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
+import org.eclipse.scout.rt.ui.html.json.JsonEvent;
 import org.eclipse.scout.rt.ui.html.json.JsonGridData;
 import org.eclipse.scout.rt.ui.html.json.JsonProperty;
 
@@ -23,6 +25,8 @@ import org.eclipse.scout.rt.ui.html.json.JsonProperty;
  * @since 8.0
  */
 public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
+
+  public static final String EVENT_LOAD = "load";
 
   public JsonTile(T model, IUiSession uiSession, String id, IJsonAdapter<?> parent) {
     super(model, uiSession, id, parent);
@@ -73,5 +77,26 @@ public class JsonTile<T extends ITile> extends AbstractJsonWidget<T> {
         return JsonGridData.toJson((GridData) value);
       }
     });
+    putJsonProperty(new JsonProperty<T>(ITile.PROP_AUTO_RELOAD_RATE, model) {
+      @Override
+      protected Integer modelValue() {
+        return getModel().getAutoReloadRate();
+      }
+    });
+  }
+
+  protected void handleUiLoad(JsonEvent event) {
+    AbstractTile tile = (AbstractTile) getModel();
+    tile.reloadDataInAutoReloadMode();
+  }
+
+  @Override
+  public void handleUiEvent(JsonEvent event) {
+    if (EVENT_LOAD.matches(event.getType())) {
+      handleUiLoad(event);
+    }
+    else {
+      super.handleUiEvent(event);
+    }
   }
 }
