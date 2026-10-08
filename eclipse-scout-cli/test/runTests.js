@@ -23,7 +23,7 @@ function runTests() {
     const transpiledContent = fs.readFileSync(transpiled, 'utf-8').toString().trim();
     const expectedContent = fs.readFileSync(expected, 'utf-8').toString().trim();
     if (transpiledContent !== expectedContent) {
-      failedFixtures.push(fixtures);
+      failedFixtures.push(fixture);
     }
   }
   if (failedFixtures.length) {
