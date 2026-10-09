@@ -17,7 +17,10 @@ import java.util.TimeZone;
  * Simple Date provider implementation.
  *
  * @since 5.2
+ * @deprecated Do not call this class directly but interact with {@link IDateProvider} instead.
  */
+@Deprecated
+@SuppressWarnings("DeprecatedIsStillUsed")
 public class DateProvider implements IDateProvider {
 
   protected Date getDate() {

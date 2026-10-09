@@ -9,22 +9,25 @@
  */
 package org.eclipse.scout.rt.testing.platform.util.date;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Calendar;
 import java.util.Date;
 
 import org.eclipse.scout.rt.platform.IBeanManager;
 import org.eclipse.scout.rt.platform.IgnoreBean;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.date.DateProvider;
+import org.eclipse.scout.rt.platform.util.date.IDateProvider;
 
 /**
- * A date / time provider for testing whose methods return the same date and time when called repeatedly. This provider
- * needs to be registered <strong>manually</strong> with the {@link IBeanManager}.
- *
- * @since 5.2
+ * A {@link IDateProvider} for testing whose methods return the same date and time when called repeatedly.
+ * <p>
+ * NOTE: This provider needs to be registered <strong>manually</strong> with the {@link IBeanManager}.
  */
 @IgnoreBean
+@SuppressWarnings("deprecation")
 public class FixedDateProvider extends DateProvider {
+
   private volatile Date m_date;
 
   /**
@@ -53,7 +56,7 @@ public class FixedDateProvider extends DateProvider {
    */
   public void setTimeMillis(long newTimeMillis) {
     setDate(new Date(newTimeMillis));
-    Assertions.assertEquals(newTimeMillis, currentUTCMillis());
+    assertEquals(newTimeMillis, currentUTCMillis());
   }
 
   /**
@@ -84,7 +87,7 @@ public class FixedDateProvider extends DateProvider {
   @Override
   public Calendar currentCalendar() {
     Calendar currentCalendar = super.currentCalendar();
-    currentCalendar.setTime(m_date);
+    currentCalendar.setTime(getDate());
     return currentCalendar;
   }
 }
