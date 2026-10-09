@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,10 +7,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {TableRowTileMappingModel, Tile, Widget} from '../index';
+import {PropertyChangeEvent, TableRowTileMappingModel, Tile, Widget, WidgetEventMap} from '../index';
 
 export class TableRowTileMapping extends Widget implements TableRowTileMappingModel {
   declare model: TableRowTileMappingModel;
+  declare eventMap: TableRowTileMappingEventMap;
+  declare self: TableRowTileMapping;
 
   tableRow: string;
   tile: Tile;
@@ -21,4 +23,12 @@ export class TableRowTileMapping extends Widget implements TableRowTileMappingMo
     this.tile = null;
     this._addWidgetProperties(['tile']);
   }
+
+  setTile(tile: Tile) {
+    this.setProperty('tile', tile);
+  }
+}
+
+export interface TableRowTileMappingEventMap extends WidgetEventMap {
+  'propertyChange:tile': PropertyChangeEvent<Tile>;
 }
