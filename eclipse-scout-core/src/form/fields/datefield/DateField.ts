@@ -38,6 +38,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   isolatedDateFormat: DateFormat;
   isolatedTimeFormat: DateFormat;
   allowedDates: Date[];
+  allowedDateProvider: AllowedDateProvider;
   htmlDateTimeComposite: HtmlComponent;
 
   $dateField: JQuery;
@@ -58,6 +59,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
    */
   protected _tempTimeDate: Date;
   protected _cellEditorPopup: CellEditorPopup<Date>;
+  protected _defaultAllowedDateProvider: AllowedDateProvider;
 
   constructor() {
     super();
@@ -89,6 +91,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     this._$predictDateField = null;
     this._$predictTimeField = null;
     this._tempTimeDate = null;
+    this._defaultAllowedDateProvider = this._provideAllowedDate.bind(this);
     this.invalidValueMessageKey = 'ui.InvalidDate';
     this._addCloneProperties(['hasDate', 'hasTime', 'dateFormatPattern', 'timeFormatPattern', 'allowedDates', 'autoDate']);
   }
@@ -134,7 +137,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       boundToAnchor: !this.touchMode,
       closeOnAnchorMouseDown: false,
       field: this,
-      allowedDates: this.allowedDates,
+      allowedDateProvider: this._allowedDateProvider,
       dateFormat: this.isolatedDateFormat
     });
   }
@@ -472,11 +475,10 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
   }
 
   isDateAllowed(date: Date): boolean {
-    if (!date || this.allowedDates.length === 0 || this.embedded) { // in embedded mode, main date field must take care of validation, otherwise error status won't be shown
+    if (!date || !this._allowedDateProvider || this.embedded) { // in embedded mode, main date field must take care of validation, otherwise error status won't be shown
       return true;
     }
-    let dateAsTimestamp = dates.trunc(date).getTime();
-    return this.allowedDates.some(allowedDate => allowedDate.getTime() === dateAsTimestamp);
+    return dates.equals(dates.trunc(this._allowedDateProvider(date, 1, true)), dates.trunc(date));
   }
 
   protected override _valueEquals(valueA: Date, valueB: Date): boolean {
@@ -505,6 +507,45 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     });
     truncDates = truncDates.sort(dates.compare);
     this._setProperty('allowedDates', truncDates);
+  }
+
+  setAllowedDateProvider(allowedDateProvider: AllowedDateProvider) {
+    this.setProperty('allowedDateProvider', allowedDateProvider);
+  }
+
+  protected get _allowedDateProvider(): AllowedDateProvider {
+    if (this.allowedDateProvider) {
+      return this.allowedDateProvider;
+    }
+    if (this.allowedDates?.length) {
+      return this._defaultAllowedDateProvider;
+    }
+    return null;
+  }
+
+  protected _provideAllowedDate(date: Date, direction: 1 | -1, allowCurrentDate: boolean): Date {
+    if (arrays.empty(this.allowedDates)) {
+      return null;
+    }
+    let referenceDate = dates.trunc(date);
+    // The allowed dates are sorted ascended, when they are set.
+    // Iterate over the allowed dates to find an allowed date after the given date or the given date itself, if allowed
+    if (direction === 1) {
+      for (const allowedDate of this.allowedDates) {
+        if (dates.compare(referenceDate, allowedDate) < (allowCurrentDate ? 1 : 0)) {
+          return allowedDate;
+        }
+      }
+      return null;
+    }
+    // Iterate over the allowed dates in reverse order to find an allowed date before the given date or the given date itself, if allowed
+    for (let i = this.allowedDates.length - 1; i >= 0; i--) {
+      let allowedDate = this.allowedDates[i];
+      if (dates.compare(referenceDate, allowedDate) > (allowCurrentDate ? -1 : 0)) {
+        return allowedDate;
+      }
+    }
+    return null;
   }
 
   protected override _updateAriaDescAndErrorMessage() {
@@ -1357,7 +1398,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
     } else {
       referenceDate = dates.trunc(dates.newDate());
     }
-    if (this.allowedDates) {
+    if (this._allowedDateProvider) {
       referenceDate = this._findAllowedReferenceDate(referenceDate);
     }
     return referenceDate;
@@ -1368,20 +1409,12 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
    */
   protected _findAllowedReferenceDate(referenceDate: Date): Date {
     // 1st: try to find a date which is equals or greater than the referenceDate (today)
-    for (let i = 0; i < this.allowedDates.length; i++) {
-      let allowedDate = this.allowedDates[i];
-      if (dates.compare(allowedDate, referenceDate) >= 0) {
-        return allowedDate;
-      }
-    }
+    let allowedDate = this._allowedDateProvider(referenceDate, 1, true);
     // 2nd: try to find an allowed date in the past
-    for (let i = this.allowedDates.length - 1; i >= 0; i--) {
-      let allowedDate = this.allowedDates[i];
-      if (dates.compare(allowedDate, referenceDate) <= 0) {
-        return allowedDate;
-      }
+    if (!allowedDate) {
+      allowedDate = this._allowedDateProvider(referenceDate, -1, false);
     }
-    return referenceDate;
+    return allowedDate || referenceDate;
   }
 
   openDatePopup() {
@@ -1871,3 +1904,12 @@ export type DateFieldPredictionResult = {
   date: Date;
   text: string;
 };
+
+/**
+ * Calculates the next/previous allowed date starting with the given reference date
+ * If the allowedDateProvider is not set but at least one allowedDates, it will be initialized with the set allowedDates
+ * @param date Acts as reference date to start the calculation of the next/previous allowed date
+ * @param direction 1 if the next allowed date should be returned, -1 if the previous one should be returned starting from the given date
+ * @param allowCurrentDate If true, the given date can be returned, if it is matching the conditions, otherwise the next/previous one
+ */
+export type AllowedDateProvider = (date: Date, direction: 1 | -1, allowCurrentDate: boolean) => Date;
