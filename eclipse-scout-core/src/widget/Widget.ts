@@ -103,7 +103,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   protected _lastFocusedWidget: Widget;
   protected _focusInListener: (event: FocusEvent | JQuery.FocusInEvent) => void;
   protected _glassPaneContributions: GlassPaneContribution[];
-  protected _parentDestroyHandler: EventHandler;
   protected _parentRemovingWhileAnimatingHandler: EventHandler;
   protected _postRenderActions: (() => void)[];
   protected _scrollHandler: (event: JQuery.ScrollEvent) => void;
@@ -153,7 +152,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.eventDelegators = [];
     this._postRenderActions = [];
     this._focusInListener = this._onFocusIn.bind(this);
-    this._parentDestroyHandler = this._onParentDestroy.bind(this);
     this._parentRemovingWhileAnimatingHandler = this._onParentRemovingWhileAnimating.bind(this);
     this._scrollHandler = this._onScroll.bind(this);
     this.loadingSupport = this._createLoadingSupport();
@@ -332,7 +330,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * <p>
    * <b>Notes</b>
    * <ul>
-   *   <li>Children that have a different owner won't be destroyed, just removed.</li>
+   *   <li>Children that have a different owner won't be destroyed, just removed and relinked to their owner.</li>
    *   <li>The function does nothing if the widget is already destroyed.</li>
    *   <li>If a remove animation is running or pending, the destroying will be delayed until the removal is done.</li>
    * </ul>
@@ -362,9 +360,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.owner._removeChild(this);
     this.owner = null;
     this.parent._removeChild(this);
-    this.parent.off('destroy', this._parentDestroyHandler);
     this.parent = null;
 
+    this._unlinkChildren(this._children); // Only the foreign children (where `this` is not the owner) remain -> Set their owner as their parent
     this.destroying = false;
     this.destroyed = true;
     this.trigger('destroy');
@@ -394,6 +392,15 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return;
     }
     child.destroy();
+  }
+
+  protected _unlinkChildren(children: Iterable<Widget>) {
+    for (const child of children) {
+      // Disconnect child from parent and re-connect to owner
+      if (child.owner !== this) {
+        child.setParent(child.owner);
+      }
+    }
   }
 
   protected _destroyOrUnlinkChildren(children: ObjectOrChildModel<Widget>[] | ObjectOrChildModel<Widget>) {
@@ -755,7 +762,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
         return;
       }
 
-      this.parent.off('destroy', this._parentDestroyHandler);
       this.parent.off('removing', this._parentRemovingWhileAnimatingHandler);
 
       if (this.parent !== this.owner) {
@@ -775,7 +781,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (this.initialized) {
       this.recomputeEnabled(this.parent.enabledComputed);
     }
-    this.parent.one('destroy', this._parentDestroyHandler);
   }
 
   protected _addChild(child: Widget) {
@@ -2015,15 +2020,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (eventDelegator.cloneToOriginal) {
       eventDelegator.cloneToOriginal.destroy();
     }
-  }
-
-  protected _onParentDestroy() {
-    if (this.destroyed) {
-      return;
-    }
-    // If the parent is destroyed but the widget not make sure it gets a new parent
-    // This ensures the old one may be properly garbage collected
-    this.setParent(this.owner);
   }
 
   /**
