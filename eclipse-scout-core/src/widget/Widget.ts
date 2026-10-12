@@ -26,7 +26,6 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   animateRemoval: boolean;
   animateRemovalClass: string;
   attached: boolean;
-  children: Widget[];
   /**
    * Will be set on the clone after a widget has been cloned.
    */
@@ -97,6 +96,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * @internal
    */
   _rendered: boolean;
+  protected _children: Set<Widget>;
+  /** Cached, frozen array of {@link _children}. Is reset whenever a child is added or removed. */
+  protected _childrenArray: Widget[];
   protected _$lastFocusedElement: JQuery;
   protected _lastFocusedWidget: Widget;
   protected _focusInListener: (event: FocusEvent | JQuery.FocusInEvent) => void;
@@ -117,7 +119,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.classId = null;
     this.owner = null;
     this.parent = null;
-    this.children = [];
+    this._children = new Set();
+    this._childrenArray = null;
     this.cloneOf = null;
     this.rendering = false;
     this.removing = false;
@@ -283,9 +286,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
 
     let widgets = [];
-    models.forEach((model, i) => {
+    for (let i = 0; i < models.length; i++) {
+      const model = models[i];
       widgets[i] = this._createChild(model);
-    });
+    }
     return widgets;
   }
 
@@ -350,7 +354,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
 
     // Destroy children in reverse order
-    this._destroyChildren(this.children.slice().reverse());
+    this._destroyChildren([...this._children].reverse());
     this.remove();
     this._destroy();
 
@@ -374,13 +378,15 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     // NOP
   }
 
-  protected _destroyChildren(widgets: Widget[] | Widget) {
-    if (!widgets) {
+  protected _destroyChildren(children: Widget[] | Widget) {
+    if (!children) {
       return;
     }
 
-    widgets = arrays.ensure(widgets);
-    widgets.forEach(widget => this._destroyChild(widget));
+    children = arrays.ensure(children);
+    for (const child of children) {
+      this._destroyChild(child);
+    }
   }
 
   protected _destroyChild(child: Widget) {
@@ -390,16 +396,16 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     child.destroy();
   }
 
-  protected _destroyOrUnlinkChildren(widgets: ObjectOrChildModel<Widget>[] | ObjectOrChildModel<Widget>) {
-    if (!widgets) {
+  protected _destroyOrUnlinkChildren(children: ObjectOrChildModel<Widget>[] | ObjectOrChildModel<Widget>) {
+    if (!children) {
       return;
     }
 
-    widgets = arrays.ensure(widgets);
-    widgets.forEach(child => {
+    children = arrays.ensure(children);
+    for (const child of children) {
       if (!(child instanceof Widget) || child.destroyed) {
         // Child may not be a widget yet during initializing
-        return;
+        continue;
       }
       if (child.owner === this) {
         this._destroyChild(child);
@@ -407,7 +413,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
         // Disconnect child from parent and re-connect to owner
         child.setParent(child.owner);
       }
-    });
+    }
   }
 
   /**
@@ -509,9 +515,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   protected _postRender() {
     let actions = this._postRenderActions;
     this._postRenderActions = [];
-    actions.forEach(action => {
+    for (const action of actions) {
       action();
-    });
+    }
   }
 
   /**
@@ -594,13 +600,12 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       this._$lastFocusedElement = null;
     }
     // remove children in reverse order.
-    this.children.slice().reverse()
-      .forEach(child => {
-        // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
-        if (child.parent === this) {
-          child.remove();
-        }
-      });
+    for (const child of [...this._children].reverse()) {
+      // Only remove the child if this widget is the current parent (if that is not the case this widget is the owner)
+      if (child.parent === this) {
+        child.remove();
+      }
+    }
 
     if (!this._rendered) {
       // The widget may have been removed already by one of the above remove() calls (e.g. by a remove listener)
@@ -775,12 +780,32 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   protected _addChild(child: Widget) {
     $.log.isTraceEnabled() && $.log.trace('addChild(' + child + ') to ' + this);
-    arrays.pushSet(this.children, child);
+    if (this._children.has(child)) {
+      return;
+    }
+    this._children.add(child);
+    this._childrenArray = null;
   }
 
   protected _removeChild(child: Widget) {
     $.log.isTraceEnabled() && $.log.trace('removeChild(' + child + ') from ' + this);
-    arrays.remove(this.children, child);
+    if (this._children.delete(child)) {
+      this._childrenArray = null;
+    }
+  }
+
+  /**
+   * The direct children of this widget.
+   *
+   * The children either have this widget as their {@link parent} or their {@link owner}, or both.
+   *
+   * The returned array is frozen and must not be modified. Create a copy if you need to modify it.
+   */
+  get children(): Widget[] {
+    if (!this._childrenArray) {
+      this._childrenArray = Object.freeze([...this._children]) as Widget[];
+    }
+    return this._childrenArray;
   }
 
   /**
@@ -927,15 +952,15 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
 
     let computedStateForChildren = scout.nvl(enabledComputedForChildren, enabledComputed);
-    this._childrenForEnabledComputed().forEach(child => {
+    for (const child of this._childrenForEnabledComputed()) {
       if (child.inheritAccessibility) {
         child.recomputeEnabled(computedStateForChildren);
       }
-    });
+    }
   }
 
-  protected _childrenForEnabledComputed(): Widget[] {
-    return this.children;
+  protected _childrenForEnabledComputed(): Iterable<Widget> {
+    return this._children;
   }
 
   protected _computeEnabled(inheritAccessibility: boolean, parentEnabled: boolean): boolean {
@@ -966,9 +991,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   setDisabledStyle(disabledStyle: DisabledStyle) {
     this.setProperty('disabledStyle', disabledStyle);
 
-    this.children.forEach(child => {
+    for (const child of this._children) {
       child.setDisabledStyle(disabledStyle);
-    });
+    }
   }
 
   protected _renderDisabledStyle() {
@@ -1412,10 +1437,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   protected _triggerChildrenOnAttach(parent: Widget) {
-    this.children.forEach(child => {
+    for (const child of this._children) {
       child._onAttach();
       child._triggerChildrenOnAttach(parent);
-    });
+    }
   }
 
   /**
@@ -1488,10 +1513,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   protected _triggerChildrenOnDetach() {
-    this.children.forEach(child => {
+    for (const child of this._children) {
       child._onDetach();
       child._triggerChildrenOnDetach();
-    });
+    }
   }
 
   /**
@@ -1631,9 +1656,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   protected _internalRemoveWidgets(widgets: Widget[]) {
     widgets = arrays.ensure(widgets);
-    widgets.forEach(widget => {
+    for (const widget of widgets) {
       widget.remove();
-    });
+    }
   }
 
   protected _callRenderProperty(propertyName: string) {
@@ -1655,7 +1680,9 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     }
 
     widgets = arrays.ensure(widgets);
-    widgets.forEach(child => child.setParent(this));
+    for (const widget of widgets) {
+      widget.setParent(this);
+    }
   }
 
   /**
@@ -1898,7 +1925,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return clone;
     }
     properties = arrays.ensure(properties);
-    properties.forEach(property => {
+    for (let property of properties) {
       property = this.adaptPropertyName(property);
       let propertyValue = this[property];
       let clonedProperty = null;
@@ -1923,7 +1950,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
         clonedProperty = propertyValue;
       }
       clone[property] = clonedProperty;
-    });
+    }
   }
 
   /**
@@ -2071,15 +2098,14 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     if (this.id === widgetId) {
       return this;
     }
-    let widgets = this.children.slice(); // list of widgets to check
-    while (widgets.length) {
-      let widget = widgets.shift();
+    let widgets = [...this._children]; // list of widgets to check
+    for (let i = 0; i < widgets.length; i++) {
+      let widget = widgets[i];
       if (widget.id === widgetId) {
         return widget; // found
       }
       if (deep) {
-        for (let i = 0; i < widget.children.length; i++) {
-          let child = widget.children[i];
+        for (const child of widget.children) {
           if (child.parent === widget) { // same check as in visitChildren()
             widgets.push(child);
           }
@@ -2408,10 +2434,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
-   * Visits every descendant of this widget in pre-order (top-down).<br>
+   * Visits every descendant of this widget in pre-order (top-down).
    * This widget itself is not visited! Only child widgets are visited recursively.
    *
-   * The children with a different parent are excluded.<br>
+   * The children with a different parent are excluded.
    * This makes sure the child is not visited twice if the owner and the parent are not the same
    * (in that case the widget would be in the children list of the owner and of the parent).
    *
@@ -2420,7 +2446,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    * @returns true if the visitor aborted the visiting, false if the visiting completed without aborting
    */
   visitChildren(visitor: TreeVisitor<Widget>): boolean | TreeVisitResult {
-    for (const child of this.children) {
+    for (const child of this._children) {
       if (child.parent !== this) {
         continue;
       }
