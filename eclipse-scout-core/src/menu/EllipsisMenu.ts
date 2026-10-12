@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -71,7 +71,7 @@ export class EllipsisMenu extends Menu implements EllipsisMenuModel {
     return super.isTabTarget() && !this.hidden;
   }
 
-  protected override _childrenForEnabledComputed(): Widget[] {
+  protected override _childrenForEnabledComputed(): Iterable<Widget> {
     return this.childActions;
   }
 }

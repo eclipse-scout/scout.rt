@@ -43,7 +43,7 @@ export class TableHeaderMenuGroup extends Widget implements TableHeaderMenuGroup
 
   protected override _addChild(child: Widget) {
     super._addChild(child);
-    this.tabbableCoordinator.setItems(this.children.filter(child => child instanceof TableHeaderMenuButton) as TableHeaderMenuButton[]);
+    this.tabbableCoordinator.setItems(this.children.filter(child => child instanceof TableHeaderMenuButton));
   }
 
   protected override _render() {
