@@ -5,7 +5,11 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 import {BenchColumn, Desktop, DesktopBench, Form} from '../../../src/index';
 import {FormSpecHelper, OutlineSpecHelper} from '../../../src/testing/index';
@@ -215,6 +219,88 @@ describe('DesktopBench', () => {
 
       setAlwaysRendered(false);
       expect(column.rendered).toBe(true);
+    });
+  });
+
+  describe('column visible', () => {
+    let bench: DesktopBench, westColumn: BenchColumn, centerColumn: BenchColumn, eastColumn: BenchColumn;
+
+    beforeEach(() => {
+      bench = desktop.bench;
+      westColumn = bench.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.LEFT];
+      centerColumn = bench.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.CENTER];
+      eastColumn = bench.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.RIGHT];
+    });
+
+    function createView(displayViewId: 'W' | 'C' | 'E'): Form {
+      let form = formHelper.createFormWithOneField();
+      form.displayViewId = displayViewId;
+      return form;
+    }
+
+    it('removes an invisible column even if it has views', () => {
+      bench.addView(createView('C'));
+      expect(centerColumn.rendered).toBe(true);
+
+      centerColumn.setVisible(false);
+      expect(centerColumn.rendered).toBe(false);
+      expect(bench.visibleColumns()).not.toContain(centerColumn);
+    });
+
+    it('removes an invisible column even if alwaysRendered is set', () => {
+      desktop.setProperty('benchLayoutData', {columns: [null, {alwaysRendered: true}, null]});
+      expect(centerColumn.rendered).toBe(true);
+
+      centerColumn.setVisible(false);
+      expect(centerColumn.rendered).toBe(false);
+
+      centerColumn.setVisible(true);
+      expect(centerColumn.rendered).toBe(true);
+      expect(centerColumn.isAlwaysRendered()).toBe(true);
+    });
+
+    it('leaves only the visible column without splitters', () => {
+      bench.addView(createView('W'));
+      bench.addView(createView('C'));
+      bench.addView(createView('E'));
+      expect(bench.getComponents().length).toBe(5);
+
+      westColumn.setVisible(false);
+      centerColumn.setVisible(false);
+      expect(bench.getComponents()).toEqual([eastColumn]);
+      expect(eastColumn.rendered).toBe(true);
+    });
+
+    it('renders the column with its views when it becomes visible again', () => {
+      let view = createView('C');
+      bench.addView(view);
+      centerColumn.setVisible(false);
+      expect(view.rendered).toBe(false);
+
+      centerColumn.setVisible(true);
+      expect(centerColumn.rendered).toBe(true);
+      expect(view.rendered).toBe(true);
+    });
+
+    it('keeps the splitters when the last view of an invisible column is removed', () => {
+      bench.addView(createView('W'));
+      bench.addView(createView('E'));
+      let view = createView('C');
+      bench.addView(view);
+      centerColumn.setVisible(false);
+      let components = bench.getComponents();
+      expect(components.length).toBe(3);
+
+      bench.removeView(view);
+      expect(centerColumn.rendered).toBe(false);
+      expect(bench.getComponents()).toBe(components);
+    });
+
+    it('does not render an invisible column when a view is added', () => {
+      centerColumn.setVisible(false);
+      bench.addView(createView('C'));
+      expect(centerColumn.viewCount()).toBe(1);
+      expect(centerColumn.rendered).toBe(false);
     });
   });
 });

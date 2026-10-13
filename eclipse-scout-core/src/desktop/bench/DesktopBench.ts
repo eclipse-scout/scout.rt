@@ -53,6 +53,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   protected _viewRemoveHandler: EventHandler<BenchColumnViewRemoveEvent>;
   protected _viewActivateHandler: EventHandler<BenchColumnViewActivateEvent>;
   protected _viewDeactivateHandler: EventHandler<BenchColumnViewDeactivateEvent>;
+  protected _columnVisibleChangeHandler: EventHandler<PropertyChangeEvent<boolean, BenchColumn>>;
 
   constructor() {
     super();
@@ -78,6 +79,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     this._viewRemoveHandler = this._onViewRemove.bind(this);
     this._viewActivateHandler = this._onViewActivate.bind(this);
     this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
+    this._columnVisibleChangeHandler = this._onColumnVisibleChange.bind(this);
   }
 
   static VIEW_MIN_HEIGHT = null; // Configured in sizes.css
@@ -159,6 +161,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       column.on('viewRemove', this._viewRemoveHandler);
       column.on('viewActivate', this._viewActivateHandler);
       column.on('viewDeactivate', this._viewDeactivateHandler);
+      column.on('propertyChange:visible', this._columnVisibleChangeHandler);
       this.columns.push(column);
     }
   }
@@ -344,11 +347,11 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     this._updateSplitterMovable();
   }
 
-  protected _updateRenderedColumns() {
+  protected _updateRenderedColumns(): boolean {
     let changed = false;
     this.columns.forEach(c => {
-      if (c.isAlwaysRendered() && !c.rendered) {
-        c.render();
+      if (c.needsRendering() && !c.rendered) {
+        this._renderColumn(c);
         changed = true;
       } else if (!c.needsRendering() && c.rendered) {
         c.remove();
@@ -358,6 +361,16 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     if (changed) {
       this._revalidateSplitters();
       this.updateFirstLastMarker();
+    }
+    return changed;
+  }
+
+  protected _syncRenderedColumns() {
+    if (!this.rendered) {
+      return;
+    }
+    if (this._updateRenderedColumns()) {
+      this._invalidateColumnLayout();
     }
   }
 
@@ -657,6 +670,20 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     event.preventDefault();
   }
 
+  protected _onColumnVisibleChange(event: PropertyChangeEvent<boolean, BenchColumn>) {
+    this._syncRenderedColumns();
+  }
+
+  protected _invalidateColumnLayout() {
+    if (this.changingCounter > 0) {
+      this.changed = true;
+      return;
+    }
+    let layout = this.htmlComp.layout as FlexboxLayout;
+    layout.reset();
+    this.htmlComp.invalidateLayoutTree();
+  }
+
   protected _onViewAdd(event: BenchColumnViewAddEvent) {
     this.trigger('viewAdd', {
       view: event.view
@@ -693,21 +720,7 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     let column = this._getColumn(view.displayViewId);
     this.tabBoxMap[view.id] = column;
     column.addView(view, activate);
-
-    if (this.rendered) {
-      if (column.viewCount() === 1 && !column.isAlwaysRendered()) {
-        this._renderColumn(column);
-        this._revalidateSplitters();
-        this.updateFirstLastMarker();
-        if (this.changingCounter > 0) {
-          this.changed = true;
-        } else {
-          let layout = this.htmlComp.layout as FlexboxLayout;
-          layout.reset();
-          this.htmlComp.invalidateLayoutTree();
-        }
-      }
-    }
+    this._syncRenderedColumns();
   }
 
   activateView(view: OutlineContent) {
@@ -748,18 +761,8 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       column.removeView(view, showSiblingView);
       this._removeViewInProgress--;
       delete this.tabBoxMap[view.id];
-      // remove if empty and not kept visible
-      if (this.rendered && !column.needsRendering() && this._removeViewInProgress === 0) {
-        column.remove();
-        this._revalidateSplitters();
-        this.updateFirstLastMarker();
-        if (this.changingCounter > 0) {
-          this.changed = true;
-        } else {
-          let layout = this.htmlComp.layout as FlexboxLayout;
-          layout.reset();
-          this.htmlComp.invalidateLayoutTree();
-        }
+      if (this._removeViewInProgress === 0) {
+        this._syncRenderedColumns();
       }
     }
   }
