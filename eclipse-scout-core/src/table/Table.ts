@@ -328,7 +328,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
      * When a row is checked the table-row is marked as checked. By default, a background
      * color is set on the table-row when the row is checked.
      */
-    TABLE_ROW: 'tableRow',
+    TABLE_ROW: 'table_row',
     /**
      * Like the CHECKBOX Style but a click anywhere on the row triggers the check.
      */
