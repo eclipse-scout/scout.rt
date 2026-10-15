@@ -873,8 +873,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
   /**
    * Closes the form and discards any unsaved changes.
    */
-  close(): Promise<void> {
-    return this.lifecycle.close();
+  close() {
+    this.lifecycle.close();
   }
 
   /**
