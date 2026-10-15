@@ -11,6 +11,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
+import ts from 'typescript';
 import tseslint from 'typescript-eslint';
 
 const baseRule = tseslint.plugin.rules['no-floating-promises'];
@@ -181,8 +182,10 @@ function isInstanceOf(type, className, checker) {
       continue;
     }
     visited.add(current);
-    if (current.isTypeParameter()) {
-      // e.g. polymorphic 'this' inside a class
+    if (current.flags & ts.TypeFlags.InstantiableNonPrimitive) {
+      // generic type, resolve its constraint, e.g.
+      // - polymorphic 'this' inside a class (type parameter)
+      // - this.widget('MyField') inside a class: WidgetMapOf<this>['MyField'] (indexed access) -> the type declared in the widget map
       queue.push(checker.getBaseConstraintOfType(current));
       continue;
     }
