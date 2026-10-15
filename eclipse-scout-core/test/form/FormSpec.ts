@@ -1320,10 +1320,9 @@ describe('Form', () => {
           expect(form.widget('savemenu').enabledComputed).toBe(false);
           expect(form.widget('searchmenu').enabledComputed).toBe(false);
 
-          return form.close().then(() => {
-            expect(session.desktop.activeForm).toBe(null);
-            done();
-          });
+          form.close();
+          expect(session.desktop.activeForm).toBe(null);
+          done();
         })
         .catch(fail);
     });
