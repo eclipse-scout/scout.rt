@@ -39,14 +39,6 @@ Workflow:
 2. Diff against it after each module; the goal is zero promise-related errors and no new errors.
 3. Also type-check downstream modules. Errors often surface in a module that consumes an unmigrated API rather than in the module that defines it.
 
-If `node_modules` symlinks are broken in your environment (e.g. they point to a Windows path that isn't mounted), don't give up on type-checking. Generate a throwaway tsconfig outside the repo that:
-
-- extends the project's base tsconfig,
-- maps every workspace package with `compilerOptions.paths` (`"@eclipse-scout/core": [".../eclipse-scout-core/src/index.ts"]`, `"<pkg>/testing"`, `"<pkg>/src/*"`, plus `jquery` → `@types/jquery`),
-- sets `typeRoots`/`types` for jquery and jasmine.
-
-Errors for missing third-party modules (TS2307) are expected in that setup and can be ignored.
-
 Besides `tsc`, lint with `@eclipse-scout/no-floating-promises` (enabled as a warning in `@eclipse-scout/eslint-config`). It finds asynchronous work nobody waits for, a class of bug the migration can expose in code that itself
 needs no change (§7b).
 
@@ -229,7 +221,8 @@ Keep in mind that the tracked state flips one microtask *after* settlement, whil
 In specs, don't track the state yourself. Use Jasmine's async matchers: `expect(promise.state()).toBe('pending')` becomes `await expectAsync(promise).toBePending()`, and `toBe('resolved')` / `toBe('rejected')` become
 `await expectAsync(promise).toBeResolved()` / `toBeRejected()`. Note that `toBeResolved()` waits for the promise, so it also replaces the wait that used to precede the state check.
 
-**Framework `Deferred` is not a thenable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
+**Framework `Deferred` is not a the
+nable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
 `spyOn(x, 'load').and.callFake(() => deferred.promise())` and `await deferred.promise()`. Awaiting the `Deferred` object itself resolves immediately with the object and doesn't wait for anything. Give it a precise type parameter (
 `new Deferred<string>()`), otherwise `resolve()` accepts anything and the returned promise is `Promise<unknown>`.
 
@@ -317,7 +310,8 @@ spec helpers now offer `sendQueuedAjaxCallsAsync(session)` for this.
 
 Native Promises trigger a global "unhandled rejection" error when nothing ever attaches a `.catch()`/`.then(_, onRejected)`/`.finally()`-with-rethrow to them — Karma/Jasmine treats this as a failing test. jQuery has no such mechanism at all, so every place a Promise-returning call's result was neither returned, stored, nor awaited was **silently swallowed under jQuery** and is now a genuine, loud failure. This is not a new bug you're introducing — it's a pre-existing gap the migration makes visible. Concrete places this shows up:
 
-- **Expected cancellations don't need local handling.** Aborting an in-flight lookup call rejects with `{abort: true}`, and widgets cancel chains with `AbortError`. Both are ignored by the global handler (§7a), so don't add local `.catch()`
+- **Expected cancellations don't need local handling.** Aborting an in-flight lookup call rejects with `{abort: true}`, an aborted `AjaxCall` with an `AjaxError` (`textStatus === 'abort'`), and widgets cancel chains with `AbortError`. All
+  of them are ignored by the global handler (§7a), so don't add local `.catch()`
   filters for them.
 - **Stray timers firing after a test (or the object) is gone.** A `setTimeout` scheduled by, say, a debounced "send" method can fire after the test ends and hit a partially torn-down mock, producing an unhandled rejection in an unrelated later test's `afterAll`. Any `destroy()`-style method should explicitly `clearTimeout` whatever it scheduled (check the base framework's own `Session.destroy()`/`HybridManager.destroy()`-equivalents for the pattern, and make sure your test teardown actually calls `destroy()`/cancels those timers between tests).
 - **A leftover ajax call executing after the test ends.** Make sure `jasmine.Ajax.install()`/`uninstall()` bracket every test that can trigger a request, so a request that fires later doesn't escape as a real network call.
@@ -343,18 +337,19 @@ Native Promises trigger a global "unhandled rejection" error when nothing ever a
   per-call-site error-handling boilerplate). Scout has a global unhandled-rejection handler analogous to its synchronous one (see §7a), so the correct migration is usually to **do nothing**: leave the rejection unhandled and let it surface.
   That's the notification, and it's exactly what the global handler is meant to catch. Ask the project owner before inventing a per-site reporting convention.
 
-### 7a. Expected cancellations (`AbortError`, `{abort: true}`) are ignored globally
+### 7a. Expected cancellations (`AbortError`, aborted `AjaxError`, `{abort: true}`) are ignored globally
 
 Much Scout code rejects *on purpose* to cancel the remainder of a chain:
 
 - `throw new AbortError()` when a widget was destroyed in the meantime (e.g. a `cancelIfDestroyed(widget)` utility called at the start of each `.then()` step), or error helpers that pass an `AbortError` on as a rejection to skip later
   `.then()`s;
 - `LookupCall.abort()` implementations reject with `{abort: true}` (`RestLookupCall`, `StaticLookupCall`, …).
+- `AjaxCall.abort()` (e.g. when a newer request supersedes a running one) rejects with an `AjaxError` with `textStatus === 'abort'`.
 
 jQuery silently dropped these at the end of every chain. Natively each one becomes an unhandled rejection, which in a real test run means hundreds of `Unhandled promise rejection: [object Object] thrown ... in afterAll` errors. **Don't add
 a per-site abort filter to every chain end.** The framework handles this centrally:
 
-- `ErrorHandler.isIgnorableRejection(reason)` returns `true` for `AbortError` and `{abort: true}`.
+- `ErrorHandler.isIgnorableRejection(reason)` returns `true` for `AbortError`, an `AjaxError` with `textStatus === 'abort'` and `{abort: true}`.
 - `App._installErrorHandler()` registers `errorHandler.unhandledRejectionHandler` for `unhandledrejection`, and it calls `preventDefault()` for ignorable rejections.
 - In Karma/Jasmine the app's handlers are not installed (`TestingApp` overrides `_installErrorHandler()`), and Jasmine fails the spec on any unhandled rejection. Jasmine's own listener is registered when its env boots, before any spec or
   app code runs. So a listener added later can't stop it, not even with `stopImmediatePropagation()`, and in the reference migration a capture-phase listener didn't work either. The solution:
@@ -472,7 +467,9 @@ request.finally(() => {
     - the property a lookup finally writes: `smartField.when('propertyChange:displayText')`, `column.when('propertyChange:text')`;
     - custom widget events the production code triggers at the end of a flow, e.g. `widget.when('valueApplied')`; or the value a flow restores, e.g. `field.when('propertyChange:value')`;
     - keep it plain: write the `when(...)` inline in the spec. Don't add wrapper helpers or "already resolved?" guards around it unless a spec actually needs one;
-    - **when to register the listener:** *before* the action if the event can fire during it (e.g. `const p = widget.when('valueApplied'); formSpecHelper.closeMessageBoxes(MessageBox.Buttons.YES); await p;`). But register it *after* a
+    - **when to register the listener:** usually *after* the action, inline: `form.open(); await table.when('rowsInserted');`. This works whenever the event fires asynchronously (after an ajax response, a lookup or
+      an async handler), and needs no variable. Register it *before* the action only if the event can fire synchronously during the call, and only then keep the promise in a variable (e.g.
+      `const p = widget.when('valueApplied'); formSpecHelper.closeMessageBoxes(MessageBox.Buttons.YES); await p;`). Also register it *after* a
       synchronous call that fires
       an unrelated early change of the same property. E.g. a type switch first clears a smart field (`displayText` → `''`) and the lookup sets the real text later, so call `setValue()` first, then
       `await field.when('propertyChange:displayText')`;

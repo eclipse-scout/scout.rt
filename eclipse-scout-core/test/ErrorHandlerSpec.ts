@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ErrorDo, ErrorHandler, ErrorInfo, LogLevel, MessageBox, MessageBoxModel, ModelOf, scout, Session, Status} from '../src/index';
+import {AbortError, AjaxError, ErrorDo, ErrorHandler, ErrorInfo, LogLevel, MessageBox, MessageBoxModel, ModelOf, scout, Session, Status} from '../src/index';
 
 describe('ErrorHandler', () => {
 
@@ -29,6 +29,21 @@ describe('ErrorHandler', () => {
       return super._severityToLogLevel(severity);
     }
   }
+
+  describe('isIgnorableRejection', () => {
+    it('returns true for expected cancellations', () => {
+      expect(errorHandler.isIgnorableRejection(new AbortError())).toBeTrue();
+      expect(errorHandler.isIgnorableRejection(new AjaxError({jqXHR: null, textStatus: 'abort', errorThrown: null, requestOptions: null}))).toBeTrue();
+      expect(errorHandler.isIgnorableRejection({abort: true})).toBeTrue();
+    });
+
+    it('returns false for other errors', () => {
+      expect(errorHandler.isIgnorableRejection(new AjaxError({jqXHR: null, textStatus: 'error', errorThrown: null, requestOptions: null}))).toBeFalse();
+      expect(errorHandler.isIgnorableRejection(new Error('abort'))).toBeFalse();
+      expect(errorHandler.isIgnorableRejection({abort: false})).toBeFalse();
+      expect(errorHandler.isIgnorableRejection(undefined)).toBeFalsy();
+    });
+  });
 
   describe('handle', () => {
     it('accepts individually passed arguments', () => {

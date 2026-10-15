@@ -188,8 +188,15 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     return message && message.toLowerCase().indexOf('script error') > -1 && !fileName && !lineNumber && !columnNumber && !error;
   }
 
-  isIgnorableRejection(reason: any) {
-    return reason instanceof AbortError || objects.isPojo(reason) && reason.abort;
+  /**
+   * @returns true if the given rejection reason is an expected cancellation that does not need to be reported:
+   * an {@link AbortError}, an {@link AjaxError} of an aborted request (`textStatus === 'abort'`, e.g. a superseded {@link AjaxCall}) or `{abort: true}` (aborted lookup calls).
+   */
+  isIgnorableRejection(reason: any): boolean {
+    return reason instanceof AbortError
+      // TODO CGU Should AjaxCall create the AbortError?
+      || reason instanceof AjaxError && reason.textStatus === 'abort'
+      || objects.isPojo(reason) && reason.abort;
   }
 
   /**
