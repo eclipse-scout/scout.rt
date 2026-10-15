@@ -105,14 +105,15 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
 
         // 2. check if save is required
         if (!this.saveNeeded()) {
-          return this.close();
+          this.close();
+          return;
         }
 
         // 3. perform save operation
         return this._save()
           .then(() => {
             this.markAsSaved();
-            return this.close();
+            this.close();
           });
       });
   }
@@ -125,14 +126,15 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
         this._okAfterAskIfSaveNeeded.bind(this),
         this.close.bind(this));
     }
-    return this.close();
+    this.close();
+    return $.resolvedPromise();
   }
 
   protected _okAfterAskIfSaveNeeded(): Promise<void> {
     return this.ok();
   }
 
-  protected _showYesNoCancelMessageBox(message: string, yesAction: () => Promise<void>, noAction: () => Promise<void>): Promise<void> {
+  protected _showYesNoCancelMessageBox(message: string, yesAction: () => Promise<void>, noAction: () => Promise<void> | void): Promise<void> {
     return MessageBoxes.createYesNoCancel(this.widget)
       .withHeader(message)
       .buildAndOpen()
@@ -155,13 +157,12 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     });
   }
 
-  close(): Promise<void> {
-    return this._close();
+  close() {
+    this._close();
   }
 
-  protected _close(): Promise<void> {
+  protected _close() {
     this.trigger('close');
-    return $.resolvedPromise();
   }
 
   save(): Promise<void> {
