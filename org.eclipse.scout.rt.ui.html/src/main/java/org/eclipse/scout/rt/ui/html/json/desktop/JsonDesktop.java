@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.DownloadHttpResponseInterceptor;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -476,6 +477,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   protected void handleModelPropertyChange(String propertyName, Object oldValue, Object newValue) {
     if (IDesktop.PROP_THEME.equals(propertyName)) {
       getUiSession().updateTheme((String) newValue);
+    }
+    if (IDesktop.PROP_ENFORCED_DEVICE_TYPE.equals(propertyName)) {
+      getUiSession().updateEnforcedDeviceType((IUiDeviceType) newValue);
     }
   }
 

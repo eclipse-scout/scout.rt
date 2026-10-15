@@ -241,7 +241,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
     boolean platformValid = (Platform.get() != null && Platform.get().getState() == State.PlatformStarted);
     if (platformValid && jsonReq.getRequestType() == RequestType.POLL_REQUEST) {
-      writeJsonResponse(resp, m_jsonRequestHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl()));
+      writeJsonResponse(resp, m_jsonRequestHelper.createSessionTerminatedResponse(uiSession.getLogoutRedirectUrl(), uiSession.getClientSession().getExitCode()));
     }
     else {
       writeJsonResponse(resp, m_jsonRequestHelper.createSessionTimeoutResponse());
