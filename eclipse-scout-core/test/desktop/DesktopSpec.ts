@@ -32,6 +32,10 @@ describe('Desktop', () => {
     desktop.viewButtons = [];
   });
 
+  afterEach(() => {
+    jasmine.clock().uninstall();
+  });
+
   describe('notification', () => {
     let ntfc: DesktopNotification, parent = new Widget();
 
@@ -189,8 +193,8 @@ describe('Desktop', () => {
       expect(desktop.bench.rendered).toBe(true);
     });
 
-    it('removes the content after the animation', () => {
-      jasmine.clock().install();
+    it('removes the content after the animation', async () => {
+      $('<style>.desktop-bench.animate-remove {animation: nop; animation-duration: 50ms</style>').appendTo($('#sandbox'));
       let form = formHelper.createFormWithOneField();
       let tabBox = desktop.bench.getTabBox('C');
       form.displayHint = Form.DisplayHint.VIEW;
@@ -211,15 +215,10 @@ describe('Desktop', () => {
       expect(form._rendered).toBe(true);
       expect(form.parent).toBe(tabBox);
 
-      // trigger actual remove
-      jasmine.clock().tick(0);
-      desktop.bench.removalPending = false;
-      desktop.bench._removeInternal();
+      await (desktop.bench.when('remove'));
       expect(desktop.bench).toBeFalsy();
       expect(form.rendered).toBe(false);
-      jasmine.clock().uninstall();
     });
-
   });
 
   describe('navigationVisible', () => {
@@ -1683,8 +1682,8 @@ describe('Desktop', () => {
         expect(desktop.headerVisible).toBe(true);
       });
 
-      it('opens the bench again if a view is shown right after the last view was closed', () => {
-        jasmine.clock().install();
+      it('opens the bench again if a view is shown right after the last view was closed', async () => {
+        $('<style>.desktop-bench.animate-remove {animation: nop; animation-duration: 50ms</style>').appendTo($('#sandbox'));
         let form = formHelper.createViewWithOneField();
         let form2 = formHelper.createViewWithOneField();
         expect(form.rendered).toBe(false);
@@ -1701,13 +1700,11 @@ describe('Desktop', () => {
         form.close();
         desktop.showForm(form2);
         expect(desktop.bench.removalPending).toBe(true);
-        jasmine.clock().tick(0);
-        desktop.bench.$container.trigger('animationend');
-        jasmine.clock().tick(0);
+
+        await form2.when('render');
         expect(form2.rendered).toBe(true);
         expect(desktop.navigationVisible).toBe(false);
         expect(desktop.benchVisible).toBe(true);
-        jasmine.clock().uninstall();
       });
 
       it('hides bench and shows navigation if the last view gets closed', () => {
@@ -2685,10 +2682,6 @@ describe('Desktop', () => {
   });
 
   describe('overlays', () => {
-
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
 
     it('displays tooltips behind popups', () => {
       jasmine.clock().install();

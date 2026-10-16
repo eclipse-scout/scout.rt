@@ -914,17 +914,41 @@ $.fn.oneAnimationEnd = function(handler) {
   if (!handler) {
     return this;
   }
-  let oneHandler = event => {
-    if (event.target !== this[0]) {
-      // Ignore events that bubble up from child elements
-      return;
+
+  const element = this[0];
+  if (!element) {
+    // Not attached
+    return this;
+  }
+
+  const activeAnimations = element.getAnimations();
+  if (activeAnimations.length > 0) {
+    // Wait for the animation.finished promise instead of listening for the animationend event
+    // This has multiple advantages:
+    // - We do not have to ignore events bubbling from children
+    // - We do not have to deregister a listener to create 'execute once' semantic
+    // - It even works when having a breakpoint in the DevTools when the animation runs.
+    //   This does not work when using an animationend event because Chrome won't trigger the animationend event even when resuming because the time has already elapsed.
+    Promise.all(activeAnimations.map(animation => animation.finished))
+      .then(() => handler(new Event('animationend')))
+      .catch(() => handler(new Event('animationcancel')));
+  } else {
+    // If there is no animation running, check if there is an animation defined.
+    // If there is one, we assume
+    // - the animation has already run (can happen when having a breakpoint at oneAnimationEnd right after the animation class was added)
+    // - or the animation was disabled by setting duration to 0s
+    const computedStyle = window.getComputedStyle(element);
+    const hasAnimation = computedStyle.animationName !== 'none';
+    if (hasAnimation) {
+      // Don't call the handler immediately to prevent endless loops
+      // e.g. if oneAnimationEnd is called if an element has an animate-class which would be removed by another animationEnd callback which has not been called yet
+      setTimeout(() => {
+        handler(new Event('animationend'));
+      });
     }
-    // Unregister listener to implement "one" semantics
-    this.off('animationend webkitAnimationEnd', oneHandler);
-    // Notify actual event handler
-    handler(event);
-  };
-  return this.on('animationend webkitAnimationEnd', oneHandler);
+  }
+
+  return this;
 };
 
 $.fn.hasAnimationClass = function() {
@@ -1361,9 +1385,6 @@ $.fn.removeAnimated = function(cssClass, callback) {
     // Remove without animation
     this.remove();
     callback && callback.call(this);
-  } else if (!Device.get().supportsCssAnimation()) {
-    // Cannot remove animated, remove with jQuery.fadeOut()
-    this.fadeOutAndRemove(callback);
   } else {
     // Add CSS class and wait for 'animationend' event
     this.addClass(cssClass || 'animate-remove');
