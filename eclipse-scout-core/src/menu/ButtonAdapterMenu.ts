@@ -101,7 +101,7 @@ export class ButtonAdapterMenu extends Menu implements ButtonAdapterMenuModel {
     menuProperties = menuProperties || {};
 
     // Plain properties: simply copy, no translation required
-    ['visible', 'selected', 'tooltipText', 'keyStroke', 'keyStrokes', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility', 'stackable', 'shrinkable'].forEach(prop => {
+    ['visible', 'selected', 'tooltipText', 'tooltipHtmlEnabled', 'keyStroke', 'keyStrokes', 'cssClass', 'modelClass', 'classId', 'iconId', 'preventDoubleClick', 'enabled', 'inheritAccessibility', 'stackable', 'shrinkable'].forEach(prop => {
       menuProperties[prop] = buttonProperties[prop];
     });
 
