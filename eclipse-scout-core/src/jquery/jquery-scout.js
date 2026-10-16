@@ -914,17 +914,39 @@ $.fn.oneAnimationEnd = function(handler) {
   if (!handler) {
     return this;
   }
+
   let oneHandler = event => {
     if (event.target !== this[0]) {
       // Ignore events that bubble up from child elements
       return;
     }
     // Unregister listener to implement "one" semantics
-    this.off('animationend webkitAnimationEnd', oneHandler);
+    // Also listen for animationcancel which can fire if one of the following happens while the animation runs
+    // - The element is made invisible
+    // • The animation class is removed
+    // • The animation-name property is changed to none
+    this.off('animationend animationcancel', oneHandler);
     // Notify actual event handler
     handler(event);
   };
-  return this.on('animationend webkitAnimationEnd', oneHandler);
+  this.on('animationend animationcancel', oneHandler);
+
+  if (!this[0]) {
+    // Not attached
+    return this;
+  }
+
+  // If there are no active animations trigger a synthetic event to call the handlers immediately.
+  // This may happen if the animation was disabled (e.g. by setting animation-name: none).
+  // Or if a breakpoint is set in the DevTools after adding the animation class.
+  // In that case, Chrome won't trigger the animationend event even when resuming because the time has already elapsed.
+  if (!this[0].getAnimations().length) {
+    // Manually dispatch the event to trigger the handlers (the one above but there may be others attached as well)
+    this[0].dispatchEvent(new Event('animationend'));
+    return this;
+  }
+
+  return this;
 };
 
 $.fn.hasAnimationClass = function() {
