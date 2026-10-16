@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -275,7 +275,8 @@ describe('DesktopNotification', () => {
         grantPermission();
       });
 
-      it('destroying the notification also destroys the native one', done => {
+      it('destroying the notification also destroys the native one', async () => {
+        $('<style>.desktop-notification-fade-out {animation: nop; animation-duration: 50ms</style>').appendTo($('#sandbox'));
         let notification = scout.create(DesktopNotification, {
           parent: parent,
           nativeNotificationVisibility: 'always',
@@ -283,25 +284,20 @@ describe('DesktopNotification', () => {
         });
 
         notification.show();
+        await sleep(); // Wait for permission, see DesktopNotification._initNativeNotification
+        expect(notification.destroyed).toBe(false);
+        expect(notification.session.desktop.notifications.length).toBe(1);
+        expect(notification.nativeNotification).not.toBeNull();
+        expect(notification.nativeNotification.body).toBe('bar');
 
-        setTimeout(() => {
-          expect(notification.destroyed).toBe(false);
-          expect(notification.session.desktop.notifications.length).toBe(1);
-          expect(notification.nativeNotification).not.toBeNull();
-          expect(notification.nativeNotification.body).toBe('bar');
+        spyOn(notification.nativeNotification, 'close').and.callThrough();
+        notification.hide();
 
-          spyOn(notification.nativeNotification, 'close').and.callThrough();
-          notification.hide();
-          notification.$container.trigger('animationend');
-        }, 10);
-
-        setTimeout(() => {
-          expect(notification.destroyed).toBe(true);
-          expect(notification.session.desktop.notifications.length).toBe(0);
-          // Close event handler is not triggered on Chrome Headless, so notification.nativeNotification won't be set to null. Looks like a Chrome bug
-          expect(notification.nativeNotification.close).toHaveBeenCalled();
-          done();
-        }, 20);
+        await notification.when('destroy'); // Wait for fade-out animation
+        expect(notification.destroyed).toBe(true);
+        expect(notification.session.desktop.notifications.length).toBe(0);
+        // Close event handler is not triggered on Chrome Headless, so notification.nativeNotification won't be set to null. Looks like a Chrome bug
+        expect(notification.nativeNotification.close).toHaveBeenCalled();
       });
 
       it('native notification is destroyed later if duration is > 0, along with the regular notification', done => {
