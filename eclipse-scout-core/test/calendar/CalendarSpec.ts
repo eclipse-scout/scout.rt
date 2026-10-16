@@ -654,12 +654,12 @@ describe('Calendar', () => {
 
     const createCalendarResource = (name = 'Test calendar', visible = true, selectable = true): CalendarResourceDo => {
       let resourceId = UuidPool.take(session);
-      return {
+      return scout.create(CalendarResourceDo, {
         resourceId: resourceId,
         name: name,
         visible: visible,
         selectable: selectable
-      };
+      });
     };
 
     const getCurrentResourceIdFor = (comp: CalendarComponent): string | number => {
