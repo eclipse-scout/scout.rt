@@ -587,6 +587,32 @@ describe('SmartField', () => {
       expect(field.lookupStatus).toBe(null);
     });
 
+    it('stays loading until the current lookup is done if the previous one is aborted', async () => {
+      let field = createFieldWithLookupCall({}, {
+        delay: 100
+      });
+      let abortedLookup = field._executeLookup(field.lookupCall.cloneForAll(), true);
+      let currentLookup = field._executeLookup(field.lookupCall.cloneForAll(), true); // aborts the first lookup
+
+      await expectAsync(abortedLookup).toBeRejected();
+      expect(field.loading).toBe(true);
+
+      await currentLookup;
+      expect(field.loading).toBe(false);
+    });
+
+    it('stops loading if the running lookup is aborted without starting a new one', async () => {
+      let field = createFieldWithLookupCall({}, {
+        delay: 100
+      });
+      let abortedLookup = field._executeLookup(field.lookupCall.cloneForAll(), true);
+      expect(field.loading).toBe(true);
+
+      field.setValue(null); // aborts the running lookup, null does not need a lookup by key
+      await expectAsync(abortedLookup).toBeRejected();
+      expect(field.loading).toBe(false);
+    });
+
     /**
      * The hierarchical result contains 2 lookup-rows, but only leafs are counted when the numLookupRows
      * property is set which is used to determine whether or not the result is unqiue.

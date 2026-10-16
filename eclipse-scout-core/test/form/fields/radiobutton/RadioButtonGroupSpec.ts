@@ -218,6 +218,27 @@ describe('RadioButtonGroup', () => {
       expect(radioButtonGroup.selectedButton.lookupRow.key).toBe(2);
     });
 
+    it('stays loading until the current lookup is done if the previous one is aborted', async () => {
+      let radioButtonGroup = scout.create(RadioButtonGroup, {
+        parent: session.desktop,
+        lookupCall: {
+          objectType: DummyLookupCall,
+          delay: 100
+        }
+      });
+      radioButtonGroup.setValue(2); // starts the first lookup
+      radioButtonGroup.render(); // starts the second lookup and aborts the first one
+
+      await sleep(20); // the aborted lookup has settled, the current one is still running
+      expect(radioButtonGroup.loading).toBe(true);
+      expect(radioButtonGroup.radioButtons.length).toBe(0);
+
+      await radioButtonGroup.when('lookupCallDone');
+      expect(radioButtonGroup.loading).toBe(false);
+      expect(radioButtonGroup.radioButtons.length).toBe(3);
+      expect(radioButtonGroup.selectedButton.radioValue).toBe(2);
+    });
+
   });
 
   describe('setValue', () => {
