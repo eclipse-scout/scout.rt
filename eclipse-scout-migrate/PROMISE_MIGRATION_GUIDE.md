@@ -112,6 +112,19 @@ await Promise.reject('abc')
 ```
 If code depends on multiple independent failure handlers all seeing the rejection, don't chain `.catch()`s — attach them all directly to the *original* promise instead (`promise.catch(a); promise.catch(b);`), or consolidate into one handler.
 
+For the same reason, a `.fail()` on a chain that is returned or used further can't become a plain `.catch()`. `.fail()` only observed the rejection and the returned promise stayed rejected, while `.catch()` without a rethrow
+resolves it, so callers suddenly see a success:
+
+```ts
+// before: reset on failure, the caller still gets the rejection
+return super._handleSaveErrorInternal(error).fail(() => this.reset());
+// now: rethrow to keep the promise rejected
+return super._handleSaveErrorInternal(error).catch(handledError => {
+  this.reset();
+  throw handledError;
+});
+```
+
 **c) `.finally()` receives no arguments; `.always()` receives the resolved/rejected value.** This is easy to miss because both look like "run regardless of outcome" callbacks. Any `.always(fn)` where `fn` actually reads its argument needs that logic moved into `.then()`/`.catch()` — it cannot become `.finally(fn)` unchanged. Watch especially for a *bound* function passed to `.always()`, where the promise's value becomes an extra trailing argument:
 ```js
 // original:
@@ -182,7 +195,10 @@ jQuery's `deferred.resolve(a, b, c)` supports multiple arguments; native `Promis
 
 - `$.when(this._asyncMethod())`, typically used to turn an `async` function's native Promise into a jQuery promise for an override: drop the wrapper and return the promise directly.
 - `$.when(...promises)` used as "wait for all": use `Promise.all(promises).then(() => undefined)` when the result is `Promise<void>`, or destructure the array if the values are used (§4).
-- `$.when(value)` with a non-promise value: `Promise.resolve(value)` / `$.resolvedPromise(value)`.
+- `$.when(value)` with a non-promise value: `$.resolvedPromise(value)` (or `Promise.resolve(value)`).
+
+Existing `$.resolvedPromise()`, `$.rejectedPromise()` and `$.promiseAll()` calls already return native promises. Keep them, don't replace them with `Promise.resolve()`, `Promise.reject()` or `Promise.all()`: it only
+enlarges the diff. The only change they may need is the callback arity of `$.promiseAll()` (§4).
 
 ## 5. `promise.state()` / `deferred.state()` don't exist on native Promise
 
@@ -222,9 +238,10 @@ Keep in mind that the tracked state flips one microtask *after* settlement, whil
 In specs, don't track the state yourself. Use Jasmine's async matchers: `expect(promise.state()).toBe('pending')` becomes `await expectAsync(promise).toBePending()`, and `toBe('resolved')` / `toBe('rejected')` become
 `await expectAsync(promise).toBeResolved()` / `toBeRejected()`. Note that `toBeResolved()` waits for the promise, so it also replaces the wait that used to precede the state check.
 
-**Framework `Deferred` is not a the
-nable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
-`spyOn(x, 'load').and.callFake(() => deferred.promise())` and `await deferred.promise()`. Awaiting the `Deferred` object itself resolves immediately with the object and doesn't wait for anything. Give it a precise type parameter (
+**Framework `Deferred` is not a thenable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
+`spyOn(x, 'load').and.callFake(() => deferred.promise())` and `await deferred.promise()`. Awaiting the `Deferred` object itself resolves immediately with the object and doesn't wait for anything. The same applies to
+`Promise.resolve(deferred)`: it used to adopt the state of a jQuery Deferred (e.g. to hand a native promise to a third-party API), now it resolves immediately with the `Deferred` object. Replace it with `deferred.promise()`.
+Give it a precise type parameter (
 `new Deferred<string>()`), otherwise `resolve()` accepts anything and the returned promise is `Promise<unknown>`.
 
 Native typings are stricter in other places too. For example, `new Deferred<ArrayBuffer>()` resolved with `fileReader.result` needs a cast (`fileReader.result as ArrayBuffer`), because `result` is typed `string | ArrayBuffer`.
@@ -461,7 +478,9 @@ request.finally(() => {
   - an `await` on the returned promise or on an event the framework already fires. There usually is one, so look for it before inventing a mechanism:
     - message box opened: `await session.desktop.when('propertyChange:messageBoxes')`, or `await form.when('propertyChange:messageBoxes')` if the form is the message box's display parent;
     - the promise the action itself returns: `await form.lifecycle.ok()`, `await form.lifecycle.cancel()`, `await form.load()`, instead of calling it and then waiting for a guessed number of ticks;
-    - form lifecycle: `form.whenClose()`, `form.whenLoad()`, `form.whenSave()`;
+    - form lifecycle: `form.whenClose()`, `form.whenLoad()`, `form.whenSave()`. Note that `form.whenSave()` resolves on the `save` event, before the rest of the save chain has run (e.g. requests sent in
+      `_save().then(...)`). So `form.save(); await form.whenSave();` lets the spec end while those requests are still pending, they are sent after `jasmine.Ajax.uninstall()` and fail. Use `await form.save()` if the spec
+      doesn't need to act in between;
     - page child loading: `await page._loadChildrenPromise` of the page whose children are being loaded (it's only set while a load is in progress). Calling `ensureLoadChildren()` would trigger a load itself;
     - pending/resolved checks: `await expectAsync(promise).toBePending()` / `.toBeResolved()` (§5);
     - any property: `widget.when('propertyChange:xyz')`. This also works on non-widgets that are a `PropertyEventEmitter`, e.g. a table `Column` (`column.when('propertyChange:text')`);
