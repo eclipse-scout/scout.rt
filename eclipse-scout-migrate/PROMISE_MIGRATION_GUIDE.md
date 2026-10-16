@@ -112,6 +112,19 @@ await Promise.reject('abc')
 ```
 If code depends on multiple independent failure handlers all seeing the rejection, don't chain `.catch()`s — attach them all directly to the *original* promise instead (`promise.catch(a); promise.catch(b);`), or consolidate into one handler.
 
+For the same reason, a `.fail()` on a chain that is returned or used further can't become a plain `.catch()`. `.fail()` only observed the rejection and the returned promise stayed rejected, while `.catch()` without a rethrow
+resolves it, so callers suddenly see a success:
+
+```ts
+// before: reset on failure, the caller still gets the rejection
+return super._handleSaveErrorInternal(error).fail(() => this.reset());
+// now: rethrow to keep the promise rejected
+return super._handleSaveErrorInternal(error).catch(handledError => {
+  this.reset();
+  throw handledError;
+});
+```
+
 **c) `.finally()` receives no arguments; `.always()` receives the resolved/rejected value.** This is easy to miss because both look like "run regardless of outcome" callbacks. Any `.always(fn)` where `fn` actually reads its argument needs that logic moved into `.then()`/`.catch()` — it cannot become `.finally(fn)` unchanged. Watch especially for a *bound* function passed to `.always()`, where the promise's value becomes an extra trailing argument:
 ```js
 // original:
@@ -182,7 +195,10 @@ jQuery's `deferred.resolve(a, b, c)` supports multiple arguments; native `Promis
 
 - `$.when(this._asyncMethod())`, typically used to turn an `async` function's native Promise into a jQuery promise for an override: drop the wrapper and return the promise directly.
 - `$.when(...promises)` used as "wait for all": use `Promise.all(promises).then(() => undefined)` when the result is `Promise<void>`, or destructure the array if the values are used (§4).
-- `$.when(value)` with a non-promise value: `Promise.resolve(value)` / `$.resolvedPromise(value)`.
+- `$.when(value)` with a non-promise value: `$.resolvedPromise(value)` (or `Promise.resolve(value)`).
+
+Existing `$.resolvedPromise()`, `$.rejectedPromise()` and `$.promiseAll()` calls already return native promises. Keep them, don't replace them with `Promise.resolve()`, `Promise.reject()` or `Promise.all()`: it only
+enlarges the diff. The only change they may need is the callback arity of `$.promiseAll()` (§4).
 
 ## 5. `promise.state()` / `deferred.state()` don't exist on native Promise
 
@@ -191,26 +207,14 @@ There is no synchronous way to query whether a native `Promise` is pending/resol
 When the promise comes from somewhere else (e.g. an ajax call), track the state explicitly. Guard the update with an identity check (§8) so a superseded promise can't overwrite the state of the current one:
 
 ```ts
-protected
-_trackState(promise
-:
-Promise<void>
-)
-{
+protected _trackState(promise: Promise<void>) {
   this._promiseState = 'pending';
   promise.then(
     () => this._updateState(promise, 'resolved'),
     () => this._updateState(promise, 'rejected')); // error is reported by the main chain
 }
 
-protected
-_updateState(promise
-:
-Promise<void>, state
-:
-'resolved' | 'rejected'
-)
-{
+protected _updateState(promise: Promise<void>, state: 'resolved' | 'rejected') {
   if (this._currentPromise === promise) {
     this._promiseState = state;
   }
@@ -222,9 +226,10 @@ Keep in mind that the tracked state flips one microtask *after* settlement, whil
 In specs, don't track the state yourself. Use Jasmine's async matchers: `expect(promise.state()).toBe('pending')` becomes `await expectAsync(promise).toBePending()`, and `toBe('resolved')` / `toBe('rejected')` become
 `await expectAsync(promise).toBeResolved()` / `toBeRejected()`. Note that `toBeResolved()` waits for the promise, so it also replaces the wait that used to precede the state check.
 
-**Framework `Deferred` is not a the
-nable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
-`spyOn(x, 'load').and.callFake(() => deferred.promise())` and `await deferred.promise()`. Awaiting the `Deferred` object itself resolves immediately with the object and doesn't wait for anything. Give it a precise type parameter (
+**Framework `Deferred` is not a thenable.** A jQuery Deferred *was* a promise, so code could return or await the deferred itself. The core `Deferred` is a separate holder object. Always hand out `deferred.promise()`, e.g.
+`spyOn(x, 'load').and.callFake(() => deferred.promise())` and `await deferred.promise()`. Awaiting the `Deferred` object itself resolves immediately with the object and doesn't wait for anything. The same applies to
+`Promise.resolve(deferred)`: it used to adopt the state of a jQuery Deferred (e.g. to hand a native promise to a third-party API), now it resolves immediately with the `Deferred` object. Replace it with `deferred.promise()`.
+Give it a precise type parameter (
 `new Deferred<string>()`), otherwise `resolve()` accepts anything and the returned promise is `Promise<unknown>`.
 
 Native typings are stricter in other places too. For example, `new Deferred<ArrayBuffer>()` resolved with `fileReader.result` needs a cast (`fileReader.result as ArrayBuffer`), because `result` is typed `string | ArrayBuffer`.
@@ -331,9 +336,11 @@ Native Promises trigger a global "unhandled rejection" error when nothing ever a
   await rejected; // await later
   ```
 
-**Don't reach for a bare `.catch(() => {})` / `.then(fn, () => {})` as the default fix for a fire-and-forget call site (typical for UI event handlers where nobody awaits the result).** That was jQuery's actual behavior — silently dropping the error — and reproducing it mechanically throws away exactly the diagnostic value native Promise gives you over jQuery. Before adding a no-op guard, decide which of these two cases you're in:
+**Don't add a bare `.catch(() => {})` / `.then(fn, () => {})` to a fire-and-forget call site (typical for UI event handlers where nobody awaits the result).** That was jQuery's actual behavior — silently dropping the error — and reproducing it mechanically throws away exactly the diagnostic value native Promise gives you over jQuery. This holds in both of these cases:
 
-- **The error is already reported somewhere in the call chain** (e.g. an inner call already goes through the framework's `ErrorHandler`, or an event that already gets to a caller that handles it, before rethrowing/settling as rejected). Here an empty guard purely to prevent an unhandled-rejection failure is fine — add a one-line comment saying so, so the next reader doesn't mistake it for a silent swallow.
+- **The called method already reported the error itself** (e.g. an `openForm()` helper that shows a message box or calls the `ErrorHandler`, and then rejects anyway). Callers must not have to handle errors the called method created, so don't
+  guard the call sites. The method is the problem: it should either not reject after handling the error, or leave the error to the global handler instead of handling it itself. Leave the call sites unchanged and report the method
+  to the project owner, who decides which way to go.
 - **There is genuinely no other reporting path.** Don't paper over this with a local `.catch(error => someErrorHandler.handle(error))` at every call site either. That just trades one form of clutter (silent swallow) for another (
   per-call-site error-handling boilerplate). Scout has a global unhandled-rejection handler analogous to its synchronous one (see §7a), so the correct migration is usually to **do nothing**: leave the rejection unhandled and let it surface.
   That's the notification, and it's exactly what the global handler is meant to catch. Ask the project owner before inventing a per-site reporting convention.
@@ -364,7 +371,7 @@ Real errors are unaffected and still fail the spec.
 
 ### 7b. Async work started in a synchronous lifecycle step
 
-A floating promise is not only an error-handling problem. It also means **nobody can wait for that work**. This is dangerous in synchronous lifecycle hooks like `Form.importData()`, `exportData()` or `_postLoad()`, when they start
+A floating promise is not only an error-handling problem. It also means **nobody can wait for that work**. This is dangerous in lifecycle hooks like `Form.importData()`, `exportData()` or `_postLoad()`, when they start
 asynchronous work (a lookup, a table reload, `_applyValue()`) and drop its promise. The lifecycle then continues, e.g. `FormLifecycle` calls `markAsSaved()` after loading, while the work is still running. When it finishes, it changes
 field values again, and the form ends up with a wrong `saveNeeded` state (or a missing value, a wrong enabled state, …).
 
@@ -385,26 +392,27 @@ Natively, the lifecycle continues as microtasks and overtakes the lookup. Nothin
 
   Triage the remaining findings by the method they are in:
   - inside a lifecycle hook, or a method called from one → the lifecycle can't wait for it: fix it (see below);
-  - other intended fire-and-forget code → mark it as intended with `void this._doSomethingAsync();`. Errors still reach the global handler (§7a).
+  - other intended fire-and-forget code → mark it as intended with `void this._doSomethingAsync();`. Errors still reach the global handler (§7a). If a project method's promise rarely needs to be awaited, add it to
+    `allowForKnownSafeMethods` instead of marking every call site.
 - **Make deferred work slower in specs.** Ordering bugs stay hidden as long as the deferred work happens to finish first. Raise `StaticLookupCall.delay` (e.g. to 50 ms) and slow down stubbed ajax responses in a test setup hook. Then run
   a generic check for each form: open it in edit mode, `await form.load()` and `expect(form.saveNeeded).toBeFalse()`. A form whose lifecycle doesn't wait for its asynchronous work now fails reliably.
 
-**How to fix them:** make the work part of the lifecycle. Return or await the promise where the hook allows it (e.g. in `_load()`). If the hook is synchronous by contract (like `importData()`), collect the promises, signal
-completion and wait for that signal in an asynchronous lifecycle step:
+**How to fix them:** make the work part of the lifecycle. Return or await the promise where the hook allows it, e.g. in `_load()` or `importData()`: `Form.importData()` may return a promise, and `Form.load()` waits for it
+before the form is marked as saved. Collect the promises if there are several:
 
 ```ts
-override importData() {
+override
+importData()
+:
+Promise < void > {
   let importPromise = this._importValues();     // previously called without using the returned promise
   let tablePromise = this._loadLookupTable();   // previously called without using the returned promise
-  // finally: trigger the event even if the import fails, otherwise the lifecycle would wait forever (the error is still reported by the global handler)
-  Promise.all([importPromise, tablePromise]).finally(() => this.trigger('importDataDone'));
-}
-
-protected override async _onLifecycleLoad(): Promise<void> {
-  await super._onLifecycleLoad();
-  await this.when('importDataDone'); // importData() is asynchronous, wait for it before the form is marked as saved
+  return Promise.all([importPromise, tablePromise]).then(() => undefined);
 }
 ```
+
+If a hook is synchronous by contract (its return value is ignored), collect the promises, signal completion (e.g. trigger an event in `.finally()`, so the lifecycle doesn't wait forever if the work fails) and wait for that
+signal in an asynchronous lifecycle step.
 
 Two related patterns to get right while you're in this territory:
 
@@ -413,8 +421,6 @@ Two related patterns to get right while you're in this territory:
   With native promises, `.finally()` already runs after a failing `.then()`. Chain `.then(onDone, onFail).finally(onAlways)` and let errors propagate. Where nobody else can ever see the promise (e.g. a central request queue), end the chain
   with one terminal `.catch(error => App.get().errorHandler.handle(error))` instead of a per-callback try/catch.
 - **A `.then(fn).catch(fn)` used only to avoid an unhandled rejection on the returned promise** (rather than for genuine multi-stage handling) is usually a sign the fire-and-forget question above wasn't asked yet — resolve it the same way rather than defaulting to that shape.
-
-If you do end up adding a no-op guard for the "already reported elsewhere" case, keep it a plain `.catch(() => {})` / `.then(fn, () => {})` with a comment — don't wrap it in a shared helper function; that's exactly the clutter a future global handler is meant to remove.
 
 ## 8. Staleness/supersession checks: replace counters with identity checks
 
@@ -461,7 +467,9 @@ request.finally(() => {
   - an `await` on the returned promise or on an event the framework already fires. There usually is one, so look for it before inventing a mechanism:
     - message box opened: `await session.desktop.when('propertyChange:messageBoxes')`, or `await form.when('propertyChange:messageBoxes')` if the form is the message box's display parent;
     - the promise the action itself returns: `await form.lifecycle.ok()`, `await form.lifecycle.cancel()`, `await form.load()`, instead of calling it and then waiting for a guessed number of ticks;
-    - form lifecycle: `form.whenClose()`, `form.whenLoad()`, `form.whenSave()`;
+    - form lifecycle: `form.whenClose()`, `form.whenLoad()`, `form.whenSave()`. Note that `form.whenSave()` resolves on the `save` event, before the rest of the save chain has run (e.g. requests sent in
+      `_save().then(...)`). So `form.save(); await form.whenSave();` lets the spec end while those requests are still pending, they are sent after `jasmine.Ajax.uninstall()` and fail. Use `await form.save()` if the spec
+      doesn't need to act in between;
     - page child loading: `await page._loadChildrenPromise` of the page whose children are being loaded (it's only set while a load is in progress). Calling `ensureLoadChildren()` would trigger a load itself;
     - pending/resolved checks: `await expectAsync(promise).toBePending()` / `.toBeResolved()` (§5);
     - any property: `widget.when('propertyChange:xyz')`. This also works on non-widgets that are a `PropertyEventEmitter`, e.g. a table `Column` (`column.when('propertyChange:text')`);
