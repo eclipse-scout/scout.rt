@@ -622,7 +622,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   protected _removeAnimated() {
     let animateRemovalWhileRemovingParent = this._animateRemovalWhileRemovingParent();
-    if ((this.parent.removing && !animateRemovalWhileRemovingParent) || !Device.get().supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
+    if ((this.parent.removing && !animateRemovalWhileRemovingParent) || !this.$container || this.$container.isDisplayNone()) {
       // Cannot remove animated, remove regularly
       this._removeInternal();
       return;
