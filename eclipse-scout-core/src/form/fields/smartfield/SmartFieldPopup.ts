@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Device, Event, FormField, InitModelOf, LookupRow, Popup, ProposalChooser, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, scout, ScoutKeyboardEvent, SmartField, SmartFieldLookupResult,
+  AbstractLayout, Event, FormField, InitModelOf, LookupRow, Popup, ProposalChooser, ProposalChooserActiveFilterSelectedEvent, ProposalChooserLookupRowSelectedEvent, scout, ScoutKeyboardEvent, SmartField, SmartFieldLookupResult,
   SmartFieldPopupEventMap, SmartFieldPopupLayout, SmartFieldPopupModel, SomeRequired, StatusOrModel
 } from '../../../index';
 
@@ -28,7 +28,7 @@ export class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupMod
 
   constructor() {
     super();
-    this.animateRemoval = SmartFieldPopup.hasPopupAnimation();
+    this.animateRemoval = true;
     this.windowPaddingX = 0;
     this.windowPaddingY = 0;
   }
@@ -138,11 +138,5 @@ export class SmartFieldPopup<TValue> extends Popup implements SmartFieldPopupMod
   /** @internal */
   _onAnimationEnd() {
     this.proposalChooser.updateScrollbars();
-  }
-
-  // --- static helpers --- //
-
-  static hasPopupAnimation(): boolean {
-    return Device.get().supportsCssAnimation();
   }
 }

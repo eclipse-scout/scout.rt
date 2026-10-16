@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -53,7 +53,7 @@ export class SmartFieldPopupLayout extends PopupLayout {
       // Don't do it the first time (will be done by popup.open), only if the popup is already
       // open and gets layouted again
       this.popup.position();
-    } else if (SmartFieldPopup.hasPopupAnimation()) {
+    } else {
       // This code here is a bit complicated because:
       // 1. we must position the scrollTo position before we start the animation
       //    because it looks ugly, when we jump to the scroll position after the

@@ -417,17 +417,12 @@ export class App extends EventEmitter {
     // the fadeout animation only contains a to-value and no from-value
     // therefore set the current value to the elements style
     $loadingRoot.css('opacity', $loadingRoot.css('opacity'));
-    // Add animation listener before adding the classes to ensure the listener will always be triggered even while debugging
-    $loadingRoot.oneAnimationEnd(() => $loadingRoot.remove());
     if ($loadingRoot.css('opacity') === '1') {
       $loadingRoot.addClass('fadeout and-more');
     } else {
       $loadingRoot.addClass('fadeout');
     }
-    if (!Device.get()?.supportsCssAnimation()) { // Device.get() may be null in case there is an error during app bootstrap before the Device was initialized
-      // fallback for old browsers that do not support the animation-end event
-      $loadingRoot.remove();
-    }
+    $loadingRoot.oneAnimationEnd(() => $loadingRoot.remove());
   }
 
   protected _initNonce() {

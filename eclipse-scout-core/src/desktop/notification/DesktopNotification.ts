@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, DesktopNotificationEventMap, DesktopNotificationModel, Device, EnumObject, InitModelOf, Notification as ScoutNotification, scout, Status, StatusOrModel, strings} from '../../index';
+import {aria, DesktopNotificationEventMap, DesktopNotificationModel, EnumObject, InitModelOf, Notification as ScoutNotification, scout, Status, StatusOrModel, strings} from '../../index';
 
 export class DesktopNotification extends ScoutNotification implements DesktopNotificationModel {
   declare model: DesktopNotificationModel;
@@ -90,9 +90,7 @@ export class DesktopNotification extends ScoutNotification implements DesktopNot
 
     aria.role(this.$container, 'alert'); // Read the notification to screen reader users
 
-    if (Device.get().supportsCssAnimation()) {
-      this.$loader.addClass('animated');
-    }
+    this.$loader.addClass('animated');
     if (this.nativeOnly) {
       this.setVisible(false);
     }
@@ -236,9 +234,6 @@ export class DesktopNotification extends ScoutNotification implements DesktopNot
 
   fadeIn($parent: JQuery) {
     this.render($parent);
-    if (!Device.get().supportsCssAnimation()) {
-      return;
-    }
     this.$container.addClassForAnimation('desktop-notification-slide-in');
   }
 
@@ -248,7 +243,7 @@ export class DesktopNotification extends ScoutNotification implements DesktopNot
       return;
     }
     this._removing = true;
-    if (!Device.get().supportsCssAnimation() || !this.rendered) {
+    if (!this.rendered) {
       this.destroy();
       return;
     }
