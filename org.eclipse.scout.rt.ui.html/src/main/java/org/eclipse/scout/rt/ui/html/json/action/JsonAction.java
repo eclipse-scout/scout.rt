@@ -13,6 +13,7 @@ import java.beans.PropertyChangeEvent;
 
 import org.eclipse.scout.rt.client.ui.action.IAction;
 import org.eclipse.scout.rt.client.ui.action.tree.IActionNode;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.ui.html.IUiSession;
@@ -75,6 +76,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       @Override
       protected String modelValue() {
         return getModel().getTooltipText();
+      }
+    });
+
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_TOOLTIP_HTML_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTooltipHtmlEnabled();
       }
     });
 

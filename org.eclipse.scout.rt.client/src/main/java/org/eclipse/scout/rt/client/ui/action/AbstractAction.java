@@ -467,6 +467,16 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   }
 
   @Override
+  public boolean isTooltipHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_TOOLTIP_HTML_ENABLED);
+  }
+
+  @Override
+  public void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled) {
+    propertySupport.setPropertyBool(PROP_TOOLTIP_HTML_ENABLED, tooltipHtmlEnabled);
+  }
+
+  @Override
   public boolean isSeparator() {
     return FLAGS_BIT_HELPER.isBitSet(SEPARATOR, m_flags);
   }

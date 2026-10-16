@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Action, icons, keys, scout, Tooltip, tooltips} from '../../src/index';
+import {Action, icons, keys, scout, Tooltip, tooltips, TooltipSupport} from '../../src/index';
 import {JQueryTesting} from '../../src/testing';
 
 describe('Action', () => {
@@ -179,6 +179,53 @@ describe('Action', () => {
 
       jasmine.clock().tick(tooltips.DEFAULT_TOOLTIP_DELAY);
       expect(action.findChild(Tooltip).rendered).toBe(true);
+    });
+  });
+
+  describe('property tooltipHtmlEnabled', () => {
+
+    it('if false, encodes html in tooltip', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>'
+      });
+      action.render();
+      let tooltipSupport : TooltipSupport = action.$container.data('tooltipSupport');
+      tooltipSupport._showTooltip(action.$container);
+      expect(tooltipSupport.tooltip.htmlEnabled).toBe(false);
+      expect(tooltipSupport.tooltip.$content.html()).toBe('&lt;b&gt;text&lt;/b&gt;');
+    });
+
+    it('if true, does not encode html in tooltip', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>',
+        tooltipHtmlEnabled: true
+      });
+      action.render();
+      let tooltipSupport : TooltipSupport = action.$container.data('tooltipSupport');
+      tooltipSupport._showTooltip(action.$container);
+      expect(tooltipSupport.tooltip.htmlEnabled).toBe(true);
+      expect(tooltipSupport.tooltip.$content.html()).toBe('<b>text</b>');
+    });
+
+    it('can be changed dynamically', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>'
+      });
+      action.render();
+      let tooltipSupport : TooltipSupport = action.$container.data('tooltipSupport');
+
+      action.setTooltipHtmlEnabled(true);
+      tooltipSupport._showTooltip(action.$container);
+      expect(tooltipSupport.tooltip.htmlEnabled).toBe(true);
+      expect(tooltipSupport.tooltip.$content.html()).toBe('<b>text</b>');
+
+      action.setTooltipHtmlEnabled(false); // closes tooltip
+      tooltipSupport._showTooltip(action.$container);
+      expect(tooltipSupport.tooltip.htmlEnabled).toBe(false);
+      expect(tooltipSupport.tooltip.$content.html()).toBe('&lt;b&gt;text&lt;/b&gt;');
     });
   });
 
