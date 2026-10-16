@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ajax, AjaxError, AjaxSettings, Box, Device, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
+import {ajax, AjaxError, AjaxSettings, Box, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
 import $ from 'jquery';
 
 export class LoginBox extends Box {
@@ -150,11 +150,9 @@ export class LoginBox extends Box {
     if (this.$password) {
       this.$password.off('input.resetLoginError');
     }
-    if (Device.get().supportsCssAnimation()) {
-      this.$button
-        .html('')
-        .append($('<div>').addClass('login-button-loading'));
-    }
+    this.$button
+      .html('')
+      .append($('<div>').addClass('login-button-loading'));
 
     let options = $.extend({}, this.ajaxOptions, {
       url: url,
@@ -199,14 +197,9 @@ export class LoginBox extends Box {
 
   redirect(data: Record<string, any>) {
     this.$backgroundElements.addClass('box-background-elements-fadeout');
-    if (Device.get().supportsCssAnimation()) {
-      this.$backgroundElements.oneAnimationEnd(() => {
-        this._redirect(data);
-      });
-    } else {
-      // fallback for old browsers that do not support the animation-end event
+    this.$backgroundElements.oneAnimationEnd(() => {
       this._redirect(data);
-    }
+    });
   }
 
   protected _redirect(data: Record<string, any>) {

@@ -447,6 +447,9 @@ export class Device implements DeviceModel, ObjectWithType {
     return typeof File === 'function';
   }
 
+  /**
+   * @deprecated all modern browsers support css animations, it is not necessary anymore to use this function
+   */
   supportsCssAnimation(): boolean {
     return this.supportsCssProperty('animation');
   }
