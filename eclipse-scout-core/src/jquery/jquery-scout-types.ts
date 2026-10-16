@@ -638,13 +638,21 @@ declare global {
     addClassForAnimation(className: string, options?: { classesToRemove?: boolean }): this;
 
     /**
-     * Adds a handler that is executed when a CSS animation ends on the current element. It will be executed
-     * only once when the 'animationend' event is triggered on the current element. Bubbling events from child
-     * elements are ignored.
+     * Adds a handler that is executed when all CSS animations end on the current element.
      *
-     * @param handler A function to execute when the 'animationend' event is triggered
+     * Only the animations on the current element are considered, animations on child elements are ignored.
+     *
+     * If the element has an animation (`animation-name` is set), but no animation is running, the handler will be called nevertheless (asynchronously).
+     * This allows disabling the animations by setting `animation-duration: 0ms` and also ensures the handler will always be executed even while debugging.
+     *
+     * IMPORTANT: This function must be called after the animation has been started (e.g. after adding a CSS class that starts the animation).
+     *
+     * @param handler A function to execute when the active CSS animations finish
+     * @param triggerOnError true, to call the handler with an `animationcancel` event if the animation aborts before it could end regularly,
+     *                       e.g. if the element is removed from the DOM, if it is made invisible or if the `animation-name` is changed.
+     *                       Default is false.
      */
-    oneAnimationEnd(handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, 'animationend'>): JQuery;
+    oneAnimationEnd(handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, 'animationend' | 'animationcancel'>, triggerOnError?: boolean): JQuery;
 
     /**
      * @returns true, if the current element has a class that starts with 'animate-'.

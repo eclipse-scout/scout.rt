@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,6 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {AbstractLayout, Dimension, HtmlComponent, HtmlCompPrefSizeOptions, Insets} from '../../src/index';
+import {JQueryTesting} from '../../src/testing';
 
 describe('HtmlComponent', () => {
   setFixtures(sandbox());
@@ -202,27 +203,44 @@ describe('HtmlComponent', () => {
       expect(htmlChild.$comp.parents).not.toHaveBeenCalled();
     });
 
-    it('does not layout components with an animating parent (CSS)', () => {
-      $comp.addClass('animate-test');
+    it('does not layout components with an animating parent (CSS)', async () => {
+      $('<style>.animate-test {animation: nop; animation-duration: 50ms</style>').appendTo($('#sandbox'));
+      $comp.addClassForAnimation('animate-test');
       spyOn(htmlChild.layout, 'layout').and.callThrough();
       htmlChild.validateLayout();
       expect(htmlChild.layout.layout).not.toHaveBeenCalled();
 
-      // Simulate end of animation
-      $comp.removeClass('animate-test');
-      $comp.trigger('animationend');
+      await JQueryTesting.whenAnimationEnd($comp);
       expect(htmlChild.layout.layout).toHaveBeenCalled();
     });
 
-    it('does not layout animated components (CSS)', () => {
+    it('does not layout animated components (CSS)', async () => {
+      $('<style>.animate-test {animation: nop; animation-duration: 50ms</style>').appendTo($('#sandbox'));
+      $comp.addClassForAnimation('animate-test');
+      spyOn(htmlComp.layout, 'layout').and.callThrough();
+      htmlComp.validateLayout();
+      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
+
+      // Simulate end of animation
+      await JQueryTesting.whenAnimationEnd($comp);
+      expect(htmlComp.layout.layout).toHaveBeenCalled();
+    });
+
+    it('does not get stuck in an animationEnd loop ', async () => {
+      $('<style>.animate-test {animation: nop; animation-duration: 50ms</style>').appendTo($('#sandbox'));
       $comp.addClass('animate-test');
       spyOn(htmlComp.layout, 'layout').and.callThrough();
       htmlComp.validateLayout();
       expect(htmlComp.layout.layout).not.toHaveBeenCalled();
 
       // Simulate end of animation
+      await JQueryTesting.whenAnimationEnd($comp);
+      expect(htmlComp.layout.layout).not.toHaveBeenCalled();
+
+      // _validateLayoutAfterAnimation has called oneAnimationEnd again because animate-test is still present
+      // If oneAnimationEnd would be synchronous, a Maximum call stack size exceeded would be thrown
       $comp.removeClass('animate-test');
-      $comp.trigger('animationend');
+      await sleep(); // Wait for the setTimeout in oneAnimationEnd
       expect(htmlComp.layout.layout).toHaveBeenCalled();
     });
 
