@@ -135,7 +135,6 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   // Signature matches the "window.onerror" event handler
   // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
   protected _onWindowError(errorMessage: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error) {
-    // TODO CGU add global promise error handler
     try {
       if (this._isIgnorableScriptError(errorMessage, fileName, lineNumber, columnNumber, error)) {
         this.handleErrorInfo({
@@ -175,7 +174,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       event.preventDefault();
       return;
     }
-    // TODO CGU use analyseError and _sendErrorMessage and _logErrorInfo
+    // TODO CGU use analyseError and _sendErrorMessage and _logErrorInfo. OR: create messagebox and remove unnecessary error handler calls in the code base?
     console.log('Unhandled promise rejection', event);
   }
 
@@ -436,7 +435,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     // Note: The error handler is installed globally, and we cannot tell in which scout session the error happened.
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
     // multi-session-case (portlet), but currently there is no other way. Besides, this feature is not in use yet.
-    let session = this.session || App.get()?.sessions[0]; // TODO CGU fixes many errors in specs, why is app not there anymore? promise resolves after spec run?
+    let session = this.session || App.get().sessions[0];
     if (session) {
       if (this.sendError) {
         this._sendErrorMessage(session, errorInfo.log, errorInfo.level);
