@@ -494,14 +494,14 @@ public abstract class AbstractTreeBox<T> extends AbstractValueField<Set<T>> impl
     return new P_TreeNodeBuilder();
   }
 
-  private void prepareLookupCall(ILookupCall<T> call, ITreeNode parent) {
+  /**
+   * do not use this internal method directly
+   */
+  public void prepareLookupCall(ILookupCall<T> call, ITreeNode parent) {
     prepareLookupCallInternal(call, parent);
     interceptPrepareLookup(call, parent);
   }
 
-  /**
-   * do not use this internal method directly
-   */
   @SuppressWarnings("unchecked")
   private void prepareLookupCallInternal(ILookupCall<T> call, ITreeNode parent) {
     // set parent key
