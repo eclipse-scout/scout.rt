@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -264,6 +264,22 @@ describe('ListBox', () => {
       field.setLookupCall(newLookupCall);
       await field.when('lookupCallDone');
       expect(field.lookupStatus).toBe(null);
+      expect(field.table.rows.length).toBe(3);
+    });
+
+    it('stays loading until the current lookup is done if the previous one is aborted', async () => {
+      let field = createFieldWithLookupCall({}, {
+        objectType: DummyLookupCall,
+        delay: 100
+      }); // rendering starts the first lookup
+      field.refreshLookup(); // starts the second lookup and aborts the first one
+
+      await sleep(20); // the aborted lookup has settled, the current one is still running
+      expect(field.loading).toBe(true);
+      expect(field.table.rows.length).toBe(0);
+
+      await field.when('lookupCallDone');
+      expect(field.loading).toBe(false);
       expect(field.table.rows.length).toBe(3);
     });
 

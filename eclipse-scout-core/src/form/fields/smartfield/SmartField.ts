@@ -1509,6 +1509,11 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     return lookupCall
       .execute()
       .finally(() => {
+        const currentLookupCall = this.original()._currentLookupCall;
+        if (currentLookupCall && currentLookupCall !== lookupCall) {
+          // A newer lookup has been started (this one was aborted), the newer one resets the state when it is done
+          return;
+        }
         this.original()._currentLookupCall = null;
         this.setLoading(false);
         this._clearLookupStatus();
