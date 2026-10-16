@@ -26,6 +26,7 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String PROP_TEXT_POSITION = "textPosition";
   String PROP_HTML_ENABLED = "htmlEnabled";
   String PROP_TOOLTIP_TEXT = "tooltipText";
+  String PROP_TOOLTIP_HTML_ENABLED = "tooltipHtmlEnabled";
   String PROP_SELECTED = "selected";
   String PROP_VISIBLE = "visible";
   String PROP_KEY_STROKE = "keyStroke";
@@ -125,6 +126,10 @@ public interface IAction extends IWidget, IOrdered, IStyleable, IVisibleDimensio
   String getTooltipText();
 
   void setTooltipText(String text);
+
+  boolean isTooltipHtmlEnabled();
+
+  void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled);
 
   boolean isSeparator();
 

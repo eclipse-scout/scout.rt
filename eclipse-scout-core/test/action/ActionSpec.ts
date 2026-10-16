@@ -182,6 +182,65 @@ describe('Action', () => {
     });
   });
 
+  describe('property tooltipHtmlEnabled', () => {
+
+    beforeEach(() => {
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    it('if false, encodes html in tooltip', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>'
+      });
+      action.render();
+      JQueryTesting.triggerMouseEnter(action.$container);
+      jasmine.clock().tick(tooltips.DEFAULT_TOOLTIP_DELAY);
+      let tooltip = action.findChild(Tooltip);
+      expect(tooltip.htmlEnabled).toBe(false);
+      expect(tooltip.$content.html()).toBe('&lt;b&gt;text&lt;/b&gt;');
+    });
+
+    it('if true, does not encode html in tooltip', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>',
+        tooltipHtmlEnabled: true
+      });
+      action.render();
+      JQueryTesting.triggerMouseEnter(action.$container);
+      jasmine.clock().tick(tooltips.DEFAULT_TOOLTIP_DELAY);
+      let tooltip = action.findChild(Tooltip);
+      expect(tooltip.htmlEnabled).toBe(true);
+      expect(tooltip.$content.html()).toBe('<b>text</b>');
+    });
+
+    it('can be changed dynamically', () => {
+      let action = scout.create(Action, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>'
+      });
+      action.render();
+      action.setTooltipHtmlEnabled(true);
+      JQueryTesting.triggerMouseEnter(action.$container);
+      jasmine.clock().tick(tooltips.DEFAULT_TOOLTIP_DELAY);
+      let tooltip = action.findChild(Tooltip);
+      expect(tooltip.htmlEnabled).toBe(true);
+      expect(tooltip.$content.html()).toBe('<b>text</b>');
+
+      action.setTooltipHtmlEnabled(false); // closes tooltip
+      JQueryTesting.triggerMouseEnter(action.$container);
+      jasmine.clock().tick(tooltips.DEFAULT_TOOLTIP_DELAY);
+      tooltip = action.findChild(Tooltip);
+      expect(tooltip.htmlEnabled).toBe(false);
+      expect(tooltip.$content.html()).toBe('&lt;b&gt;text&lt;/b&gt;');
+    });
+  });
+
   describe('aria properties', () => {
 
     it('has aria role button', () => {

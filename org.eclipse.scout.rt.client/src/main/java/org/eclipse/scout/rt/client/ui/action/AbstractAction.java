@@ -145,6 +145,12 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     return null;
   }
 
+  @ConfigProperty(ConfigProperty.BOOLEAN)
+  @Order(55)
+  protected boolean getConfiguredTooltipHtmlEnabled() {
+    return false;
+  }
+
   /**
    * Defines the keystroke for this action. A keystroke is built from optional modifiers (alt, control, shift) and a key
    * (p, f11, delete). The keystroke has to follow a certain pattern: The modifiers (alt, shift, control) are separated
@@ -281,6 +287,7 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
     setTextPosition(getConfiguredTextPosition());
     setHtmlEnabled(getConfiguredHtmlEnabled());
     setTooltipText(getConfiguredTooltipText());
+    setTooltipHtmlEnabled(getConfiguredTooltipHtmlEnabled());
     setKeyStroke(getConfiguredKeyStroke());
     setKeyStrokeFirePolicy(getConfiguredKeyStrokeFirePolicy());
     setVisible(getConfiguredVisible());
@@ -464,6 +471,16 @@ public abstract class AbstractAction extends AbstractWidget implements IAction, 
   @Override
   public void setTooltipText(String text) {
     propertySupport.setPropertyString(PROP_TOOLTIP_TEXT, text);
+  }
+
+  @Override
+  public boolean isTooltipHtmlEnabled() {
+    return propertySupport.getPropertyBool(PROP_TOOLTIP_HTML_ENABLED);
+  }
+
+  @Override
+  public void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled) {
+    propertySupport.setPropertyBool(PROP_TOOLTIP_HTML_ENABLED, tooltipHtmlEnabled);
   }
 
   @Override
