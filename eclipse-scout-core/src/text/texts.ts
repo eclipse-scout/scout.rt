@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, arrays, Session, TextMap} from '../index';
+import {ajax, App, arrays, Session, TextMap} from '../index';
 import $ from 'jquery';
 
 export type TextMapType = Record<string, TextMap>;
@@ -23,14 +23,14 @@ export const texts = {
 
   textsByLocale: {} as TextMapType,
 
-  bootstrap(url: string | string[]): JQuery.Promise<any> {
+  bootstrap(url: string | string[]): Promise<any> {
     if (!url) {
       return $.resolvedPromise({});
     }
     let promises = [];
     let urls = arrays.ensure(url);
     urls.forEach(url => promises.push(
-      $.ajaxJson(url).then(texts._handleBootstrapResponse.bind(this, url)))
+      ajax.getJson(url).then(texts._handleBootstrapResponse.bind(this, url)))
     );
     return $.promiseAll(promises);
   },

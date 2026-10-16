@@ -11,7 +11,7 @@
  * jQuery plugin with scout extensions
  */
 import $ from 'jquery';
-import {App, aria, arrays, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
+import {App, aria, arrays, Deferred, Device, Dimension, events, fields, IconDesc, icons, objects, Resizable, scout, strings} from '../index';
 
 // === internal methods ===
 
@@ -216,7 +216,7 @@ $.negate = fx => function(...args) {
 
 $.injectScript = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let scriptTag = myDocument.createElement('script');
@@ -248,7 +248,7 @@ $.injectScript = (url, options) => {
 
 $.injectStyleSheet = (url, options) => {
   options = options || {};
-  let deferred = $.Deferred();
+  let deferred = new Deferred();
 
   let myDocument = options.document || window.document;
   let linkTag = myDocument.createElement('link');
@@ -305,38 +305,42 @@ $.pxToNumber = pixel => {
   return parseFloat(pixel);
 };
 
+/**
+ * If the given `array` has a length > 1, the array is returned.
+ * If the length is 1, the first element is returned.
+ * Otherwise, it returns `undefined`.
+ */
+function singleValue(array) {
+  return array.length <= 1 ? array[0] : array;
+}
+
 $.resolvedDeferred = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
+  let deferred = new Deferred();
+  deferred.resolve(singleValue(args));
   return deferred;
 };
 
 $.resolvedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.resolve(...args);
+  let deferred = new Deferred();
+  deferred.resolve(singleValue(args));
   return deferred.promise();
 };
 
 $.rejectedPromise = (...args) => {
-  let deferred = $.Deferred();
-  deferred.reject(...args);
+  let deferred = new Deferred();
+  deferred.reject(singleValue(args));
   return deferred.promise();
 };
 
 $.promiseAll = (promises, asArray) => {
   asArray = scout.nvl(asArray, false);
   promises = arrays.ensure(promises);
-  let deferred = $.Deferred();
-  $.when(...promises).done((...args) => {
+  return Promise.all(promises).then(results => {
     if (asArray) {
-      deferred.resolve(args);
-    } else {
-      deferred.resolve(...args);
+      return results;
     }
-  }).fail((...args) => {
-    deferred.reject(...args);
+    return singleValue(results);
   });
-  return deferred.promise();
 };
 
 $.ajaxJson = url => $.ajax({
@@ -910,17 +914,39 @@ $.fn.oneAnimationEnd = function(handler) {
   if (!handler) {
     return this;
   }
+
   let oneHandler = event => {
     if (event.target !== this[0]) {
       // Ignore events that bubble up from child elements
       return;
     }
     // Unregister listener to implement "one" semantics
-    this.off('animationend webkitAnimationEnd', oneHandler);
+    // Also listen for animationcancel which can fire if one of the following happens while the animation runs
+    // - The element is made invisible
+    // • The animation class is removed
+    // • The animation-name property is changed to none
+    this.off('animationend animationcancel', oneHandler);
     // Notify actual event handler
     handler(event);
   };
-  return this.on('animationend webkitAnimationEnd', oneHandler);
+  this.on('animationend animationcancel', oneHandler);
+
+  if (!this[0]) {
+    // Not attached
+    return this;
+  }
+
+  // If there are no active animations trigger a synthetic event to call the handlers immediately.
+  // This may happen if the animation was disabled (e.g. by setting animation-name: none).
+  // Or if a breakpoint is set in the DevTools after adding the animation class.
+  // In that case, Chrome won't trigger the animationend event even when resuming because the time has already elapsed.
+  if (!this[0].getAnimations().length) {
+    // Manually dispatch the event to trigger the handlers (the one above but there may be others attached as well)
+    this[0].dispatchEvent(new Event('animationend'));
+    return this;
+  }
+
+  return this;
 };
 
 $.fn.hasAnimationClass = function() {

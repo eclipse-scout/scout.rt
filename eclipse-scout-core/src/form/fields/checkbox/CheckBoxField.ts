@@ -110,7 +110,7 @@ export class CheckBoxField extends ValueField<boolean> implements CheckBoxFieldM
     return super._ensureValue(value);
   }
 
-  protected override _formatValue(value: boolean): string | JQuery.Promise<string> {
+  protected override _formatValue(value: boolean): string | Promise<string> {
     if (value === null) {
       return '';
     }

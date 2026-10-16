@@ -714,7 +714,7 @@ describe('Outline', () => {
 
     class SpecPageWithNodes extends PageWithNodes {
 
-      protected override _createChildPages(): JQuery.Promise<Page[]> {
+      protected override _createChildPages(): Promise<Page[]> {
         let childPages = [
           scout.create(SpecPageWithTable, {
             parent: this.outline,
@@ -746,7 +746,7 @@ describe('Outline', () => {
         });
       }
 
-      protected override _loadTableData(searchFilter: any): JQuery.Promise<any> {
+      protected override _loadTableData(searchFilter: any): Promise<any> {
         let data = [
           {string: 'string 1'},
           {string: 'string 2'},

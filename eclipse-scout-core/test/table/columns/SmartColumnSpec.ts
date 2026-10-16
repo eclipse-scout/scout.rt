@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,11 +25,11 @@ describe('SmartColumn', () => {
   });
 
   class SpecLookupCall extends LookupCall<string> {
-    override _getByKeys(keys: string[]): JQuery.Promise<LookupResult<string>> {
+    override _getByKeys(keys: string[]): Promise<LookupResult<string>> {
       return super._getByKeys(keys);
     }
 
-    override _getByKey(key: string): JQuery.Promise<LookupResult<string>> {
+    override _getByKey(key: string): Promise<LookupResult<string>> {
       return super._getByKey(key);
     }
   }
@@ -44,7 +44,8 @@ describe('SmartColumn', () => {
     return lookupCall;
   }
 
-  it('rows with object key can be resolved', () => {
+  it('rows with object key can be resolved', async () => {
+    jasmine.clock().uninstall();
     const table = helper.createTable({
       columns: [{
         objectType: SmartColumn
@@ -66,7 +67,7 @@ describe('SmartColumn', () => {
     // insert 6 rows
     table.insertRows(keys.concat(keys).map(getRow));
     table.render();
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
 
     // text should get resolved with a single batch lookup call
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(1);
@@ -75,18 +76,18 @@ describe('SmartColumn', () => {
     expect(lookupCall._getByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(keys));
 
     table.insertRow(getRow(objects.ensureValidKey(key1)));
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(2);
 
     table.insertRow(getRow(objects.ensureValidKey(key2)));
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
 
     // disable batch mode, now textByKey should be called instead
     lookupCall.setBatch(false);
 
     table.insertRows(keys.map(getRow));
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
 
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
     expect(lookupCall._getByKey).toHaveBeenCalledTimes(3);
@@ -122,7 +123,7 @@ describe('SmartColumn', () => {
   /**
    * Makes sure no lookup call is executed (this would throw an error, because no lookup call is configured for the column / smart-field).
    */
-  it('must NOT execute a lookup by key when the editor is initialized', () => {
+  it('must NOT execute a lookup by key when the editor is initialized', async () => {
     let table = helper.createTable({
       columns: [{
         objectType: SmartColumn,
@@ -144,12 +145,13 @@ describe('SmartColumn', () => {
     });
     table.render();
     table.focusCell(column, row);
-    jasmine.clock().tick(0);
+    await table.when('startCellEdit');
     expect(field.displayText).toEqual('Foo');
     expect(field.value).toEqual(7);
   });
 
-  it('must use batch lookup calls when enabled', () => {
+  it('must use batch lookup calls when enabled', async () => {
+    jasmine.clock().uninstall();
     const table = helper.createTable({
       columns: [{
         objectType: SmartColumn
@@ -167,7 +169,7 @@ describe('SmartColumn', () => {
     // insert 6 rows
     table.insertRows(keys.concat(keys).map(getRow));
     table.render();
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
 
     // text should get resolved with a single batch lookup call
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(1);
@@ -176,11 +178,11 @@ describe('SmartColumn', () => {
     expect(lookupCall._getByKeys).toHaveBeenCalledWith(arrayEqualsIgnoreOrder(keys));
 
     table.insertRow(getRow('key1'));
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(2);
 
     table.insertRow(getRow('key2'));
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
 
     // _getByKey should never be called in batch mode
@@ -190,7 +192,7 @@ describe('SmartColumn', () => {
     lookupCall.setBatch(false);
 
     table.insertRows(keys.map(getRow));
-    jasmine.clock().tick(500);
+    await table.when('propertyChange:loading');
 
     expect(lookupCall._getByKeys).toHaveBeenCalledTimes(3);
     expect(lookupCall._getByKey).toHaveBeenCalledTimes(3);

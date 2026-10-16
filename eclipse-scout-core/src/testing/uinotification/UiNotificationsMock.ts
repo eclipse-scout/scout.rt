@@ -52,7 +52,7 @@ export class UiNotificationsMock {
  */
 export class LocalUiNotificationSystem extends UiNotificationSystem {
 
-  override whenSubscriptionStart(topic: string): JQuery.Promise<string> {
+  override whenSubscriptionStart(topic: string): Promise<string> {
     return $.resolvedPromise(topic);
   }
 

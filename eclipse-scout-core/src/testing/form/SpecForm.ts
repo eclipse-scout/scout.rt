@@ -13,19 +13,19 @@ import {SpecLifecycle} from '../index';
 export class SpecForm extends Form {
   declare lifecycle: SpecLifecycle;
 
-  override _load(): JQuery.Promise<object> {
+  override _load(): Promise<object> {
     return super._load();
   }
 
-  override _save(data: object): JQuery.Promise<void> {
+  override _save(data: object): Promise<void> {
     return super._save(data);
   }
 
-  override _validate(): Status | JQuery.Promise<Status> {
+  override _validate(): Status | Promise<Status> {
     return super._validate();
   }
 
-  override _showFormInvalidMessageBox(status: Status): JQuery.Promise<Status> {
+  override _showFormInvalidMessageBox(status: Status): Promise<Status> {
     return super._showFormInvalidMessageBox(status);
   }
 
@@ -33,7 +33,7 @@ export class SpecForm extends Form {
     return super._createStatusMessageBox(status);
   }
 
-  override _openStatusMessageBox(status: Status): JQuery.Promise<MessageBoxOption> {
+  override _openStatusMessageBox(status: Status): Promise<MessageBoxOption> {
     return super._openStatusMessageBox(status);
   }
 }

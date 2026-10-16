@@ -8,13 +8,12 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AjaxCall, AjaxCallModel, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil, FocusManager, fonts, icons,
-  InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions, objects, ObjectWithType,
-  Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings, UserAgent, webstorage,
-  Widget
+  ajax, AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil,
+  FocusManager, fonts, icons, InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions,
+  objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings,
+  UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
-import ErrorTextStatus = JQuery.Ajax.ErrorTextStatus;
 
 export class Session extends EventEmitter implements SessionModel, ModelAdapterLike, ObjectWithType {
   declare model: SessionModel;
@@ -75,10 +74,11 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   root: Widget;
   widget: Widget; // same as root
   $entryPoint: JQuery;
+  destroyed = false;
 
   protected _adapterDataCache: Record<string, AdapterData>;
   protected _deferredEventTypes: string[];
-  protected _deferred: JQuery.Deferred<string[], never, never>;
+  protected _deferred: Deferred<string[]>;
   protected _fatalMessagesOnScreen: Record<string, boolean>;
   protected _retryRequest: RemoteRequest;
   protected _queuedRequest: RemoteRequest;
@@ -328,6 +328,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    * request at the end of the user interaction
    */
   sendEvent(event: RemoteEvent, delay?: number) {
+    if (this.destroyed) {
+      return;
+    }
     delay = delay || 0;
 
     this.asyncEvents = this._coalesceEvents(this.asyncEvents, event);
@@ -348,7 +351,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }, this._asyncDelay);
   }
 
-  protected _sendStartupRequest(): JQuery.Promise<any> {
+  protected _sendStartupRequest(): Promise<any> {
     // Build startup request (see JavaDoc for JsonStartupRequest.java for details)
     let request = this._newRequest({
       startup: true
@@ -368,13 +371,16 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     // Send request
     let ajaxOptions = this.defaultAjaxOptions(request);
 
-    return $.ajax(ajaxOptions)
+    return this._callAjax({
+      ajaxOptions: ajaxOptions,
+      name: this._getRequestName(request, 'startup request')
+    })
       .catch(onAjaxFail.bind(this))
       .then(onAjaxDone.bind(this));
 
     // ----- Helper methods -----
 
-    function onAjaxDone(data: SessionStartupResponse): JQuery.Promise<any> {
+    function onAjaxDone(data: SessionStartupResponse): Promise<any> {
       return this._processStartupResponse(data).then(() => {
         if (data.error) {
           return $.rejectedPromise(data);
@@ -383,9 +389,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       });
     }
 
-    function onAjaxFail(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, ...args: any[]): JQuery.Promise<any> {
-      this._processErrorResponse(jqXHR, textStatus, errorThrown, request);
-      return $.rejectedPromise(jqXHR, textStatus, errorThrown, ...args);
+    function onAjaxFail(ajaxError: AjaxError): Promise<any> {
+      this._processErrorResponse(ajaxError, request);
+      return $.rejectedPromise(ajaxError);
     }
   }
 
@@ -415,7 +421,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     return params;
   }
 
-  protected _processStartupResponse(data: SessionStartupResponse): JQuery.Promise<any> {
+  protected _processStartupResponse(data: SessionStartupResponse): Promise<any> {
     // Handle errors from server
     if (data.error) {
       let isFatalError = this._processErrorJsonResponse(data.error);
@@ -481,7 +487,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.desktop = this.getOrCreateWidget(clientSessionModel.desktop, this.rootAdapter.widget) as Desktop;
     App.get()._triggerDesktopReady(this.desktop);
 
-    const def = $.Deferred();
+    const def = new Deferred<void>();
     this.render(() => this._renderDesktopImpl(data))
       .then(() => this.onRequestsDone(() => def.resolve())); // wait for all remaining events to be processed
     return def.promise();
@@ -538,7 +544,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     return id;
   }
 
-  render(renderFunc: () => void): JQuery.Promise<any> {
+  render(renderFunc: () => void): Promise<any> {
     // Render desktop after fonts have been preloaded (this fixes initial layouting issues when font icons are not yet ready)
     if (fonts.loadingComplete) {
       renderFunc();
@@ -738,7 +744,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     });
   }
 
-  protected _callAjax(callOptions: InitModelOf<AjaxCall>): JQuery.Promise<RemoteResponse> {
+  protected _callAjax(callOptions: InitModelOf<AjaxCall>): Promise<RemoteResponse> {
     let defaultOptions = {
       retryIntervals: [100, 500, 500, 500],
       registerInAbortableContext: false
@@ -746,7 +752,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     let ajaxCall = scout.create(AjaxCall, $.extend(defaultOptions, callOptions, this.ajaxCallOptions));
     this.registerAjaxCall(ajaxCall);
     return ajaxCall.call()
-      .always(this.unregisterAjaxCall.bind(this, ajaxCall));
+      .finally(this.unregisterAjaxCall.bind(this, ajaxCall));
   }
 
   protected _performUserAjaxRequest(ajaxOptions: UrlAjaxSettings, busyHandling: boolean, request?: RemoteRequest) {
@@ -755,49 +761,39 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
     this.setRequestPending(true);
 
-    let jsError = null,
-      success = false;
+    let success = false;
+    let responseData: RemoteResponse = null;
 
     this._callAjax({
       ajaxOptions: ajaxOptions,
       name: this._getRequestName(request, 'user request')
     })
-      .done(onAjaxDone.bind(this))
-      .fail(onAjaxFail.bind(this))
-      .always(onAjaxAlways.bind(this));
+      .then(onAjaxDone.bind(this), onAjaxFail.bind(this))
+      .finally(onAjaxAlways.bind(this))
+      .catch(error => App.get().errorHandler.handle(error)); // show message box on error
 
     // ----- Helper methods -----
 
     function onAjaxDone(data: RemoteResponse) {
-      try {
-        // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
-        // correctly, because the glasspane of the busy indicator is still visible.
-        // The second check prevents flickering of the busy indicator if there is a scheduled request
-        // that will be sent immediately afterward (see onAjaxAlways).
-        if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
-          this._setBusy(false);
-        }
-        success = this.responseQueue.process(data);
-      } catch (err) {
-        jsError = jsError || err;
+      // Busy handling is remove _before_ processing the response, otherwise the focus cannot be set
+      // correctly, because the glasspane of the busy indicator is still visible.
+      // The second check prevents flickering of the busy indicator if there is a scheduled request
+      // that will be sent immediately afterward (see onAjaxAlways).
+      if (busyHandling && !this.areBusyIndicatedEventsQueued()) {
+        this._setBusy(false);
       }
+      responseData = data;
+      success = this.responseQueue.process(data);
     }
 
-    function onAjaxFail(ajaxError: { jqXHR: JQuery.jqXHR; textStatus: ErrorTextStatus; errorThrown: string }) {
-      try {
-        if (busyHandling) {
-          this._setBusy(false);
-        }
-        this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
-      } catch (err) {
-        jsError = jsError || err;
+    function onAjaxFail(ajaxError: AjaxError) {
+      if (busyHandling) {
+        this._setBusy(false);
       }
+      this._processErrorResponse(ajaxError, request);
     }
 
-    // Variable arguments:
-    // "done" --> data, textStatus, jqXHR
-    // "fail" --> jqXHR, textStatus, errorThrown
-    function onAjaxAlways(data: RemoteResponse | JQuery.jqXHR, textStatus: JQuery.Ajax.TextStatus, errorThrown: string | JQuery.jqXHR) {
+    function onAjaxAlways() {
       this.setRequestPending(false);
 
       // "success" is false when either
@@ -805,7 +801,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       // b) a JSON response with the error flag set (UI processing error) was returned
       if (success) {
         this._resumeBackgroundJobPolling();
-        this._fireRequestFinished(data);
+        this._fireRequestFinished(responseData);
 
         if (this._retryRequest) {
           // Send retry request first
@@ -834,11 +830,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         this._setBusy(false);
       }
       this.layoutValidator.validate();
-
-      // Throw previously caught error
-      if (jsError) {
-        throw jsError;
-      }
     }
   }
 
@@ -866,12 +857,6 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     arrays.remove(this.ajaxCalls, ajaxCall);
   }
 
-  interruptAllAjaxCalls() {
-    // Because the error handlers alter the "this.ajaxCalls" array,
-    // the loop must operate on a copy of the original array!
-    this.ajaxCalls.slice().forEach(ajaxCall => ajaxCall.pendingCall && ajaxCall.pendingCall.abort());
-  }
-
   abortAllAjaxCalls() {
     // Because the error handlers alter the "this.ajaxCalls" array,
     // the loop must operate on a copy of the original array!
@@ -882,10 +867,10 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    * (Re-)starts background job polling when not started yet or when an error occurred while polling.
    * In the latter case, polling is resumed when a user-initiated request has been successful.
    */
-  protected _resumeBackgroundJobPolling() {
+  protected _resumeBackgroundJobPolling(): Promise<void> {
     if (this.backgroundJobPollingSupport.enabled && this.backgroundJobPollingSupport.status !== BackgroundJobPollingStatus.RUNNING) {
       $.log.isInfoEnabled() && $.log.info('Resume background jobs polling request, status was=' + this.backgroundJobPollingSupport.status);
-      this._pollForBackgroundJobs();
+      return this._pollForBackgroundJobs();
     }
   }
 
@@ -895,7 +880,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    * the server doesn't return until either a time-out occurs or there's something in the response when
    * a model job is done and no request initiated by a user is running.
    */
-  protected _pollForBackgroundJobs() {
+  protected _pollForBackgroundJobs(): Promise<void> {
     this.backgroundJobPollingSupport.setRunning();
 
     let request = this._newRequest({
@@ -905,12 +890,12 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
 
     let ajaxOptions = this.defaultAjaxOptions(request);
 
-    this._callAjax({
+    return this._callAjax({
       ajaxOptions: ajaxOptions,
       name: this._getRequestName(request, 'request')
     })
-      .done(onAjaxDone.bind(this))
-      .fail(onAjaxFail.bind(this));
+      .then(onAjaxDone.bind(this), onAjaxFail.bind(this))
+      .catch(error => App.get().errorHandler.handle(error).then(errorInfo => undefined)); // show message box on error, ignore result);
 
     // --- Helper methods ---
 
@@ -960,9 +945,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       }
     }
 
-    function onAjaxFail(ajaxError: { jqXHR: JQuery.jqXHR; textStatus: ErrorTextStatus; errorThrown: string }) {
+    function onAjaxFail(ajaxError: AjaxError) {
       this.backgroundJobPollingSupport.setFailed();
-      this._processErrorResponse(ajaxError.jqXHR, ajaxError.textStatus, ajaxError.errorThrown, request);
+      this._processErrorResponse(ajaxError, request);
     }
   }
 
@@ -1020,10 +1005,11 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
   }
 
-  protected _processErrorResponse(jqXHR: JQuery.jqXHR, textStatus: ErrorTextStatus, errorThrown: string, request: RemoteRequest) {
+  protected _processErrorResponse(error: AjaxError, request: RemoteRequest) {
+    let {jqXHR, textStatus, errorThrown} = error;
     $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
 
-    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
+    let offlineError = AjaxCall.isOfflineError(error);
     if (offlineError) {
       if (this.ready) {
         this.goOffline();
@@ -1146,7 +1132,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    *          If defined, a second call to this method with the same errorCode will
    *          do nothing. Can be used to prevent double messages for the same error.
    */
-  showFatalMessage(options: FatalMessageOptions, errorCode?: string): JQuery.Promise<void> {
+  showFatalMessage(options: FatalMessageOptions, errorCode?: string): Promise<void> {
     if (!errorCode) {
       errorCode = App.get().errorHandler.getJsErrorCode();
     }
@@ -1305,9 +1291,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
   }
 
-  listen(): JQuery.Promise<string[]> {
+  listen(): Promise<string[]> {
     if (!this._deferred) {
-      this._deferred = $.Deferred();
+      this._deferred = new Deferred();
       this._deferredEventTypes = [];
     }
     return this._deferred.promise();
@@ -1316,7 +1302,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   /**
    * @returns a promise that is resolved when pending requests are finished or if there are no requests pending and no events queued.
    */
-  whenRequestsDone(): JQuery.Promise<string[]> {
+  whenRequestsDone(): Promise<string[]> {
     if (this.areRequestsPending() || this.areEventsQueued()) {
       return this.listen();
     }
@@ -1331,7 +1317,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    */
   onRequestsDone(func: (...args: any[]) => void, ...vararg: any[]) {
     if (this.areRequestsPending() || this.areEventsQueued()) {
-      this.listen().done(onEventsProcessed);
+      this.listen().then(onEventsProcessed);
     } else {
       func.apply(this, vararg);
     }
@@ -1415,8 +1401,10 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       };
     }
 
-    // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once
-    $.ajax(this.defaultAjaxOptions(request));
+    // Do not use _sendRequest to make sure a log request has no side effects and will be sent only once.
+    ajax.call(this.defaultAjaxOptions(request)).catch(error => {
+      $.log.isWarnEnabled() && $.log.warn('Failed to send log request', error);
+    });
   }
 
   /** @internal */
@@ -1472,7 +1460,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     this.trigger('eventsProcessed');
   }
 
-  start(): JQuery.Promise<any> {
+  start(): Promise<any> {
     $.log.isInfoEnabled() && $.log.info('Session starting...');
 
     // Send startup request
@@ -1498,7 +1486,10 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   }
 
   destroy() {
-    // NOP
+    clearTimeout(this._sendTimeoutId);
+    this._sendTimeoutId = null;
+    this._asyncDelay = null;
+    this.destroyed = true;
   }
 
   exportAdapterData(adapterData: AdapterData): AdapterData {
