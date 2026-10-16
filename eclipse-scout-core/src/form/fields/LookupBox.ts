@@ -130,6 +130,10 @@ export abstract class LookupBox<TValue> extends ValueField<TValue[], TValue | TV
     return lookupCall
       .execute()
       .finally(() => {
+        if (this._currentLookupCall !== lookupCall) {
+          // A newer lookup has been started (this one was aborted), the newer one resets the state when it is done
+          return;
+        }
         this._currentLookupCall = null;
         this._lookupExecuted = true;
         this.setLoading(false);
