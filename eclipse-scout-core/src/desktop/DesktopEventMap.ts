@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BenchColumnLayoutData, Desktop, DesktopDisplayStyle, DesktopHistoryState, Event, FileChooser, Form, KeyStroke, Menu, MessageBox, NativeNotificationDefaults, Popup, PropertyChangeEvent, ViewButton, Widget, WidgetEventMap
+  BenchColumnDisplayViewId, BenchColumnLayoutData, Desktop, DesktopDisplayStyle, DesktopHistoryState, Event, FileChooser, Form, KeyStroke, Menu, MessageBox, NativeNotificationDefaults, Popup, PropertyChangeEvent, ViewButton, Widget,
+  WidgetEventMap
 } from '../index';
 
 export interface DesktopCancelFormsEvent<T = Desktop> extends Event<T> {
@@ -42,6 +43,7 @@ export interface DesktopEventMap extends WidgetEventMap {
   'propertyChange:headerVisible': PropertyChangeEvent<boolean>;
   'propertyChange:inBackground': PropertyChangeEvent<boolean>;
   'propertyChange:keyStrokes': PropertyChangeEvent<KeyStroke[]>;
+  'propertyChange:maximizedBenchColumn': PropertyChangeEvent<BenchColumnDisplayViewId>;
   'propertyChange:menus': PropertyChangeEvent<Menu[]>;
   'propertyChange:messageBoxes': PropertyChangeEvent<MessageBox[]>;
   'propertyChange:nativeNotificationDefaults': PropertyChangeEvent<NativeNotificationDefaults>;

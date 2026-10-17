@@ -222,7 +222,7 @@ describe('DesktopBench', () => {
     });
   });
 
-  describe('column visible', () => {
+  describe('maximizedBenchColumn', () => {
     let bench: DesktopBench, westColumn: BenchColumn, centerColumn: BenchColumn, eastColumn: BenchColumn;
 
     beforeEach(() => {
@@ -238,69 +238,184 @@ describe('DesktopBench', () => {
       return form;
     }
 
-    it('removes an invisible column even if it has views', () => {
+    it('removes the other columns even if they have views', () => {
       bench.addView(createView('C'));
+      bench.addView(createView('E'));
       expect(centerColumn.rendered).toBe(true);
 
-      centerColumn.setVisible(false);
+      desktop.setMaximizedBenchColumn('E');
       expect(centerColumn.rendered).toBe(false);
-      expect(bench.visibleColumns()).not.toContain(centerColumn);
+      expect(eastColumn.rendered).toBe(true);
+      expect(bench.visibleColumns()).toEqual([eastColumn]);
     });
 
-    it('removes an invisible column even if alwaysRendered is set', () => {
+    it('removes the other columns even if alwaysRendered is set', () => {
       desktop.setProperty('benchLayoutData', {columns: [null, {alwaysRendered: true}, null]});
+      bench.addView(createView('E'));
       expect(centerColumn.rendered).toBe(true);
 
-      centerColumn.setVisible(false);
+      desktop.setMaximizedBenchColumn('E');
       expect(centerColumn.rendered).toBe(false);
 
-      centerColumn.setVisible(true);
+      desktop.setMaximizedBenchColumn(null);
       expect(centerColumn.rendered).toBe(true);
       expect(centerColumn.isAlwaysRendered()).toBe(true);
     });
 
-    it('leaves only the visible column without splitters', () => {
+    it('leaves only the maximized column without splitters', () => {
       bench.addView(createView('W'));
       bench.addView(createView('C'));
       bench.addView(createView('E'));
       expect(bench.getComponents().length).toBe(5);
 
-      westColumn.setVisible(false);
-      centerColumn.setVisible(false);
+      desktop.setMaximizedBenchColumn('E');
       expect(bench.getComponents()).toEqual([eastColumn]);
-      expect(eastColumn.rendered).toBe(true);
+      expect(westColumn.rendered).toBe(false);
     });
 
-    it('renders the column with its views when it becomes visible again', () => {
+    it('renders the other columns with their views when reset', () => {
       let view = createView('C');
       bench.addView(view);
-      centerColumn.setVisible(false);
+      bench.addView(createView('E'));
+      desktop.setMaximizedBenchColumn('E');
       expect(view.rendered).toBe(false);
 
-      centerColumn.setVisible(true);
+      desktop.setMaximizedBenchColumn(null);
       expect(centerColumn.rendered).toBe(true);
       expect(view.rendered).toBe(true);
     });
 
-    it('keeps the splitters when the last view of an invisible column is removed', () => {
-      bench.addView(createView('W'));
+    it('keeps the components when the last view of a hidden column is removed', () => {
       bench.addView(createView('E'));
       let view = createView('C');
       bench.addView(view);
-      centerColumn.setVisible(false);
+      desktop.setMaximizedBenchColumn('E');
       let components = bench.getComponents();
-      expect(components.length).toBe(3);
+      expect(components).toEqual([eastColumn]);
 
       bench.removeView(view);
       expect(centerColumn.rendered).toBe(false);
       expect(bench.getComponents()).toBe(components);
     });
 
-    it('does not render an invisible column when a view is added', () => {
-      centerColumn.setVisible(false);
-      bench.addView(createView('C'));
+    it('does not render a hidden column when a view is added without activation', () => {
+      bench.addView(createView('E'));
+      desktop.setMaximizedBenchColumn('E');
+      bench.addView(createView('C'), false);
       expect(centerColumn.viewCount()).toBe(1);
       expect(centerColumn.rendered).toBe(false);
+      expect(desktop.maximizedBenchColumn).toBe('E');
+    });
+
+    it('is reset when a view in another column is activated', () => {
+      bench.addView(createView('C'));
+      bench.addView(createView('E'));
+      desktop.setMaximizedBenchColumn('E');
+
+      let view = createView('C');
+      bench.addView(view);
+      expect(desktop.maximizedBenchColumn).toBe(null);
+      expect(centerColumn.rendered).toBe(true);
+      expect(view.rendered).toBe(true);
+    });
+
+    it('is not reset when a view in the maximized column is activated', () => {
+      bench.addView(createView('C'));
+      let view = createView('E');
+      bench.addView(view);
+      bench.addView(createView('E'));
+      desktop.setMaximizedBenchColumn('E');
+
+      bench.activateView(view);
+      expect(desktop.maximizedBenchColumn).toBe('E');
+      expect(centerColumn.rendered).toBe(false);
+    });
+
+    it('is not reset when a view is activated during the initial form rendering', () => {
+      let view = createView('C');
+      bench.addView(view, false);
+      bench.addView(createView('E'));
+      desktop.setMaximizedBenchColumn('E');
+
+      desktop.initialFormRendering = true;
+      bench.activateView(view);
+      desktop.initialFormRendering = false;
+      expect(desktop.maximizedBenchColumn).toBe('E');
+      expect(centerColumn.rendered).toBe(false);
+    });
+
+    it('is applied to a recreated bench', () => {
+      desktop.setMaximizedBenchColumn('E');
+      desktop.setBenchVisible(false);
+      desktop.setBenchVisible(true);
+      bench = desktop.bench;
+      bench.addView(createView('C'), false);
+      bench.addView(createView('E'));
+
+      expect(bench.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.CENTER].rendered).toBe(false);
+      expect(bench.visibleColumns()).toEqual([bench.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.RIGHT]]);
+    });
+
+    describe('with header tab area', () => {
+
+      beforeEach(() => {
+        session = sandboxSession({
+          desktop: {
+            headerVisible: true,
+            benchVisible: true
+          }
+        });
+        desktop = session.desktop;
+        formHelper = new FormSpecHelper(session);
+        bench = desktop.bench;
+        centerColumn = bench.columns[DesktopBench.VIEW_AREA_COLUMN_INDEX.CENTER];
+      });
+
+      function showView(title: string): Form {
+        let form = formHelper.createViewWithOneField();
+        form.title = title;
+        form.displayViewId = 'C';
+        desktop.showForm(form);
+        return form;
+      }
+
+      it('renders the view tabs again when the maximized column is reset', () => {
+        let view1 = showView('view1');
+        let view2 = showView('view2');
+        let tabArea = desktop.header.tabArea;
+        let [tab1, tab2] = tabArea.tabs;
+        expect(tab1.view).toBe(view1);
+        expect(tab2.view).toBe(view2);
+        expect(tab2.selected).toBe(true);
+
+        desktop.setMaximizedBenchColumn('E');
+        expect(tab1.rendered).toBe(false);
+        expect(tab2.rendered).toBe(false);
+
+        desktop.setMaximizedBenchColumn(null);
+        expect(view2.rendered).toBe(true);
+        expect(tab1.rendered).toBe(true);
+        expect(tab2.rendered).toBe(true);
+        expect(tab1.selected).toBe(false);
+        expect(tab2.selected).toBe(true);
+        expect(tab2.$container.parent()[0]).toBe(tabArea.$container[0]);
+        expect(tab2.$container.prevAll('.simple-tab')[0]).toBe(tab1.$container[0]);
+      });
+
+      it('keeps the view tab linked to its view after the maximized column was reset', () => {
+        let view = showView('title');
+        let tab = desktop.header.tabArea.tabs[0];
+        desktop.setMaximizedBenchColumn('E');
+        desktop.setMaximizedBenchColumn(null);
+
+        view.setTitle('new title');
+        expect(tab.title).toBe('new title');
+        expect(tab.$title.text()).toBe('new title');
+
+        view.close();
+        expect(tab.destroyed).toBe(true);
+        expect(desktop.header.tabArea.tabs.length).toBe(0);
+      });
     });
   });
 });

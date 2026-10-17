@@ -82,6 +82,15 @@ export class HeaderTabBoxController extends DesktopTabBoxController {
     }
   }
 
+  renderTabs() {
+    if (!this.tabArea.rendered) {
+      return;
+    }
+    this.tabArea.getTabs()
+      .filter(tab => !tab.rendered)
+      .forEach(tab => this.tabArea.renderTab(tab));
+  }
+
   override getTabs(): DesktopTab[] {
     if (this.tabAreaInHeader) {
       return this.tabArea.getTabs();

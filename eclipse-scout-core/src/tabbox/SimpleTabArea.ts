@@ -197,6 +197,18 @@ export class SimpleTabArea<TView extends SimpleTabView = SimpleTabView> extends 
     }
   }
 
+  renderTab(tab: SimpleTab<TView>) {
+    let index = this.tabs.indexOf(tab);
+    if (index < 0 || tab.rendered || !this.rendered) {
+      return;
+    }
+    let sibling = this.tabs.slice(0, index).reverse().find(t => t.rendered);
+    tab.renderAfter(this.$container, sibling);
+    this._renderVisible();
+    widgets.updateFirstLastMarker(this.getTabs());
+    this.invalidateLayoutTree();
+  }
+
   destroyTab(tab: SimpleTab<TView>) {
     let index = this.tabs.indexOf(tab);
     if (index < 0) {

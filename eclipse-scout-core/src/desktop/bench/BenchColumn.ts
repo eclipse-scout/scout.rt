@@ -342,7 +342,7 @@ export class BenchColumn extends Widget implements BenchColumnModel {
   }
 
   needsRendering(): boolean {
-    return this.visible && (this.isAlwaysRendered() || this.hasViews());
+    return this.isAlwaysRendered() || this.hasViews();
   }
 
   getComponents(): (SimpleTabBox<OutlineContent> | Splitter)[] {

@@ -53,7 +53,6 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   protected _viewRemoveHandler: EventHandler<BenchColumnViewRemoveEvent>;
   protected _viewActivateHandler: EventHandler<BenchColumnViewActivateEvent>;
   protected _viewDeactivateHandler: EventHandler<BenchColumnViewDeactivateEvent>;
-  protected _columnVisibleChangeHandler: EventHandler<PropertyChangeEvent<boolean, BenchColumn>>;
 
   constructor() {
     super();
@@ -79,7 +78,6 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     this._viewRemoveHandler = this._onViewRemove.bind(this);
     this._viewActivateHandler = this._onViewActivate.bind(this);
     this._viewDeactivateHandler = this._onViewDeactivate.bind(this);
-    this._columnVisibleChangeHandler = this._onColumnVisibleChange.bind(this);
   }
 
   static VIEW_MIN_HEIGHT = null; // Configured in sizes.css
@@ -161,7 +159,6 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       column.on('viewRemove', this._viewRemoveHandler);
       column.on('viewActivate', this._viewActivateHandler);
       column.on('viewDeactivate', this._viewDeactivateHandler);
-      column.on('propertyChange:visible', this._columnVisibleChangeHandler);
       this.columns.push(column);
     }
   }
@@ -201,7 +198,16 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   }
 
   visibleColumns(): BenchColumn[] {
-    return this.columns.filter(column => column.needsRendering());
+    return this.columns.filter(column => this._needsRendering(column));
+  }
+
+  protected _needsRendering(column: BenchColumn): boolean {
+    return column.needsRendering() && !this._isHiddenByMaximizedColumn(column);
+  }
+
+  protected _isHiddenByMaximizedColumn(column: BenchColumn): boolean {
+    let maximizedColumnId = this.desktop.maximizedBenchColumn;
+    return !!maximizedColumnId && column !== this._getColumn(maximizedColumnId);
   }
 
   protected _renderColumns() {
@@ -214,6 +220,9 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
       return;
     }
     column.render();
+    if (this.headerTabAreaController && column === this._getColumn('C')) {
+      this.headerTabAreaController.renderTabs();
+    }
   }
 
   protected override _remove() {
@@ -350,10 +359,11 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
   protected _updateRenderedColumns(): boolean {
     let changed = false;
     this.columns.forEach(c => {
-      if (c.needsRendering() && !c.rendered) {
+      let needsRendering = this._needsRendering(c);
+      if (needsRendering && !c.rendered) {
         this._renderColumn(c);
         changed = true;
-      } else if (!c.needsRendering() && c.rendered) {
+      } else if (!needsRendering && c.rendered) {
         c.remove();
         changed = true;
       }
@@ -588,6 +598,9 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     if (event.propertyName === 'benchLayoutData') {
       this._onBenchLayoutDataChange();
     }
+    if (event.propertyName === 'maximizedBenchColumn') {
+      this._syncRenderedColumns();
+    }
   }
 
   protected _onNavigationHandleAction(event: CollapseHandleActionEvent) {
@@ -670,10 +683,6 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     event.preventDefault();
   }
 
-  protected _onColumnVisibleChange(event: PropertyChangeEvent<boolean, BenchColumn>) {
-    this._syncRenderedColumns();
-  }
-
   protected _invalidateColumnLayout() {
     if (this.changingCounter > 0) {
       this.changed = true;
@@ -700,6 +709,9 @@ export class DesktopBench extends Widget implements DesktopBenchModel {
     let view = event.view;
     if (this.outlineContent === view) {
       this.desktop.bringOutlineToFront();
+    }
+    if (this.desktop.rendered && !this.desktop.initialFormRendering && this._isHiddenByMaximizedColumn(event.source)) {
+      this.desktop.setMaximizedBenchColumn(null);
     }
     this.trigger('viewActivate', {
       view: view
