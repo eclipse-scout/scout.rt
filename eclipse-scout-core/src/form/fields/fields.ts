@@ -173,7 +173,12 @@ export const fields = {
    * Using the exec command allows the user to undo the operation (e.g. using ctrl-z).
    */
   focusAndInsertText($input: JQuery<HTMLInputElement | HTMLTextAreaElement>, text: string) {
-    $input[0].focus();
-    $input.document(true).execCommand('insertText', false, text);
+    let inputElem = $input[0];
+    inputElem.focus();
+    if (inputElem.tagName === 'TEXTAREA') {
+      inputElem.setRangeText(text);
+    } else {
+      $input.document(true).execCommand('insertText', false, text);
+    }
   }
 };
