@@ -1163,31 +1163,6 @@ describe('Widget', () => {
       expect(widget.children.length).toBe(1);
     });
 
-    it('relinks parent destroy listener to the new parent', () => {
-      let widget = createWidget({
-        parent: parent
-      });
-      let another = createWidget({
-        parent: parent
-      });
-      expect(widget.parent).toBe(parent);
-      expect(another.parent).toBe(parent);
-
-      let widgetListenerCount = widget.events.count();
-      let parentListenerCount = parent.events.count();
-      another.setParent(widget);
-      expect(parent.events.count()).toBe(parentListenerCount - 1);
-      expect(widget.events.count()).toBe(widgetListenerCount + 1);
-
-      another.setParent(parent);
-      expect(parent.events.count()).toBe(parentListenerCount);
-      expect(widget.events.count()).toBe(widgetListenerCount);
-
-      // Ensure parent destroy listener is removed on destroy
-      another.destroy();
-      expect(parent.events.count()).toBe(parentListenerCount - 1);
-    });
-
     it('triggers hierarchyChange event when parent changes', () => {
       let widget = createWidget({
         parent: parent

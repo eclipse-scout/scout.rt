@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,6 +19,10 @@ export type ColumnComparator<T = any> = {
   install(session: Session): boolean;
   [key: string]: any;
 };
+
+// Shared instances to avoid creating new regexps on every compare.
+const ALPHANUMERIC_REGEXP_1 = /([0-9]+)|[^0-9]+/g;
+const ALPHANUMERIC_REGEXP_2 = /([0-9]+)|[^0-9]+/g;
 
 export const comparators = {
   /**
@@ -141,29 +145,44 @@ export const comparators = {
         return 1;
       }
 
-      let pattern = '(([0-9]+)|([^0-9]+))';
-      let regexp1 = new RegExp(pattern, 'g');
-      let regexp2 = new RegExp(pattern, 'g');
-      let found1 = regexp1.exec(valueA + '');
-      let found2 = regexp2.exec(valueB + '');
-      while (found1 && found2) {
-        let n1 = parseInt(found1[1], 0);
-        let n2 = parseInt(found2[1], 0);
-        if (!isNaN(n1) && !isNaN(n2)) {
-          let numericResult = comparators.NUMERIC.compare(n1, n2);
-          if (numericResult !== 0) {
-            return numericResult;
-          }
-        } else {
-          let textResult = ignoreCase ? comparators.TEXT.compareIgnoreCase(found1[1], found2[1]) : comparators.TEXT.compare(found1[1], found2[1]);
-          if (textResult !== 0) {
-            return textResult;
-          }
-        }
-        found1 = regexp1.exec(valueA + '');
-        found2 = regexp2.exec(valueB + '');
+      valueA = valueA + '';
+      valueB = valueB + '';
+      if (valueA === valueB) {
+        return 0;
       }
 
+      // Split the values into chunks of digits or text.
+      // found[0] is the whole chunk, found[1] (the only capture group) is only set if the chunk consists of digits.
+      let regexp1 = ALPHANUMERIC_REGEXP_1;
+      let regexp2 = ALPHANUMERIC_REGEXP_2;
+      regexp1.lastIndex = 0; // Reset because the regexps are shared and a previous call may have stopped early
+      regexp2.lastIndex = 0;
+      let found1 = regexp1.exec(valueA);
+      let found2 = regexp2.exec(valueB);
+      while (found1 && found2) {
+        // Identical chunks always compare as 0 -> skip them
+        if (found1[0] !== found2[0]) {
+          // If found[1] is set we know it is a number (there is no need to use isNaN() to check it again which makes it faster)
+          if (found1[1] && found2[1]) {
+            // Both chunks only contain digits -> compare numerically
+            let numericResult = comparators.NUMERIC.compare(parseInt(found1[1], 10), parseInt(found2[1], 10));
+            if (numericResult !== 0) {
+              return numericResult;
+            }
+          } else {
+            // At least one chunk is text -> compare both chunks as text
+            let textResult = ignoreCase ? comparators.TEXT.compareIgnoreCase(found1[0], found2[0]) : comparators.TEXT.compare(found1[0], found2[0]);
+            if (textResult !== 0) {
+              return textResult;
+            }
+          }
+        }
+        // Get the next chunk of digits or text
+        found1 = regexp1.exec(valueA);
+        found2 = regexp2.exec(valueB);
+      }
+
+      // All common chunks are equal -> the value with more chunks is sorted last
       if (!found1 && !found2) {
         return 0;
       }
