@@ -134,6 +134,23 @@ describe('SequenceBox', () => {
       expect(field.tooltipText).toBe('foo');
       expect(field.fields[1].$status.isVisible()).toBe(false);
       expect(field.fields[1].tooltipText).toBe('foo');
+
+      field.fields[1].setTooltipHtmlEnabled(true);
+      expect(field.tooltipHtmlEnabled).toBe(true);
+
+      field.fields[1].setTooltipText(null);
+      expect(field.tooltipHtmlEnabled).toBe(false);
+
+      field.setTooltipHtmlEnabled(true);
+      field.fields[1].setTooltipHtmlEnabled(false);
+      expect(field.tooltipHtmlEnabled).toBe(true);
+
+      field.fields[1].setTooltipText('bar');
+      expect(field.tooltipText).toBe('bar');
+      expect(field.tooltipHtmlEnabled).toBe(false);
+
+      field.fields[1].setTooltipHtmlEnabled(true);
+      expect(field.tooltipHtmlEnabled).toBe(true);
     });
 
     it('moves the menus of the last field to the seq box', () => {
