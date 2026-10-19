@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -55,6 +55,7 @@ export class FormField extends Widget implements FormFieldModel {
   /** If set to true, {@link saveNeeded} will return true as well, even if the value has not been changed. */
   touched: boolean;
   tooltipText: string;
+  tooltipHtmlEnabled: boolean;
   font: string;
   foregroundColor: string;
   backgroundColor: string;
@@ -121,6 +122,7 @@ export class FormField extends Widget implements FormFieldModel {
     this.suppressStatus = null;
     this.touched = false;
     this.tooltipText = null;
+    this.tooltipHtmlEnabled = false;
     this.tooltipAnchor = FormField.TooltipAnchor.DEFAULT;
     this.onFieldTooltipOptionsCreator = null;
     this.validationResultProvider = this._createValidationResultProvider();
@@ -483,6 +485,16 @@ export class FormField extends Widget implements FormFieldModel {
 
   /** @internal */
   _renderTooltipText() {
+    this._updateTooltip();
+  }
+
+  /** @see FormFieldModel.tooltipText */
+  setTooltipHtmlEnabled(tooltipHtmlEnabled: boolean) {
+    this.setProperty('tooltipHtmlEnabled', tooltipHtmlEnabled);
+  }
+
+  /** @internal */
+  _renderTooltipHtmlEnabled() {
     this._updateTooltip();
   }
 
@@ -1155,7 +1167,8 @@ export class FormField extends Widget implements FormFieldModel {
       parent: this,
       position: this.statusPosition,
       // This will be done by _updateFieldStatus again, but doing it here prevents unnecessary layout invalidations later on
-      visible: this._computeStatusVisible()
+      visible: this._computeStatusVisible(),
+      tooltipHtmlEnabled: this.tooltipHtmlEnabled
     });
     this.fieldStatus.render();
     this.$status = this.fieldStatus.$container;
