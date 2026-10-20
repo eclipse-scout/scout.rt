@@ -207,26 +207,14 @@ There is no synchronous way to query whether a native `Promise` is pending/resol
 When the promise comes from somewhere else (e.g. an ajax call), track the state explicitly. Guard the update with an identity check (§8) so a superseded promise can't overwrite the state of the current one:
 
 ```ts
-protected
-_trackState(promise
-:
-Promise<void>
-)
-{
+protected _trackState(promise: Promise<void>) {
   this._promiseState = 'pending';
   promise.then(
     () => this._updateState(promise, 'resolved'),
     () => this._updateState(promise, 'rejected')); // error is reported by the main chain
 }
 
-protected
-_updateState(promise
-:
-Promise<void>, state
-:
-'resolved' | 'rejected'
-)
-{
+protected _updateState(promise: Promise<void>, state: 'resolved' | 'rejected') {
   if (this._currentPromise === promise) {
     this._promiseState = state;
   }
@@ -348,9 +336,11 @@ Native Promises trigger a global "unhandled rejection" error when nothing ever a
   await rejected; // await later
   ```
 
-**Don't reach for a bare `.catch(() => {})` / `.then(fn, () => {})` as the default fix for a fire-and-forget call site (typical for UI event handlers where nobody awaits the result).** That was jQuery's actual behavior — silently dropping the error — and reproducing it mechanically throws away exactly the diagnostic value native Promise gives you over jQuery. Before adding a no-op guard, decide which of these two cases you're in:
+**Don't add a bare `.catch(() => {})` / `.then(fn, () => {})` to a fire-and-forget call site (typical for UI event handlers where nobody awaits the result).** That was jQuery's actual behavior — silently dropping the error — and reproducing it mechanically throws away exactly the diagnostic value native Promise gives you over jQuery. This holds in both of these cases:
 
-- **The error is already reported somewhere in the call chain** (e.g. an inner call already goes through the framework's `ErrorHandler`, or an event that already gets to a caller that handles it, before rethrowing/settling as rejected). Here an empty guard purely to prevent an unhandled-rejection failure is fine — add a one-line comment saying so, so the next reader doesn't mistake it for a silent swallow.
+- **The called method already reported the error itself** (e.g. an `openForm()` helper that shows a message box or calls the `ErrorHandler`, and then rejects anyway). Callers must not have to handle errors the called method created, so don't
+  guard the call sites. The method is the problem: it should either not reject after handling the error, or leave the error to the global handler instead of handling it itself. Leave the call sites unchanged and report the method
+  to the project owner, who decides which way to go.
 - **There is genuinely no other reporting path.** Don't paper over this with a local `.catch(error => someErrorHandler.handle(error))` at every call site either. That just trades one form of clutter (silent swallow) for another (
   per-call-site error-handling boilerplate). Scout has a global unhandled-rejection handler analogous to its synchronous one (see §7a), so the correct migration is usually to **do nothing**: leave the rejection unhandled and let it surface.
   That's the notification, and it's exactly what the global handler is meant to catch. Ask the project owner before inventing a per-site reporting convention.
@@ -402,7 +392,8 @@ Natively, the lifecycle continues as microtasks and overtakes the lookup. Nothin
 
   Triage the remaining findings by the method they are in:
   - inside a lifecycle hook, or a method called from one → the lifecycle can't wait for it: fix it (see below);
-  - other intended fire-and-forget code → mark it as intended with `void this._doSomethingAsync();`. Errors still reach the global handler (§7a).
+  - other intended fire-and-forget code → mark it as intended with `void this._doSomethingAsync();`. Errors still reach the global handler (§7a). If a project method's promise rarely needs to be awaited, add it to
+    `allowForKnownSafeMethods` instead of marking every call site.
 - **Make deferred work slower in specs.** Ordering bugs stay hidden as long as the deferred work happens to finish first. Raise `StaticLookupCall.delay` (e.g. to 50 ms) and slow down stubbed ajax responses in a test setup hook. Then run
   a generic check for each form: open it in edit mode, `await form.load()` and `expect(form.saveNeeded).toBeFalse()`. A form whose lifecycle doesn't wait for its asynchronous work now fails reliably.
 
@@ -430,8 +421,6 @@ Two related patterns to get right while you're in this territory:
   With native promises, `.finally()` already runs after a failing `.then()`. Chain `.then(onDone, onFail).finally(onAlways)` and let errors propagate. Where nobody else can ever see the promise (e.g. a central request queue), end the chain
   with one terminal `.catch(error => App.get().errorHandler.handle(error))` instead of a per-callback try/catch.
 - **A `.then(fn).catch(fn)` used only to avoid an unhandled rejection on the returned promise** (rather than for genuine multi-stage handling) is usually a sign the fire-and-forget question above wasn't asked yet — resolve it the same way rather than defaulting to that shape.
-
-If you do end up adding a no-op guard for the "already reported elsewhere" case, keep it a plain `.catch(() => {})` / `.then(fn, () => {})` with a comment — don't wrap it in a shared helper function; that's exactly the clutter a future global handler is meant to remove.
 
 ## 8. Staleness/supersession checks: replace counters with identity checks
 
