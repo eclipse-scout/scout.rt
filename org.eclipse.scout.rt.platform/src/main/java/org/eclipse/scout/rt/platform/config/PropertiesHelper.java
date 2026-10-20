@@ -98,7 +98,7 @@ public class PropertiesHelper {
 
   private static final char ENVIRONMENT_VARIABLE_DOT_REPLACEMENT = '_';
   private static final Pattern PLACEHOLDER_PATTERN = PropertiesUtility.DEFAULT_VARIABLE_PATTERN;
-  private static final Pattern PATH_PLACEHOLDER_PATTERN = Pattern.compile("^\\$([^\\$]+)\\$");
+  private static final Pattern PATH_PLACEHOLDER_PATTERN = Pattern.compile("^\\$([^$]+)\\$");
   public static final String CLASSPATH_PROTOCOL_NAME = "classpath";
   public static final char PROTOCOL_DELIMITER = ':';
   public static final char NAMESPACE_DELIMITER = '|';
@@ -107,7 +107,7 @@ public class PropertiesHelper {
   public static final char COLLECTION_DELIMITER_END = ']';
   public static final String CLASSPATH_PREFIX = CLASSPATH_PROTOCOL_NAME + PROTOCOL_DELIMITER;
   public static final String IMPORT_KEY = "import";
-  private static final Pattern IMPORT_PATTERN = Pattern.compile("^import(\\[[^\\]]*\\])?$");
+  private static final Pattern IMPORT_PATTERN = Pattern.compile("^import(\\[[^]]*])?$");
 
   /**
    * The variable ${CURRENT_DIR} can be used in a property file defined with -Dscout.env=file:/path/to/file to access
@@ -155,8 +155,8 @@ public class PropertiesHelper {
     try {
       m_initializing = true;
       if (properties != null) {
-        m_hasProviderProperties = parse(properties);
-        importSystemImports(new HashSet<>(), null);
+        m_hasProviderProperties = parse(properties, m_configProperties);
+        importSystemImports(new HashSet<>(), null, m_configProperties);
         resolveAll(PLACEHOLDER_PATTERN);
 
         // remove internal properties
@@ -197,7 +197,7 @@ public class PropertiesHelper {
     }
     properties.forEach(prop -> {
       String key = prop.getKey();
-      String value = resolveImports(key, prop.getValue());
+      String value = resolveImports(key, prop.getValue(), m_envProperties);
       if (StringUtility.hasText(key)) {
         m_envProperties.put(key, value);
       }
@@ -206,11 +206,11 @@ public class PropertiesHelper {
   }
 
   /**
-   * Parse regular config.properties
+   * Parse properties file and add them to provided propertiesMap
    *
    * @return true if the file exists
    */
-  protected boolean parse(IPropertyProvider propertyProvider) {
+  protected boolean parse(IPropertyProvider propertyProvider, Map<String, String> propertiesMap) {
     m_parsedFiles.add(propertyProvider.getPropertiesIdentifier());
     List<Entry<String, String>> properties = propertyProvider.readProperties();
     if (properties == null) {
@@ -218,26 +218,26 @@ public class PropertiesHelper {
     }
     properties.forEach(prop -> {
       String key = prop.getKey();
-      String value = resolveImports(key, prop.getValue());
-      String oldValue = m_configProperties.get(key);
+      String value = resolveImports(key, prop.getValue(), propertiesMap);
+      String oldValue = propertiesMap.get(key);
       if (oldValue != null && !oldValue.equals(value)) {
         if (m_referencedKeys.contains(key)) {
-          LOG.error("Replacement of already used config key: '{}' is not allowed. Old value '{}' will NOT be replaced with '{}'", key, m_configProperties.get(key), value);
+          LOG.error("Replacement of already used config key: '{}' is not allowed. Old value '{}' will NOT be replaced with '{}'", key, propertiesMap.get(key), value);
           return;
         }
         else {
-          LOG.info("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, m_configProperties.get(key), value);
+          LOG.info("Duplicate config key: '{}'. Old value '{}' replaced with '{}'.", key, propertiesMap.get(key), value);
         }
       }
       if (StringUtility.hasText(key)) {
-        m_configProperties.put(key, value);
+        propertiesMap.put(key, value);
       }
     });
     return true;
   }
 
   private String normalizeImportKey(String key) {
-    Pattern p = Pattern.compile("^" + IMPORT_KEY + "(\\_|\\.)(.*)$");
+    Pattern p = Pattern.compile("^" + IMPORT_KEY + "([_.])(.*)$");
     Matcher m = p.matcher(key);
     if (m.find()) {
       return IMPORT_KEY + "[" + m.group(2) + "]";
@@ -1139,7 +1139,7 @@ public class PropertiesHelper {
     return PropertiesUtility.resolveValue(null, value, variablePattern, replacer, true);
   }
 
-  protected void importSystemImports(Set<String> importsToIgnore, Pattern pat) {
+  protected void importSystemImports(Set<String> importsToIgnore, Pattern pat, Map<String, String> propertiesMap) {
     // import map key might contain any text, not relevant, but that's why getPropertyList cannot be used here (expects increasing indexes)
     Collection<String> systemImports = getPropertyMap(IMPORT_KEY, Collections.emptyMap(), null, true).values();
     if (systemImports.isEmpty()) {
@@ -1149,7 +1149,7 @@ public class PropertiesHelper {
     systemImports.forEach(impUrl -> {
       IPropertyProvider props = getPropertyProvider(impUrl);
       if (!m_parsedFiles.contains(props.getPropertiesIdentifier())) {
-        parse(props);
+        parse(props, propertiesMap);
       }
     });
   }
@@ -1158,14 +1158,14 @@ public class PropertiesHelper {
     return m_configProperties;
   }
 
-  protected String resolveImports(String key, String value) {
+  protected String resolveImports(String key, String value, Map<String, String> propertiesMap) {
     if (IMPORT_PATTERN.matcher(key).find()) {
       // in case of an import evaluate system and environment write now to not import wrong properties
 
       value = resolve(resolveSystemProperty(key, value), PLACEHOLDER_PATTERN);
       IPropertyProvider propertyProvider = getPropertyProvider(value);
       if (!m_parsedFiles.contains(propertyProvider.getPropertiesIdentifier())) {
-        parse(propertyProvider);
+        parse(propertyProvider, propertiesMap);
       }
       else {
         LOG.warn("Import of '{}' skipped because already imported: {}.", value, m_parsedFiles);
