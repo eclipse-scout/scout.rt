@@ -19,7 +19,7 @@ export interface DatePickerModel extends WidgetModel {
   selectedDate?: Date;
   dateFormat?: DateFormat | string;
   viewDate?: Date;
-  allowedDates: Date[];
+  allowedDates?: Date[];
   allowedDateProvider?: (date: Date, direction: 1 | -1, allowCurrentDate: boolean) => Date;
   touch?: boolean;
 }
