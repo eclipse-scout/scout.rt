@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,18 +13,21 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
 
   declare model: DataObjectDeserializerModel;
 
-  protected static _TYPE_VERSION_ATTRIBUTE_NAME = '_typeVersion';
+  static _TYPE_VERSION_ATTRIBUTE_NAME = '_typeVersion';
 
   id: string;
   objectType: string;
   createPojoIfDoIsUnknown: boolean;
+  deserializeBaseDoEntity: boolean;
   retainTypeVersion: Predicate<object>;
 
   constructor(model?: InitModelOf<DataObjectDeserializer>) {
     this.createPojoIfDoIsUnknown = !!model?.createPojoIfDoIsUnknown;
-    this.retainTypeVersion = scout.nvl(model?.retainTypeVersion, (obj: object) => !(obj instanceof BaseDoEntity));
-    if (!objects.isFunction(this.retainTypeVersion)) {
-      const retain = !!this.retainTypeVersion;
+    this.deserializeBaseDoEntity = objects.isNullOrUndefined(model?.deserializeBaseDoEntity) || model?.deserializeBaseDoEntity === true;
+    if (objects.isFunction(model?.retainTypeVersion)) {
+      this.retainTypeVersion = model.retainTypeVersion;
+    } else {
+      const retain = scout.nvl(model?.retainTypeVersion, true);
       this.retainTypeVersion = () => retain;
     }
   }
@@ -38,7 +41,7 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
     if (objects.isNullOrUndefined(value)) {
       return value; // no value to convert
     }
-    if (objects.isPojo(value)) {
+    if ((this.deserializeBaseDoEntity && value instanceof BaseDoEntity) || objects.isPojo(value)) {
       // nested object
       return this._deserializeObject(value, valueMetaData);
     }
@@ -105,8 +108,15 @@ export interface DataObjectDeserializerModel extends ObjectModel<DataObjectDeser
   /**
    * Controls whether the '_typeVersion' property is retained when deserializing DataObjects.
    * The property can be given as a {@link boolean} or a {@link Predicate}, whose input is the deserialized DataObject.
-   * If `true`, the '_typeVersion' will be set on the deserialized DataObject. If `false`, it will be ignored.
-   * Default is a {@link Predicate} that ignores the '_typeVersion' if the deserialized DataObject is instance of {@link BaseDoEntity}.
+   * If `true`, the '_typeVersion' will be set on the deserialized DataObject. If `false`, it will be ignored. Default is `true`.
    */
   retainTypeVersion?: boolean | Predicate<object>;
+  /**
+   * Controls the behavior when deserializing a property which is already `instanceof BaseDoEntity`.
+   *
+   * If `true` (default) it is deserialized like a Pojo which means the resulting object is a deep copy and does not reference the original DO.
+   *
+   * If `false` it is directly assigned to the resulting object which means no new instance is created and the new object shares the instance with the original DO.
+   */
+  deserializeBaseDoEntity?: boolean;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, Constructor, DataObjectInventory, ObjectFactory, ObjectType, TypeDescriptor} from '../../index';
+import {Constructor, DataObjectInventory, ObjectFactory, ObjectType, TypeDescriptor} from '../../index';
 
 export const doValueMetaData = {
   TYPE_META_DATA_KEY: 'scout.m.t',
@@ -85,9 +85,6 @@ export const doValueMetaData = {
   },
 
   detectDataObjectClass(obj: any): Constructor {
-    if (obj instanceof BaseDoEntity) {
-      return obj.constructor as Constructor;
-    }
     const typeName = obj._type;
     if (typeof typeName === 'string') {
       const doConstructor = DataObjectInventory.get().toConstructor(typeName);
