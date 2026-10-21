@@ -315,6 +315,16 @@ public class OutlineMenuWrapper extends AbstractWidget implements IReadOnlyMenu 
   }
 
   @Override
+  public boolean isTooltipHtmlEnabled() {
+    return m_wrappedMenu.isTooltipHtmlEnabled();
+  }
+
+  @Override
+  public void setTooltipHtmlEnabled(boolean tooltipHtmlEnabled) {
+    m_wrappedMenu.setTooltipHtmlEnabled(tooltipHtmlEnabled);
+  }
+
+  @Override
   public boolean isSeparator() {
     return m_wrappedMenu.isSeparator();
   }
