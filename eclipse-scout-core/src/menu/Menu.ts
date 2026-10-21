@@ -758,7 +758,9 @@ export class Menu extends Action implements MenuModel {
 
   protected override _computeTooltipText(): string {
     if (this._showTextAsTooltip()) {
-      return strings.join('\n\n', this.text, this.tooltipText);
+      let separator = this.tooltipHtmlEnabled ? '<br><br>' : '\n\n';
+      let text = this.tooltipHtmlEnabled && !this.htmlEnabled ? strings.encode(this.text) : this.text;
+      return strings.join(separator, text, this.tooltipText);
     }
     return super._computeTooltipText();
   }

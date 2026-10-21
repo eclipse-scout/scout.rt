@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, TabbableItem,
+  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, strings,
+  TabbableItem,
   TooltipPosition, tooltips, TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
@@ -41,7 +42,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
   textVisible: boolean;
   toggleAction: boolean;
   tooltipText: string;
-  tooltipHtmlEnabled = false;
+  tooltipHtmlEnabled : boolean = false;
   showTooltipWhenSelected: boolean;
   tooltipPosition: TooltipPosition;
   icon: Icon;
@@ -72,11 +73,10 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     this.textVisible = true;
     this.toggleAction = false;
     this.tooltipText = null;
-    this.tooltipHtmlEnabled = false;
     this.showTooltipWhenSelected = true;
 
     this._doubleClickSupport = new DoubleClickSupport();
-    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'toggleAction']);
+    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'tooltipHtmlEnabled', 'toggleAction']);
   }
 
   static ActionStyle = {
@@ -337,7 +337,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
 
   protected _updateAriaLabel() {
     let ariaLabel = this.text;
-    let ariaDesc = this.tooltipText;
+    let ariaDesc = this.tooltipHtmlEnabled ? strings.plainText(this.tooltipText) : this.tooltipText;
     if (ariaLabel) {
       if (this.textVisible) {
         // not needed if text is visible
