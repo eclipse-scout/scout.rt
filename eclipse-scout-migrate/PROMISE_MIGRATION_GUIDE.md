@@ -371,7 +371,7 @@ Real errors are unaffected and still fail the spec.
 
 ### 7b. Async work started in a synchronous lifecycle step
 
-A floating promise is not only an error-handling problem. It also means **nobody can wait for that work**. This is dangerous in synchronous lifecycle hooks like `Form.importData()`, `exportData()` or `_postLoad()`, when they start
+A floating promise is not only an error-handling problem. It also means **nobody can wait for that work**. This is dangerous in lifecycle hooks like `Form.importData()`, `exportData()` or `_postLoad()`, when they start
 asynchronous work (a lookup, a table reload, `_applyValue()`) and drop its promise. The lifecycle then continues, e.g. `FormLifecycle` calls `markAsSaved()` after loading, while the work is still running. When it finishes, it changes
 field values again, and the form ends up with a wrong `saveNeeded` state (or a missing value, a wrong enabled state, …).
 
@@ -397,22 +397,22 @@ Natively, the lifecycle continues as microtasks and overtakes the lookup. Nothin
 - **Make deferred work slower in specs.** Ordering bugs stay hidden as long as the deferred work happens to finish first. Raise `StaticLookupCall.delay` (e.g. to 50 ms) and slow down stubbed ajax responses in a test setup hook. Then run
   a generic check for each form: open it in edit mode, `await form.load()` and `expect(form.saveNeeded).toBeFalse()`. A form whose lifecycle doesn't wait for its asynchronous work now fails reliably.
 
-**How to fix them:** make the work part of the lifecycle. Return or await the promise where the hook allows it (e.g. in `_load()`). If the hook is synchronous by contract (like `importData()`), collect the promises, signal
-completion and wait for that signal in an asynchronous lifecycle step:
+**How to fix them:** make the work part of the lifecycle. Return or await the promise where the hook allows it, e.g. in `_load()` or `importData()`: `Form.importData()` may return a promise, and `Form.load()` waits for it
+before the form is marked as saved. Collect the promises if there are several:
 
 ```ts
-override importData() {
+override
+importData()
+:
+Promise < void > {
   let importPromise = this._importValues();     // previously called without using the returned promise
   let tablePromise = this._loadLookupTable();   // previously called without using the returned promise
-  // finally: trigger the event even if the import fails, otherwise the lifecycle would wait forever (the error is still reported by the global handler)
-  Promise.all([importPromise, tablePromise]).finally(() => this.trigger('importDataDone'));
-}
-
-protected override async _onLifecycleLoad(): Promise<void> {
-  await super._onLifecycleLoad();
-  await this.when('importDataDone'); // importData() is asynchronous, wait for it before the form is marked as saved
+  return Promise.all([importPromise, tablePromise]).then(() => undefined);
 }
 ```
+
+If a hook is synchronous by contract (its return value is ignored), collect the promises, signal completion (e.g. trigger an event in `.finally()`, so the lifecycle doesn't wait forever if the work fails) and wait for that
+signal in an asynchronous lifecycle step.
 
 Two related patterns to get right while you're in this territory:
 
