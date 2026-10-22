@@ -1084,18 +1084,12 @@
         <version>2.22.0</version>
       </dependency>
 
-      <!-- Used transitively by scribejava-apis. ScribeJava is still based on OkHttp 4.x,
-           therefore we pin the latest available 4.x release instead of upgrading to OkHttp 5.x. -->
       <dependency>
         <groupId>com.squareup.okhttp3</groupId>
-        <artifactId>okhttp</artifactId>
-        <version>4.12.0</version>
-      </dependency>
-      <!-- Fix version to avoid dependency convergence between MinIO (okhttp 4.12.0 -> okio-jvm 3.6.0) and OpenTelemetry (okhttp-jvm 5.5.0 -> okio-jvm 3.18.1) -->
-      <dependency>
-        <groupId>com.squareup.okio</groupId>
-        <artifactId>okio-jvm</artifactId>
-        <version>3.18.1</version>
+        <artifactId>okhttp-bom</artifactId>
+        <version>5.5.1</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
 
       <dependency>
