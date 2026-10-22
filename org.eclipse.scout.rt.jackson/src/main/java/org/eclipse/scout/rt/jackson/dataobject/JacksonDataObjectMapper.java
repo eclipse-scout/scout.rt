@@ -151,7 +151,8 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
     return JsonMapper.builder(createJsonFactoryBuilder().build())
         .addModule(scoutDataObjectModule)
         .defaultDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)) // TODO [23.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
-        .deactivateDefaultTyping(); // disabled for security reasons
+        .deactivateDefaultTyping() // disabled for security reasons
+        .deserializerFactory(new ScoutDeserializerFactory());
   }
 
   protected JsonFactoryBuilder createJsonFactoryBuilder() {
