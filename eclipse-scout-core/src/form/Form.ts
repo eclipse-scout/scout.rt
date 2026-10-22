@@ -458,13 +458,22 @@ export class Form extends Widget implements FormModel, DisplayParent {
             return;
           }
 
+          const promises = [];
+
           this.setData(data);
-          this.importData();
+          let importPromise = this.importData();
+          if (objects.isPromise(importPromise)) {
+            promises.push(importPromise);
+          }
 
           // Wait for async field validators to complete so the value is set when the form loading finishes
           let pendingFields = FormLifecycle.validateFormFields(this).pendingElements;
           if (pendingFields.length) {
-            return $.promiseAll(pendingFields.map(field => field.promise))
+            promises.push(...pendingFields.map(field => field.promise));
+          }
+
+          if (promises.length) {
+            return $.promiseAll(promises)
               .then(() => this._loadingDone());
           }
 
@@ -562,8 +571,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Imports the {@link data} to the form.
+   *
+   * If a promise is returned, {@link load()} will wait for the promise to be resolved.
    */
-  importData() {
+  importData(): void | Promise<void> {
     // NOP
   }
 
