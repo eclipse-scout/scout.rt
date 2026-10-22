@@ -264,6 +264,25 @@ describe('Form', () => {
 
       return promise;
     });
+
+    it('waits for importData to complete if a promise is returned', async () => {
+      const def = new Deferred<void>();
+
+      class AsyncImportForm extends Form {
+        override importData() {
+          return def.promise();
+        }
+      }
+
+      let form = scout.create(AsyncImportForm, {parent: session.desktop});
+
+      let promise = form.load();
+      await sleep(); // Simulate long-running import
+      await expectAsync(promise).toBePending();
+
+      def.resolve();
+      await expectAsync(promise).toBeResolved();
+    });
   });
 
   describe('busy', () => {
