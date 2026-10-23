@@ -172,7 +172,7 @@ describe('BooleanColumn', () => {
       });
 
       describe('cell edit', () => {
-        it('updates the cell correctly', () => {
+        it('updates the cell correctly', async () => {
           let model = helper.createModelSingleColumnByValues([true], BooleanColumn);
           let table = helper.createTable(model);
           let column0 = table.columns[0] as BooleanColumn;
@@ -182,8 +182,7 @@ describe('BooleanColumn', () => {
           table.render();
 
           table.on('rowsUpdated', event => updateRowCount++);
-          table.prepareCellEdit(column0, table.rows[0]);
-          jasmine.clock().tick(0);
+          await table.prepareCellEdit(column0, table.rows[0]);
           let field = table.cellEditorPopup.cell.field;
           field.setValue(null);
           expect(field.value).toBe(null);
@@ -193,8 +192,7 @@ describe('BooleanColumn', () => {
           expect(table.$cell(column0, table.rows[0].$row).children('.check-box')).toHaveClass('undefined');
           expect(updateRowCount).toBe(1);
 
-          table.prepareCellEdit(column0, table.rows[0]);
-          jasmine.clock().tick(0);
+          await table.prepareCellEdit(column0, table.rows[0]);
           field = table.cellEditorPopup.cell.field;
           field.setValue(false);
           expect(field.value).toBe(false);

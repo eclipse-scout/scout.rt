@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, HierarchicalLookupResultBuilder, InitModelOf, LookupCall, LookupResult, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
+import {arrays, Deferred, HierarchicalLookupResultBuilder, InitModelOf, LookupCall, LookupResult, LookupRow, objects, QueryBy, scout, StaticLookupCallModel, strings} from '../index';
 import $ from 'jquery';
 
 /**
@@ -20,7 +20,7 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
 
   delay: number;
   data: any[];
-  protected _deferred: JQuery.Deferred<LookupResult<TKey>>;
+  protected _deferred: Deferred<LookupResult<TKey>>;
 
   constructor() {
     super();
@@ -54,13 +54,17 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     super.abort();
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getAll(): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByAll.bind(this), this.delay);
     return this._deferred.promise();
   }
 
   protected _queryByAll() {
+    if (this.session?.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     this._deferred.resolve({
       queryBy: QueryBy.ALL,
       lookupRows: this._lookupRowsByAll()
@@ -96,8 +100,8 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     return this.active === scout.nvl(dataRow.active, true);
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByText(text: string): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByText.bind(this, text), this.delay);
     return this._deferred.promise();
   }
@@ -126,15 +130,12 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     // before we can resolve the results
     promise
       .then(lookupRows => builder.addParentLookupRows(lookupRows))
-      .done(lookupRows => {
+      .then(lookupRows => {
         this._deferred.resolve({
           queryBy: QueryBy.TEXT,
           text: text,
           lookupRows: lookupRows
         });
-      })
-      .fail(error => {
-        throw error;
       });
   }
 
@@ -172,13 +173,17 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     return new RegExp('^' + text + '$', 'siu'); // s = DOT_ALL, i = CASE_INSENSITIVE, u = UNICODE_CASE
   }
 
-  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByKey(key: TKey): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByKey.bind(this, key), this.delay);
     return this._deferred.promise();
   }
 
   protected _queryByKey(key: TKey) {
+    if (this.session?.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     let lookupRow = this._lookupRowByKey(key);
     if (lookupRow) {
       this._deferred.resolve({
@@ -190,13 +195,17 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     }
   }
 
-  protected override _getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByKeys(keys: TKey[]): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(() => this._queryByKeys(keys), this.delay);
     return this._deferred.promise();
   }
 
   protected _queryByKeys(keys: TKey[]) {
+    if (this.session?.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     const lookupRows = arrays.ensure(keys).map(key => this._lookupRowByKey(key)).filter(row => !!row);
     if (lookupRows.length) {
       this._deferred.resolve({
@@ -216,13 +225,17 @@ export class StaticLookupCall<TKey> extends LookupCall<TKey> implements StaticLo
     return this._dataToLookupRow(data);
   }
 
-  protected override _getByRec(rec: TKey): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected override _getByRec(rec: TKey): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     setTimeout(this._queryByRec.bind(this, rec), this.delay);
     return this._deferred.promise();
   }
 
   protected _queryByRec(rec: TKey) {
+    if (this.session?.destroyed) {
+      // May cause unhandled rejection errors if session is destroyed
+      return;
+    }
     this._deferred.resolve({
       queryBy: QueryBy.REC,
       rec: rec,

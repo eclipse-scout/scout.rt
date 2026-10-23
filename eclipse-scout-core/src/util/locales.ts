@@ -7,14 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, arrays, Locale, LocaleModel, objects, scout, texts} from '../index';
+import {ajax, App, arrays, Locale, LocaleModel, objects, scout, texts} from '../index';
 import $ from 'jquery';
 
 export const locales = {
   localesMap: {},
 
-  bootstrap(url: string): JQuery.Promise<void> {
-    let promise: JQuery.Promise<any> = url ? $.ajaxJson(url) : $.resolvedPromise([]);
+  bootstrap(url: string): Promise<void> {
+    let promise: Promise<any> = url ? ajax.getJson(url) : $.resolvedPromise([]);
     return promise.then(locales._handleBootstrapResponse.bind(this, url));
   },
 

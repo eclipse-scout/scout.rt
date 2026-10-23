@@ -22,12 +22,10 @@ describe('DateField', () => {
     session = sandboxSession();
     helper = new FormSpecHelper(session);
     jasmine.Ajax.install();
-    jasmine.clock().install();
   });
 
   afterEach(() => {
     jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
     $('.tooltip').remove();
     removePopups(session, '.date-picker-popup');
     removePopups(session, '.time-picker-popup');
@@ -88,7 +86,6 @@ describe('DateField', () => {
 
   function focusDate(dateField: DateField) {
     dateField.$dateField.focus();
-    jasmine.clock().tick(101);
     expect(dateField.$dateField).toBeFocused();
   }
 
@@ -326,7 +323,6 @@ describe('DateField', () => {
     });
 
     it('triggers acceptInput with the correct value if input changed even with async validators', async () => {
-      jasmine.clock().uninstall();
       let field = scout.create(SpecDateField, {parent: session.desktop});
       field.render();
       field.addValidator(value => $.resolvedPromise(value));
@@ -493,14 +489,14 @@ describe('DateField', () => {
       expectDate(date, 2015, 2, 11);
     });
 
-    it('sends value and displayText', () => {
+    it('sends value and displayText', async () => {
       let dateField = createFieldAndFocusAndOpenPicker({
         value: '2014-10-01'
       });
 
       dateField.$dateField.val('11.02.2015');
       dateField._onDateFieldBlur();
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       // Order is important, displayText needs to be before value
@@ -516,26 +512,25 @@ describe('DateField', () => {
       expect(mostRecentJsonRequest()).toContainEventsExactly(events);
     });
 
-    it('does not send value and displayText again if not changed', () => {
+    it('does not send value and displayText again if not changed', async () => {
       let dateField = createFieldAndFocusAndOpenPicker({
         value: '2014-10-01'
       });
 
       dateField.$dateField.val('11.02.2015');
       dateField._onDateFieldBlur();
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
 
       dateField._onDateFieldBlur();
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1); // still 1
     });
 
-    it('does not send value and displayText if no date was entered', () => {
+    it('does not send value and displayText if no date was entered', async () => {
       let dateField = createFieldAndFocusAndOpenPicker();
-
       dateField._onDateFieldBlur();
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
   });
@@ -638,7 +633,6 @@ describe('DateField', () => {
     });
 
     it('triggers acceptInput event if a date is selected even with async validators', async () => {
-      jasmine.clock().uninstall();
       let field = scout.create(DateField, {
         parent: session.desktop,
         autoDate: '2026-05-22'

@@ -86,9 +86,9 @@ export class OutlineSpecHelper {
     let model = this.createModelFixture(3, 2, true);
     let outline = this.createOutline(model);
     let node = outline.nodes[0];
-    node.detailForm = new FormSpecHelper(this.session).createFormWithOneField({
+    node.setDetailForm(new FormSpecHelper(this.session).createFormWithOneField({
       modal: false
-    });
+    }));
     node.detailFormVisible = true;
     return outline;
   }
