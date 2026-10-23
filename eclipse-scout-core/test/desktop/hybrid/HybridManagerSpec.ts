@@ -9,7 +9,8 @@
  */
 
 import {
-  Deferred, DisposeWidgetsHybridActionDo, Form, FormAdapter, HybridActionContextElements, HybridActionEvent, HybridManager, HybridManagerAdapter, LabelField, NumberField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget
+  BaseDoEntity, Deferred, DisposeWidgetsHybridActionDo, Form, FormAdapter, HybridActionContextElements, HybridActionEvent, HybridManager, HybridManagerAdapter, LabelField, NumberField, scout, StringField, Tree, TreeAdapter, TreeNode,
+  UuidPool, Widget
 } from '../../../src';
 import {FormSpecHelper, JasmineScoutUtil, TreeSpecHelper} from '../../../src/testing';
 
@@ -440,7 +441,7 @@ describe('HybridManager', () => {
     });
 
     it('can send context elements to the server', () => {
-      hybridManager.callActionAndWait('foo', {customData: 123}, scout.create(HybridActionContextElements)
+      hybridManager.callActionAndWait('foo', scout.create(BaseDoEntity, {customData: 123} as any), scout.create(HybridActionContextElements)
         .withElement('form', form)
         .withElement('node', tree, treeNode));
 
@@ -460,7 +461,7 @@ describe('HybridManager', () => {
     });
 
     it('only sends context elements when needed', () => {
-      hybridManager.callActionAndWait('foo', {customData: 123});
+      hybridManager.callActionAndWait('foo', scout.create(BaseDoEntity, {customData: 123} as any));
 
       sendQueuedAjaxCalls();
       expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -479,7 +480,7 @@ describe('HybridManager', () => {
       jasmine.clock().uninstall();
 
       let promise = hybridManager.when('hybridActionEnd:767676767').then(event => {
-        expect(event.data).toEqual({customData: 123});
+        expect(event.data).toEqual(scout.create(BaseDoEntity, {customData: 123} as any));
         expect(event.contextElements).toBeInstanceOf(HybridActionContextElements);
         expect(event.contextElements.isEmpty()).toBe(false);
         expect(event.contextElements.getList('form').length).toBe(1);

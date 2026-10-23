@@ -298,8 +298,7 @@ export class OutlineAdapter extends TreeAdapter {
     let jsPageModel = this._createJsPageModel(pageModel, pageParam);
     if (pageModel.jsPageModel) {
       // If the jsPageModel contains data objects, deserialize them if possible.
-      // Create POJOs for objects whose _type attribute cannot be resolved to a class to maintain backward compatibility.
-      let deserializedJsPageModel = dataObjects.deserialize(pageModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
+      let deserializedJsPageModel = dataObjects.deserialize(pageModel.jsPageModel);
       delete deserializedJsPageModel._type; // _type should not be written to page if present
       jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
     }

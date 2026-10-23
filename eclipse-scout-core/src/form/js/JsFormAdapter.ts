@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,14 +24,13 @@ export class JsFormAdapter extends FormAdapter {
       objectType: model.jsFormObjectType,
       displayParent: model.displayParent,
       displayHint: model.displayHint,
-      data: dataObjects.deserialize(model.inputData, null, {createPojoIfDoIsUnknown: true}),
+      data: dataObjects.deserialize(model.inputData),
       __hybridModelAdapter: this
     };
 
     if (model.jsFormModel) {
       // If the jsFormModel contains properties containing data objects deserialize them if possible
-      // createPojoIfDoIsUnknown is true to create POJOs if the _type attributes cannot be resolved to classes to maintain backwards compatibility
-      let deserializedJsFormModel = dataObjects.deserialize(model.jsFormModel, null, {createPojoIfDoIsUnknown: true});
+      let deserializedJsFormModel = dataObjects.deserialize(model.jsFormModel);
       delete deserializedJsFormModel._type; // _type should not be written to Form if present
       jsFormModel = $.extend({}, deserializedJsFormModel, jsFormModel);
     }
