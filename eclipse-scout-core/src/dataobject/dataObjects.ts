@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver,
-  doValueMetaData, InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
+  ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver, doValueMetaData,
+  InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
 } from '../index';
 
 /**
@@ -149,7 +149,7 @@ export const dataObjects = {
    * Adds a new DO entity contribution to the given DO entity.
    * Existing contributions for the same contribution class are replaced. If the contribution is a plain object, existing contributions with the same _type are replaced.
    */
-  addContribution(contribution: AnyDoEntity, doEntity: DoEntityWithContributions) {
+  addContribution(contribution: DoEntity, doEntity: DoEntityWithContributions) {
     if (!doEntity) {
       return;
     }
