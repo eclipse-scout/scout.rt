@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, App, arrays, DisposeWidgetsHybridActionDo, Event, EventHandler, EventListener, EventMapOf, Extension, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent,
+  App, arrays, BaseDoEntity, DisposeWidgetsHybridActionDo, Event, EventHandler, EventListener, EventMapOf, Extension, Form, HybridActionContextElements, HybridActionEvent, HybridManagerEventMap, HybridManagerWidgetAddEvent,
   HybridManagerWidgetRemoveEvent, InitModelOf, ObjectOrChildModel, objects, scout, Session, strings, UuidPool, Widget
 } from '../../index';
 
@@ -162,12 +162,12 @@ export class HybridManager extends Widget {
   // hybrid events (java to js)
 
   /** @internal */
-  onHybridEvent(id: string, eventType: string, data: AnyDoEntity, contextElements: HybridActionContextElements) {
+  onHybridEvent(id: string, eventType: string, data: BaseDoEntity, contextElements: HybridActionContextElements) {
     this.trigger(`${eventType}:${id}`, {data, contextElements});
   }
 
   /** @internal */
-  onHybridWidgetEvent(id: string, eventType: string, data: AnyDoEntity) {
+  onHybridWidgetEvent(id: string, eventType: string, data: BaseDoEntity) {
     const widget = this.widgets[id];
     if (!widget) {
       return;
@@ -179,11 +179,11 @@ export class HybridManager extends Widget {
     }
   }
 
-  protected _onHybridWidgetEvent(widget: Widget, eventType: string, data: AnyDoEntity) {
+  protected _onHybridWidgetEvent(widget: Widget, eventType: string, data: BaseDoEntity) {
     widget.trigger(eventType, {data});
   }
 
-  protected _onHybridFormEvent(form: HybridManagerForm, eventType: string, data: AnyDoEntity) {
+  protected _onHybridFormEvent(form: HybridManagerForm, eventType: string, data: BaseDoEntity) {
     if (eventType === 'data') {
       form.setData(data);
     } else if (eventType === 'reset') {
@@ -213,7 +213,7 @@ export class HybridManager extends Widget {
    * @returns the id of the triggered hybrid action
    * @see IHybridAction.java
    */
-  callAction(actionType: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): string {
+  callAction(actionType: string, data?: BaseDoEntity, contextElements?: HybridActionContextElements): string {
     const id = this._createEventId();
     this.trigger('hybridAction', {data: {id, actionType, contextElements, data}} as HybridActionEvent);
     return id;
@@ -227,7 +227,7 @@ export class HybridManager extends Widget {
    * @see IHybridAction
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  callActionAndWait(actionType: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<AnyDoEntity> {
+  callActionAndWait(actionType: string, data?: BaseDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<BaseDoEntity> {
     return this.callActionAndWaitWithContext(actionType, data, contextElements)
       .then(result => result.data);
   }
@@ -241,7 +241,7 @@ export class HybridManager extends Widget {
    * @see IHybridAction
    * @see AbstractHybridAction.fireHybridActionEndEvent
    */
-  callActionAndWaitWithContext(actionType: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<HybridManagerActionEndEventResult> {
+  callActionAndWaitWithContext(actionType: string, data?: BaseDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<HybridManagerActionEndEventResult> {
     const id = this.callAction(actionType, data, contextElements);
     return this.when(`hybridActionEnd:${id}`).then(event => ({
       data: event.data,
@@ -256,7 +256,7 @@ export class HybridManager extends Widget {
    * @param data a data object that will be passed to the hybrid action
    * @returns a promise that will be resolved once the form has been created
    */
-  openForm(modelVariant: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<Form> {
+  openForm(modelVariant: string, data?: BaseDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<Form> {
     const id = this.callAction(`scout.openForm:${modelVariant}`, data, contextElements);
     return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
@@ -268,7 +268,7 @@ export class HybridManager extends Widget {
    * @param data a data object that will be passed to the hybrid action
    * @returns a promise that will be resolved once the form has been created
    */
-  createForm(modelVariant: string, data?: AnyDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<Form> {
+  createForm(modelVariant: string, data?: BaseDoEntity, contextElements?: HybridActionContextElements): JQuery.Promise<Form> {
     const id = this.callAction(`scout.createForm:${modelVariant}`, data, contextElements);
     return this.when(`widgetAdd:${id}`).then(event => this._onFormAdd(event.widget as Form));
   }
@@ -352,7 +352,7 @@ export class HybridManager extends Widget {
 }
 
 export interface HybridManagerActionEndEventResult {
-  data: AnyDoEntity;
+  data: BaseDoEntity;
   contextElements?: HybridActionContextElements;
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractConstructor, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, DoEntity, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget
+  AbstractConstructor, arrays, AutoLeafPageWithNodes, BaseDoEntity, Constructor, dataObjects, HybridActionEvent, HybridManager, ObjectFactory, Page, PageWithNodes, PageWithTable, scout, Session, strings, TypeDescriptor, Widget
 } from '../index';
 import $ from 'jquery';
 import 'jasmine-ajax';
@@ -138,7 +138,7 @@ export const JasmineScoutUtil = {
    * - `AbstractHybridAction.addWidget(IWidget)` (e.g. `AbstractFormHybridAction`): `${widgetId}`
    * - `AbstractHybridAction.addWidgets(Map<String, IWidget>)`: `${actionId}${widgetId}`
    */
-  mockHybridAction<TData extends DoEntity>(session: Session, actionType: string, mock: (event: HybridActionEvent<TData>) => Record<string, Widget>) {
+  mockHybridAction<TData extends BaseDoEntity>(session: Session, actionType: string, mock: (event: HybridActionEvent<TData>) => Record<string, Widget>) {
     let hm = HybridManager.get(session);
     hm.on('hybridAction', (event: HybridActionEvent<TData>) => {
       if (event.data.actionType === actionType) {

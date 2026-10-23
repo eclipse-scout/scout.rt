@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -388,7 +388,8 @@ describe('OutlineAdapter', () => {
       expect(dataObject.prop).toBe(3);
 
       let legacyDataObject = node['legacyDataObject'];
-      expect(objects.isPojo(legacyDataObject)).toBe(true);
+      expect(objects.isPojo(legacyDataObject)).toBe(false);
+      expect(legacyDataObject).toBeInstanceOf(BaseDoEntity);
       expect(legacyDataObject.prop).toBe(5);
     });
 

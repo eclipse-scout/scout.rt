@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AnyDoEntity, dataObjects, Event, HybridActionEvent, HybridManager, hybridUtil, ModelAdapter, RemoteEvent} from '../../index';
+import {BaseDoEntity, dataObjects, Event, HybridActionEvent, HybridManager, hybridUtil, ModelAdapter, RemoteEvent} from '../../index';
 
 export class HybridManagerAdapter extends ModelAdapter {
   declare widget: HybridManager;
@@ -24,12 +24,12 @@ export class HybridManagerAdapter extends ModelAdapter {
 
   protected _onHybridEvent(event: HybridRemoteEvent) {
     let contextElements = hybridUtil.jsonToContextElements(this.session, event.contextElements);
-    let dataobject = dataObjects.deserialize(event.data, null, {createPojoIfDoIsUnknown: true});
+    let dataobject = dataObjects.deserialize(event.data);
     this.widget.onHybridEvent(event.id, event.eventType, dataobject, contextElements);
   }
 
   protected _onHybridWidgetEvent(event: HybridRemoteEvent) {
-    let dataobject = dataObjects.deserialize(event.data, null, {createPojoIfDoIsUnknown: true});
+    let dataobject = dataObjects.deserialize(event.data);
     this.widget.onHybridWidgetEvent(event.id, event.eventType, dataobject);
   }
 
@@ -53,7 +53,7 @@ export class HybridManagerAdapter extends ModelAdapter {
   }
 }
 
-interface HybridRemoteEvent<TObject extends AnyDoEntity = AnyDoEntity> extends RemoteEvent {
+interface HybridRemoteEvent<TObject extends BaseDoEntity = BaseDoEntity> extends RemoteEvent {
   id: string;
   eventType: string;
   data: TObject;
