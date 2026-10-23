@@ -14,7 +14,7 @@ import {
 import $ from 'jquery';
 import 'jasmine-ajax';
 
-let _jsonResourceCache = {};
+let _jsonResourceCache: Record<string, Promise<any>> = {};
 
 /**
  * Utility functions for jasmine tests.
@@ -34,7 +34,7 @@ export const JasmineScoutUtil = {
       }
     }
 
-    return ajax.getJson(jsonResourceUrl, {async: false})
+    return ajax.getJson(jsonResourceUrl)
       .then(json => {
         if (scout.nvl(options.useCache, true)) {
           _jsonResourceCache[jsonResourceUrl] = json;
@@ -46,14 +46,17 @@ export const JasmineScoutUtil = {
       });
   },
 
+  /**
+   * Loads the JSON resource and mocks the call with it as soon as it is loaded.
+   */
   loadJsonResourceAndMockRestCall(resourceUrlToMock: string, jsonResourceUrl: string, options: {
     useCache?: boolean;
     restriction?: any;
     method?: string;
-  } = {}) {
+  } = {}): Promise<void> {
     scout.assertParameter('resourceUrlToMock', resourceUrlToMock);
 
-    JasmineScoutUtil.loadJsonResource(jsonResourceUrl, options)
+    return JasmineScoutUtil.loadJsonResource(jsonResourceUrl, options)
       .then(json => JasmineScoutUtil.mockRestCall(resourceUrlToMock, json, options));
   },
 
