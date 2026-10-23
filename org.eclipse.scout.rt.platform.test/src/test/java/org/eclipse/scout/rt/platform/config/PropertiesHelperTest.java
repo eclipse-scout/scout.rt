@@ -440,6 +440,31 @@ public class PropertiesHelperTest {
   }
 
   @Test
+  public void testImportCorrectPropertyMap() {
+    IPropertyProvider properties1 = new SimpleConfigPropertyProvider("ID1")
+        .withProperty("prop1", "abc")
+        .withProperty("import[props2]", "propFile2");
+    IPropertyProvider properties2 = new SimpleConfigPropertyProvider("ID2")
+        .withProperty("prop2", "def")
+        .withProperty("import[props1]", "propFile1");
+
+    PropertiesHelper h = new PropertiesHelper(null, properties1) {
+      @Override
+      protected IPropertyProvider getPropertyProvider(String configUrl) {
+        if ("propFile1".equals(configUrl)) {
+          return properties1;
+        }
+        else if ("propFile2".equals(configUrl)) {
+          return properties2;
+        }
+        return super.getPropertyProvider(configUrl);
+      }
+    };
+    assertEquals("abc", h.getEnvFilePropertyValue("prop1"));
+    assertEquals("def", h.getEnvFilePropertyValue("prop2"));
+  }
+
+  @Test
   public void testLoopOnSelf() {
     try {
       new PropertiesHelper(new SimpleConfigPropertyProvider("ID")
