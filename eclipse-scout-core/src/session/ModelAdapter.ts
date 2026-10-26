@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, App, arrays, ChildModelOf, comparators, defaultValues, Event, EventEmitter, EventListener, FullModelOf, InitModelOf, ModelAdapterEventMap, ModelAdapterModel, objectFactoryHints, ObjectModel, objects, Predicate,
-  PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, SomeRequired, strings, Widget, WidgetEventTypeFilter
+  AdapterData, App, arrays, BaseDoEntity, ChildModelOf, comparators, dataObjects, defaultValues, Event, EventEmitter, EventListener, FullModelOf, InitModelOf, ModelAdapterEventMap, ModelAdapterModel, objectFactoryHints, ObjectModel,
+  objects, ObjectType, Predicate, PropertyChangeEvent, PropertyChangeEventFilter, RemoteEvent, scout, Session, SomeRequired, strings, Widget, WidgetEventTypeFilter
 } from '../index';
 import $ from 'jquery';
 
@@ -35,11 +35,16 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
   /**
    * Widget properties which should be sent to server on property change.
    */
-  protected _remoteProperties: string[];
+  protected _remoteProperties: Set<string>;
   /**
    * Properties that need to be synced in a specific order.
    */
   protected _orderedProperties: string[];
+  /**
+   * Properties which are DataObjects and require serializing/deserializing
+   */
+  protected _dataObjectProperties: Set<string>;
+
   protected _widgetListener: EventListener;
   protected _propertyChangeEventFilter: PropertyChangeEventFilter;
   protected _widgetEventTypeFilter: WidgetEventTypeFilter;
@@ -54,8 +59,9 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
     this.destroyed = false;
     this.widget = null;
     this._enabledBeforeOffline = true;
-    this._remoteProperties = [];
+    this._remoteProperties = new Set();
     this._orderedProperties = [];
+    this._dataObjectProperties = new Set();
     this._widgetListener = null;
     this._propertyChangeEventFilter = new PropertyChangeEventFilter();
     this._widgetEventTypeFilter = new WidgetEventTypeFilter();
@@ -125,7 +131,32 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
    * Override this method to call _sync* methods of the ModelAdapter _before_ the widget is created.
    */
   protected _initProperties(model: ObjectModel) {
-    // NOP
+    this._deserializeDataObjectsIn(model); // allowed to modify the model as it is a deepCopy already
+  }
+
+  protected _deserializeDataObjectsIn(obj: any) {
+    // loop over DO-attributes as this list is typically smaller than looping over the properties of obj
+    this._dataObjectProperties.forEach(propertyName => {
+      if (obj[propertyName]) {
+        obj[propertyName] = this._deserializeDataObject(obj[propertyName]);
+      }
+    });
+  }
+
+  protected _deserializeDataObject(rawValue: any, objectType?: ObjectType<BaseDoEntity | BaseDoEntity[]>): any {
+    return dataObjects.deserialize(rawValue, objectType);
+  }
+
+  protected _serializeDataObject(data: any): any {
+    return dataObjects.serialize(data);
+  }
+
+  isDataObjectProperty(propertyName: string): boolean {
+    return this._dataObjectProperties.has(propertyName);
+  }
+
+  protected _addDataObjectProperties(properties: string[] | string) {
+    this._addProperties('_dataObjectProperties', properties);
   }
 
   /**
@@ -185,7 +216,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
   }
 
   isRemoteProperty(propertyName: string): boolean {
-    return this._remoteProperties.indexOf(propertyName) > -1;
+    return this._remoteProperties.has(propertyName);
   }
 
   protected _addRemoteProperties(properties: string[] | string) {
@@ -197,20 +228,22 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
   }
 
   protected _addOrderedProperties(properties: string[] | string) {
-    this._addProperties('_orderedProperties', properties);
+    this._orderedProperties.push(...arrays.ensure(properties));
   }
 
   protected _addProperties(propertyName: string, properties: string[] | string) {
+    const container = this[propertyName] as Set<string>;
     if (Array.isArray(properties)) {
-      this[propertyName] = this[propertyName].concat(properties);
+      properties.forEach(property => container.add(property));
     } else {
-      this[propertyName].push(properties);
+      container.add(properties);
     }
   }
 
   protected _removeProperties(propertyName: string, properties: string[] | string) {
     properties = arrays.ensure(properties);
-    arrays.removeAll(this[propertyName], properties);
+    const container = this[propertyName] as Set<string>;
+    properties.forEach(property => container.delete(property));
   }
 
   /**
@@ -238,7 +271,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
     options = opts;
     // (End legacy fallback)
 
-    let event = new RemoteEvent(this.id, type, data);
+    let event = new RemoteEvent(this.id, type, this._prepareSendData(data));
     // The following properties will not be sent to the server, see Session._requestToJson().
     if (options.coalesce !== undefined) {
       event.coalesce = options.coalesce;
@@ -250,6 +283,19 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
       event.newRequest = options.newRequest;
     }
     this.session.sendEvent(event, options.delay);
+  }
+
+  protected _prepareSendData(data: any): any {
+    if (this._dataObjectProperties.size < 1) {
+      return data; // nothing to copy or serialize
+    }
+    const result = $.extend({}, data); // create copy to not pollute the original object
+    this._dataObjectProperties.forEach(propertyName => {
+      if (result[propertyName]) {
+        result[propertyName] = this._serializeDataObject(result[propertyName]);
+      }
+    });
+    return result;
   }
 
   /**
@@ -368,10 +414,10 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
   }
 
   protected _syncPropertiesOnPropertyChange(newProperties: Record<string, any>) {
-    let orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
+    const orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
     orderedPropertyNames.forEach(propertyName => {
-      let value = newProperties[propertyName];
-      let syncFuncName = '_sync' + strings.toUpperCaseFirstLetter(propertyName);
+      const value = this.isDataObjectProperty(propertyName) ? this._deserializeDataObject(newProperties[propertyName]) : newProperties[propertyName];
+      const syncFuncName = '_sync' + strings.toUpperCaseFirstLetter(propertyName);
       if (this[syncFuncName]) {
         this[syncFuncName](value);
       } else {
@@ -397,6 +443,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
     return propertyNames;
   }
 
+  // noinspection DuplicatedCode
   protected _createPropertySortFunc(order: string[]): (a: string, b: string) => number {
     return (a, b) => {
       let ia = order.indexOf(a);
@@ -424,8 +471,13 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
     if (event.type === 'property') { // Special handling for 'property' type
       this.onModelPropertyChange(event);
     } else {
+      this._prepareModelEvent(event);
       this.onModelAction(event);
     }
+  }
+
+  protected _prepareModelEvent(event: RemoteEvent) {
+    this._deserializeDataObjectsIn(event); // modifies the input event
   }
 
   /**
