@@ -331,34 +331,61 @@ describe('jquery-scout', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
-    it('calls the handler if the element is made invisible while the animation is running', async () => {
-      let handler = jasmine.createSpy('handler');
-      $e.addClass('spec-animate');
-      $e.oneAnimationEnd(handler);
-      expect(handler).not.toHaveBeenCalled();
-
-      await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
-      $e.css('display', 'none'); // cancels the animation
-      await whenNativeAnimationEvent($e, 'animationcancel');
-      expect(handler).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls the handler if the animation class is removed while the animation is running', async () => {
-      let handler = jasmine.createSpy('handler');
-      $e.addClass('spec-animate');
-      $e.oneAnimationEnd(handler);
-      expect(handler).not.toHaveBeenCalled();
-
-      await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
-      $e.removeClass('spec-animate'); // cancels the animation
-      await whenNativeAnimationEvent($e, 'animationcancel');
-      expect(handler).toHaveBeenCalledTimes(1);
-    });
-
     it('does nothing for an empty jquery object', () => {
       let handler = jasmine.createSpy('handler');
       expect(() => $().oneAnimationEnd(handler)).not.toThrow();
       expect(handler).not.toHaveBeenCalled();
+    });
+
+    describe('triggerOnError', () => {
+
+      it('if true, calls the handler if the element is made invisible while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler, true);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.css('display', 'none'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(1);
+      });
+
+      it('if true, calls the handler if the animation class is removed while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler, true);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.removeClass('spec-animate'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(1);
+      });
+
+      it('if false, does not call the handler if the element is made invisible while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.css('display', 'none'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(0);
+      });
+
+      it('if false, does not call the handler if the animation class is removed while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.removeClass('spec-animate'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(0);
+      });
     });
   });
 

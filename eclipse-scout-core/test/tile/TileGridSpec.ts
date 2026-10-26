@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -1254,10 +1254,10 @@ describe('TileGrid', () => {
     beforeEach(() => {
       $(`<style>
       @keyframes nop { 0% { opacity: 1; } 100% { opacity: 1; } }
-      .tile.animate-visible { animation: nop; animation-duration: 100ms;}
-      .tile.animate-invisible { animation: nop; animation-duration: 100ms;}
-      .tile.animate-insert { animation: nop; animation-duration: 100ms;}
-      .tile.animate-remove { animation: nop; animation-duration: 100ms;}
+      .tile.animate-visible { animation: nop; animation-duration: 50ms;}
+      .tile.animate-invisible { animation: nop; animation-duration: 50ms;}
+      .tile.animate-insert { animation: nop; animation-duration: 50ms;}
+      .tile.animate-remove { animation: nop; animation-duration: 50ms;}
       .tile.newly-rendered { visibility: hidden !important;}
       .tile.before-animate-insert { visibility: hidden !important;}
 
@@ -1442,6 +1442,25 @@ describe('TileGrid', () => {
       expect(tile.$container).not.toHaveClass('animate-insert');
       expect(tile.$container.isVisibilityHidden()).toBe(false);
       expect(tile.$container.isVisible()).toBe(true);
+    });
+
+    it('does not fail if tile is removed before animation ends', async () => {
+      let tileGrid = createTileGrid(1);
+      let tile = tileGrid.tiles[0];
+      tileGrid.render();
+      tileGrid.validateLayout();
+      expect(tile.$container).not.toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      tile.setVisible(false);
+      expect(tile.$container).toHaveClass('animate-invisible');
+      expect(tile.$container.isVisibilityHidden()).toBe(false);
+      expect(tile.$container.isVisible()).toBe(true);
+
+      await sleep(); // Start animation
+      tileGrid.remove();
+      await sleep(100); // Wait for the animation to finish -> expect no exception
     });
   });
 

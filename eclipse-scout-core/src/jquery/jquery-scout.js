@@ -910,7 +910,7 @@ $.fn.addClassForAnimation = function(className, options) {
   return this;
 };
 
-$.fn.oneAnimationEnd = function(handler) {
+$.fn.oneAnimationEnd = function(handler, triggerOnError = false) {
   if (!handler) {
     return this;
   }
@@ -931,7 +931,11 @@ $.fn.oneAnimationEnd = function(handler) {
     //   This does not work when using an animationend event because Chrome won't trigger the animationend event even when resuming because the time has already elapsed.
     Promise.all(activeAnimations.map(animation => animation.finished))
       .then(() => handler(new Event('animationend')))
-      .catch(() => handler(new Event('animationcancel')));
+      .catch(e => {
+        if (triggerOnError) {
+          handler(new Event('animationcancel'));
+        }
+      });
   } else {
     // If there is no animation running, check if there is an animation defined.
     // If there is one, we assume
