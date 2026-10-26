@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -110,7 +110,7 @@ public class HealthCheckServlet extends AbstractHttpServlet {
           .findFirst()
           .orElse(null);
       if (category == null) {
-        LOG.error("Ignoring invalid category {} for health check", inputCategory);
+        LOG.info("Ignoring invalid category '{}' for health check", inputCategory);
       }
     }
     return category;
