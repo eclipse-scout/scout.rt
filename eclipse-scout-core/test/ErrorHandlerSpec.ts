@@ -46,34 +46,17 @@ describe('ErrorHandler', () => {
   });
 
   describe('handle', () => {
-    it('accepts individually passed arguments', () => {
-      errorHandler = scout.create(ErrorHandler);
+    it('analyzes and handles the error', async () => {
+      errorHandler = scout.create(ErrorHandler, {displayError: false, logError: false, sendError: false});
       spyOn(errorHandler, 'analyzeError').and.callThrough();
+      spyOn(errorHandler, 'handleErrorInfo').and.callThrough();
 
-      errorHandler.handle('err', 'a', 'b');
+      let errorInfo = await errorHandler.handle('err');
 
-      expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
-    });
-
-    it('accepts argument like object as first param', () => {
-      errorHandler = scout.create(ErrorHandler);
-      spyOn(errorHandler, 'analyzeError').and.callThrough();
-
-      (function(...args: any[]) {
-        // eslint-disable-next-line prefer-rest-params
-        errorHandler.handle(arguments);
-      })('err', 'a', 'b');
-
-      expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
-    });
-
-    it('accepts array as first param', () => {
-      errorHandler = scout.create(ErrorHandler);
-      spyOn(errorHandler, 'analyzeError').and.callThrough();
-
-      errorHandler.handle(['err', 'a', 'b']);
-
-      expect(errorHandler.analyzeError).toHaveBeenCalledWith('err', 'a', 'b');
+      expect(errorHandler.analyzeError).toHaveBeenCalledWith('err');
+      expect(errorHandler.handleErrorInfo).toHaveBeenCalledWith(errorInfo);
+      expect(errorInfo.error).toBe('err');
+      expect(errorInfo.message).toBe('err');
     });
   });
 
@@ -90,38 +73,39 @@ describe('ErrorHandler', () => {
       }).finally(done);
     });
 
-    it('can handle jQuery AJAX errors', done => {
+    it('can handle jQuery AJAX errors', async () => {
       let fakeXHR = {
         readyState: 4,
         status: 404,
         statusText: 'Not found'
       };
 
-      let promises = [];
-      promises.push(errorHandler.analyzeError(fakeXHR).then(errorInfo => {
-        expect(errorInfo.code).toBe('X404');
-        expect(errorInfo.message).toBe('AJAX call failed [404]');
-        expect(errorInfo.log).toContain('AJAX call failed [404]');
-      }));
+      let errorInfo = await errorHandler.analyzeError(fakeXHR);
+      expect(errorInfo.code).toBe('X404');
+      expect(errorInfo.message).toBe('AJAX call failed [404]');
+      expect(errorInfo.log).toContain('AJAX call failed [404]');
+    });
 
-      promises.push(errorHandler.analyzeError([fakeXHR]).then(errorInfo => {
-        expect(errorInfo.code).toBe('X404');
-        expect(errorInfo.message).toBe('AJAX call failed [404]');
-        expect(errorInfo.log).toContain('AJAX call failed [404]');
-      }));
+    it('can handle AjaxErrors', async () => {
+      let fakeXHR = {
+        readyState: 4,
+        status: 500,
+        statusText: 'Internal Server Error'
+      } as JQuery.jqXHR;
+      let error = new AjaxError({
+        jqXHR: fakeXHR,
+        textStatus: 'error',
+        errorThrown: 'Internal Server Error',
+        requestOptions: {
+          method: 'POST',
+          url: 'http://server.example/service'
+        }
+      });
 
-      fakeXHR.status = 500;
-      fakeXHR.statusText = 'Internal Server Error';
-      promises.push(errorHandler.analyzeError(fakeXHR, 'error', 'Internal Server Error', {
-        method: 'POST',
-        url: 'http://server.example/service'
-      }).then(errorInfo => {
-        expect(errorInfo.code).toBe('X500');
-        expect(errorInfo.message).toBe('AJAX call "POST http://server.example/service" failed [500 Internal Server Error]');
-        expect(errorInfo.log).toContain('AJAX call "POST http://server.example/service" failed [500 Internal Server Error]');
-      }));
-
-      $.promiseAll(promises).finally(done);
+      let errorInfo = await errorHandler.analyzeError(error);
+      expect(errorInfo.code).toBe('X500');
+      expect(errorInfo.message).toBe('AJAX call "POST http://server.example/service" failed [500 Internal Server Error]');
+      expect(errorInfo.log).toContain('AJAX call "POST http://server.example/service" failed [500 Internal Server Error]');
     });
 
     it('can handle no arguments', done => {

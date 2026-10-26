@@ -199,41 +199,28 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   }
 
   /**
-   * Handles unexpected JavaScript errors. The arguments are first analyzed and then handled.
+   * Handles unexpected JavaScript errors. The error is first analyzed and then handled.
    *
-   * This method may be called by passing the arguments individually or as an array (or array-like object)
-   * in the first argument.
    * Examples:
    *   1. try { ... } catch (err) { handler.handle(err); }
-   *   2. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(jqXHR, textStatus, errorThrown); }
-   *   3. $.get().fail(function(jqXHR, textStatus, errorThrown) { handler.handle(arguments); } // <-- recommended
+   *   2. ajax.get(url).catch(error => handler.handle(error));
    *
-   * @param errorOrArgs error or array or array-like object containing the error and other arguments
+   * @param error the error, e.g. the reason of a rejected promise
    * @returns the analyzed errorInfo
    */
-  handle(errorOrArgs: any | IArguments | any[], ...args: any[]): Promise<ErrorInfo> {
-    let error = errorOrArgs;
-    if (errorOrArgs && args.length === 0) {
-      if ((String(errorOrArgs) === '[object Arguments]')) {
-        error = errorOrArgs[0];
-        args = [...errorOrArgs].slice(1);
-      } else if (Array.isArray(errorOrArgs)) {
-        error = errorOrArgs[0];
-        args = errorOrArgs.slice(1);
-      }
-    }
-    return this.analyzeError(error, ...args)
+  handle(error: any): Promise<ErrorInfo> {
+    return this.analyzeError(error)
       .then(this.handleErrorInfo.bind(this));
   }
 
   /**
-   * Returns an "errorInfo" object for the given arguments. The following cases are handled:
+   * Returns an "errorInfo" object for the given error. The following cases are handled:
    * 1. Error objects           (code: computed by getJsErrorCode())
-   * 2. jQuery AJAX errors      (code: 'X' + HTTP status code)
+   * 2. AJAX errors             (code: 'X' + HTTP status code), i.e. an {@link AjaxError} or a jqXHR
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
    */
-  analyzeError(error?: any, ...args: any[]): Promise<ErrorInfo> {
+  analyzeError(error?: any): Promise<ErrorInfo> {
     let errorInfo: ErrorInfo = {
       error: error,
       message: null,
@@ -247,10 +234,10 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       debugInfo: null
     };
 
-    return this._analyzeError(errorInfo, ...args);
+    return this._analyzeError(errorInfo);
   }
 
-  protected _analyzeError(errorInfo: ErrorInfo, ...args: any[]): Promise<ErrorInfo> {
+  protected _analyzeError(errorInfo: ErrorInfo): Promise<ErrorInfo> {
     let error = errorInfo.error;
     // 1. Regular errors
     if (error instanceof Error) {
@@ -268,8 +255,8 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     }
 
     // 2. Ajax errors
-    if ($.isJqXHR(error) || (Array.isArray(error) && $.isJqXHR(error[0])) || error instanceof AjaxError) {
-      this._analyzeAjaxError(errorInfo, ...args);
+    if ($.isJqXHR(error) || error instanceof AjaxError) {
+      this._analyzeAjaxError(errorInfo);
       return $.resolvedPromise(errorInfo);
     }
 
@@ -314,7 +301,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     errorInfo.log = arrays.format(log, '\n');
   }
 
-  protected _analyzeAjaxError(errorInfo: ErrorInfo, ...args: any[]) {
+  protected _analyzeAjaxError(errorInfo: ErrorInfo) {
     let error = errorInfo.error;
     let jqXHR: JQuery.jqXHR, errorThrown: string, requestOptions: AjaxSettings, errorDo: ErrorDo = null;
     if (error instanceof AjaxError) {
@@ -324,12 +311,8 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
       requestOptions = error.requestOptions; // scout extension
       errorDo = error.errorDo;
     } else {
-      // jQuery $.ajax() error (arguments of the fail handler are: jqXHR, textStatus, errorThrown, requestOptions)
-      // The first argument (jqXHR) is stored in errorInfo.error (may even be an array) -> create args array again and extract the parameters
-      args = arrays.ensure(error).concat(args);
-      jqXHR = args[0];
-      errorThrown = args[2];
-      requestOptions = args[3]; // scout extension
+      // jqXHR, e.g. the rejection reason of an awaited $.ajax() call (errorThrown and request options are not available)
+      jqXHR = error;
       let errorDoCandidate = jqXHR?.responseJSON?.error;
       if (AjaxError.isErrorDo(errorDoCandidate)) {
         errorDo = errorDoCandidate;
