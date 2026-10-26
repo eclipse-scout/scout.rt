@@ -362,7 +362,7 @@ scout:
     chalk@2.4.2>escape-string-regexp: 1.0.5
     chalk@2.4.2>supports-color: 5.5.0
     char-regex: 1.0.2
-    chart.js: 4.5.1
+    chart.js: 4.6.1
     chokidar: 3.6.0
     chokidar@4.0.3>readdirp: 4.1.2
     chownr: 1.1.4
