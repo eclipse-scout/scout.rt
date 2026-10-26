@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataObjects, Event, HybridActionEvent, HybridManager, hybridUtil, ModelAdapter, RemoteEvent} from '../../index';
+import {BaseDoEntity, Event, HybridActionEvent, HybridManager, hybridUtil, ModelAdapter, RemoteEvent} from '../../index';
 
 export class HybridManagerAdapter extends ModelAdapter {
   declare widget: HybridManager;
@@ -24,12 +24,12 @@ export class HybridManagerAdapter extends ModelAdapter {
 
   protected _onHybridEvent(event: HybridRemoteEvent) {
     let contextElements = hybridUtil.jsonToContextElements(this.session, event.contextElements);
-    let dataobject = dataObjects.deserialize(event.data);
+    let dataobject = this._deserializeDataObject(event.data);
     this.widget.onHybridEvent(event.id, event.eventType, dataobject, contextElements);
   }
 
   protected _onHybridWidgetEvent(event: HybridRemoteEvent) {
-    let dataobject = dataObjects.deserialize(event.data);
+    let dataobject = this._deserializeDataObject(event.data);
     this.widget.onHybridWidgetEvent(event.id, event.eventType, dataobject);
   }
 
@@ -42,7 +42,7 @@ export class HybridManagerAdapter extends ModelAdapter {
   }
 
   protected _onWidgetHybridAction(event: HybridActionEvent) {
-    let dataobject = dataObjects.serialize(event.data.data);
+    let dataobject = this._serializeDataObject(event.data.data);
     let contextElements = hybridUtil.contextElementsToJson(event.data.contextElements);
     this._send('hybridAction', {
       actionType: event.data.actionType, // add as first property (devtools sometimes show properties in that order)
