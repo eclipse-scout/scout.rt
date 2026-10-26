@@ -51,6 +51,7 @@ export class TableLoadingSupport extends LoadingSupport {
   }
 
   protected _onTableRemove() {
+    clearTimeout(this._loadingIndicatorTimeoutId);
     // remove busy indicator, this can not be done in remove() as it is also asynchronously triggered by _removeLoadingIndicator()
     this._setDesktopBusy(false);
   }
