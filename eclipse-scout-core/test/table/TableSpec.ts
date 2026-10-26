@@ -5619,43 +5619,118 @@ describe('Table', () => {
       </style>`).appendTo($('#sandbox'));
     });
 
-    it('renders loading indicator while loading when asyncLoading=true', async () => {
-      const model = helper.createModelFixture(3, 2);
-      const table = helper.createTable(model);
-      table.loadingSupport.setLoadingIndicatorDelay(0);
-      table.render();
+    describe('true', () => {
 
-      table.setAsyncLoading(true);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+      it('renders loading indicator while loading', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(0);
+        table.render();
 
-      table.setLoading(true);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(1);
+        table.setAsyncLoading(true);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
 
-      table.setLoading(false);
-      await JQueryTesting.whenAnimationEnd((table.loadingSupport as LoadingSupport & { _$loadingIndicator: JQuery })._$loadingIndicator);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setLoading(true);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(1);
+
+        table.setLoading(false);
+        await JQueryTesting.whenAnimationEnd((table.loadingSupport as LoadingSupport & { _$loadingIndicator: JQuery })._$loadingIndicator);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+      });
     });
 
-    it('sets desktop busy while loading when asyncLoading=false', () => {
-      const model = helper.createModelFixture(3, 2);
-      const table = helper.createTable(model);
-      table.loadingSupport.setLoadingIndicatorDelay(0);
-      table.render();
+    describe('false', () => {
+      it('sets desktop busy while loading', () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(0);
+        table.render();
 
-      table.setAsyncLoading(false);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
 
-      table.setLoading(true);
-      expect(session.desktop.busy).toBeTrue();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setLoading(true);
+        expect(session.desktop.busy).toBeTrue();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
 
-      table.setLoading(false);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+      });
+
+      it('considers loading indicator delay', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(1);
+        table.render();
+
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true); // indicator will be shown later
+        expect(session.desktop.busy).toBeFalse();
+
+        await sleep(10); // await setTimeout in LoadingSupport.ts
+        expect(session.desktop.busy).toBeTrue();
+
+        table.setLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+      });
+
+      it('only sets desktop busy if table is rendered', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(0);
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.render();
+        expect(session.desktop.busy).toBeTrue();
+
+        table.remove();
+        expect(session.desktop.busy).toBeFalse();
+      });
+
+      it('does not set desktop busy if table was removed before loading started', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(1);
+        table.render();
+
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true); // indicator will be shown later using setTimeout
+        expect(session.desktop.busy).toBeFalse();
+
+        table.remove();
+        await sleep(10); // setTimeout must have been aborted
+        expect(session.desktop.busy).toBeFalse();
+      });
+
+      it('does not set desktop busy if loading was set to false again before loading started', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(1);
+        table.render();
+
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true); // indicator will be shown later using setTimeout
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(false);
+        await sleep(10); // setTimeout must have been aborted
+        expect(session.desktop.busy).toBeFalse();
+      });
     });
 
     it('may be changed while loading', async () => {
