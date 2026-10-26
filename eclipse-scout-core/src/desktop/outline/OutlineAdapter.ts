@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, OutlineReloadKeyStroke, Page, PageModel, PageParamDo, PageResolver, PageWithTable, RemoteEvent, scout, Table, TableAdapter,
-  TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
+  App, ChildModelOf, ErrorHandler, EventHandler, Form, icons, objects, Outline, OutlineReloadKeyStroke, Page, PageModel, PageParamDo, PageResolver, PageWithTable, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow,
+  TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -298,7 +298,7 @@ export class OutlineAdapter extends TreeAdapter {
     let jsPageModel = this._createJsPageModel(pageModel, pageParam);
     if (pageModel.jsPageModel) {
       // If the jsPageModel contains data objects, deserialize them if possible.
-      let deserializedJsPageModel = dataObjects.deserialize(pageModel.jsPageModel);
+      let deserializedJsPageModel = this._deserializeDataObject(pageModel.jsPageModel);
       delete deserializedJsPageModel._type; // _type should not be written to page if present
       jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
     }
@@ -337,7 +337,7 @@ export class OutlineAdapter extends TreeAdapter {
 
   protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<Page> {
     const model = super._initNodeModel(nodeModel) as ChildModelOf<Page>;
-    model.pageParam = dataObjects.deserialize(model.pageParam);
+    model.pageParam = this._deserializeDataObject(model.pageParam);
     model.overviewIconId = model.overviewIconId || null;
     return model;
   }
