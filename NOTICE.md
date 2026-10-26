@@ -348,7 +348,7 @@ Batik XML utility library (1.10)
 * Project: https://xmlgraphics.apache.org/batik/
 * Source: http://svn.apache.org/repos/asf/xmlgraphics/batik/trunk/
 
-chart.js@2.9.3 (2.9.3)
+chart.js@4.6.1 (4.6.1)
 
 * License: MIT
 
