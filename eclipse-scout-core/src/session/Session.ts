@@ -90,6 +90,19 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    */
   protected _busy: boolean;
   protected _cancellationHandler: EventHandler<Event<BusyIndicator>>;
+  protected _preventBusyHandling = 0; // FIXME bsh [ucb] Find a better solution!
+
+  get preventBusyHandling(): boolean {
+    return this._preventBusyHandling > 0;
+  }
+
+  set preventBusyHandling(preventBusyHandling: boolean) {
+    if (preventBusyHandling) {
+      this._preventBusyHandling++;
+    } else {
+      this._preventBusyHandling--;
+    }
+  }
 
   constructor() {
     super();
@@ -341,6 +354,11 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       this._sendTimeoutId = null;
       this._asyncDelay = null;
       if (this.areRequestsPending()) {
+        // A request without busy handling is currently running and a new request _with_ busy handling
+        // was queued -> activate busy handling.
+        if (!this._busy && this.areBusyIndicatedEventsQueued()) {
+          this._setBusy(true);
+        }
         // do not send if there are any requests pending because the order matters -> prevents race conditions
         return;
       }
@@ -750,7 +768,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
   }
 
   protected _performUserAjaxRequest(ajaxOptions: UrlAjaxSettings, busyHandling: boolean, request?: RemoteRequest) {
-    if (busyHandling) {
+    if (busyHandling && !this.preventBusyHandling) {
       this._setBusy(true);
     }
     this.setRequestPending(true);
