@@ -52,7 +52,7 @@ describe('DataObjectDeserializer', () => {
     expect(firstPass).toBeInstanceOf(BaseDoEntity);
     expect(firstPass['num']).toBe(1);
     expect(firstPass['nested']).toBeInstanceOf(BaseDoEntity);
-    expect(firstPass['nested']['_type']).toBe('scout.NestedSpec');
+    expect(firstPass['nested'][dataObjects._TYPE_ATTRIBUTE_NAME]).toBe('scout.NestedSpec');
     expect(firstPass['nested']['num']).toBe(2);
     expect(firstPass._type).toBe('scout.NestedSpec');
 

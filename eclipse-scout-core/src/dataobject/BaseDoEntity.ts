@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Constructor, DataObjectDeserializer, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, DoEntity, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
+import {Constructor, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, DoEntity, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
 import $ from 'jquery';
 
 /**
@@ -15,7 +15,8 @@ import $ from 'jquery';
  */
 @objectFactoryHints({ensureObjectType: false})
 export class BaseDoEntity implements DoEntity {
-  declare model: DeepPartial<Omit<this, 'model' | 'init' | 'getContribution' | 'getContributions' | 'addContribution' | 'removeContribution' | 'contribution' | 'toPojo' | 'clone' | 'equals' | 'visit'>>;
+  declare model: DeepPartial<Omit<this, 'model' | 'init' | 'getContribution' | 'getContributions' | 'addContribution' | 'removeContribution'
+    | 'contribution' | 'toPojo' | 'clone' | 'equals' | 'visit'>>;
 
   _type?: string;
   _typeVersion?: string;
@@ -118,9 +119,9 @@ export class BaseDoEntity implements DoEntity {
     const propertiesToCompare = new Set(Object.keys(this).concat(Object.keys(obj)));
 
     // special handling for _typeVersion
-    const hasTypeVersion = propertiesToCompare.delete(DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME);
+    const hasTypeVersion = propertiesToCompare.delete(dataObjects._TYPE_VERSION_ATTRIBUTE_NAME);
     if (hasTypeVersion) {
-      const otherTypeVersion = obj[DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME];
+      const otherTypeVersion = obj[dataObjects._TYPE_VERSION_ATTRIBUTE_NAME];
       if (otherTypeVersion && this._typeVersion && otherTypeVersion !== this._typeVersion) {
         // must only match if both have a version, otherwise it should be ignored
         return false;

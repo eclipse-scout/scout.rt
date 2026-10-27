@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {AbstractConstructor, BaseDoEntity, Constructor} from '../index';
+import {AbstractConstructor, BaseDoEntity, Constructor, dataObjects} from '../index';
 
 /**
  * Base interface for data objects. Consider using classes extending {@link BaseDoEntity} instead.
@@ -26,7 +26,7 @@ export function typeName(typeName?: string) {
   return <T extends Constructor | AbstractConstructor>(BaseClass: T) => class extends BaseClass {
     constructor(...args: any[]) {
       super(...args);
-      Reflect.set(this, '_type', typeName);
+      Reflect.set(this, dataObjects._TYPE_ATTRIBUTE_NAME, typeName);
     }
   };
 }
