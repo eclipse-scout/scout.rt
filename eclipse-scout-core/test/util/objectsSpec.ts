@@ -1067,6 +1067,7 @@ describe('objects', () => {
       expect(objects.isEmpty(scout.create(CodeDo, {enabled: undefined}))).toBe(true);
       expect(objects.isEmpty(scout.create(CodeDo, {iconId: '1234'}))).toBe(false);
       expect(objects.isEmpty(scout.create(CodeDo))).toBe(true);
+      expect(objects.isEmpty(scout.create(CodeDo, {_typeVersion: '1234', _contributions: [scout.create(CodeDo, {enabled: false})]}))).toBe(true);
     });
   });
 

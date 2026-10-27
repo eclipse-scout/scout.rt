@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, BaseDoEntity, dates, ObjectFactory, Primitive, scout, Widget} from '../index';
+import {arrays, BaseDoEntity, dataObjects, dates, ObjectFactory, Primitive, scout, Widget} from '../index';
 import $ from 'jquery';
 
 const CONST_REGEX = /\${const:([^}]*)}/;
@@ -743,8 +743,10 @@ export const objects = {
    * - an empty {@link Map}
    * - an empty {@link Set}
    * - or an object without keys (except {@link Date} which is never empty).
+   * - or a {@link BaseDoEntity} as it appears when creating a new instance (ignoring `_type`, `_typeVersion` and `_contributions`)
    *
    * @returns `true` if *obj* is empty, `false` if *obj* is not empty, `undefined` if *obj* is no object (e.g. a primitive).
+   * @see dataObjects.isEmpty
    */
   isEmpty(obj: any): boolean | undefined {
     if (objects.isNullOrUndefined(obj)) {
@@ -766,7 +768,7 @@ export const objects = {
       return obj.size === 0;
     }
     if (obj instanceof BaseDoEntity) {
-      return Object.keys(obj).every(key => key === '_type' || obj[key] === undefined);
+      return dataObjects.isEmpty(obj);
     }
     return Object.keys(obj).length === 0;
   },
