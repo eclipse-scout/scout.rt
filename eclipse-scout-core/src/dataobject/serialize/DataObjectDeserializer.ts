@@ -13,8 +13,6 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
 
   declare model: DataObjectDeserializerModel;
 
-  static _TYPE_VERSION_ATTRIBUTE_NAME = '_typeVersion';
-
   id: string;
   objectType: string;
   createPojoIfDoIsUnknown: boolean;
@@ -54,14 +52,14 @@ export class DataObjectDeserializer implements DataObjectDeserializerModel, Obje
     const proto = Object.getPrototypeOf(constructor).prototype;
     Object.keys(rawObj)
       // Ignore _typeVersion as it is handled later on.
-      .filter(key => key !== DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME)
+      .filter(key => key !== dataObjects._TYPE_VERSION_ATTRIBUTE_NAME)
       .forEach(key => {
         resultObj[key] = this._convertFieldValue(proto, rawObj, key, rawObj[key]);
       });
 
-    const typeVersion = rawObj[DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME];
+    const typeVersion = rawObj[dataObjects._TYPE_VERSION_ATTRIBUTE_NAME];
     if (typeVersion && this.retainTypeVersion(resultObj)) {
-      resultObj[DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME] = this._convertFieldValue(proto, rawObj, DataObjectDeserializer._TYPE_VERSION_ATTRIBUTE_NAME, typeVersion);
+      resultObj[dataObjects._TYPE_VERSION_ATTRIBUTE_NAME] = this._convertFieldValue(proto, rawObj, dataObjects._TYPE_VERSION_ATTRIBUTE_NAME, typeVersion);
     }
 
     return resultObj;
@@ -95,7 +93,6 @@ export interface DataObjectDeserializerModel extends ObjectModel<DataObjectDeser
   /**
    * Controls the kind of object that will be created when deserializing unknown DataObjects.
    * If `true` a pojo will be created for unknown DOs. If `false`, instances of {@link BaseDoEntity} will be created.
-   * Changing the type of the deserialized DataObject may change the deserialization behaviour of the property '_typeVersion' (see {@link retainTypeVersion} for more details).
    * Default is `false`.
    *
    * A DataObject can be unknown e.g. if:
@@ -108,7 +105,8 @@ export interface DataObjectDeserializerModel extends ObjectModel<DataObjectDeser
   /**
    * Controls whether the '_typeVersion' property is retained when deserializing DataObjects.
    * The property can be given as a {@link boolean} or a {@link Predicate}, whose input is the deserialized DataObject.
-   * If `true`, the '_typeVersion' will be set on the deserialized DataObject. If `false`, it will be ignored. Default is `true`.
+   * If `true`, the '_typeVersion' will be set on the deserialized DataObject. If `false`, it will be ignored.
+   * Default is `true`.
    */
   retainTypeVersion?: boolean | Predicate<object>;
   /**

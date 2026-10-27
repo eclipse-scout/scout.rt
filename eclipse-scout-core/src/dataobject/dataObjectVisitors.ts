@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {arrays, BaseDoEntity, Constructor, objects, scout, strings, TreeVisitResult} from '../index';
+import {arrays, BaseDoEntity, Constructor, dataObjects, objects, scout, TreeVisitResult} from '../index';
 
 export const dataObjectVisitors = {
 
@@ -169,14 +169,7 @@ export class DataObjectVisitHelper {
    * Visits all values and all contributions of a {@link BaseDoEntity} using the visitor.
    */
   protected _visitBaseDoEntity(baseDoEntity: BaseDoEntity, context: DataObjectVisitorContext, visitor: DataObjectVisitor<any>): TreeVisitResult {
-    if (this._visitSetOrArray(
-      Object
-        .keys(baseDoEntity)
-        .filter(key => !strings.startsWith(key, '_'))
-        .map(key => baseDoEntity[key]),
-      context,
-      visitor
-    ) === TreeVisitResult.TERMINATE) {
+    if (this._visitSetOrArray(dataObjects.values(baseDoEntity), context, visitor) === TreeVisitResult.TERMINATE) {
       return TreeVisitResult.TERMINATE;
     }
     return this._visitSetOrArray(baseDoEntity.getContributions(), context, visitor);
