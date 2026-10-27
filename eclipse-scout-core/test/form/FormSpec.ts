@@ -2386,13 +2386,18 @@ describe('Form', () => {
       throwInLoad = false;
       throwInPostLoad = false;
       throwInSave = false;
+      postLoadPromise: Promise<void>;
 
-      protected override _load(): Promise<object> {
+      override _load(): Promise<object> {
         expect(this.session.desktop.busy).toBe(true);
         if (this.throwInLoad) {
           return $.rejectedPromise('load');
         }
         return $.resolvedPromise({});
+      }
+
+      override _handleLoadError(error: any): Promise<void> {
+        return super._handleLoadError(error);
       }
 
       protected override _postLoad(): Promise<void> {
@@ -2409,6 +2414,15 @@ describe('Form', () => {
           return $.rejectedPromise('save');
         }
         return $.resolvedPromise();
+      }
+
+      override _handleSaveError(error: any): Promise<void> {
+        return super._handleSaveError(error);
+      }
+
+      override _onLifecyclePostLoad(): Promise<void> {
+        this.postLoadPromise = super._onLifecyclePostLoad();
+        return this.postLoadPromise;
       }
     }
 
@@ -2431,118 +2445,233 @@ describe('Form', () => {
       App.get().errorHandler.session = originalErrorHandlerSession;
     });
 
-    it('is automatically handled in load', async () => {
+    it('rejects load if _load fails', async () => {
       expect(session.desktop.busy).toBe(false);
 
       form.throwInLoad = true;
-      const loadPromise = form.load()
-        .then(fail)
-        .catch(e => {
-          expect(e).toEqual('load');
-          catchCalled = true;
-        });
-
-      await sleep(); // Wait for ErrorHandler to display message box
-      const messageBoxes = helper.findMessageBoxes();
-      expect(messageBoxes.size).toBe(1);
+      await expectAsync(form.load()).toBeRejectedWith('load'); // Global rejection handler will display message box
+      expect(form.destroyed).toBe(true);
       expect(session.desktop.busy).toBe(false);
-
-      const messageBox: MessageBox = messageBoxes.values().next().value;
-      expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
-
-      helper.closeMessageBoxes();
-      await loadPromise;
-      expect(catchCalled).toBe(true);
-      expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
     });
 
-    it('is automatically handled in postLoad', done => {
+    it('rejects load if _load fails synchronously', async () => {
+      let error = null;
+      form._load = () => {
+        throw 'Something went wrong';
+      };
+      form.render();
+      try {
+        await form.load()
+          .catch(e => {
+            error = e;
+          });
+      } catch (error0) {
+        // should not happen
+        fail();
+      }
+      expect(form.destroyed).toBe(true);
+      expect(error).toBe('Something went wrong');
+    });
+
+    it('does not reject load if error happens in postLoad', async () => {
       form.throwInPostLoad = true;
+      let event;
       form.on('error', e => {
-        expect(e.phase).toBe('postLoad');
-        expect(e.error).toBe('postLoad');
-        done();
+        event = e;
       });
-      form.load()
-        .catch(fail); // error in postLoad does not reject the load promise
+      await form.load();
+      expect(form.destroyed).toBe(false);
+      expect(event.phase).toBe('postLoad');
+      expect(event.error).toBe('postLoad');
+
+      await expectAsync(form.postLoadPromise).toBeRejectedWith('postLoad');// Global rejection handler will display message box
     });
 
-    it('is automatically handled in save', async () => {
+    it('rejects save if _save fails', async () => {
       expect(session.desktop.busy).toBe(false);
 
       form.throwInSave = true;
       await form.load();
       form.touch();
-      const okPromise = form.ok()
-        .then(fail)
-        .catch(e => {
-          catchCalled = true;
-          expect(e).toEqual('save');
-        });
-
-      await sleep(); // Wait for ErrorHandler to display message box
-      const messageBoxes = helper.findMessageBoxes();
-      expect(messageBoxes.size).toBe(1);
+      await expectAsync(form.ok()).toBeRejectedWith('save'); // Global rejection handler will display message box
       expect(session.desktop.busy).toBe(false);
-
-      const messageBox: MessageBox = messageBoxes.values().next().value;
-      expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
-
-      helper.closeMessageBoxes();
-      await okPromise;
-      expect(catchCalled).toBe(true);
       expect(form.formSaved).toBe(false); // save failed: do not mark as stored
-      expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
     });
 
-    it('load error handling can be exchanged', done => {
+    it('triggers event on load error', async () => {
       form.throwInLoad = true;
       let numHandled = 0;
       form.on('error', e => {
         numHandled++;
-        e.preventDefault(); // disable default error handling
       });
-      form.load()
-        .then(fail)
-        .catch(e => {
-          catchCalled = true;
-          expect(form.session.desktop.busy).toBe(false);
-          expect(e).toBe('load');
-          expect(numHandled).toBe(1);
-        })
-        .finally(() => {
-          expect(catchCalled).toBe(true);
-          expect(App.get().errorHandler.handleErrorInfo).not.toHaveBeenCalled();
-          done();
-        });
+      await expectAsync(form.load()).toBeRejectedWith('load'); // Global rejection handler will display message box
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
     });
 
-    it('save error handling can be exchanged', done => {
+    it('does not reject load if error event is prevented', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        e.preventDefault(); // Resolves promise
+      });
+      await expectAsync(form.load()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(false);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('prevents form open if load error occurs', async () => {
+      form.throwInLoad = true;
+      await expectAsync(form.open()).toBeRejectedWith('load');
+      expect(form.rendered).toBe(false);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('does not prevent form open if load error event is prevented', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        e.preventDefault(); // Resolves promise
+      });
+      await expectAsync(form.open()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.rendered).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be converted by _handleLoadError', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      const orig = form._handleLoadError;
+      form._handleLoadError = error => {
+        numHandled++;
+        return orig.call(form, 'converted'); // super._handleLoadError(error), will close form
+      };
+      await expectAsync(form.load()).toBeRejectedWith('converted');
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be converted by _handleLoadError synchronously', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      const orig = form._handleLoadError;
+      form._handleLoadError = error => {
+        numHandled++;
+        form.close();
+        throw 'converted'; // Can throw sync because _handleErrorInternal is only called by async code so an error will be converted to a rejected promise automatically
+      };
+      await expectAsync(form.load()).toBeRejectedWith('converted');
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be resolved by _handleLoadError', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      form._handleLoadError = error => {
+        numHandled++;
+        return Promise.resolve();
+      };
+      await expectAsync(form.load()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(false);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('triggers event on save error', async () => {
       form.throwInSave = true;
       let numHandled = 0;
       form.on('error', e => {
         numHandled++;
         expect(e.phase).toBe('save');
-        e.preventDefault(); // disable default error handling
       });
-      form.load()
-        .then(() => {
-          form.touch();
-          form.ok()
-            .then(fail)
-            .catch(e => {
-              catchCalled = true;
-              expect(form.session.desktop.busy).toBe(false);
-              expect(e).toEqual('save');
-              expect(numHandled).toBe(1);
-            })
-            .finally(() => {
-              expect(catchCalled).toBe(true);
-              expect(App.get().errorHandler.handleErrorInfo).not.toHaveBeenCalled();
-              done();
-            });
-        })
-        .catch(fail);
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.save()).toBeRejectedWith('save');
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('does not reject save if error event is prevented', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        expect(e.phase).toBe('save');
+        e.preventDefault(); // Resolves promise
+      });
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.save()).toBeResolved();
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('triggers event on save error during ok', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        expect(e.phase).toBe('save');
+      });
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.ok()).toBeRejectedWith('save');
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('does not reject ok if error event is prevented', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        expect(e.phase).toBe('save');
+        e.preventDefault(); // Resolves promise
+      });
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.ok()).toBeResolved();
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('can be converted by _handleSaveError', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form._handleSaveError = error => {
+        numHandled++;
+        return Promise.reject('converted');
+      };
+      form.touch();
+      await expectAsync(form.save()).toBeRejectedWith('converted');
+      expect(numHandled).toBe(1);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be resolved by _handleSaveError', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form._handleSaveError = error => {
+        numHandled++;
+        return Promise.resolve();
+      };
+      form.touch();
+      await expectAsync(form.save()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.session.desktop.busy).toBe(false);
     });
   });
 

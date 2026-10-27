@@ -304,9 +304,9 @@ export class App extends EventEmitter {
       // This may happen for REST resources or if a reverse proxy returned the response
       url = ajaxError.requestOptions?.url || '';
       message = `${ajaxError.errorDo?.message || ''}`;
-      let httpStatus = `${this.errorHandler.formatAjaxStatus(ajaxError.jqXHR, ajaxError.errorThrown)}`;
-      if (!message.includes(httpStatus)) {
-        message = `${message} [${this.errorHandler.formatAjaxStatus(ajaxError.jqXHR, ajaxError.errorThrown)}]`.trim();
+      let status = ajaxError.formatStatus();
+      if (!message.includes(status)) {
+        message = `${message} [${status}]`.trim();
       }
     } else if (jsonError) {
       // Json based error
@@ -609,17 +609,22 @@ export class App extends EventEmitter {
     } else {
       // Session.js may already display a fatal message box
       // -> don't handle the error again and display multiple error messages
-      this.sessions
-        .filter(session => !session.ready && !session.isFatalMessageShown())
-        .forEach(session => {
-          session.$entryPoint.empty();
-          const errorHandler = this._createErrorHandler({session: session});
-          const promise = errorHandler.analyzeError(error).then(info => {
-            info.showAsFatalError = true;
-            return errorHandler.handleErrorInfo(info);
-          });
-          promises.push(promise);
+      for (const session of this.sessions) {
+        if (session.isFatalMessageShown()) {
+          ErrorHandler.consume(error); // Ensure global rejection handler won't show the message again
+          continue;
+        }
+        if (session.ready) {
+          continue;
+        }
+        session.$entryPoint.empty();
+        const errorHandler = this._createErrorHandler({session});
+        const promise = errorHandler.analyzeError(error).then(info => {
+          info.showAsFatalError = true;
+          return errorHandler.handleErrorInfo(info);
         });
+        promises.push(promise);
+      }
     }
 
     this.trigger('fail', {error});
