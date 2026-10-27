@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,18 +7,13 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {FormSpecHelper, TestingApp} from '../src/testing/index';
-import {App, Deferred} from '../src';
+import {FormSpecHelper, JasmineScoutUtil, TestingApp} from '../src/testing/index';
+import {App, Deferred, ErrorHandler} from '../src';
 
 describe('RemoteApp', () => {
   let session: SandboxSession;
   let helper: FormSpecHelper;
   let originalApp = App.get();
-
-  afterAll(() => {
-    // restore original app as creating new App instances automatically overwrites the static App variable
-    TestingApp.set(originalApp);
-  });
 
   beforeEach(() => {
     // @ts-expect-error
@@ -27,6 +22,16 @@ describe('RemoteApp', () => {
       renderDesktop: false
     });
     helper = new FormSpecHelper(session);
+    jasmine.Ajax.install();
+  });
+
+  afterEach(() => {
+    jasmine.Ajax.uninstall();
+  });
+
+  afterAll(() => {
+    // restore original app as creating new App instances automatically overwrites the static App variable
+    TestingApp.set(originalApp);
   });
 
   describe('initDone', () => {
@@ -73,6 +78,25 @@ describe('RemoteApp', () => {
 
       await expectAsync(initPromise).toBeRejected();
       expect(app.initialized).toBe(false);
+    });
+  });
+
+  describe('_fail', () => {
+    it('marks error as consumed if session shows fatal message', async () => {
+      let app = new TestingApp();
+      app._createSession = options => session;
+      let promise = app.init();
+      const sessionExpiredResponse = {
+        'error': {
+          'code': 10,
+          'message': 'The session has expired, please reload the page.'
+        }
+      };
+      JasmineScoutUtil.mockRestCall('json?startup', sessionExpiredResponse);
+      const error = await promise.catch(err => err);
+      expect(error.error).toEqual(sessionExpiredResponse.error);
+      expect(ErrorHandler.isConsumed(error)).toBeTrue();
+      expect(session.isFatalMessageShown()).toBeTrue();
     });
   });
 });
