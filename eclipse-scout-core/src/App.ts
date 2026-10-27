@@ -304,9 +304,9 @@ export class App extends EventEmitter {
       // This may happen for REST resources or if a reverse proxy returned the response
       url = ajaxError.requestOptions?.url || '';
       message = `${ajaxError.errorDo?.message || ''}`;
-      let httpStatus = `${this.errorHandler.formatAjaxStatus(ajaxError.jqXHR, ajaxError.errorThrown)}`;
-      if (!message.includes(httpStatus)) {
-        message = `${message} [${this.errorHandler.formatAjaxStatus(ajaxError.jqXHR, ajaxError.errorThrown)}]`.trim();
+      let status = ajaxError.formatStatus();
+      if (!message.includes(status)) {
+        message = `${message} [${status}]`.trim();
       }
     } else if (jsonError) {
       // Json based error
