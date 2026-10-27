@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,7 @@ export interface AjaxErrorModel {
   requestOptions: AjaxSettings;
 }
 
-export class AjaxError implements AjaxErrorModel {
+export class AjaxError extends Error implements AjaxErrorModel {
   declare model: AjaxErrorModel;
 
   jqXHR: JQuery.jqXHR;
@@ -27,6 +27,7 @@ export class AjaxError implements AjaxErrorModel {
   requestOptions: AjaxSettings;
 
   constructor(model: InitModelOf<AjaxError>) {
+    super();
     this.jqXHR = null;
     this.textStatus = null;
     this.errorThrown = null;
