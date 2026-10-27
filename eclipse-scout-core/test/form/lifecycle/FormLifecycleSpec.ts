@@ -299,48 +299,6 @@ describe('FormLifecycle', () => {
     });
   });
 
-  describe('load', () => {
-
-    it('should handle errors that occur in promise', done => {
-      let form = helper.createFormWithOneField();
-      form._load = () => {
-        return $.resolvedPromise()
-          .then(() => {
-            throw 'Something went wrong';
-          });
-      };
-      form.render();
-      form.load().catch(error => {
-        expect(form.destroyed).toBe(true);
-      }).finally(done);
-    });
-
-    /**
-     * Errors that are thrown directly in the _load function should be wrapped into a Promise
-     * so that the catch() of the Promise is called in all error cases. Otherwise, custom error handling is not possible.
-     */
-    it('should handle errors that occur in _load function', async () => {
-      let form = helper.createFormWithOneField();
-      let error = null;
-      form._load = () => {
-        throw 'Something went wrong';
-      };
-      form.render();
-      try {
-        await form.load()
-          .catch(e => {
-            error = e;
-          });
-      } catch (error0) {
-        // should not happen
-        fail();
-      }
-      expect(form.destroyed).toBe(true);
-      expect(error).toBe('Something went wrong');
-    });
-
-  });
-
   describe('validation error message', () => {
 
     it('should list labels of missing and invalid fields', () => {

@@ -85,6 +85,10 @@ export interface ErrorInfo {
    * Additional custom debug info. May come from an extra field on an Error thrown (Scout extension) or the response text from an ajax call.
    */
   debugInfo?: string;
+  /**
+   * The analyzed error info of the cause, if {@link error.cause} is set.
+   */
+  causeInfo?: ErrorInfo;
 }
 
 /**
@@ -167,15 +171,18 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     }
   }
 
-  protected _onUnhandledRejection(event: PromiseRejectionEvent) {
+  protected async _onUnhandledRejection(event: PromiseRejectionEvent) {
+    event.preventDefault();
     const reason = event.reason;
     if (this.isIgnorableRejection(event.reason)) {
       $.log.isDebugEnabled() && $.log.debug('Ignored abort error', reason);
-      event.preventDefault();
       return;
     }
-    // TODO CGU use analyseError and _sendErrorMessage and _logErrorInfo. OR: create messagebox and remove unnecessary error handler calls in the code base?
-    console.log('Unhandled promise rejection', event);
+    this.handle(reason)
+      // If handling causes an error, try again with a new error, maybe the reason caused the error
+      .catch(e => this.handle(new Error('An error occurred while handling a unhandled rejection', {cause: e})))
+      // If it still fails, just log it
+      .catch(e => $.log.error('An error occurred during the second handle() in unhandled rejection', e));
   }
 
   protected _isIgnorableScriptError(message: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error): boolean {
@@ -215,8 +222,8 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
 
   /**
    * Returns an "errorInfo" object for the given error. The following cases are handled:
-   * 1. Error objects           (code: computed by getJsErrorCode())
-   * 2. AJAX errors             (code: 'X' + HTTP status code), i.e. an {@link AjaxError} or a jqXHR
+   * 1. AJAX errors             (code: 'X' + HTTP status code), i.e. an {@link AjaxError} or a jqXHR
+   * 2. Error objects           (code: computed by getJsErrorCode())
    * 3. Nothing                 (code: 'P3')
    * 4. Everything else         (code: 'P4')
    */
@@ -237,10 +244,19 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     return this._analyzeError(errorInfo);
   }
 
-  protected _analyzeError(errorInfo: ErrorInfo): Promise<ErrorInfo> {
+  protected async _analyzeError(errorInfo: ErrorInfo): Promise<ErrorInfo> {
     let error = errorInfo.error;
-    // 1. Regular errors
+    // 1. Ajax errors (checked first because AjaxError extends Error)
+    if ($.isJqXHR(error) || error instanceof AjaxError) {
+      this._analyzeAjaxError(errorInfo);
+      return $.resolvedPromise(errorInfo);
+    }
+
+    // 2. Regular errors
     if (error instanceof Error) {
+      if (error.cause instanceof Error) {
+        errorInfo.causeInfo = await this.analyzeError(error.cause);
+      }
       // Map stack first before analyzing the error
       return this.mapStack(error.stack)
         .catch(result => {
@@ -252,12 +268,6 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
           this._analyzeRegularError(errorInfo);
           return errorInfo;
         });
-    }
-
-    // 2. Ajax errors
-    if ($.isJqXHR(error) || error instanceof AjaxError) {
-      this._analyzeAjaxError(errorInfo);
-      return $.resolvedPromise(errorInfo);
     }
 
     // 3. No reason provided
@@ -410,10 +420,17 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
    */
   handleErrorInfo(errorInfo: ErrorInfo): Promise<ErrorInfo> {
+    if (ErrorHandler.isConsumed(errorInfo.error)) {
+      $.log.info(`Error has already been consumed, ignoring it. Code ${errorInfo.code}.`);
+      return $.resolvedPromise(errorInfo);
+    }
+
     errorInfo.level = scout.nvl(errorInfo.level, LogLevel.ERROR);
-    if (this.logError && errorInfo.log) {
+    if (this.logError) {
       this._logErrorInfo(errorInfo);
     }
+
+    ErrorHandler.consume(errorInfo.error);
 
     // Note: The error handler is installed globally, and we cannot tell in which scout session the error happened.
     // We simply use the first scout session to display the message box and log the error. This is not ideal in the
@@ -438,22 +455,33 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     return $.resolvedPromise(errorInfo);
   }
 
-  protected _logErrorInfo(errorInfo: ErrorInfo) {
+  protected _logErrorInfo(errorInfo: ErrorInfo, prefix?: string) {
+    if (!errorInfo?.log) {
+      return;
+    }
+
+    let msg = errorInfo.log;
+    let causeInfo = errorInfo.causeInfo;
+    while (causeInfo) {
+      msg += '\nCaused by: ' + causeInfo.log;
+      causeInfo = causeInfo.causeInfo;
+    }
+
     switch (errorInfo.level) {
       case LogLevel.TRACE:
-        $.log.trace(errorInfo.log);
+        $.log.trace(msg);
         break;
       case LogLevel.DEBUG:
-        $.log.debug(errorInfo.log);
+        $.log.debug(msg);
         break;
       case LogLevel.INFO:
-        $.log.info(errorInfo.log);
+        $.log.info(msg);
         break;
       case LogLevel.WARN:
-        $.log.warn(errorInfo.log);
+        $.log.warn(msg);
         break;
       default:
-        $.log.error(errorInfo.log);
+        $.log.error(msg);
     }
 
     // Note: when the null-logger is active it has already written the error to the console
@@ -464,11 +492,11 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
     }
     if (writeToConsole && window && window.console) {
       if (errorInfo.level === LogLevel.ERROR && window.console.error) {
-        window.console.error(errorInfo.log);
+        window.console.error(msg);
       } else if (errorInfo.level === LogLevel.WARN && window.console.warn) {
-        window.console.warn(errorInfo.log);
+        window.console.warn(msg);
       } else if (window.console.log) {
-        window.console.log(errorInfo.log);
+        window.console.log(msg);
       }
     }
   }
@@ -660,5 +688,31 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
         body = textMap.optGet('ui.UnexpectedProblem', 'Unexpected problem');
     }
     return body;
+  }
+
+  /**
+   * Marks the error as consumed to make the {@link ErrorHandler} ignore the error.
+   *
+   * This can be useful if the error is handled and rethrown e.g. to display a custom message box.
+   * If the error is rethrown it will eventually be handled by the global {@link ErrorHandler} unless it was caught again.
+   * Because the error was marked as consumed, the error handler won't display it a second time.
+   *
+   * This works the same for errors in synchronous code as well as for errors in promise chains.
+   * Because there is a global rejection handler, it is not necessary to catch and handle errors in promise chains just to pass them to the {@link ErrorHandler}.
+   * The global rejection handler will eventually do it.
+   */
+  static consume(error: any) {
+    if (objects.isObject(error)) {
+      try {
+        error.__consumed = true;
+      } catch (e) {
+        // May happen if error is frozen or sealed
+        $.log.warn('Cannot set __consumed property on error object', error);
+      }
+    }
+  }
+
+  static isConsumed(error: any): boolean {
+    return error?.__consumed;
   }
 }

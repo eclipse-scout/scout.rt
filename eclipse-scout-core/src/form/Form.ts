@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, App, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, ChildModelOf, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, ErrorHandler, Event, EventHandler,
-  FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf,
-  KeyStroke, KeyStrokeContext, Lifecycle, MessageBox, MessageBoxController, MessageBoxes, MessageBoxOption, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status,
+  AbortKeyStroke, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, ChildModelOf, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, EventHandler, FileChooser,
+  FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke,
+  KeyStrokeContext, Lifecycle, MessageBox, MessageBoxController, MessageBoxes, MessageBoxOption, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status,
   StatusOrModel, strings, TextListWithTitle, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
@@ -414,12 +414,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
     if (!allowReload && this.formLoaded) {
       return $.resolvedPromise();
     }
-    try {
-      return this.withBusyHandling(() => this.lifecycle.load())
-        .catch(error => this._handleLoadErrorInternal(error));
-    } catch (error) {
-      return this._handleLoadErrorInternal(error);
-    }
+    return this.withBusyHandling(() => this.lifecycle.load())
+      .catch(error => this._handleLoadErrorInternal(error));
   }
 
   /**
@@ -427,14 +423,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
    *
    * @see setBusy
    */
-  withBusyHandling<T>(action: () => Promise<T>, opts?: Pick<BusyIndicatorOptions, 'renderDelay'>): Promise<T> {
+  async withBusyHandling<T>(action: () => Promise<T>, opts?: Pick<BusyIndicatorOptions, 'renderDelay'>): Promise<T> {
     this.setBusy(opts ? {...opts, busy: true} : true);
     try {
-      return action()
-        .finally(() => this.setBusy(false));
-    } catch (error) {
+      return await action();
+    } finally {
       this.setBusy(false);
-      throw error;
     }
   }
 
@@ -505,7 +499,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Default load error handler. May be overridden by subclasses.
-   * By default, the error is forwarded to the {@link ErrorHandler}, the form is closed and a rejected promise is returned so a caller of {@link load} may catch the error.
+   * By default, the form is closed and a rejected promise is returned so a caller of {@link load} may catch the error.
    */
   protected _handleLoadError(error: any): Promise<void> {
     this.close();
@@ -529,20 +523,12 @@ export class Form extends Widget implements FormModel, DisplayParent {
     return this.when('postLoad');
   }
 
-  protected _onLifecyclePostLoad() {
-    let promise: Promise<void>;
-    try {
-      promise = this._postLoad()
-        .then(() => {
-          this.trigger('postLoad');
-        })
-        .catch(error => this._handlePostLoadErrorInternal(error));
-    } catch (error) {
-      promise = this._handlePostLoadErrorInternal(error);
-    }
-    promise.catch(e => {
-      // It is not necessary to return the promise, catch it to prevent unhandled promise rejection error
-    });
+  protected _onLifecyclePostLoad(): Promise<void> {
+    return this._postLoad()
+      .then(() => {
+        this.trigger('postLoad');
+      })
+      .catch(error => this._handlePostLoadErrorInternal(error));
   }
 
   /**
@@ -554,7 +540,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Default postLoad error handler. May be overridden by subclasses.
-   * By default, the error is forwarded to the {@link ErrorHandler} and a rejected promise is returned.
+   * By default, a rejected promise is returned.
    */
   protected _handlePostLoadError(error: any): Promise<void> {
     return this._handleError(error);
@@ -594,12 +580,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * @returns promise which is resolved when the save completes and rejected on an error.
    */
   ok(): Promise<void> {
-    try {
-      return this.withBusyHandling(() => this.lifecycle.ok())
-        .catch(error => this._handleSaveErrorInternal(error));
-    } catch (error) {
-      return this._handleSaveErrorInternal(error);
-    }
+    return this.withBusyHandling(() => this.lifecycle.ok())
+      .catch(error => this._handleSaveErrorInternal(error));
   }
 
   /**
@@ -611,12 +593,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * @returns promise which is resolved when the save completes and rejected on an error.
    */
   save(): Promise<void> {
-    try {
-      return this.withBusyHandling(() => this.lifecycle.save())
-        .catch(error => this._handleSaveErrorInternal(error));
-    } catch (error) {
-      return this._handleSaveErrorInternal(error);
-    }
+    return this.withBusyHandling(() => this.lifecycle.save())
+      .catch(error => this._handleSaveErrorInternal(error));
   }
 
   /**
@@ -645,7 +623,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Default save error handler. May be overridden by subclasses.
-   * By default, the error is forwarded to the {@link ErrorHandler} and the promise is rejected so a caller of {@link save} may catch the error.
+   * By default, the promise is rejected so a caller of {@link save} may catch the error.
    */
   protected _handleSaveError(error: any): Promise<void> {
     return this._handleError(error);
@@ -654,18 +632,10 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   protected _handleErrorInternal<T>(error: any, phase: string, errorHandler: (error: any) => Promise<T>): Promise<T> {
     const event = this.trigger('error', {phase, error});
-    let promise;
     if (event.defaultPrevented) {
-      promise = $.resolvedPromise();
-    } else {
-      promise = errorHandler(error).catch(errorInErrorHandler => {
-        // prevents that a rejected promise from the error handler overwrites the actual error from the form.
-        $.log.error('Error in error handler while trying to handle error "' + error + '".', errorInErrorHandler);
-      });
+      return $.resolvedPromise();
     }
-    return promise.then(() => {
-      throw error; // always throw so it can be catched. // TODO CGU this is probably a bad idea if we want to use the global rejection handler. If we remove it, callers need to be checked for catch()
-    });
+    return errorHandler(error);
   }
 
   /**
@@ -673,10 +643,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * @returns A promise that resolves when the error is handled.
    */
   protected _handleError(error: any): Promise<void> {
-    const errorHandler = App.get().errorHandler;
-    return errorHandler
-      .handle(error) // shows a message box with the error
-      .then(errorInfo => undefined);
+    return Promise.reject(error);
   }
 
   /**
@@ -685,12 +652,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * @returns a promise resolved with the validation result as {@link Status}.
    */
   validate(): Promise<Status> {
-    try {
-      return this.withBusyHandling(() => this.lifecycle.validate())
-        .catch(error => this._handleValidateErrorInternal(error));
-    } catch (error) {
-      return this._handleValidateErrorInternal(error);
-    }
+    return this.withBusyHandling(() => this.lifecycle.validate())
+      .catch(error => this._handleValidateErrorInternal(error));
   }
 
   /**
@@ -703,7 +666,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
 
   /**
    * Default validate error handler. May be overridden by subclasses.
-   * By default, the error is forwarded to the {@link ErrorHandler} and the promise is rejected so a caller of {@link validate} may catch the error.
+   * By default, the promise is rejected so a caller of {@link validate} may catch the error.
    */
   protected _handleValidateError(error: any): Promise<void> {
     return this._handleError(error);
@@ -855,12 +818,8 @@ export class Form extends Widget implements FormModel, DisplayParent {
    * Resets the form to its initial state.
    */
   reset(): Promise<void> {
-    try {
-      return this.withBusyHandling(() => this.lifecycle.reset())
-        .catch(error => this._handleLoadErrorInternal(error));
-    } catch (error) {
-      return this._handleLoadErrorInternal(error);
-    }
+    return this.withBusyHandling(() => this.lifecycle.reset())
+      .catch(error => this._handleLoadErrorInternal(error));
   }
 
   /**
