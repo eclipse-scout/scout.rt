@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataObjects, DoEntity, DoEntityWithContributions, scout, typeName} from '../../src/index';
+import {BaseDoEntity, CodeDo, dataObjects, DoEntity, DoEntityWithContributions, scout, typeName} from '../../src/index';
 
 describe('dataObjects', () => {
 
@@ -35,6 +35,89 @@ describe('dataObjects', () => {
   class AnotherBaseDoEntityContribDo extends BaseDoEntity {
     contribProp2: string;
   }
+
+  describe('values', () => {
+    it('can handle simpel inputs', () => {
+      expect(dataObjects.values(null)).toEqual([]);
+      expect(dataObjects.values(undefined)).toEqual([]);
+    });
+
+    it('ignores internal properties', () => {
+      const dataObject = scout.create(CodeDo, {
+        _typeVersion: '12',
+        _contributions: [scout.create(CodeDo, {iconId: 'asdf'})],
+        enabled: true
+      });
+      expect(dataObjects.values(dataObject)).toEqual([undefined, // id
+        undefined, // objectType
+        undefined, // modelClass
+        undefined, // active
+        true, // enabled
+        undefined, // iconId
+        undefined, // tooltipText
+        undefined, // backgroundColor
+        undefined, // foregroundColor
+        undefined, // font
+        undefined, // cssClass
+        undefined, // extKey
+        undefined, // value
+        undefined, // partitionId
+        undefined, // sortCode
+        undefined, // fieldName
+        undefined, // texts
+        undefined]); // children
+    });
+  });
+
+  describe('keys', () => {
+    it('can handle simpel inputs', () => {
+      expect(dataObjects.keys(null)).toEqual([]);
+      expect(dataObjects.keys(undefined)).toEqual([]);
+    });
+
+    it('ignores internal properties', () => {
+      const dataObject = scout.create(CodeDo, {
+        _typeVersion: '12',
+        _contributions: [scout.create(CodeDo, {iconId: 'asdf'})],
+        enabled: true
+      });
+      expect(dataObjects.keys(dataObject)).toEqual(['id', 'objectType', 'modelClass', 'active', 'enabled', 'iconId', 'tooltipText', 'backgroundColor', 'foregroundColor',
+        'font', 'cssClass', 'extKey', 'value', 'partitionId', 'sortCode', 'fieldName', 'texts', 'children']);
+    });
+  });
+
+  describe('entries', () => {
+    it('can handle simpel inputs', () => {
+      expect(dataObjects.entries(null)).toEqual([]);
+      expect(dataObjects.entries(undefined)).toEqual([]);
+    });
+
+    it('', () => {
+      const dataObject = scout.create(CodeDo, {
+        _typeVersion: '12',
+        _contributions: [scout.create(CodeDo, {iconId: 'asdf'})],
+        enabled: true
+      });
+      expect(dataObjects.entries(dataObject)).toEqual([['id', undefined],
+        ['objectType', undefined],
+        ['modelClass', undefined],
+        ['active', undefined],
+        ['enabled', true],
+        ['iconId', undefined],
+        ['tooltipText', undefined],
+        ['backgroundColor', undefined],
+        ['foregroundColor', undefined],
+        ['font', undefined],
+        ['cssClass', undefined],
+        ['extKey', undefined],
+        ['value', undefined],
+        ['partitionId', undefined],
+        ['sortCode', undefined],
+        ['fieldName', undefined],
+        ['texts', undefined],
+        ['children', undefined]]);
+    });
+  });
 
   describe('addContribution', () => {
     it('adds a contribution to the DO', () => {
