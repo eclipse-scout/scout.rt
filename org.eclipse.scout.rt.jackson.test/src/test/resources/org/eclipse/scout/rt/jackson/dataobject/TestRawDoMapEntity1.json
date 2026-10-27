@@ -1,0 +1,6 @@
+{
+  "attrib" : {
+    "_type" : "TestBigInteger",
+    "bigIntegerAttribute" : 1234
+  }
+}
