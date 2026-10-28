@@ -5,7 +5,11 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 const transform = require('./tranform');
 const fs = require('fs');
@@ -13,7 +17,7 @@ const path = require('path');
 
 function runTests() {
   const rootFixture = './test/fixtures/TestDo.ts';
-  transform([rootFixture]);
+  transform.compile([rootFixture]);
 
   const fixtures = [rootFixture, './test/fixtures/Test2Do.ts'];
   const failedFixtures = [];
@@ -24,6 +28,10 @@ function runTests() {
     const expectedContent = fs.readFileSync(expected, 'utf-8').toString().trim();
     if (transpiledContent !== expectedContent) {
       failedFixtures.push(fixture);
+    }
+    // the result must be the same if the types are not checked
+    if (transform.transpile(fixture).trim() !== expectedContent) {
+      failedFixtures.push(fixture + ' (transpileOnly)');
     }
   }
   if (failedFixtures.length) {
