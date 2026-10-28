@@ -43,7 +43,8 @@ public final class HttpProxyConfigProperties {
   }
 
   /**
-   * Sets the timeout (in milliseconds) for the {@link AsyncContext} used by the {@link HttpProxy} when forwarding requests.
+   * Sets the timeout (in milliseconds) for the {@link AsyncContext} used by the {@link HttpProxy} when forwarding requests
+   * and for individual blocking I/O operations of the classic-over-async bridge. Non-positive values disable both timeouts.
    * <p>
    * <b>Note:</b> Keep this value smaller or equals to {@link org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationStreamIdleTimeoutProperty}
    * to ensure the async context can be closed before the underlying connection is terminated.
@@ -59,7 +60,7 @@ public final class HttpProxyConfigProperties {
 
     @Override
     public String description() {
-      return "Timeout in milliseconds for async servlet contexts. Default: " + getDefaultValue() + ".";
+      return "Timeout in milliseconds for async servlet contexts and blocking proxy I/O operations. Non-positive values disable both timeouts. Default: " + getDefaultValue() + ".";
     }
 
     @Override
