@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  App, ChildModelOf, ErrorHandler, EventHandler, Form, icons, objects, Outline, OutlineReloadKeyStroke, Page, PageModel, PageParamDo, PageResolver, PageWithTable, RemoteEvent, scout, Table, TableAdapter, TableFilterRemovedEvent, TableRow,
-  TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
+  App, ChildModelOf, dataObjects, ErrorHandler, EventHandler, Form, icons, objects, Outline, OutlineReloadKeyStroke, Page, PageModel, PageParamDo, PageResolver, PageWithTable, RemoteEvent, scout, Table, TableAdapter,
+  TableFilterRemovedEvent, TableRow, TableRowInitEvent, TableRowsInsertedEvent, TreeAdapter, TreeNodeModel
 } from '../../index';
 
 export class OutlineAdapter extends TreeAdapter {
@@ -290,7 +290,7 @@ export class OutlineAdapter extends TreeAdapter {
     pageModel.jsPageObjectType = pageModel.jsPageObjectType || PageResolver.get(this.session).findObjectTypeForPageParam(pageParam);
     if (!pageModel.jsPageObjectType) {
       if (pageParam) {
-        throw new Error('Could not resolve page objectType for pageParam ' + JSON.stringify(pageParam));
+        throw new Error('Could not resolve page objectType for pageParam ' + dataObjects.stringify(pageParam));
       }
       throw new Error('jsPageObjectType not set');
     }
