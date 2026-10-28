@@ -47,5 +47,10 @@ TestSpecialTypesDo = __decorate([
     typeName('test.TestSpecialTypes')
 ], TestSpecialTypesDo);
 export { TestSpecialTypesDo };
+export var ImportedStringEnum;
+(function (ImportedStringEnum) {
+    ImportedStringEnum["A"] = "a";
+    ImportedStringEnum["B"] = "b";
+})(ImportedStringEnum || (ImportedStringEnum = {}));
 window["scout"]["DataObjectInventory"].get().add(Test2Do, "test.Test2", "test.Test2Do");
 window["scout"]["DataObjectInventory"].get().add(TestSpecialTypesDo, "test.TestSpecialTypes", "test.TestSpecialTypesDo");

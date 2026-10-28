@@ -9,8 +9,13 @@
  */
 
 const ts = require('typescript');
-const ModuleDetector = require('./ModuleDetector');
 const CONSTANT_PATTERN = new RegExp('^[A-Z_0-9]+$');
+const BUILT_IN_TYPES = new Set(['Array', 'Blob', 'Boolean', 'Date', 'File', 'Map', 'Number', 'Object', 'Set', 'String']);
+const READONLY_TYPES = new Map([['ReadonlyArray', 'Array'], ['ReadonlyMap', 'Map'], ['ReadonlySet', 'Set']]);
+const WRAPPER_TYPES = new Set(['NonNullable', 'Partial', 'Readonly', 'Required']); // utility types which are replaced by their type argument
+// bigint is not supported
+const PRIMITIVE_KEYWORDS = new Map([[ts.SyntaxKind.StringKeyword, 'String'], [ts.SyntaxKind.NumberKeyword, 'Number'], [ts.SyntaxKind.BooleanKeyword, 'Boolean']]);
+const MAX_EVALUATION_DEPTH = 10;
 
 /**
  * TypeScript transformer for DataObject which injects @Reflect.metadata('scout.m.t', dataType) decorators to all DO attributes.
@@ -21,17 +26,20 @@ const CONSTANT_PATTERN = new RegExp('^[A-Z_0-9]+$');
  */
 module.exports = class DataObjectTransformer {
 
-  constructor(program, context, namespaceResolver) {
+  constructor(program, context, moduleResolver) {
     this.program = program;
     this.context = context;
-    this.moduleDetector = null; // created on first use
+    this.currentSourceFile = null;
     this.doInventoryAddStatements = [];
     this.currentClassTypeParams = null;
-    this.namespaceResolver = namespaceResolver;
+    this.resolvingTypeParams = new Set(); // to detect recursive type parameter constraints
+    this.resolvingTypeAliases = new Set(); // to detect recursive type aliases
+    this.moduleResolver = moduleResolver;
   }
 
   transform(node) {
     if (ts.isSourceFile(node)) {
+      this.currentSourceFile = node;
       let transformedFile = this._visitChildren(node); // step into top level source files
       if (this.doInventoryAddStatements.length) {
         // add auto-register DO statements to the source file end
@@ -40,7 +48,7 @@ module.exports = class DataObjectTransformer {
           transformedFile.isDeclarationFile, transformedFile.referencedFiles, transformedFile.typeReferenceDirectives, transformedFile.hasNoDefaultLib, transformedFile.libReferenceDirectives);
         this.doInventoryAddStatements = []; // clear added statements
       }
-      this.moduleDetector = null; // forget cached types for this file
+      this.currentSourceFile = null;
       return transformedFile;
     }
     if (ts.isClassDeclaration(node)) {
@@ -87,12 +95,12 @@ module.exports = class DataObjectTransformer {
 
   /**
    * @param node {ts.ClassDeclaration}
-   * @returns Map<string, TypeReferenceNode>
+   * @returns Map<string, ts.TypeNode|null> The constraint (or default type if there is no constraint) by type parameter name. Null if the type parameter has neither.
    */
   _buildTypeParamMap(node) {
     const mappings = node.typeParameters
-      ?.map(typeParameter => [typeParameter?.name?.escapedText, typeParameter.constraint])
-      ?.filter(mapping => !!mapping[0] && !!mapping[1]);
+      ?.map(typeParameter => [typeParameter?.name?.escapedText, typeParameter.constraint || typeParameter.default || null])
+      ?.filter(mapping => !!mapping[0]);
     return new Map(mappings);
   }
 
@@ -138,10 +146,7 @@ module.exports = class DataObjectTransformer {
    * @returns {ts.Decorator[]}
    */
   _createMetaDataDecoratorsFor(node) {
-    if (!node.type) {
-      return null;
-    }
-    const typeNode = this._createTypeNode(node.type);
+    const typeNode = node.type ? this._createTypeNode(node.type) : this._createTypeNodeFromInitializer(node.initializer);
     if (!typeNode) {
       return null; // unsupported types like union-types or any or unknown
     }
@@ -149,31 +154,90 @@ module.exports = class DataObjectTransformer {
   }
 
   /**
-   * Creates the value node to be added to the @Reflect.metadata('scout.m.t', valueNode) decorator.
-   * @param typeNode {ts.TypeNode} The data type node of a DO property.
-   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression}
-   *   A constructor reference identifier for primitives like number, string, boolean, object, unknown, any, void, etc.
-   *   A constructor reference identifier for built-in types like Map, Set, Date.
-   *   A RawFieldMetaData object literal for arrays (having Array type and the element type as type arguments: Array<ElementType>).
-   *   A string literal for string literal types as e.g. used in IDs: UuId<'scout.SimpleUuid'>.
-   *   A string literal for custom type references not having type arguments in the form of a Scout objectType: 'myApp.MySpecialDo'.
-   *   A RawFieldMetaData object literal for type references having type arguments.
+   * Creates the value node to be added to the @Reflect.metadata('scout.m.t', valueNode) decorator for a property without type declaration.
+   * The data type is detected from the initializer expression (e.g. prop = 10; or prop = new Set<string>();).
+   * @param initializer {ts.Expression|undefined} The initializer of a DO property.
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression|null} see _createTypeNode
    */
-  _createTypeNode(typeNode) {
-    if (typeNode.kind === ts.SyntaxKind.NumberKeyword) {
-      // primitive number
-      return ts.factory.createIdentifier('Number');
+  _createTypeNodeFromInitializer(initializer) {
+    if (!initializer) {
+      return null;
     }
-    if (typeNode.kind === ts.SyntaxKind.StringKeyword) {
-      // primitive string
+    if (ts.isParenthesizedExpression(initializer)) {
+      return this._createTypeNodeFromInitializer(initializer.expression);
+    }
+    if (ts.isAsExpression(initializer) || ts.isSatisfiesExpression(initializer)) {
+      return this._createTypeNode(initializer.type);
+    }
+    if (ts.isTemplateExpression(initializer)) {
       return ts.factory.createIdentifier('String');
     }
-    if (typeNode.kind === ts.SyntaxKind.BooleanKeyword) {
-      // primitive boolean
-      return ts.factory.createIdentifier('Boolean');
+    const primitiveTypes = this._evaluatePrimitiveValue(initializer);
+    if (primitiveTypes) {
+      return this._toPrimitiveTypeNode(primitiveTypes);
     }
-    // bigint is not yet supported as it is only part of ES2020 while Scout still uses ES2019
+    if (ts.isNewExpression(initializer) && ts.isIdentifier(initializer.expression)) {
+      // treat new Obj<T>() like a declaration of type Obj<T>
+      return this._createTypeNode(ts.factory.createTypeReferenceNode(initializer.expression, initializer.typeArguments));
+    }
+    if (ts.isArrayLiteralExpression(initializer)) {
+      return this._createFieldMetaData(ts.factory.createIdentifier('Array'), [this._createArrayLiteralElementTypeNode(initializer)]);
+    }
+    return null; // e.g. null, undefined, function calls, object literals
+  }
 
+  /**
+   * @param arrayLiteral {ts.ArrayLiteralExpression}
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression} The element type if all elements have the same detectable type, a null literal otherwise.
+   */
+  _createArrayLiteralElementTypeNode(arrayLiteral) {
+    const printer = ts.createPrinter();
+    let elementType = null;
+    let elementTypeText = null;
+    for (const element of arrayLiteral.elements) {
+      const type = this._createTypeNodeFromInitializer(element);
+      if (!type) {
+        return ts.factory.createNull();
+      }
+      const typeText = printer.printNode(ts.EmitHint.Expression, type, arrayLiteral.getSourceFile());
+      if (elementTypeText !== null && elementTypeText !== typeText) {
+        return ts.factory.createNull(); // mixed element types
+      }
+      elementType = type;
+      elementTypeText = typeText;
+    }
+    return elementType ?? ts.factory.createNull();
+  }
+
+  /**
+   * Creates the value node to be added to the @Reflect.metadata('scout.m.t', valueNode) decorator.
+   * @param typeNode {ts.TypeNode} The data type node of a DO property.
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression|null}
+   *   A constructor reference identifier for primitives like number, string, boolean.
+   *   A constructor reference identifier for primitive literal types, unions of such literal types and enums (e.g. String for 'a' | 'b').
+   *   A constructor reference identifier for built-in types like Map, Set, Date.
+   *   A RawFieldMetaData object literal for arrays (having Array type and the element type as type arguments: Array<ElementType>).
+   *   A string literal for custom type references not having type arguments in the form of a Scout objectType: 'myApp.MySpecialDo'.
+   *   A RawFieldMetaData object literal for type references having type arguments.
+   *   The result for the aliased type for type aliases.
+   *   The result for the remaining type for unions with null or undefined (e.g. Date | null).
+   *   null for unsupported types like any, void, unknown, unions and other global types (e.g. Promise).
+   */
+  _createTypeNode(typeNode) {
+    if (PRIMITIVE_KEYWORDS.has(typeNode.kind) || ts.isLiteralTypeNode(typeNode) || ts.isTypeQueryNode(typeNode)) {
+      // number, string, boolean, literal types (e.g. 'a') or typeof MY_CONSTANT
+      return this._createPrimitiveTypeNode(typeNode);
+    }
+    if (ts.isParenthesizedTypeNode(typeNode)) {
+      return this._createTypeNode(typeNode.type);
+    }
+    if (ts.isTypeOperatorNode(typeNode) && typeNode.operator === ts.SyntaxKind.ReadonlyKeyword) {
+      // treat readonly Obj[] like Obj[]
+      return this._createTypeNode(typeNode.type);
+    }
+    if (ts.isUnionTypeNode(typeNode)) {
+      return this._createUnionTypeNode(typeNode);
+    }
     if (ts.isArrayTypeNode(typeNode)) {
       // treat Obj[] like Array<Obj>
       const objectType = ts.factory.createIdentifier('Array');
@@ -183,27 +247,351 @@ module.exports = class DataObjectTransformer {
       }
       return this._createFieldMetaData(objectType, [elementType]);
     }
-
     if (ts.isTypeReferenceNode(typeNode)) {
-      const objectType = this._createTypeReferenceNode(typeNode);
-      if (!typeNode.typeArguments?.length) {
-        // no type arguments: directly use the type reference (constructor ref or objectType string)
-        return objectType;
-      }
+      return this._createTypeReferenceTypeNode(typeNode);
+    }
+    return null; // e.g. any, void, unknown
+  }
 
-      // types with typeArguments like Map<string, number> or Array<MyObject>
-      const typeArgsNodes = typeNode.typeArguments.map(typeArg => this._createTypeNode(typeArg) ?? ts.factory.createNull());
-      return this._createFieldMetaData(objectType, typeArgsNodes);
+  /**
+   * @param typeNode {ts.TypeReferenceNode}
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression|null} see _createTypeNode
+   */
+  _createTypeReferenceTypeNode(typeNode) {
+    const name = typeNode.typeName.escapedText;
+    if (this.currentClassTypeParams?.has(name)) {
+      return this._createTypeParamTypeNode(name);
     }
 
-    // // literal types like e.g. in IDs: UuId<'scout.SimpleUuid'>
+    if (this._isDeclaredInFile(typeNode, name)) {
+      const declaration = this._findDeclaration(typeNode, name);
+      if (declaration && ts.isEnumDeclaration(declaration)) {
+        return this._toPrimitiveTypeNode(this._evaluateEnum(declaration));
+      }
+      if (declaration && ts.isTypeAliasDeclaration(declaration)) {
+        return this._createTypeAliasTypeNode(typeNode, declaration);
+      }
+    } else if (WRAPPER_TYPES.has(name)) {
+      const typeArg = typeNode.typeArguments?.[0];
+      return typeArg ? this._createTypeNode(typeArg) : null;
+    }
+
+    const objectType = this._createTypeReferenceNode(typeNode);
+    if (!objectType || !typeNode.typeArguments?.length) {
+      // no type arguments: directly use the type reference (constructor ref or objectType string)
+      return objectType;
+    }
+
+    // types with typeArguments like Map<string, number> or Array<MyObject>
+    const typeArgsNodes = typeNode.typeArguments.map(typeArg => this._createTypeNode(typeArg) ?? ts.factory.createNull());
+    return this._createFieldMetaData(objectType, typeArgsNodes);
+  }
+
+  /**
+   * Resolves a type parameter of the current DO class to its constraint or default type.
+   * @param name {string} The name of the type parameter
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression|null} see _createTypeNode.
+   * null if the type parameter has neither a constraint nor a default or if the constraint is recursive (e.g. T extends Comparable<T>).
+   */
+  _createTypeParamTypeNode(name) {
+    const typeParamType = this.currentClassTypeParams.get(name);
+    if (!typeParamType || this.resolvingTypeParams.has(name)) {
+      return null;
+    }
+    this.resolvingTypeParams.add(name);
+    try {
+      return this._createTypeNode(typeParamType);
+    } finally {
+      this.resolvingTypeParams.delete(name);
+    }
+  }
+
+  /**
+   * @param typeNode {ts.UnionTypeNode}
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression|null}
+   *   The result for the remaining type if the union only consists of one type besides null and undefined (e.g. Date | null).
+   *   A constructor reference identifier if the union only consists of primitive types of the same kind (e.g. String for 'a' | 'b').
+   *   null otherwise.
+   */
+  _createUnionTypeNode(typeNode) {
+    const types = typeNode.types.filter(type => !this._isNullOrUndefinedType(type));
+    if (types.length === 1) {
+      return this._createTypeNode(types[0]);
+    }
+    return this._createPrimitiveTypeNode(typeNode);
+  }
+
+  _isNullOrUndefinedType(typeNode) {
+    return typeNode.kind === ts.SyntaxKind.UndefinedKeyword || typeNode.kind === ts.SyntaxKind.NullKeyword
+      || (ts.isLiteralTypeNode(typeNode) && typeNode.literal.kind === ts.SyntaxKind.NullKeyword);
+  }
+
+  /**
+   * @param typeNode {ts.TypeReferenceNode} The reference to the type alias.
+   * @param declaration {ts.TypeAliasDeclaration}
+   * @returns {ts.StringLiteral|ts.NullLiteral|ts.Identifier|ts.ObjectLiteralExpression|null} The result for the aliased type.
+   *   For generic type aliases (e.g. EnumObject<typeof MyEnum>) only primitive types can be detected. null for recursive type aliases.
+   */
+  _createTypeAliasTypeNode(typeNode, declaration) {
+    if (declaration.typeParameters?.length) {
+      return this._createPrimitiveTypeNode(typeNode);
+    }
+    if (this.resolvingTypeAliases.has(declaration)) {
+      return null;
+    }
+    const classTypeParams = this.currentClassTypeParams;
+    this.currentClassTypeParams = null; // the type parameters of the DO class are not visible in the type alias
+    this.resolvingTypeAliases.add(declaration);
+    try {
+      return this._createTypeNode(declaration.type);
+    } finally {
+      this.resolvingTypeAliases.delete(declaration);
+      this.currentClassTypeParams = classTypeParams;
+    }
+  }
+
+  /**
+   * Detects if the given type node resolves to a primitive type, a primitive literal type or a union of such types.
+   * @param typeNode {ts.TypeNode}
+   * @returns {ts.Identifier|null} see _toPrimitiveTypeNode
+   */
+  _createPrimitiveTypeNode(typeNode) {
+    return this._toPrimitiveTypeNode(this._evaluatePrimitiveType(typeNode, new Map(), 0));
+  }
+
+  /**
+   * @param primitiveTypes {Set<string>|null} see _evaluatePrimitiveType
+   * @returns {ts.Identifier|null} String, Number or Boolean if all types have the same primitive type. null otherwise.
+   */
+  _toPrimitiveTypeNode(primitiveTypes) {
+    return primitiveTypes?.size === 1 ? ts.factory.createIdentifier([...primitiveTypes][0]) : null;
+  }
+
+  /**
+   * Computes the primitive types a type node can have.
+   * Supports primitive and literal types, unions, enums, type aliases (also generic ones), typeof of constants and indexed access types of the form T[keyof T].
+   *
+   * @param typeNode {ts.TypeNode}
+   * @param typeArgs {Map<string, {typeNode: ts.TypeNode, typeArgs: Map}>} The type arguments of the generic type aliases currently evaluated.
+   * @param depth {number} The current evaluation depth to stop on recursive types.
+   * @returns {Set<string>|null} The names of the primitive types ('String', 'Number', 'Boolean'). null if the type is not primitive.
+   */
+  _evaluatePrimitiveType(typeNode, typeArgs, depth) {
+    if (!typeNode || depth > MAX_EVALUATION_DEPTH) {
+      return null;
+    }
+    depth++;
+    const keywordKind = PRIMITIVE_KEYWORDS.get(typeNode.kind);
+    if (keywordKind) {
+      return new Set([keywordKind]);
+    }
+    if (this._isNullOrUndefinedType(typeNode)) {
+      return new Set();
+    }
+    if (ts.isParenthesizedTypeNode(typeNode)) {
+      return this._evaluatePrimitiveType(typeNode.type, typeArgs, depth);
+    }
     if (ts.isLiteralTypeNode(typeNode)) {
-      if (ts.isStringLiteral(typeNode.literal)) {
-        return ts.factory.createStringLiteral(typeNode.literal.text);
+      return this._evaluatePrimitiveValue(typeNode.literal);
+    }
+    if (ts.isUnionTypeNode(typeNode)) {
+      return this._mergePrimitiveTypes(typeNode.types.map(type => this._evaluatePrimitiveType(type, typeArgs, depth)));
+    }
+    if (ts.isTypeQueryNode(typeNode)) {
+      // typeof MY_CONSTANT
+      return this._evaluateValueType(this._resolveValue(typeNode.exprName), depth);
+    }
+    if (ts.isIndexedAccessTypeNode(typeNode)) {
+      // T[keyof T]: the types of all values of T
+      const indexType = typeNode.indexType;
+      if (ts.isTypeOperatorNode(indexType) && indexType.operator === ts.SyntaxKind.KeyOfKeyword && this._isSameTypeReference(typeNode.objectType, indexType.type)) {
+        return this._evaluateObjectValueTypes(typeNode.objectType, typeArgs, depth);
+      }
+      return null;
+    }
+    if (ts.isTypeReferenceNode(typeNode)) {
+      const name = typeNode.typeName.escapedText;
+      const typeArg = typeArgs.get(name);
+      if (typeArg) {
+        return this._evaluatePrimitiveType(typeArg.typeNode, typeArg.typeArgs, depth);
+      }
+      const declaration = name ? this._findDeclaration(typeNode, name) : null;
+      if (declaration && ts.isEnumDeclaration(declaration)) {
+        return this._evaluateEnum(declaration);
+      }
+      if (declaration && ts.isTypeAliasDeclaration(declaration)) {
+        return this._evaluatePrimitiveType(declaration.type, this._buildTypeArgMap(declaration, typeNode, typeArgs), depth);
       }
     }
+    return null;
+  }
 
-    return null; // e.g. any, void, unknown, union-types
+  /**
+   * @param typeNode {ts.TypeNode} The object type: a type parameter of a generic type alias or typeof of a constant object, enum or static class property.
+   * @param typeArgs {Map} see _evaluatePrimitiveType
+   * @param depth {number} see _evaluatePrimitiveType
+   * @returns {Set<string>|null} The primitive types of all property values of the object type.
+   */
+  _evaluateObjectValueTypes(typeNode, typeArgs, depth) {
+    if (depth > MAX_EVALUATION_DEPTH) {
+      return null;
+    }
+    depth++;
+    if (ts.isTypeReferenceNode(typeNode)) {
+      const typeArg = typeArgs.get(typeNode.typeName.escapedText);
+      return typeArg ? this._evaluateObjectValueTypes(typeArg.typeNode, typeArg.typeArgs, depth) : null;
+    }
+    if (!ts.isTypeQueryNode(typeNode)) {
+      return null;
+    }
+    const value = this._resolveValue(typeNode.exprName);
+    if (value?.declaration && ts.isEnumDeclaration(value.declaration)) {
+      return this._evaluateEnum(value.declaration);
+    }
+    if (value?.typeNode && ts.isTypeLiteralNode(value.typeNode)) {
+      // declared type (e.g. in declaration files): {readonly A: 'a'; readonly B: 'b'}
+      return this._mergePrimitiveTypes(value.typeNode.members.map(member => ts.isPropertySignature(member) ? this._evaluatePrimitiveType(member.type, new Map(), depth) : null));
+    }
+    const objectLiteral = value?.expression;
+    if (!objectLiteral || !ts.isObjectLiteralExpression(objectLiteral)) {
+      return null;
+    }
+    return this._mergePrimitiveTypes(objectLiteral.properties.map(property => ts.isPropertyAssignment(property) ? this._evaluatePrimitiveValue(this._unwrapExpression(property.initializer)) : null));
+  }
+
+  /**
+   * @param value {{typeNode?: ts.TypeNode, expression?: ts.Expression}|null} see _resolveValue
+   * @param depth {number} see _evaluatePrimitiveType
+   * @returns {Set<string>|null} The primitive types of the declared type or of the initializer if there is no declared type.
+   */
+  _evaluateValueType(value, depth) {
+    if (value?.typeNode) {
+      return this._evaluatePrimitiveType(value.typeNode, new Map(), depth);
+    }
+    return value?.expression ? this._evaluatePrimitiveValue(value.expression) : null;
+  }
+
+  /**
+   * @param expression {ts.Expression} An initializer or a literal of a literal type.
+   * @returns {Set<string>|null}
+   */
+  _evaluatePrimitiveValue(expression) {
+    if (ts.isStringLiteral(expression) || ts.isNoSubstitutionTemplateLiteral(expression)) {
+      return new Set(['String']);
+    }
+    if (ts.isNumericLiteral(expression) || (ts.isPrefixUnaryExpression(expression) && ts.isNumericLiteral(expression.operand))) {
+      return new Set(['Number']);
+    }
+    if (expression.kind === ts.SyntaxKind.TrueKeyword || expression.kind === ts.SyntaxKind.FalseKeyword) {
+      return new Set(['Boolean']);
+    }
+    return null;
+  }
+
+  /**
+   * @param declaration {ts.EnumDeclaration}
+   * @returns {Set<string>|null} The primitive types of all enum members. null for enums with computed values.
+   */
+  _evaluateEnum(declaration) {
+    if (!declaration.members.length) {
+      return null;
+    }
+    return this._mergePrimitiveTypes(declaration.members.map(member => member.initializer
+      ? this._evaluatePrimitiveValue(member.initializer)
+      : new Set(['Number'])));
+  }
+
+  /**
+   * @param primitiveTypes {(Set<string>|null)[]}
+   * @returns {Set<string>|null} The union of all given primitive types. null if one of them is not primitive.
+   */
+  _mergePrimitiveTypes(primitiveTypes) {
+    if (primitiveTypes.some(primitiveType => !primitiveType)) {
+      return null;
+    }
+    return new Set(primitiveTypes.flatMap(primitiveType => [...primitiveType]));
+  }
+
+  /**
+   * @param declaration {ts.TypeAliasDeclaration} A generic type alias.
+   * @param typeNode {ts.TypeReferenceNode} The reference to the type alias containing the type arguments.
+   * @param typeArgs {Map} The type arguments the type arguments of the reference are evaluated with.
+   * @returns {Map} The type arguments by type parameter name of the type alias.
+   */
+  _buildTypeArgMap(declaration, typeNode, typeArgs) {
+    const typeArgMap = new Map();
+    declaration.typeParameters?.forEach((typeParameter, index) => {
+      const typeArg = typeNode.typeArguments?.[index];
+      if (typeArg) {
+        typeArgMap.set(typeParameter.name.escapedText, {typeNode: typeArg, typeArgs});
+      } else if (typeParameter.default) {
+        typeArgMap.set(typeParameter.name.escapedText, {typeNode: typeParameter.default, typeArgs: typeArgMap});
+      }
+    });
+    return typeArgMap;
+  }
+
+  _isSameTypeReference(typeNode1, typeNode2) {
+    return ts.isTypeReferenceNode(typeNode1) && ts.isTypeReferenceNode(typeNode2) && !!typeNode1.typeName.escapedText
+      && typeNode1.typeName.escapedText === typeNode2.typeName.escapedText;
+  }
+
+  /**
+   * Resolves the value of an expression used in typeof (e.g. typeof MY_CONSTANT, typeof MyEnum, typeof MyClass.CONSTANT or typeof MY_OBJECT.property).
+   * The declared type is preferred over the initializer, as declaration files (*.d.ts) of built dependencies only contain the declared types of objects.
+   * @param entityName {ts.EntityName}
+   * @returns {{declaration?: ts.Declaration, typeNode?: ts.TypeNode, expression?: ts.Expression}|null}
+   *   declaration: the declaration for enums and classes.
+   *   typeNode: the declared type of constants and properties.
+   *   expression: the initializer of constants and properties without declared type.
+   */
+  _resolveValue(entityName) {
+    if (ts.isIdentifier(entityName)) {
+      const declaration = this._findDeclaration(entityName, entityName.escapedText);
+      if (!declaration) {
+        return null;
+      }
+      if (ts.isVariableDeclaration(declaration)) {
+        return this._createValue(declaration.type, declaration.initializer);
+      }
+      return {declaration};
+    }
+    if (!ts.isQualifiedName(entityName)) {
+      return null;
+    }
+    const left = this._resolveValue(entityName.left);
+    const name = entityName.right.escapedText;
+    if (left?.declaration && ts.isClassDeclaration(left.declaration)) {
+      const member = left.declaration.members.find(m => ts.isPropertyDeclaration(m) && m.name?.escapedText === name
+        && m.modifiers?.some(modifier => modifier.kind === ts.SyntaxKind.StaticKeyword));
+      if (!member) {
+        return null;
+      }
+      return this._createValue(member.type, member.initializer);
+    }
+    if (left?.typeNode && ts.isTypeLiteralNode(left.typeNode)) {
+      const member = left.typeNode.members.find(m => ts.isPropertySignature(m) && m.name?.escapedText === name);
+      return member?.type ? {typeNode: member.type} : null;
+    }
+    if (left?.expression && ts.isObjectLiteralExpression(left.expression)) {
+      const property = left.expression.properties.find(p => ts.isPropertyAssignment(p) && p.name?.escapedText === name);
+      return property ? this._createValue(null, property.initializer) : null;
+    }
+    return null;
+  }
+
+  _createValue(typeNode, initializer) {
+    if (typeNode) {
+      return {typeNode};
+    }
+    return initializer ? {expression: this._unwrapExpression(initializer)} : null;
+  }
+
+  _unwrapExpression(expression) {
+    while (expression && (ts.isAsExpression(expression) || ts.isSatisfiesExpression(expression) || ts.isParenthesizedExpression(expression))) {
+      expression = expression.expression;
+    }
+    return expression || null;
   }
 
   /**
@@ -230,19 +618,20 @@ module.exports = class DataObjectTransformer {
    * Or a string with the Scout objectType for the type (e.g. 'myApp.MySpecialDo').
    *
    * @param node {ts.TypeReferenceNode}
-   * @returns {ts.StringLiteral|ts.Identifier}
+   * @returns {ts.StringLiteral|ts.Identifier|null} null for global types which are not supported (e.g. Promise).
    */
   _createTypeReferenceNode(node) {
-    let name = node.typeName.escapedText;
-    const typeParam = this.currentClassTypeParams?.get(name);
-    if (typeParam) {
-      return this._createTypeNode(typeParam);
-    }
-    if (global[name]) {
-      return ts.factory.createIdentifier(name); // Use directly the constructor for known types like Date, Number, String, Boolean, Map, Set, Array
-    }
-    if ('Record' === name) {
-      return ts.factory.createStringLiteral(name);
+    const name = node.typeName.escapedText;
+    if (!this._isDeclaredInFile(node, name)) {
+      // global type
+      const builtInName = READONLY_TYPES.get(name) || name;
+      if (BUILT_IN_TYPES.has(builtInName)) {
+        return ts.factory.createIdentifier(builtInName); // Use directly the constructor for known types like Date, Number, String, Boolean, Map, Set, Array
+      }
+      if ('Record' === name) {
+        return ts.factory.createStringLiteral(name);
+      }
+      return null;
     }
 
     const exportInfo = this._detectExportInfoFor(node);
@@ -269,12 +658,43 @@ module.exports = class DataObjectTransformer {
    * @returns {{namespace: string|null;exportName: string|null}} The namespace of the module that contains the given type.
    */
   _detectExportInfoFor(typeNode) {
-    if (!this.moduleDetector) {
-      this.moduleDetector = new ModuleDetector(typeNode);
+    const typeReferenceResolver = this._getTypeReferenceResolver(typeNode);
+    const exportInfo = typeReferenceResolver.detectExportInfoOf(typeNode);
+    const exportName = exportInfo?.exportName || typeNode?.typeName?.escapedText;
+    let declaringFile = typeReferenceResolver.sourceFile.fileName;
+    if (exportInfo?.module) {
+      // imported from another file: use the file the module name resolves to
+      declaringFile = this.moduleResolver.resolveModuleFile(exportInfo.module, declaringFile, this.context.getCompilerOptions())?.resolvedFileName;
     }
-    const exportInfo = this.moduleDetector.detectExportInfoOf(typeNode);
-    const namespace = this.namespaceResolver.resolveNamespace(exportInfo?.module, this.moduleDetector.sourceFile.fileName);
-    return {namespace, exportName: exportInfo?.exportName || typeNode?.typeName?.escapedText};
+    const namespace = declaringFile ? this.moduleResolver.resolveNamespace(declaringFile, this.currentSourceFile.fileName) : null;
+    return {namespace, exportName};
+  }
+
+  /**
+   * @param node {ts.Node}
+   * @param name {string}
+   * @returns {boolean} true if the name is imported or declared in the file containing the given node.
+   */
+  _isDeclaredInFile(node, name) {
+    return this._getTypeReferenceResolver(node).isDeclaredInFile(name);
+  }
+
+  /**
+   * @param node {ts.Node}
+   * @param name {string} A name imported or declared in the file containing the given node.
+   * @returns {ts.Declaration|null} see TypeReferenceResolver.findDeclaration
+   */
+  _findDeclaration(node, name) {
+    return this._getTypeReferenceResolver(node).findDeclaration(name);
+  }
+
+  /**
+   * @param node {ts.Node}
+   * @returns {TypeReferenceResolver} The resolver for the file containing the given node. This is not the current file for nodes of declarations in other files (e.g. imported type aliases).
+   */
+  _getTypeReferenceResolver(node) {
+    const sourceFile = this.moduleResolver.findSourceFile(node) || this.currentSourceFile;
+    return this.moduleResolver.getTypeReferenceResolverOfSourceFile(sourceFile, this.context.getCompilerOptions());
   }
 
   /**

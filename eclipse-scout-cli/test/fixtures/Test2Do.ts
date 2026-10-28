@@ -24,3 +24,12 @@ export class TestSpecialTypesDo extends BaseDoEntity {
   arrUnion: Array<string | number>;
   rec: Record<string, any>;
 }
+
+export enum ImportedStringEnum {
+  A = 'a',
+  B = 'b'
+}
+
+export type ImportedLiteralUnion = 'x' | 'y';
+
+export type ImportedDoAlias = Test2Do;
