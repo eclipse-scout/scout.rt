@@ -11,7 +11,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 import { BaseDoEntity, ObjectFactory, typeName } from '../../../eclipse-scout-core/src';
 let Test2Do = class Test2Do extends BaseDoEntity {
@@ -47,5 +51,10 @@ TestSpecialTypesDo = __decorate([
     typeName('test.TestSpecialTypes')
 ], TestSpecialTypesDo);
 export { TestSpecialTypesDo };
+export var ImportedStringEnum;
+(function (ImportedStringEnum) {
+    ImportedStringEnum["A"] = "a";
+    ImportedStringEnum["B"] = "b";
+})(ImportedStringEnum || (ImportedStringEnum = {}));
 window["scout"]["DataObjectInventory"].get().add(Test2Do, "test.Test2", "test.Test2Do");
 window["scout"]["DataObjectInventory"].get().add(TestSpecialTypesDo, "test.TestSpecialTypes", "test.TestSpecialTypesDo");
