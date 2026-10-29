@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -60,7 +60,6 @@ import org.apache.hc.core5.http.message.BasicHttpResponse;
 import org.apache.hc.core5.http.support.BasicRequestBuilder;
 import org.eclipse.jetty.http.HttpHeader;
 import org.eclipse.jetty.http2.server.HTTP2CServerConnectionFactory;
-import org.eclipse.jetty.io.Content;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
@@ -437,7 +436,7 @@ public class HttpProxyTest {
     HttpServletResponse httpResp = testProxyRequestInternal(new Handler.Abstract() {
       @Override
       public boolean handle(Request request, Response response, Callback callback) throws Exception {
-        try (InputStream input = Content.Source.asInputStream(request)) {
+        try (InputStream input = Request.asInputStream(request)) {
           receivedContent.set(input.readAllBytes());
         }
         response.setStatus(200);
@@ -446,6 +445,7 @@ public class HttpProxyTest {
       }
     }, 30 * 1000L, 1, httpReq);
 
+    verify(httpReq).getInputStream();
     verify(httpResp).setStatus(200);
     assertArrayEquals(content, receivedContent.get());
     assertArrayEquals(content, ((BufferedServletOutputStream) httpResp.getOutputStream()).getContent());
@@ -455,14 +455,14 @@ public class HttpProxyTest {
   public void testProxyRequest_formParameters() throws IOException {
     HttpServletRequest httpReq = prepareHttpRequest("/");
     when(httpReq.getMethod()).thenReturn(Method.POST.toString());
-    when(httpReq.getContentType()).thenReturn("application/x-www-form-urlencoded");
+    when(httpReq.getContentType()).thenReturn("application/x-www-form-urlencoded;charset=UTF-8");
     when(httpReq.getParameterMap()).thenReturn(singletonMap("name", new String[]{"Alice & Bob", ""}));
-    byte[] content = "name=Alice+%26+Bob&name=".getBytes(StandardCharsets.UTF_8);
+    byte[] expectedContent = "name=Alice+%26+Bob&name=".getBytes(StandardCharsets.UTF_8);
     AtomicReference<byte[]> receivedContent = new AtomicReference<>();
     HttpServletResponse httpResp = testProxyRequestInternal(new Handler.Abstract() {
       @Override
       public boolean handle(Request request, Response response, Callback callback) throws Exception {
-        try (InputStream input = Content.Source.asInputStream(request)) {
+        try (InputStream input = Request.asInputStream(request)) {
           receivedContent.set(input.readAllBytes());
         }
         response.setStatus(200);
@@ -471,9 +471,9 @@ public class HttpProxyTest {
       }
     }, 30 * 1000L, 1, httpReq);
 
-    verify(httpResp).setStatus(200);
-    assertArrayEquals(content, receivedContent.get());
     verify(httpReq, never()).getInputStream();
+    verify(httpResp).setStatus(200);
+    assertArrayEquals(expectedContent, receivedContent.get());
   }
 
   @Test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -52,7 +52,6 @@ import org.apache.hc.client5.http.impl.async.CloseableHttpAsyncClient;
 import org.apache.hc.client5.http.impl.async.HttpAsyncClients;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.core5.concurrent.Cancellable;
 import org.apache.hc.core5.concurrent.ComplexFuture;
 import org.apache.hc.core5.concurrent.FutureCallback;
 import org.apache.hc.core5.http.ClassicHttpRequest;
@@ -318,7 +317,7 @@ public class HttpProxy {
         future.completed(result);
       }
     };
-    future.setDependency((Cancellable) () -> {
+    future.setDependency(() -> {
       try {
         return request.cancel();
       }
@@ -661,11 +660,6 @@ public class HttpProxy {
       @Override
       public long getContentLength() {
         return -1;
-      }
-
-      @Override
-      public boolean isRepeatable() {
-        return false;
       }
 
       @Override
