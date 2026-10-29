@@ -59,6 +59,6 @@ public class DoDateSerializer extends JavaUtilDateSerializer {
 
   @Override
   public JavaUtilDateSerializer withFormat(Boolean timestamp, DateFormat customFormat) {
-    return new JavaUtilDateSerializer(timestamp, customFormat);
+    return new DoDateSerializer(timestamp, customFormat);
   }
 }
