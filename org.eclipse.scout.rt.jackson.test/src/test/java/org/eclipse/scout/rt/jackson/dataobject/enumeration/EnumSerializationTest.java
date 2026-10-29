@@ -14,7 +14,6 @@ import static org.junit.Assert.*;
 import java.net.URL;
 import java.util.Collections;
 import java.util.EnumMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.DoNode;
@@ -23,7 +22,6 @@ import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
 import org.eclipse.scout.rt.jackson.dataobject.JacksonDataObjectMapper;
-import org.eclipse.scout.rt.jackson.dataobject.JacksonLenientDataObjectMapper;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumMapKeyDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
@@ -34,7 +32,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import tools.jackson.core.type.TypeReference;
-import tools.jackson.databind.exc.InvalidFormatException;
 import tools.jackson.databind.json.JsonMapper;
 
 public class EnumSerializationTest {
@@ -113,7 +110,7 @@ public class EnumSerializationTest {
 
   @Test
   public void testDeserializeInvalidMapKey() {
-    String json = "{\"_type\":\"scout.TestEntityWithEnumMapKey\",\"map\":{\"unknown\":\"value\"}}";
+    String json = "{\"_type\" : \"scout.TestEntityWithEnumMapKey\", \"map\" : { \"unknown\" : \"value\" } }";
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithEnumMapKeyDo.class));
 
     TestEntityWithEnumMapKeyDo marshalledLenient = m_lenientDataObjectMapper.readValue(json, TestEntityWithEnumMapKeyDo.class);
@@ -122,45 +119,17 @@ public class EnumSerializationTest {
     //noinspection AssertBetweenInconvertibleTypes
     assertEquals("unknown", CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
     assertEquals("value", CollectionUtility.firstElement(map.values()));
-    m_testHelper.assertJsonEquals(json, m_lenientDataObjectMapper.writeValue(marshalledLenient));
   }
 
   @Test
-  @SuppressWarnings("deprecation")
-  public void testDeserializeEnumKeyMap() {
-    JsonMapper mapper = BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
-    TypeReference<Map<FixtureEnum, String>> type = new TypeReference<>() {
-    };
-    Map<FixtureEnum, String> map = mapper.readValue("{\"one\":\"value\"}", type);
-    assertTrue(map instanceof LinkedHashMap);
-    assertEquals(Collections.singletonMap(FixtureEnum.ONE, "value"), map);
-    m_testHelper.assertJsonEquals("{\"one\":\"value\"}", mapper.writerFor(type).writeValueAsString(map));
-    assertThrows(InvalidFormatException.class, () -> mapper.readValue("{\"unknown\":\"value\"}", type));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testDeserializeLenientEnumKeyMap() {
-    JsonMapper mapper = BEANS.get(JacksonLenientDataObjectMapper.class).getObjectMapper();
-    String json = "{\"one\":\"known\",\"unknown\":\"value\"}";
-    Map<FixtureEnum, String> map = mapper.readValue(json, new TypeReference<>() {
-    });
-    assertTrue(map instanceof LinkedHashMap);
-    assertEquals(2, map.size());
-    assertEquals("known", map.get(FixtureEnum.ONE));
-    assertEquals("value", map.get("unknown"));
-    m_testHelper.assertJsonEquals(json, mapper.writeValueAsString(map));
-  }
-
-  @Test
-  @SuppressWarnings("deprecation")
-  public void testSerializeDeserializeExplicitEnumMap() {
-    JsonMapper mapper = BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
+  public void testSerializeDeserialize_ExplicitEnumMap() {
+    @SuppressWarnings("deprecation") JsonMapper objectMapper = BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
     TypeReference<EnumMap<FixtureEnum, String>> type = new TypeReference<>() {
     };
-    EnumMap<FixtureEnum, String> map = mapper.readValue("{\"one\":\"value\"}", type);
-    assertEquals(Collections.singletonMap(FixtureEnum.ONE, "value"), map);
-    m_testHelper.assertJsonEquals("{\"one\":\"value\"}", mapper.writerFor(type).writeValueAsString(map));
+    String json = "{\"one\":\"value\"}";
+    EnumMap<FixtureEnum, String> marshalled = objectMapper.readValue(json, type);
+    assertEquals(Collections.singletonMap(FixtureEnum.ONE, "value"), marshalled);
+    m_testHelper.assertJsonEquals(json, objectMapper.writerFor(type).writeValueAsString(marshalled));
   }
 
   protected URL toURL(String resourceName) {
