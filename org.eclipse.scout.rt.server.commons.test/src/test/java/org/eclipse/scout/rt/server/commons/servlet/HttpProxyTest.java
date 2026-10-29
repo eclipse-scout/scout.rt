@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,13 @@ package org.eclipse.scout.rt.server.commons.servlet;
 import static java.util.Collections.*;
 import static org.eclipse.scout.rt.platform.util.CollectionUtility.*;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.*;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -67,6 +69,7 @@ import org.eclipse.scout.rt.platform.exception.ExceptionHandler;
 import org.eclipse.scout.rt.platform.internal.BeanInstanceUtil;
 import org.eclipse.scout.rt.platform.util.EnumerationUtility;
 import org.eclipse.scout.rt.platform.util.ImmutablePair;
+import org.eclipse.scout.rt.platform.util.IOUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.SleepUtil;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -400,6 +403,30 @@ public class HttpProxyTest {
   }
 
   @Test
+  public void testProxyRequest_gzipResponse() throws IOException {
+    byte[] content = IOUtility.compressGzip("gzip response".getBytes(StandardCharsets.UTF_8));
+    HttpServletResponse resp = testProxyRequestInternal(new Handler.Abstract() {
+      @Override
+      public boolean handle(Request request, Response response, Callback callback) {
+        response.setStatus(200);
+        response.getHeaders().put(HttpHeader.CONTENT_ENCODING, "gzip");
+        response.getHeaders().put(HttpHeader.CONTENT_LENGTH, content.length);
+        response.write(true, ByteBuffer.wrap(content), callback);
+        return true;
+      }
+    }, 1, null);
+
+    ArgumentCaptor<String> headerNameCaptor = ArgumentCaptor.forClass(String.class);
+    ArgumentCaptor<String> headerValueCaptor = ArgumentCaptor.forClass(String.class);
+    verify(resp, atLeastOnce()).setHeader(headerNameCaptor.capture(), headerValueCaptor.capture());
+    List<String> headerNames = headerNameCaptor.getAllValues();
+    List<String> headerValues = headerValueCaptor.getAllValues();
+    assertTrue(IntStream.range(0, headerNames.size()).anyMatch(i -> "Content-Encoding".equalsIgnoreCase(headerNames.get(i)) && "gzip".equals(headerValues.get(i))));
+    assertTrue(IntStream.range(0, headerNames.size()).anyMatch(i -> "Content-Length".equalsIgnoreCase(headerNames.get(i)) && String.valueOf(content.length).equals(headerValues.get(i))));
+    assertArrayEquals(content, ((BufferedServletOutputStream) resp.getOutputStream()).getContent());
+  }
+
+  @Test
   public void testProxyRequest_postRequest() {
     HttpServletRequest httpReq = prepareHttpRequest("/");
     when(httpReq.getMethod()).thenReturn(Method.POST.toString());
@@ -599,6 +626,11 @@ public class HttpProxyTest {
 
   @Test
   public void testUnexpectedCompletedAsyncContextDuringFailureMustNotAffectOtherRequests() {
+    // only run test for DefaultAsyncHttpClientManager
+    // this test cannot be applied for H2AsyncHttpClientManager and ForceHttp2DefaultAsyncHttpClientManager
+    // because the AsyncContext#complete() method is not called at all
+    assumeTrue(DefaultAsyncHttpClientManager.class.equals(m_httpProxyTestParameter.m_clientManagerClazz));
+
     Handler.Abstract handler = new Handler.Abstract() {
       @Override
       public boolean handle(Request request, Response response, Callback callback) {
