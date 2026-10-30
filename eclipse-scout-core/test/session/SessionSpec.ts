@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
+import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing';
 
 describe('Session', () => {
@@ -492,8 +492,7 @@ describe('Session', () => {
         status: 200,
         responseText: '{"events": [ { "target": "invalidTarget" } ]}' // <-- causes a JS error
       });
-      spyOn(App.get().errorHandler, 'handle').and.resolveTo(); // don't show message box
-      await expectAsync(promise).toBeResolved();
+      await expectAsync(promise).toBeRejectedWithError(/Could not resolve event targets/);
       expect(session.backgroundJobPollingSupport.status).toBe(BackgroundJobPollingStatus.FAILURE); // <--
       expect(session.areRequestsPending()).toBe(false);
       expect(session.areEventsQueued()).toBe(false);
