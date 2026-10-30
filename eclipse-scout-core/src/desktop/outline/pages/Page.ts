@@ -722,6 +722,7 @@ interface ContributedMenu extends Menu {
  *
  * @see BookmarkSupport
  */
+@typeName()
 export class PageParamDo extends BaseDoEntity {
 }
 

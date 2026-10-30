@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,14 +40,14 @@ describe('UiPreferences', () => {
       expect(tableUiPreferences.get(table2)).toBe(undefined);
       store.preferences = scout.create(UiPreferencesDo, {
         tablePreferences: [
-          scout.create(TableClientUiPreferencesDo, {
+          {
             tableId: 't1',
             tileMode: false
-          }),
-          scout.create(TableClientUiPreferencesDo, {
+          },
+          {
             tableId: 't2',
             tileMode: false
-          })
+          }
         ]
       });
 
@@ -63,14 +63,14 @@ describe('UiPreferences', () => {
       expect(table2.tileMode).toBe(false);
 
       store.subscribers[0](scout.create(UiPreferencesUpdateDo, {
-        preferences: scout.create(UiPreferencesDo, {
+        preferences: {
           tablePreferences: [
-            scout.create(TableClientUiPreferencesDo, {
+            {
               tableId: 't1',
               tileMode: true
-            })
+            }
           ]
-        })
+        }
       }));
 
       expect(store.loadCount).toBe(1); // still 1

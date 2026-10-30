@@ -755,6 +755,9 @@ describe('arrays', () => {
       expect(arrays.hasElements(['test'])).toBe(true);
       expect(arrays.hasElements([0])).toBe(true);
       expect(arrays.hasElements([null])).toBe(true);
+
+      const unionTypedArray: string[] | number[] = [1, 2];
+      expect(arrays.hasElements(unionTypedArray)).toBe(true);
     });
   });
 

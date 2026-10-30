@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ChildModelOf, dataObjects, Event, Form, FormAdapter, FullModelOf, JsFormModel, Widget} from '../../index';
+import {ChildModelOf, Event, Form, FormAdapter, FullModelOf, JsFormModel, Widget} from '../../index';
 
 export class JsFormAdapter extends FormAdapter {
 
@@ -24,14 +24,13 @@ export class JsFormAdapter extends FormAdapter {
       objectType: model.jsFormObjectType,
       displayParent: model.displayParent,
       displayHint: model.displayHint,
-      data: dataObjects.deserialize(model.inputData, null, {createPojoIfDoIsUnknown: true}),
+      data: this._deserializeDataObject(model.inputData),
       __hybridModelAdapter: this
     };
 
     if (model.jsFormModel) {
       // If the jsFormModel contains properties containing data objects deserialize them if possible
-      // createPojoIfDoIsUnknown is true to create POJOs if the _type attributes cannot be resolved to classes to maintain backwards compatibility
-      let deserializedJsFormModel = dataObjects.deserialize(model.jsFormModel, null, {createPojoIfDoIsUnknown: true});
+      let deserializedJsFormModel = this._deserializeDataObject(model.jsFormModel);
       delete deserializedJsFormModel._type; // _type should not be written to Form if present
       jsFormModel = $.extend({}, deserializedJsFormModel, jsFormModel);
     }
@@ -100,7 +99,7 @@ export class JsFormAdapter extends FormAdapter {
 
   protected _sendOutputData(type: string, data?: any) {
     this._send(type, {
-      outputData: dataObjects.serialize(data)
+      outputData: this._serializeDataObject(data)
     });
   }
 

@@ -8,14 +8,18 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AnyDoEntity, ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver,
-  doValueMetaData, InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
+  ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver, doValueMetaData,
+  InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
 } from '../index';
 
 /**
  * Helper functions to deal with data objects.
  */
 export const dataObjects = {
+
+  _TYPE_VERSION_ATTRIBUTE_NAME: '_typeVersion',
+  _TYPE_ATTRIBUTE_NAME: '_type',
+  _CONTRIBUTIONS_ATTRIBUTE_NAME: '_contributions',
 
   /**
    * Editable array of {@link DoNodeSerializer} instances.
@@ -39,7 +43,7 @@ export const dataObjects = {
    *
    * The list may be modified to add a custom resolver. This may be useful for example in the following scenario:
    * Normally, a {@link BaseDoEntity} is created if the data object class cannot be resolved, unless {@link DataObjectDeserializerModel.createPojoIfDoIsUnknown} is set to true.
-   * To use a specific {@link BaseDoEntity} class for unknown {@link DoEntity._type} values, a custom resolver can be added.
+   * To use a specific {@link BaseDoEntity} class for unknown {@link BaseDoEntity._type} values, a custom resolver can be added.
    */
   doTypeResolvers: [new DefaultDoTypeResolver()] as DoTypeResolver[],
 
@@ -149,13 +153,13 @@ export const dataObjects = {
    * Adds a new DO entity contribution to the given DO entity.
    * Existing contributions for the same contribution class are replaced. If the contribution is a plain object, existing contributions with the same _type are replaced.
    */
-  addContribution(contribution: AnyDoEntity, doEntity: DoEntityWithContributions) {
+  addContribution(contribution: DoEntity, doEntity: DoEntityWithContributions) {
     if (!doEntity) {
       return;
     }
     scout.assertParameter('contribution', contribution);
     if (objects.isPojo(contribution)) {
-      scout.assertProperty(contribution, '_type');
+      scout.assertProperty(contribution, dataObjects._TYPE_ATTRIBUTE_NAME);
       dataObjects.removeContribution(contribution._type, doEntity);
     } else {
       // @ts-expect-error
@@ -200,6 +204,49 @@ export const dataObjects = {
       dataObjects.addContribution(contribution, doEntity);
     }
     return contribution;
+  },
+
+  /**
+   * Checks if the given DataObject is empty.
+   * Means: all properties have the value `undefined` (`_type`, `_typeVersion` and `_contributions` are always ignored and the DataObject is considered empty even if these internal attributes are set).
+   * @returns `true` if all attributes (except `_type`, `_typeVersion` and `_contributions`) are `undefined` or the DataObject is `falsy`.
+   */
+  isEmpty(dataObject: DoEntity): boolean {
+    if (!dataObject) {
+      return true; // same as objects.isEmpty does
+    }
+    return dataObjects.values(dataObject).every(value => value === undefined);
+  },
+
+  /**
+   * @returns the values (attribute values) of the given DataObject. The values of internal keys (`_type`, `_typeVersion` and `_contributions`) are *NOT* returned. A `falsy` input returns an empty array.
+   */
+  values(dataObject: DoEntity): any[] {
+    if (!dataObject) {
+      return [];
+    }
+    return dataObjects.entries(dataObject).map(([key, value]) => value);
+  },
+
+  /**
+   * @returns the keys (attribute names) of the given DataObject. Internal keys (`_type`, `_typeVersion` and `_contributions`) are *NOT* returned. A `falsy` input returns an empty array.
+   */
+  keys(dataObject: DoEntity): string[] {
+    if (!dataObject) {
+      return [];
+    }
+    return Object.keys(dataObject).filter(key => key !== dataObjects._TYPE_ATTRIBUTE_NAME && key !== dataObjects._TYPE_VERSION_ATTRIBUTE_NAME && key !== dataObjects._CONTRIBUTIONS_ATTRIBUTE_NAME);
+  },
+
+  /**
+   * @returns The key-value-pairs of the given DataObject. Internal keys (`_type`, `_typeVersion` and `_contributions`) are *NOT* returned. A `falsy` input returns an empty array.
+   */
+  entries(dataObject: DoEntity): [string, any][] {
+    if (!dataObject) {
+      return [];
+    }
+    return Object.entries(dataObject)
+      .filter(([k, v]) => k !== dataObjects._TYPE_ATTRIBUTE_NAME && k !== dataObjects._TYPE_VERSION_ATTRIBUTE_NAME && k !== dataObjects._CONTRIBUTIONS_ATTRIBUTE_NAME);
   }
 };
 

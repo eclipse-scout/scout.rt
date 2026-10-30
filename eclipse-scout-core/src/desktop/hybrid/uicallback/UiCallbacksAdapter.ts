@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, dataObjects, Event, hybridUtil, JsonHybridActionContextElement, ModelAdapter, RemoteEvent, scout, UiCallbackEndEvent, UiCallbacks, Widget} from '../../../index';
+import {BaseDoEntity, Event, hybridUtil, JsonHybridActionContextElement, ModelAdapter, RemoteEvent, scout, UiCallbackEndEvent, UiCallbacks, Widget} from '../../../index';
 
 export class UiCallbacksAdapter extends ModelAdapter {
   declare widget: UiCallbacks;
@@ -24,7 +24,7 @@ export class UiCallbacksAdapter extends ModelAdapter {
     let callbackId = event.id;
     let handlerObjectType = event.handlerObjectType;
     let owner = this._resolveOwner(event.owner);
-    let data = dataObjects.deserialize(event.data);
+    let data = this._deserializeDataObject(event.data);
     let contextElements = hybridUtil.jsonToContextElements(this.session, event.contextElements);
 
     this.widget.onCallback(handlerObjectType, callbackId, owner, data, contextElements);
@@ -55,8 +55,8 @@ export class UiCallbacksAdapter extends ModelAdapter {
 
     this._send('callbackEnd', {
       id: callbackId,
-      error: dataObjects.serialize(error) ?? undefined,
-      data: dataObjects.serialize(result?.data) ?? undefined,
+      error: this._serializeDataObject(error) ?? undefined,
+      data: this._serializeDataObject(result?.data) ?? undefined,
       contextElements: hybridUtil.contextElementsToJson(result?.contextElements) ?? undefined
     });
   }

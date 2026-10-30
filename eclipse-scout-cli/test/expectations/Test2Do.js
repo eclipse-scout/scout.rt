@@ -29,4 +29,28 @@ Test2Do = __decorate([
 ], Test2Do);
 export { Test2Do };
 ObjectFactory.get().registerNamespace('test', {}); // declares namespace for current module
+let TestSpecialTypesDo = class TestSpecialTypesDo extends BaseDoEntity {
+    arrUnknown;
+    arrUnion;
+    rec;
+};
+__decorate([
+    Reflect.metadata("scout.m.t", { objectType: Array, typeArgs: [null] })
+], TestSpecialTypesDo.prototype, "arrUnknown", void 0);
+__decorate([
+    Reflect.metadata("scout.m.t", { objectType: Array, typeArgs: [null] })
+], TestSpecialTypesDo.prototype, "arrUnion", void 0);
+__decorate([
+    Reflect.metadata("scout.m.t", { objectType: "Record", typeArgs: [String, null] })
+], TestSpecialTypesDo.prototype, "rec", void 0);
+TestSpecialTypesDo = __decorate([
+    typeName('test.TestSpecialTypes')
+], TestSpecialTypesDo);
+export { TestSpecialTypesDo };
+export var ImportedStringEnum;
+(function (ImportedStringEnum) {
+    ImportedStringEnum["A"] = "a";
+    ImportedStringEnum["B"] = "b";
+})(ImportedStringEnum || (ImportedStringEnum = {}));
 window["scout"]["DataObjectInventory"].get().add(Test2Do, "test.Test2", "test.Test2Do");
+window["scout"]["DataObjectInventory"].get().add(TestSpecialTypesDo, "test.TestSpecialTypes", "test.TestSpecialTypesDo");

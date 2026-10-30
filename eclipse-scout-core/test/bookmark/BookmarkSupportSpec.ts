@@ -11,7 +11,7 @@
 import {
   ActivateBookmarkPathParam, BaseDoEntity, BookmarkDo, BookmarkDoBuilder, BookmarkSupport, BookmarkTableRowIdentifierDo, BookmarkTableRowIdentifierStringComponentDo, BooleanColumn, Column, dates, Desktop, NodeBookmarkPageDo, NumberColumn,
   NumberColumnUserFilter, NumberColumnUserFilterStateDo, Outline, OutlineBookmarkDefinitionDo, PageBookmarkDefinitionDo, PageIdDummyPageParamDo, ResetMenu, scout, SearchMenu, Table, TableBookmarkPageDo, TableClientUiPreferenceProfileDo,
-  TableClientUiPreferencesDo, TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, TableUiPreferences, TreeNodesInsertedEvent, UuidPool
+  TableColumnClientUiPreferenceDo, TableTextUserFilter, TableTextUserFilterStateDo, TableUiPreferences, TreeNodesInsertedEvent, UuidPool
 } from '../../src/index';
 import {
   createSpecSearchDo, FRUIT_1_KEY, FRUIT_2_KEY, FRUIT_3_KEY, FRUIT_4_KEY, FRUIT_5_KEY, goToOutline, SPEC_NODE_PAGE_1_UUID, SPEC_NODE_PAGE_2_UUID, SPEC_NODE_PAGE_3_UUID, SPEC_NODE_PAGE_4_UUID, SPEC_OUTLINE_1_ID, SPEC_OUTLINE_1_UUID,
@@ -627,21 +627,21 @@ describe('BookmarkSupport', () => {
             selectedChildRows: [],
             searchFilterComplete: true,
             searchData: scout.create(SpecSearchDo, {text: 'n'}),
-            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+            tablePreferences: {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tileMode: false,
               tablePreferenceProfiles: new Map([
                 [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
                       viewIndex: 0,
                       visible: false,
                       width: 60,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
                       viewIndex: 1,
                       visible: true,
@@ -649,24 +649,24 @@ describe('BookmarkSupport', () => {
                       sortOrder: 0,
                       sortAscending: true,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
                       viewIndex: 2,
                       visible: true,
                       width: 333,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
                       viewIndex: 3,
                       visible: false,
                       width: 77,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
                       viewIndex: 4,
                       visible: true,
@@ -675,7 +675,7 @@ describe('BookmarkSupport', () => {
                       groupingActive: false,
                       aggregationFunctionId: 'sum',
                       backgroundEffectId: null
-                    })
+                    }
                   ],
                   userFilters: [
                     scout.create(TableTextUserFilterStateDo, {
@@ -690,7 +690,7 @@ describe('BookmarkSupport', () => {
                   ]
                 })]
               ])
-            })
+            }
           }),
           pagePath: []
         })
@@ -765,12 +765,12 @@ describe('BookmarkSupport', () => {
             pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
             displayText: 'Table Page 2',
             selectedChildRows: [
-              scout.create(BookmarkTableRowIdentifierDo, {
+              {
                 keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_2_KEY})] // Banana
-              }),
-              scout.create(BookmarkTableRowIdentifierDo, {
+              },
+              {
                 keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_4_KEY})] // Lemon
-              })
+              }
             ],
             searchFilterComplete: true,
             searchData: scout.create(SpecSearchDo, {text: 'n'})
@@ -783,13 +783,13 @@ describe('BookmarkSupport', () => {
             scout.create(TableBookmarkPageDo, {
               pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
               displayText: 'Table Page 2',
-              expandedChildRow: scout.create(BookmarkTableRowIdentifierDo, {
+              expandedChildRow: {
                 keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_5_KEY})] // Kiwi
-              }),
+              },
               selectedChildRows: [
-                scout.create(BookmarkTableRowIdentifierDo, {
+                {
                   keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_5_KEY})] // Kiwi
-                })
+                }
               ],
               searchFilterComplete: true,
               searchData: scout.create(SpecSearchDo, {text: 'i'})
@@ -985,13 +985,13 @@ describe('BookmarkSupport', () => {
             scout.create(TableBookmarkPageDo, {
               pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
               displayText: 'Table Page 2',
-              expandedChildRow: scout.create(BookmarkTableRowIdentifierDo, {
+              expandedChildRow: {
                 keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_5_KEY})] // Kiwi
-              }),
+              },
               selectedChildRows: [
-                scout.create(BookmarkTableRowIdentifierDo, {
+                {
                   keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_5_KEY})] // Kiwi
-                })
+                }
               ],
               searchFilterComplete: true,
               searchData: scout.create(SpecSearchDo, {text: 'i'})
@@ -1325,13 +1325,13 @@ describe('BookmarkSupport', () => {
         parentBookmarkPage: scout.create(TableBookmarkPageDo, {
           pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
           displayText: 'Table Page 2',
-          expandedChildRow: scout.create(BookmarkTableRowIdentifierDo, {
+          expandedChildRow: {
             keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_2_KEY})] // Banana
-          }),
+          },
           selectedChildRows: [
-            scout.create(BookmarkTableRowIdentifierDo, {
+            {
               keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_2_KEY})] // Banana
-            })
+            }
           ],
           searchFilterComplete: true,
           searchData: null
@@ -1344,13 +1344,13 @@ describe('BookmarkSupport', () => {
           scout.create(TableBookmarkPageDo, {
             pageParam: scout.create(PageIdDummyPageParamDo, {pageId: SPEC_TABLE_PAGE_2_UUID}),
             displayText: 'Table Page 2',
-            expandedChildRow: scout.create(BookmarkTableRowIdentifierDo, {
+            expandedChildRow: {
               keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_4_KEY})] // Lemon
-            }),
+            },
             selectedChildRows: [
-              scout.create(BookmarkTableRowIdentifierDo, {
+              {
                 keyComponents: [scout.create(BookmarkTableRowIdentifierStringComponentDo, {key: FRUIT_4_KEY})] // Lemon
-              })
+              }
             ],
             searchFilterComplete: true,
             searchData: createSpecSearchDo({text: 'le'})
@@ -1525,20 +1525,20 @@ describe('BookmarkSupport', () => {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
             searchData: createSpecSearchDo({text: 'yell'}),
-            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+            tablePreferences: {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
                 [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
                       viewIndex: 0,
                       visible: false,
                       width: 60,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
                       viewIndex: 1,
                       visible: true,
@@ -1546,24 +1546,24 @@ describe('BookmarkSupport', () => {
                       sortOrder: 0,
                       sortAscending: true,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
                       viewIndex: 2,
                       visible: true,
                       width: 333,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
                       viewIndex: 3,
                       visible: false,
                       width: 77,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
                       viewIndex: 4,
                       visible: true,
@@ -1572,7 +1572,7 @@ describe('BookmarkSupport', () => {
                       groupingActive: false,
                       aggregationFunctionId: 'avg',
                       backgroundEffectId: 'colorGradient2'
-                    })
+                    }
                   ],
                   userFilters: [
                     scout.create(TableTextUserFilterStateDo, {
@@ -1581,7 +1581,7 @@ describe('BookmarkSupport', () => {
                   ]
                 })]
               ])
-            })
+            }
           })
         })
       });
@@ -1666,20 +1666,20 @@ describe('BookmarkSupport', () => {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
             searchData: createSpecSearchDo({text: 'yell'}),
-            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+            tablePreferences: {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
                 [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
                       viewIndex: 0,
                       visible: false,
                       width: 60,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
                       viewIndex: 1,
                       visible: true,
@@ -1687,24 +1687,24 @@ describe('BookmarkSupport', () => {
                       sortOrder: 0,
                       sortAscending: true,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
                       viewIndex: 2,
                       visible: true,
                       width: 333,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
                       viewIndex: 3,
                       visible: false,
                       width: 77,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
                       viewIndex: 4,
                       visible: true,
@@ -1713,7 +1713,7 @@ describe('BookmarkSupport', () => {
                       groupingActive: false,
                       aggregationFunctionId: 'avg',
                       backgroundEffectId: 'colorGradient2'
-                    })
+                    }
                   ],
                   userFilters: [
                     scout.create(TableTextUserFilterStateDo, {
@@ -1722,7 +1722,7 @@ describe('BookmarkSupport', () => {
                   ]
                 })]
               ])
-            })
+            }
           })
         })
       });
@@ -1972,20 +1972,20 @@ describe('BookmarkSupport', () => {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
             searchData: createSpecSearchDo({text: 'yell'}),
-            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+            tablePreferences: {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
                 [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
                       viewIndex: 0,
                       visible: false,
                       width: 60,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
                       viewIndex: 1,
                       visible: true,
@@ -1993,24 +1993,24 @@ describe('BookmarkSupport', () => {
                       sortOrder: 0,
                       sortAscending: true,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
                       viewIndex: 2,
                       visible: true,
                       width: 333,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
                       viewIndex: 3,
                       visible: false,
                       width: 77,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
                       viewIndex: 4,
                       visible: true,
@@ -2019,7 +2019,7 @@ describe('BookmarkSupport', () => {
                       groupingActive: false,
                       aggregationFunctionId: 'avg',
                       backgroundEffectId: 'colorGradient2'
-                    })
+                    }
                   ],
                   userFilters: [
                     scout.create(TableTextUserFilterStateDo, {
@@ -2028,7 +2028,7 @@ describe('BookmarkSupport', () => {
                   ]
                 })]
               ])
-            })
+            }
           })
         })
       });
@@ -2066,20 +2066,20 @@ describe('BookmarkSupport', () => {
         definition: scout.create(PageBookmarkDefinitionDo, {
           bookmarkedPage: scout.create(TableBookmarkPageDo, {
             searchData: createSpecSearchDo({text: 'cy'}),
-            tablePreferences: scout.create(TableClientUiPreferencesDo, {
+            tablePreferences: {
               tableId: `${SPEC_TABLE_PAGE_3_TABLE_UUID}|${SPEC_TABLE_PAGE_3_UUID}`,
               tablePreferenceProfiles: new Map([
                 [TableUiPreferences.PROFILE_ID_BOOKMARK, scout.create(TableClientUiPreferenceProfileDo, {
                   columns: [
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_1_UUID, // KeyColumn
                       viewIndex: 0,
                       visible: false,
                       width: 60,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_3_UUID, // HexColumn
                       viewIndex: 1,
                       visible: true,
@@ -2087,24 +2087,24 @@ describe('BookmarkSupport', () => {
                       sortOrder: 0,
                       sortAscending: true,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_2_UUID, // ColorColumn
                       viewIndex: 2,
                       visible: true,
                       width: 333,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_4_UUID, // PrimaryColumn
                       viewIndex: 3,
                       visible: false,
                       width: 77,
                       sortOrder: -1,
                       groupingActive: false
-                    }),
-                    scout.create(TableColumnClientUiPreferenceDo, {
+                    },
+                    {
                       columnId: SPEC_TABLE_PAGE_3_TABLE_COLUMN_5_UUID, // UsageColumn
                       viewIndex: 4,
                       visible: true,
@@ -2113,7 +2113,7 @@ describe('BookmarkSupport', () => {
                       groupingActive: false,
                       aggregationFunctionId: 'avg',
                       backgroundEffectId: 'colorGradient2'
-                    })
+                    }
                   ],
                   userFilters: [
                     scout.create(TableTextUserFilterStateDo, {
@@ -2122,7 +2122,7 @@ describe('BookmarkSupport', () => {
                   ]
                 })]
               ])
-            })
+            }
           })
         })
       });

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,77 @@ describe('BaseDoEntity', () => {
     ObjectFactory.get().registerNamespace('scout', {
       BaseDoEntityFixture01Do, BaseDoEntityFixture02Do
     }, {allowedReplacements: ['scout.BaseDoEntityFixture01Do', 'scout.BaseDoEntityFixture02Do']});
+  });
+
+  describe('init', () => {
+    it('shallow copies model properties', () => {
+      const nested = scout.create(BaseDoEntity, {nested: true} as any);
+
+      // model is a Pojo
+      const root = scout.create(BaseDoEntity, {_type: 'whatever', root: true, nested} as any);
+      expect(root['nested']).toBe(nested);
+
+      // model is a DO
+      const copy = scout.create(BaseDoEntityFixture01Do, root);
+      expect(copy).toBeInstanceOf(BaseDoEntityFixture01Do);
+      expect(copy._type).toBe('whatever'); // model wins over @typeName annotation in case it is more specific
+      expect(copy['root']).toBeTrue();
+      expect(copy['nested']).toBe(nested); // nested is not deep cloned but instance is copied over (shallow)
+    });
+  });
+
+  describe('equals', () => {
+
+    function expectDoEquals(a: object, b: object, equals: boolean) {
+      expect(scout.create(BaseDoEntity, a).equals(scout.create(BaseDoEntity, b))).toBe(equals);
+    }
+
+    it('handles types correctly', () => {
+      const dataObject = scout.create(BaseDoEntity);
+      expect(dataObject.equals(null)).toBeFalse();
+      expect(dataObject.equals(undefined)).toBeFalse();
+      expect(dataObject.equals('asdf')).toBeFalse();
+      expect(dataObject.equals({})).toBeFalse();
+      expect(dataObject.equals(new Date())).toBeFalse();
+      expect(dataObject.equals(dataObject)).toBeTrue();
+      expect(dataObject.equals(dataObject.clone())).toBeTrue();
+    });
+
+    it('ignores _typeVersion if only on one DO', () => {
+      expectDoEquals({a: 1, _typeVersion: '123', b: false}, {a: 1, _typeVersion: '123', b: false}, true);
+
+      expectDoEquals({a: 1, _typeVersion: '123', b: false}, {a: 1, _typeVersion: null, b: false}, true);
+      expectDoEquals({a: 1, _typeVersion: null, b: false}, {a: 1, _typeVersion: null, b: false}, true);
+      expectDoEquals({a: 1, _typeVersion: null, b: false}, {a: 1, _typeVersion: '123', b: false}, true);
+      expectDoEquals({a: 1, _typeVersion: '123', b: false}, {a: 1, b: false}, true);
+      expectDoEquals({a: 1, b: false}, {a: 1, _typeVersion: '123', b: false}, true);
+
+      expectDoEquals({a: 1, _typeVersion: '123', b: false}, {b: false, a: 1, _typeVersion: undefined}, true);
+      expectDoEquals({a: 1, _typeVersion: undefined, b: false}, {a: 1, _typeVersion: undefined, b: false}, true);
+      expectDoEquals({a: 1, _typeVersion: undefined, b: false}, {a: 1, _typeVersion: '123', b: false}, true);
+      expectDoEquals({a: 1, _typeVersion: '123', b: false}, {a: 1, b: false}, true);
+      expectDoEquals({a: 1, b: false}, {a: 1, _typeVersion: '123', b: false}, true);
+
+      expectDoEquals({a: 1, _typeVersion: '123', b: false}, {a: 1, _typeVersion: '1234', b: false}, false);
+    });
+
+    it('works recursively', () => {
+      const firstDoStructure = scout.create(BaseDoEntityFixture01Do, {
+        arr: [1, 2, 3],
+        propObj: {dateProp: new Date(2026, 10)}
+      });
+      const secondDoStructure = scout.create(BaseDoEntityFixture01Do, {
+        arr: [1, 2, 3],
+        propObj: {dateProp: new Date(2026, 11)}
+      });
+      expect(firstDoStructure.equals(secondDoStructure)).toBeFalse();
+    });
+
+    it('handles missing properties like undefined properties', () => {
+      expectDoEquals({a: 1, b: false, c: 'c'}, {a: 1, b: false, c: 'c'}, true);
+      expectDoEquals({a: 1, b: false, c: 'c'}, {a: 1, b: false, c: 'd'}, false);
+      expectDoEquals({a: undefined, b: false, c: 'c'}, {b: false, c: 'c'}, true);
+    });
   });
 
   describe('clone', () => {

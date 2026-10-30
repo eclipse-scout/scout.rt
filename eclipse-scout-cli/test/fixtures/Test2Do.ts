@@ -17,3 +17,19 @@ export class Test2Do extends BaseDoEntity {
 }
 
 ObjectFactory.get().registerNamespace('test', {}); // declares namespace for current module
+
+@typeName('test.TestSpecialTypes')
+export class TestSpecialTypesDo extends BaseDoEntity {
+  arrUnknown: Array<unknown>;
+  arrUnion: Array<string | number>;
+  rec: Record<string, any>;
+}
+
+export enum ImportedStringEnum {
+  A = 'a',
+  B = 'b'
+}
+
+export type ImportedLiteralUnion = 'x' | 'y';
+
+export type ImportedDoAlias = Test2Do;

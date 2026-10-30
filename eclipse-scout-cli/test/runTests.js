@@ -13,7 +13,7 @@ const path = require('path');
 
 function runTests() {
   const rootFixture = './test/fixtures/TestDo.ts';
-  transform([rootFixture]);
+  transform.compile([rootFixture]);
 
   const fixtures = [rootFixture, './test/fixtures/Test2Do.ts'];
   const failedFixtures = [];
@@ -23,7 +23,11 @@ function runTests() {
     const transpiledContent = fs.readFileSync(transpiled, 'utf-8').toString().trim();
     const expectedContent = fs.readFileSync(expected, 'utf-8').toString().trim();
     if (transpiledContent !== expectedContent) {
-      failedFixtures.push(fixtures);
+      failedFixtures.push(fixture);
+    }
+    // the result must be the same if the types are not checked
+    if (transform.transpile(fixture).trim() !== expectedContent) {
+      failedFixtures.push(fixture + ' (transpileOnly)');
     }
   }
   if (failedFixtures.length) {
