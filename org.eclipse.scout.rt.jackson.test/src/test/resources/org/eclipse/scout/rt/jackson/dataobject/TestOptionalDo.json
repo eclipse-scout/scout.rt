@@ -1,14 +1,5 @@
 {
   "_type" : "TestOptional",
-  "optString" : {
-    "empty" : true,
-    "present" : false
-  },
-  "optStringList" : [ {
-    "empty" : true,
-    "present" : false
-  }, {
-    "empty" : false,
-    "present" : true
-  } ]
+  "optString" : null,
+  "optStringList" : [ null, "foo" ]
 }

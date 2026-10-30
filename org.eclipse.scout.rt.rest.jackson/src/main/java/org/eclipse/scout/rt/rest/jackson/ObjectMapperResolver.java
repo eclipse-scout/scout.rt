@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,10 +17,10 @@ import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.rest.RestApplication;
 import org.eclipse.scout.rt.rest.RestApplicationContributors.ContextResolverContributor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Provides an {@link ObjectMapper} instance produced by {@link JacksonDataObjectMapper}.
+ * Provides an {@link JsonMapper} instance produced by {@link JacksonDataObjectMapper}.
  * <p>
  * This class is intended to be registered in a REST application class.
  *
@@ -28,11 +28,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @see ContextResolverContributor
  */
 @Bean
-public class ObjectMapperResolver implements ContextResolver<ObjectMapper> {
+public class ObjectMapperResolver implements ContextResolver<JsonMapper> {
 
   @Override
   @SuppressWarnings("deprecation") // allow access to internal object mapper instance
-  public ObjectMapper getContext(Class<?> type) {
+  public JsonMapper getContext(Class<?> type) {
     return BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
   }
 }

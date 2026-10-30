@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,8 @@ import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
 
-import com.fasterxml.jackson.core.JsonToken;
+import tools.jackson.core.JsonToken;
+import tools.jackson.databind.DatabindContext;
 
 /**
  * Type resolver used for type resolution by {@link DoEntityDeserializer}.
@@ -40,7 +41,7 @@ public interface IDoEntityDeserializerTypeStrategy {
   /**
    * Resolves attribute type class for given {@code entityClass}, {@code attributeName} and the {@code currentToken}.
    */
-  Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken);
+  Optional<AttributeType> resolveAttributeType(Class<? extends IDoEntity> entityClass, String attributeName, JsonToken currentToken, DatabindContext ctxt);
 
   /**
    * Adds the contributions to the given DO entity.

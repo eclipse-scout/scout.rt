@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,6 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Date;
@@ -19,10 +18,12 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Entity object with same fields as {@link TestComplexEntityDo} but using POJO style getter/setter and plain jackson
@@ -33,10 +34,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 public class TestComplexEntityPojo {
 
   // TODO pbz: Remove this class when Jackson issue 1600 is fixed
-  static class P_CustomLocaleSerializer extends JsonSerializer<Locale> {
+  static class P_CustomLocaleSerializer extends ValueSerializer<Locale> {
     @Override
-    public void serialize(Locale value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-      gen.writeObject(value.toLanguageTag());
+    public void serialize(Locale value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
+      gen.writePOJO(value.toLanguageTag());
     }
   }
 

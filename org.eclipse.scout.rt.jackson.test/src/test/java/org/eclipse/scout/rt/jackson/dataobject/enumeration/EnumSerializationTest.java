@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,7 @@ import static org.junit.Assert.*;
 
 import java.net.URL;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.Map;
 
 import org.eclipse.scout.rt.dataobject.DoNode;
@@ -20,6 +21,7 @@ import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.ILenientDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
+import org.eclipse.scout.rt.jackson.dataobject.JacksonDataObjectMapper;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumMapKeyDo;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
@@ -28,6 +30,9 @@ import org.eclipse.scout.rt.platform.exception.PlatformException;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.junit.Before;
 import org.junit.Test;
+
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 
 public class EnumSerializationTest {
 
@@ -114,6 +119,17 @@ public class EnumSerializationTest {
     //noinspection AssertBetweenInconvertibleTypes
     assertEquals("unknown", CollectionUtility.firstElement(map.keySet())); // string is returned as key because lenient data object mapper is used
     assertEquals("value", CollectionUtility.firstElement(map.values()));
+  }
+
+  @Test
+  public void testSerializeDeserialize_ExplicitEnumMap() {
+    @SuppressWarnings("deprecation") JsonMapper objectMapper = BEANS.get(JacksonDataObjectMapper.class).getObjectMapper();
+    TypeReference<EnumMap<FixtureEnum, String>> type = new TypeReference<>() {
+    };
+    String json = "{\"one\":\"value\"}";
+    EnumMap<FixtureEnum, String> marshalled = objectMapper.readValue(json, type);
+    assertEquals(Collections.singletonMap(FixtureEnum.ONE, "value"), marshalled);
+    m_testHelper.assertJsonEquals(json, objectMapper.writerFor(type).writeValueAsString(marshalled));
   }
 
   protected URL toURL(String resourceName) {
