@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxSettings, Box, Device, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
+import {ajax, AjaxError, AjaxSettings, Box, InitModelOf, LoginAppModel, strings, TextMap} from '../index';
 import $ from 'jquery';
 
 export class LoginBox extends Box {
@@ -150,19 +150,19 @@ export class LoginBox extends Box {
     if (this.$password) {
       this.$password.off('input.resetLoginError');
     }
-    if (Device.get().supportsCssAnimation()) {
-      this.$button
-        .html('')
-        .append($('<div>').addClass('login-button-loading'));
-    }
+    this.$button
+      .html('')
+      .append($('<div>').addClass('login-button-loading'));
 
     let options = $.extend({}, this.ajaxOptions, {
       url: url,
       data: data
     });
-    $.ajax(options)
-      .done(this._onPostDone.bind(this))
-      .fail(this._onPostFail.bind(this));
+    ajax.call(options)
+      .then(
+        data => this._onPostDone(data),
+        error => this._onPostFail(error)
+      );
   }
 
   checkTwoFactorResponse(data: Record<string, any>) {
@@ -197,14 +197,9 @@ export class LoginBox extends Box {
 
   redirect(data: Record<string, any>) {
     this.$backgroundElements.addClass('box-background-elements-fadeout');
-    if (Device.get().supportsCssAnimation()) {
-      this.$backgroundElements.oneAnimationEnd(() => {
-        this._redirect(data);
-      });
-    } else {
-      // fallback for old browsers that do not support the animation-end event
+    this.$backgroundElements.oneAnimationEnd(() => {
       this._redirect(data);
-    }
+    });
   }
 
   protected _redirect(data: Record<string, any>) {
@@ -228,12 +223,12 @@ export class LoginBox extends Box {
     this.onPostDoneFunc.call(this, data);
   }
 
-  protected _onPostFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected _onPostFail(error: AjaxError) {
     // execute delayed to make sure loading animation is visible, otherwise (if it is very fast), it flickers
-    setTimeout(this._onPostFailImpl.bind(this, jqXHR, textStatus, errorThrown), 300);
+    setTimeout(this._onPostFailImpl.bind(this), 300);
   }
 
-  protected _onPostFailImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
+  protected _onPostFailImpl() {
     if (this.$token) {
       this.$password = this._createPasswortField();
       this.$token

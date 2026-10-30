@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,15 +12,24 @@ import $ from 'jquery';
 
 export class AjaxCall extends Call implements AjaxCallModel {
   declare model: AjaxCallModel;
-  declare pendingCall: JQuery.jqXHR;
   declare initModel: SomeRequired<this['model'], 'ajaxOptions'>;
 
   ajaxOptions: UrlAjaxSettings;
+  /**
+   * The {@link JQuery.jqXHR} of the current or most recent request (successful or not), e.g. to access the HTTP status code
+   * once the promise returned by {@link call} has settled. It is also used to abort a pending request.
+   *
+   * Only accessible on {@link AjaxCall} instances created directly, e.g. using {@link ajax.createCall}/{@link ajax.createCallJson}:
+   * the shorthand functions like {@link ajax.get}/{@link ajax.getJson} only ever return the resolved response body,
+   * since a native promise cannot carry the jqXHR alongside it the way a jQuery done/fail callback could.
+   */
+  xhr: JQuery.jqXHR;
 
   constructor() {
     super();
     this.type = 'ajax';
     this.ajaxOptions = null;
+    this.xhr = null;
   }
 
   override init(model: InitModelOf<this>) {
@@ -38,7 +47,7 @@ export class AjaxCall extends Call implements AjaxCallModel {
 
   // ==================================================================================
 
-  protected override _callImpl(): JQuery.jqXHR {
+  protected override _callImpl(): Promise<any> {
     // Mark retries by adding a URL parameter
     if (this.callCounter !== 1) {
       this.ajaxOptions.url = new URL(this.ajaxOptions.url).setParameter('retry', (this.callCounter - 1) + '').toString({
@@ -47,41 +56,55 @@ export class AjaxCall extends Call implements AjaxCallModel {
     }
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + (this.callCounter === 1 ? '--- ' : '') + this.ajaxOptions.method + ' "' + this.ajaxOptions.url + '"' + (this.callCounter === 1 ? ' ---' : ''));
 
-    return $.ajax(this.ajaxOptions);
+    let jqXHR = $.ajax(this.ajaxOptions);
+    // pendingCall (inherited from Call) is the native promise wrapping the jqXHR and has no abort() method -> keep the jqXHR to abort it
+    this.xhr = jqXHR;
+    // Capture the extra arguments of jQuery's done/fail callbacks and create a native promise.
+    // Note: use the two-argument form of then() (rather than .then(fn).catch(fn)) so success and failure each
+    // incur exactly one jQuery.Deferred#then() scheduling hop (jQuery defers then() reactions via setTimeout,
+    // even for an already-settled Deferred). Chaining .then(fn).catch(fn) instead would need two such hops for
+    // a rejection (one to pass it through the first then(), one for catch() to actually handle it), which can
+    // let an unrelated, later-settling success elsewhere resolve before an earlier rejection is fully processed.
+    return new Promise((resolve, reject) => {
+      jqXHR.then(
+        (data, textStatus) => {
+          resolve(data);
+        },
+        (xhr, textStatus, errorThrown) => {
+          reject(new AjaxError({
+            jqXHR,
+            textStatus,
+            errorThrown,
+            requestOptions: this.ajaxOptions
+          }));
+        }
+      );
+    });
   }
 
-  protected override _setResultFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
-    // Store result as single object to make rethrowing the error easier for callers of AjaxCall
-    this._setResult(new AjaxError({
-      jqXHR: jqXHR,
-      textStatus: textStatus,
-      errorThrown: errorThrown,
-      requestOptions: this.ajaxOptions
-    }));
-  }
-
-  protected override _onCallDone(data: any, textStatus: JQuery.Ajax.SuccessTextStatus, jqXHR: JQuery.jqXHR) {
+  protected override _onCallDone(data?: any) {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX success');
-    super._onCallDone(data, textStatus, jqXHR);
+    super._onCallDone(data);
   }
 
-  protected override _onCallFail(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string) {
-    $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX fail: type=' + textStatus + ', httpStatus=' + jqXHR.status + (errorThrown ? ' "' + errorThrown + '"' : ''));
-    super._onCallFail(jqXHR, textStatus, errorThrown);
+  protected override _onCallFail(error: AjaxError) {
+    $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'AJAX fail: type=' + error.textStatus + ', httpStatus=' + error.jqXHR?.status + (error.errorThrown ? ' "' + error.errorThrown + '"' : ''));
+    super._onCallFail(error);
   }
 
-  protected override _nextRetryImpl(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string): number | boolean {
-    let offlineError = AjaxCall.isOfflineError(jqXHR, textStatus, errorThrown);
+  protected override _nextRetryImpl(error: AjaxError): number | boolean {
+    let offlineError = AjaxCall.isOfflineError(error);
     if (!offlineError) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Unexpected HTTP error');
       return false;
     }
-    return super._nextRetryImpl();
+    return super._nextRetryImpl(error);
   }
 
   /* --- STATIC HELPERS ------------------------------------------------------------- */
 
-  static isOfflineError(jqXHR: JQuery.jqXHR, textStatus: JQuery.Ajax.ErrorTextStatus, errorThrown: string): boolean {
+  static isOfflineError(error: AjaxError): boolean {
+    const jqXHR = error.jqXHR;
     return (
       // Status code = 0 -> no connection
       !jqXHR.status ||
@@ -104,9 +127,8 @@ export class AjaxCall extends Call implements AjaxCallModel {
   }
 
   protected override _abortImpl() {
-    if (this.pendingCall && typeof this.pendingCall.abort === 'function') {
-      this.pendingCall.abort();
-    }
+    // aborting an already completed request has no effect
+    this.xhr?.abort();
   }
 }
 

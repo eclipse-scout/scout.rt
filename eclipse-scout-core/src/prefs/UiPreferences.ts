@@ -94,7 +94,7 @@ export class UiPreferences implements ObjectWithType {
     return oldStore;
   }
 
-  bootstrap(): JQuery.Promise<void> {
+  bootstrap(): Promise<void> {
     return $.resolvedPromise()
       .then(() => this._subscribeForUpdates())
       .then(() => this.load());
@@ -103,7 +103,7 @@ export class UiPreferences implements ObjectWithType {
   /**
    * Loads preferences from the {@link UiPreferencesStore} into this singleton object.
    */
-  load(): JQuery.Promise<void> {
+  load(): Promise<void> {
     return this._store.load()
       .then(preferences => this._initPreferences(preferences));
   }
@@ -111,7 +111,7 @@ export class UiPreferences implements ObjectWithType {
   /**
    * Writes the current state of this singleton object to the {@link UiPreferencesStore}.
    */
-  store(): JQuery.Promise<void> {
+  store(): Promise<void> {
     this._processModifiedHandlers();
     return this._store.store(this._preferences);
   }
@@ -167,7 +167,7 @@ export class UiPreferences implements ObjectWithType {
     this._modifiedHandlers.clear();
   }
 
-  protected _subscribeForUpdates(): JQuery.Promise<void> {
+  protected _subscribeForUpdates(): Promise<void> {
     return this._store.subscribeForUpdates(event => this._onPreferencesUpdate(event));
   }
 

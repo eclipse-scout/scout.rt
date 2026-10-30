@@ -918,7 +918,8 @@ describe('Table', () => {
       helper.assertSelectionEvent(model.id, helper.getRowIds(model.rows));
     });
 
-    it('selects none if all are selected', () => {
+    it('selects none if all are selected', async () => {
+      jasmine.clock().uninstall();
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
@@ -931,12 +932,12 @@ describe('Table', () => {
 
       table.toggleSelection();
       helper.assertSelection(table, []);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       helper.assertSelectionEvent(model.id, []);
 
       table.toggleSelection();
       helper.assertSelection(table, table.rows);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       helper.assertSelectionEvent(model.id, helper.getRowIds(table.rows));
     });
   });
@@ -2044,7 +2045,8 @@ describe('Table', () => {
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
     });
 
-    it('sends only click if row already is selected', () => {
+    it('sends only click if row already is selected', async () => {
+      jasmine.clock().uninstall();
       let model = helper.createModelFixture(2, 5);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
@@ -2052,7 +2054,7 @@ describe('Table', () => {
 
       let $row = table.$rows().first();
       clickRowAndAssertSelection(table, $row);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['property', 'rowsSelected', 'rowClick']);
 
@@ -2062,7 +2064,7 @@ describe('Table', () => {
 
       jasmine.Ajax.requests.reset();
       clickRowAndAssertSelection(table, $row);
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       expect(mostRecentJsonRequest()).toContainEventTypesExactly(['rowClick']);
     });
@@ -2600,18 +2602,18 @@ describe('Table', () => {
       expect(requestData).toContainEvents(event);
     });
 
-    it('only selects first row if mouse move selection or multi selection is disabled', () => {
+    it('only selects first row if mouse move selection or multi selection is disabled', async () => {
       let model = helper.createModelFixture(2, 4);
       let adapter = helper.createTableAdapter(model);
       let table = adapter.createWidget(model, session.desktop) as SpecTable;
       table.selectionHandler.mouseMoveSelectionEnabled = false;
-      verifyMouseMoveSelectionIsDisabled(model, table, false);
+      await verifyMouseMoveSelectionIsDisabled(model, table, false);
 
       model = helper.createModelFixture(2, 4);
       model.multiSelect = false;
       adapter = helper.createTableAdapter(model);
       table = adapter.createWidget(model, session.desktop) as SpecTable;
-      verifyMouseMoveSelectionIsDisabled(model, table, true);
+      await verifyMouseMoveSelectionIsDisabled(model, table, true);
     });
 
     it('can delete all rows during mouse down event', () => {
@@ -2624,7 +2626,8 @@ describe('Table', () => {
       }).not.toThrow();
     });
 
-    function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
+    async function verifyMouseMoveSelectionIsDisabled(model, table, selectionMovable) {
+      jasmine.clock().uninstall();
       table.render();
 
       let $rows = table.$data.children('.table-row');
@@ -2648,7 +2651,7 @@ describe('Table', () => {
         }
       }
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
 
       let requestData = mostRecentJsonRequest();
       let event = new RemoteEvent(table.id, 'rowsSelected', {
@@ -5616,43 +5619,118 @@ describe('Table', () => {
       </style>`).appendTo($('#sandbox'));
     });
 
-    it('renders loading indicator while loading when asyncLoading=true', async () => {
-      const model = helper.createModelFixture(3, 2);
-      const table = helper.createTable(model);
-      table.loadingSupport.setLoadingIndicatorDelay(0);
-      table.render();
+    describe('true', () => {
 
-      table.setAsyncLoading(true);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+      it('renders loading indicator while loading', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(0);
+        table.render();
 
-      table.setLoading(true);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(1);
+        table.setAsyncLoading(true);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
 
-      table.setLoading(false);
-      await JQueryTesting.whenAnimationEnd((table.loadingSupport as LoadingSupport & { _$loadingIndicator: JQuery })._$loadingIndicator);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setLoading(true);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(1);
+
+        table.setLoading(false);
+        await JQueryTesting.whenAnimationEnd((table.loadingSupport as LoadingSupport & { _$loadingIndicator: JQuery })._$loadingIndicator);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+      });
     });
 
-    it('sets desktop busy while loading when asyncLoading=false', () => {
-      const model = helper.createModelFixture(3, 2);
-      const table = helper.createTable(model);
-      table.loadingSupport.setLoadingIndicatorDelay(0);
-      table.render();
+    describe('false', () => {
+      it('sets desktop busy while loading', () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(0);
+        table.render();
 
-      table.setAsyncLoading(false);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
 
-      table.setLoading(true);
-      expect(session.desktop.busy).toBeTrue();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setLoading(true);
+        expect(session.desktop.busy).toBeTrue();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
 
-      table.setLoading(false);
-      expect(session.desktop.busy).toBeFalse();
-      expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+        table.setLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+        expect(table.$data.children('.glasspane.loading-glasspane').length).toBe(0);
+      });
+
+      it('considers loading indicator delay', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(1);
+        table.render();
+
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true); // indicator will be shown later
+        expect(session.desktop.busy).toBeFalse();
+
+        await sleep(10); // await setTimeout in LoadingSupport.ts
+        expect(session.desktop.busy).toBeTrue();
+
+        table.setLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+      });
+
+      it('only sets desktop busy if table is rendered', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(0);
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.render();
+        expect(session.desktop.busy).toBeTrue();
+
+        table.remove();
+        expect(session.desktop.busy).toBeFalse();
+      });
+
+      it('does not set desktop busy if table was removed before loading started', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(1);
+        table.render();
+
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true); // indicator will be shown later using setTimeout
+        expect(session.desktop.busy).toBeFalse();
+
+        table.remove();
+        await sleep(10); // setTimeout must have been aborted
+        expect(session.desktop.busy).toBeFalse();
+      });
+
+      it('does not set desktop busy if loading was set to false again before loading started', async () => {
+        const model = helper.createModelFixture(3, 2);
+        const table = helper.createTable(model);
+        table.loadingSupport.setLoadingIndicatorDelay(1);
+        table.render();
+
+        table.setAsyncLoading(false);
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(true); // indicator will be shown later using setTimeout
+        expect(session.desktop.busy).toBeFalse();
+
+        table.setLoading(false);
+        await sleep(10); // setTimeout must have been aborted
+        expect(session.desktop.busy).toBeFalse();
+      });
     });
 
     it('may be changed while loading', async () => {

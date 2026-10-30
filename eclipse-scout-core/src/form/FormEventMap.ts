@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,6 +37,13 @@ export interface FormEventMap extends WidgetEventMap {
   'move': FormMoveEvent;
   'postLoad': Event<Form>;
   'reset': Event<Form>;
+  /**
+   * Will be triggered if an error occurs during {@link Form.load}, {@link Form.postLoad} or {@link Form.save}.
+   *
+   * If `event.preventDefault()` is called, the corresponding error handler of the form won't be called ({@link Form._handleLoadError}, {@link Form._handlePostLoadError}, {@link Form._handleSaveError}).
+   * This means the error won't be rethrown which resolves the promise chain.
+   * This will also _not_ close the form if the error happens during {@link Form.load}.
+   */
   'error': FormErrorEvent;
   'invalid': FormInvalidEvent;
   'revealInvalidField': FormRevealInvalidFieldEvent;

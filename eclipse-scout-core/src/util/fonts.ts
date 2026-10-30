@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {arrays, graphics, scout, strings} from '../index';
+import {arrays, Deferred, graphics, scout, strings} from '../index';
 import $ from 'jquery';
 
 export interface FontDescriptor {
@@ -53,7 +53,7 @@ export interface FontPreloadOptions {
 }
 
 export const fonts = {
-  _deferred: $.Deferred(),
+  _deferred: new Deferred<void>(),
 
   /**
    * Indicates whether all fonts have been loaded successfully. Check this variable before
@@ -69,7 +69,7 @@ export const fonts = {
    * @param fontArr (optional) array of fonts
    * @returns promise that is resolved when all fonts are loaded
    */
-  bootstrap(fontArr: FontDescriptor[]): JQuery.Promise<void> {
+  bootstrap(fontArr: FontDescriptor[]): Promise<void> {
     fontArr = fontArr || fonts.autoDetectFonts();
 
     if (fontArr.length === 0) {
@@ -104,7 +104,7 @@ export const fonts = {
    * loadingComplete first! Do not wait for the promise when loadingComplete
    * is true, because the promise will never be resolved.
    */
-  preloader(): JQuery.Promise<void> {
+  preloader(): Promise<void> {
     return fonts._deferred.promise();
   },
 

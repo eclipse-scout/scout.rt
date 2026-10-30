@@ -13,7 +13,7 @@ import {scrollbars} from '../../src/index';
 
 describe('jquery-scout', () => {
 
-  let $e;
+  let $e: JQuery;
 
   /**
    * We must append $e to the DOM, because otherwise test would fail in some browsers (Chrome, PhantomJS).
@@ -22,11 +22,6 @@ describe('jquery-scout', () => {
     setFixtures(sandbox());
     $e = $('<div>');
     $e.appendTo($('#sandbox'));
-    jasmine.clock().install();
-  });
-
-  afterEach(() => {
-    jasmine.clock().uninstall();
   });
 
   describe('isEnabled', () => {
@@ -253,10 +248,152 @@ describe('jquery-scout', () => {
 
   });
 
+  describe('oneAnimationEnd', () => {
+    let $style: JQuery;
+
+    beforeEach(() => {
+      $style = $('<style>@keyframes spec-fade {from {opacity: 0;} to {opacity: 1;}} .spec-animate {animation: spec-fade 50ms;} .spec-animate-short {animation: spec-fade 10ms;}</style>');
+      $style.appendTo($('#sandbox'));
+    });
+
+    afterEach(() => {
+      $style.remove();
+    });
+
+    /** Resolves when the browser fires the native animation event of the element itself (not a bubbling one of a child) */
+    function whenNativeAnimationEvent($elem: JQuery, type: 'animationstart' | 'animationend' | 'animationcancel' = 'animationend'): Promise<void> {
+      return new Promise(resolve => {
+        let listener = (event: Event) => {
+          if (event.target === $elem[0]) {
+            $elem[0].removeEventListener(type, listener);
+            resolve();
+          }
+        };
+        $elem[0].addEventListener(type, listener);
+      });
+    }
+
+    it('calls the handler once when the animation ends', async () => {
+      let handler = jasmine.createSpy('handler');
+      $e.addClass('spec-animate');
+      $e.oneAnimationEnd(handler);
+      expect(handler).not.toHaveBeenCalled();
+
+      await whenNativeAnimationEvent($e);
+      expect(handler).toHaveBeenCalledTimes(1);
+
+      // "one" semantics: the handler is not called again for the next animation
+      $e.removeClass('spec-animate');
+      $e[0].getBoundingClientRect(); // force style recalculation so that the animation restarts
+      $e.addClass('spec-animate');
+      await whenNativeAnimationEvent($e);
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignores animationend events of child elements', async () => {
+      let handler = jasmine.createSpy('handler');
+      let $child = $e.appendDiv();
+      $e.addClass('spec-animate');
+      $e.oneAnimationEnd(handler);
+      $child.addClass('spec-animate-short'); // ends before the animation of the parent
+
+      await whenNativeAnimationEvent($child);
+      expect(handler).not.toHaveBeenCalled();
+      await whenNativeAnimationEvent($e);
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the handler even if the animation is disabled', async () => {
+      let handler = jasmine.createSpy('handler');
+      $e.css('animation-duration', '0s'); // disabled before the animation is started
+      $e.addClass('spec-animate');
+      $e.oneAnimationEnd(handler);
+      expect(handler).toHaveBeenCalledTimes(0);
+
+      await sleep();
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the handler even if the animation has already ended when the listener is added', async () => {
+      let handler = jasmine.createSpy('handler');
+      $e.addClass('spec-animate');
+
+      // Simulate a breakpoint after adding the class: the animation is over before the listener is added.
+      // (With a breakpoint, Chrome does not fire animationend at all.)
+      // The finished promise resolves before the animationend event is dispatched.
+      let [animation] = $e[0].getAnimations();
+      await animation.finished;
+
+      $e.oneAnimationEnd(handler);
+      expect(handler).toHaveBeenCalledTimes(0);
+
+      await sleep();
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('does nothing for an empty jquery object', () => {
+      let handler = jasmine.createSpy('handler');
+      expect(() => $().oneAnimationEnd(handler)).not.toThrow();
+      expect(handler).not.toHaveBeenCalled();
+    });
+
+    describe('triggerOnError', () => {
+
+      it('if true, calls the handler if the element is made invisible while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler, true);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.css('display', 'none'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(1);
+      });
+
+      it('if true, calls the handler if the animation class is removed while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler, true);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.removeClass('spec-animate'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(1);
+      });
+
+      it('if false, does not call the handler if the element is made invisible while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.css('display', 'none'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(0);
+      });
+
+      it('if false, does not call the handler if the animation class is removed while the animation is running', async () => {
+        let handler = jasmine.createSpy('handler');
+        $e.addClass('spec-animate');
+        $e.oneAnimationEnd(handler);
+        expect(handler).not.toHaveBeenCalled();
+
+        await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+        $e.removeClass('spec-animate'); // cancels the animation
+        await whenNativeAnimationEvent($e, 'animationcancel');
+        expect(handler).toHaveBeenCalledTimes(0);
+      });
+    });
+  });
+
   describe('icon', () => {
 
     it('sets and removes icons', () => {
       // Set and remove font icon
+      // @ts-expect-error
       $e.icon();
       expect($e.children().length).toBe(0);
       expect($e.data('$icon')).toBeUndefined();
@@ -302,6 +439,7 @@ describe('jquery-scout', () => {
       expect($e.data('$icon').hasClass('icon')).toBe(true);
 
       // Reset
+      // @ts-expect-error
       $e.icon();
       expect($e.children().length).toBe(0);
       expect($e.data('$icon')).toBeUndefined();
@@ -312,6 +450,7 @@ describe('jquery-scout', () => {
   describe('textOrNbsp', () => {
 
     it('sets text or nbsp', () => {
+      // @ts-expect-error
       $e.textOrNbsp();
       expect($e.html()).toBe('&nbsp;');
       $e.empty();
@@ -334,6 +473,7 @@ describe('jquery-scout', () => {
       expect($e.html()).toBe('Company &amp; Co.');
 
       // Empty class
+      // @ts-expect-error
       $e.textOrNbsp();
       expect($e.html()).toBe('&nbsp;');
       expect($e.hasClass('empty')).toBe(false);
@@ -352,6 +492,7 @@ describe('jquery-scout', () => {
   describe('htmlOrNbsp', () => {
 
     it('sets html or nbsp', () => {
+      // @ts-expect-error
       $e.htmlOrNbsp();
       expect($e.html()).toBe('&nbsp;');
       $e.empty();
@@ -376,6 +517,7 @@ describe('jquery-scout', () => {
       expect($e.html()).toBe('Company &amp; Co.');
 
       // Empty class
+      // @ts-expect-error
       $e.htmlOrNbsp();
       expect($e.html()).toBe('&nbsp;');
       expect($e.hasClass('empty')).toBe(false);
@@ -398,6 +540,7 @@ describe('jquery-scout', () => {
       $f.appendTo($('#sandbox'));
       let $g = $('<div>'); // not in DOM
 
+      // @ts-expect-error
       expect($e.nvl()).toBe($e);
       expect($e.nvl($f)).toBe($e);
       expect($e.nvl($g)).toBe($e);
@@ -561,6 +704,13 @@ describe('jquery-scout', () => {
   });
 
   describe('debounce', () => {
+    beforeEach(() => {
+      jasmine.clock().install();
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
 
     it('is debounces function calls', () => {
       let counter = 0;
