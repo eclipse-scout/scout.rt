@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, arrays, Event, EventEmitter, EventMap, ObjectOrModel, objects, Table, TableRow} from '../index';
+import {arrays, Event, EventEmitter, EventMap, ObjectOrModel, objects, Table, TableRow} from '../index';
 
 export class TableUpdateBuffer extends EventEmitter {
   declare self: TableUpdateBuffer;
@@ -77,9 +77,6 @@ export class TableUpdateBuffer extends EventEmitter {
       let rows = objects.values(this._rowMap)
         .filter(row => this.table.hasRow(row)); // ignore old buffered rows that have been removed in the meantime
       this.table.updateRows(rows);
-    } catch (err: any) {
-      App.get().errorHandler.handle(err); // otherwise error is ignored
-      throw err; // let the promise fail
     } finally {
       this._rowMap = {};
       this.table.setLoading(false);
