@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.scout.rt.app.filter.ExceptionFilter;
+import org.eclipse.scout.rt.app.filter.PlatformStateFilter;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
@@ -32,6 +33,14 @@ import org.glassfish.jersey.servlet.ServletProperties;
 public final class ServerServletContributors {
 
   private ServerServletContributors() {
+  }
+
+  @Order(200)
+  public static class PlatformStateFilterContributor implements IServletFilterContributor {
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(PlatformStateFilter.class, "/*", null);
+    }
   }
 
   @Order(750)

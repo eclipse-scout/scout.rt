@@ -20,6 +20,7 @@ import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.ServletHolder.Registration;
 import org.eclipse.scout.rt.app.filter.ExceptionFilter;
+import org.eclipse.scout.rt.app.filter.PlatformStateFilter;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
@@ -36,6 +37,14 @@ import org.eclipse.scout.rt.ui.html.filter.UiServletUserBootstrapFilter;
 public final class UiServletContributors {
 
   private UiServletContributors() {
+  }
+
+  @Order(20)
+  public static class PlatformStateFilterContributor implements IServletFilterContributor {
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(PlatformStateFilter.class, "/*", null);
+    }
   }
 
   @Order(50)
