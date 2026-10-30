@@ -518,6 +518,15 @@ public class MailHelperTest {
   }
 
   @Test
+  public void testIsEmailAddressValidAsciiOnly() {
+    MailHelper mailHelper = BEANS.get(MailHelper.class);
+    assertFalse(mailHelper.isEmailAddressValid("foo@bär.de", false));
+    assertFalse(mailHelper.isEmailAddressValid("foo@domaintest.みんな", false));
+    assertFalse(mailHelper.isEmailAddressValid("füü@bär.de", false));
+    assertFalse(mailHelper.isEmailAddressValid("I❤\uFE0FCHOCOLATE@example.com", false));
+  }
+
+  @Test
   public void testEnsureFromAddressWithoutFromAndDefaultFrom() throws MessagingException {
     MailMessage mailMessage = BEANS.get(MailMessage.class)
         .withBodyPlainText("lorem");
