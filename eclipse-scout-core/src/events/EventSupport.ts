@@ -264,6 +264,11 @@ export class EventSupport {
   }
 
   trigger(type: string, event?: Event) {
+    if (this._eventListenersByType.size === 0) {
+      // There are no event handlers registered
+      return;
+    }
+
     type = strings.trim(type);
     if (!type) {
       return;
