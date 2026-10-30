@@ -769,8 +769,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       name: this._getRequestName(request, 'user request')
     })
       .then(onAjaxDone.bind(this), onAjaxFail.bind(this))
-      .finally(onAjaxAlways.bind(this))
-      .catch(error => App.get().errorHandler.handle(error)); // show message box on error
+      .finally(onAjaxAlways.bind(this));
 
     // ----- Helper methods -----
 
@@ -894,8 +893,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       ajaxOptions: ajaxOptions,
       name: this._getRequestName(request, 'request')
     })
-      .then(onAjaxDone.bind(this), onAjaxFail.bind(this))
-      .catch(error => App.get().errorHandler.handle(error).then(errorInfo => undefined)); // show message box on error, ignore result);
+      .then(onAjaxDone.bind(this), onAjaxFail.bind(this));
 
     // --- Helper methods ---
 

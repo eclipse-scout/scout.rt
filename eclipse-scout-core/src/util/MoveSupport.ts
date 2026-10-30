@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, ErrorHandler, Event, EventEmitter, EventMap, events, graphics, InitModelOf, Insets, keys, Point, Rectangle, scout, scrollbars, Session, ViewportScroller, ViewportScrollerModel, Widget} from '../index';
+import {ErrorHandler, Event, EventEmitter, EventMap, events, graphics, InitModelOf, Insets, keys, Point, Rectangle, scout, scrollbars, Session, ViewportScroller, ViewportScrollerModel, Widget} from '../index';
 import $ from 'jquery';
 
 export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
@@ -419,8 +419,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
         }, error => {
           scout.create(ErrorHandler, {displayError: false}).handle(error);
           this.cancel();
-        })
-        .catch(error => App.get().errorHandler.handle(error));
+        });
     } else {
       this._restoreStyles();
       this._moveData = null;
