@@ -42,7 +42,8 @@ public class PlatformStateFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
     final HttpServletResponse resp = (HttpServletResponse) response;
-    if (Platform.get() == null || Platform.get().getState() != IPlatform.State.PlatformStarted) {
+    final IPlatform platform = Platform.peek();
+    if (platform == null || platform.getState() != IPlatform.State.PlatformStarted) {
       LOG.debug("Platform is not running");
       resp.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
       return;
