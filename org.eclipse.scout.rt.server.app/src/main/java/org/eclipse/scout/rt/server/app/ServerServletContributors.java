@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,7 @@ import java.util.List;
 import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
 import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.scout.rt.app.filter.ExceptionFilter;
+import org.eclipse.scout.rt.app.filter.PlatformStateFilter;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.Order;
@@ -32,6 +33,15 @@ import org.glassfish.jersey.servlet.ServletProperties;
 public final class ServerServletContributors {
 
   private ServerServletContributors() {
+  }
+
+  @Order(200)
+  public static class PlatformStateFilterContributor implements IServletFilterContributor {
+
+    @Override
+    public void contribute(ServletContextHandler handler) {
+      handler.addFilter(PlatformStateFilter.class, "/*", null);
+    }
   }
 
   @Order(750)
@@ -67,7 +77,7 @@ public final class ServerServletContributors {
      */
     protected List<String> getFilterExcludes() {
       return CollectionUtility.arrayList(
-          "/status" // see StatusServletContributor
+          StatusServletContributor.PATH
       );
     }
   }
@@ -87,9 +97,11 @@ public final class ServerServletContributors {
   @Order(1000)
   public static class StatusServletContributor implements IServletContributor {
 
+    public static final String PATH = "/status";
+
     @Override
     public void contribute(ServletContextHandler handler) {
-      handler.addServlet(HealthCheckServlet.class, "/status");
+      handler.addServlet(HealthCheckServlet.class, PATH);
     }
   }
 
