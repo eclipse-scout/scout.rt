@@ -68,7 +68,6 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_sessionData = new SessionData();
     m_objectExtensions = new ObjectExtensions<>(this, true);
 
-    m_sessionMetrics.sessionCreated(SESSION_TYPE);
     if (autoInitConfig) {
       interceptInitConfig();
     }
@@ -135,7 +134,7 @@ public abstract class AbstractServerSession implements IServerSession, Serializa
     m_id = assertNotNull(sessionId, "Session id must not be null");
 
     interceptLoadSession();
-
+    m_sessionMetrics.sessionCreated(SESSION_TYPE);
     m_active = true;
 
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STARTED));
