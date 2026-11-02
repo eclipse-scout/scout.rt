@@ -114,7 +114,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     m_sharedVariableMap = new SharedVariableMap();
     m_exposedSharedVariables = null;
 
-    m_sessionMetrics.sessionCreated(SESSION_TYPE);
     setLocale(NlsLocale.get());
 
     if (autoInitConfig) {
@@ -322,6 +321,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
     }
     m_id = sessionId;
     interceptLoadSession();
+    m_sessionMetrics.sessionCreated(SESSION_TYPE);
     setActive(true);
 
     fireSessionChangedEvent(new SessionEvent(this, SessionEvent.TYPE_STARTED));

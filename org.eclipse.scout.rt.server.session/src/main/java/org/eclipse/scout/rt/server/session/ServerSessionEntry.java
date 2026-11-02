@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.FinalValue;
 import org.eclipse.scout.rt.server.session.context.ServerSessionRunContexts;
 
 /**
- * Cache Entry for {@link IServerSession} and meta data: HttpSessions using this {@link IServerSession} and lifecycle
+ * Cache Entry for {@link IServerSession} and metadata: HttpSessions using this {@link IServerSession} and lifecycle
  * handler.
  */
 public class ServerSessionEntry {
@@ -55,7 +55,7 @@ public class ServerSessionEntry {
   }
 
   /**
-   * {@code true} if this {@link ServerSessionEntry} contained the specified element and it was successfully removed.
+   * {@code true} if this {@link ServerSessionEntry} contained the specified element, and it was successfully removed.
    * {@code false} if it was not part of this entry.
    */
   protected boolean removeHttpSessionId(String httpSessionId) {
@@ -79,7 +79,7 @@ public class ServerSessionEntry {
       m_sessionLifecycleHandler.destroy(session);
     }
     else {
-      // in case the destroy is called by the servlet container when invalidating the HTTP session: ensure the session is on the context
+      // in case destroy is called by the servlet container when invalidating the HTTP session: ensure the session is on the context
       ServerSessionRunContexts
           .copyCurrent(true)
           .withSession(session)
