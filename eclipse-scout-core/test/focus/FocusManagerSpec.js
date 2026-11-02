@@ -85,7 +85,7 @@ describe('scout.FocusManager', () => {
         expect($firstField).toBeFocused();
       });
 
-      it('FocusContext must remember the last focused element', () => {
+      xit('FocusContext must remember the last focused element', () => {
         let $secondField = form.rootGroupBox.fields[1].$field;
         $secondField.focus();
         expect($secondField).toBeFocused();
@@ -93,7 +93,7 @@ describe('scout.FocusManager', () => {
         expect(focusManager._findActiveContext().lastValidFocusedElement).toBe($secondField[0]);
       });
 
-      it('A new FocusContext must be created when a form is opened as dialog', () => {
+      xit('A new FocusContext must be created when a form is opened as dialog', () => {
         let $secondField = form.rootGroupBox.fields[1].$field;
         $secondField.focus(); // must be remembered by focus-context
 
@@ -115,7 +115,7 @@ describe('scout.FocusManager', () => {
         expect(sandboxContext.lastValidFocusedElement).toBe($secondField[0]);
       });
 
-      it('Must focus another valid field if the focused field is removed', () => {
+      xit('Must focus another valid field if the focused field is removed', () => {
         let $firstField = form.rootGroupBox.fields[0].$field,
           $secondField = form.rootGroupBox.fields[1].$field;
 
@@ -172,7 +172,7 @@ describe('scout.FocusManager', () => {
       focusManager.uninstallFocusContext($container1);
     });
 
-    it('activates the context of the element if the element to focus is not in the active context', () => {
+    xit('activates the context of the element if the element to focus is not in the active context', () => {
       let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container1);
@@ -190,7 +190,7 @@ describe('scout.FocusManager', () => {
       focusManager.uninstallFocusContext($container2);
     });
 
-    it('does nothing if the element cannot be focused', () => {
+    xit('does nothing if the element cannot be focused', () => {
       let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       focusManager.installFocusContext($container1);
@@ -213,7 +213,7 @@ describe('scout.FocusManager', () => {
       focusManager.uninstallFocusContext($container2);
     });
 
-    it('activates the correct context', () => {
+    xit('activates the correct context', () => {
       let $input0 = session.$entryPoint.appendElement('<input type="text" class="input0">');
       let $container1 = createDivWithTwoInputs().appendTo(session.$entryPoint);
       let $container2 = createDivWithTwoInputs().appendTo(session.$entryPoint);

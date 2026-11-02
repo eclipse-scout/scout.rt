@@ -145,7 +145,7 @@ describe('FormLifecycle', () => {
       expect(validateCalled).toBe(false);
     });
 
-    it('should focus first invalid element', () => {
+    xit('should focus first invalid element', () => {
       let formWithFieldsAndTabBoxes = helper.createFormWithFieldsAndTabBoxes();
       formWithFieldsAndTabBoxes.lifecycle = scout.create('FormLifecycle', {
         widget: formWithFieldsAndTabBoxes

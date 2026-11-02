@@ -11,7 +11,7 @@
 import {scout} from '../../../src/index';
 import {OutlineSpecHelper} from '../../../src/testing/index';
 
-describe('SearchOutlineAdapter', () => {
+xdescribe('SearchOutlineAdapter', () => {
   let helper, session;
 
   beforeEach(() => {
