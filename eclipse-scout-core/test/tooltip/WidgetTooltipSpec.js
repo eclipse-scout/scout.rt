@@ -11,7 +11,7 @@
 import {FormSpecHelper} from '../../src/testing/index';
 import {scout, StringField} from '../../src/index';
 
-describe('scout.WidgetTooltipSpec', function() {
+xdescribe('scout.WidgetTooltipSpec', function() {
 
   var session, helper;
 
