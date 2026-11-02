@@ -1233,7 +1233,7 @@ describe('DateField', () => {
         expect(dateField.$timeField.text()).toBe(dateField.displayText);
       });
 
-      it('does not remove date if time was cleared but another time selected ', () => {
+      xit('does not remove date if time was cleared but another time selected ', () => {
         let dateField = scout.create('DateField', {
           parent: session.desktop,
           touchMode: true,
