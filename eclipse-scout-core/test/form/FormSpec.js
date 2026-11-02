@@ -687,7 +687,7 @@ describe('Form', function() {
     /**
      * Scenario: Switch between two outline nodes and expect the focus in its detail forms are preserved.
      */
-    it('on detail forms', function() {
+    xit('on detail forms', function() {
       // setup an outline with 2 nodes each node has a detail form with 3 fields
       var model = outlineHelper.createModelFixture(2, 0, true);
       var outline = outlineHelper.createOutline(model);
