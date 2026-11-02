@@ -17,7 +17,7 @@ import org.eclipse.scout.rt.server.IServerSession;
 import org.eclipse.scout.rt.server.context.ServerRunContexts;
 
 /**
- * Cache Entry for {@link IServerSession} and meta data: HttpSessions using this {@link IServerSession} and lifecycle
+ * Cache Entry for {@link IServerSession} and metadata: HttpSessions using this {@link IServerSession} and lifecycle
  * handler.
  */
 public class ServerSessionEntry {
@@ -56,7 +56,7 @@ public class ServerSessionEntry {
   }
 
   /**
-   * {@code true} if this {@link ServerSessionEntry} contained the specified element and it was successfully removed.
+   * {@code true} if this {@link ServerSessionEntry} contained the specified element, and it was successfully removed.
    * {@code false} if it was not part of this entry.
    */
   protected boolean removeHttpSessionId(String httpSessionId) {
@@ -80,7 +80,7 @@ public class ServerSessionEntry {
       m_sessionLifecycleHandler.destroy(session);
     }
     else {
-      // in case the destroy is called by the servlet container when invalidating the HTTP session: ensure the session is on the context
+      // in case destroy is called by the servlet container when invalidating the HTTP session: ensure the session is on the context
       ServerRunContexts
           .copyCurrent(true)
           .withSession(session)
