@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {TreeNode} from './../index';
+import {TreeNode} from '../index';
 
 /**
  * This object is needed during an update in the tree. It
