@@ -103,6 +103,16 @@ public interface IUiSession {
   long getLastAccessedTime();
 
   /**
+   * Called by {@link JsonMessageRequestHandler} for every request of this UI session, including polling requests.
+   */
+  void touchRequest();
+
+  /**
+   * @return the time in millis of the last request of any type (incl. the startup request and polling requests).
+   */
+  long getLastRequestTime();
+
+  /**
    * Marks the UI session is disposed (irreversible) and destroys the internal data structures and references (i.e. it
    * disposes the JSON adapter registry).
    * <p>

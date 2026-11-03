@@ -115,6 +115,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         if (jsonRequest.getRequestType() != RequestType.POLL_REQUEST) {
           uiSession.touch();
         }
+        uiSession.touchRequest();
       }
 
       uiSession.verifySubject(req);
