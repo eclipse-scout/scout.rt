@@ -80,7 +80,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   private final IExecutionSemaphore m_modelJobSemaphore = Jobs.newExecutionSemaphore(1).seal();
 
   // state
-  private final Object m_stateLock;
   private volatile boolean m_active;
   private volatile boolean m_stopping;
   private final Semaphore m_permitToSaveBeforeClosing = new Semaphore(1);
@@ -106,7 +105,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   public AbstractClientSession(boolean autoInitConfig) {
     m_eventListeners = new FastListenerList<>();
     m_sessionData = new SessionData();
-    m_stateLock = new Object();
     m_userAgent = UserAgent.get();
     m_subject = Subject.current();
     m_user = User.current();
@@ -208,10 +206,7 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   }
 
   private void setActive(boolean b) {
-    synchronized (m_stateLock) {
-      m_active = b;
-      m_stateLock.notifyAll();
-    }
+    m_active = b;
   }
 
   @Override
@@ -230,11 +225,6 @@ public abstract class AbstractClientSession extends AbstractPropertyObserver imp
   protected <T> T getSharedContextVariable(String name, Class<T> type) {
     Object o = m_sharedVariableMap.get(name);
     return TypeCastUtility.castValue(o, type);
-  }
-
-  @Override
-  public final Object getStateLock() {
-    return m_stateLock;
   }
 
   /*

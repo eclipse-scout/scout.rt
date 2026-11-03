@@ -68,11 +68,6 @@ public interface IClientSession extends ISession, IPropertyObserver {
   URI getBrowserURI();
 
   /**
-   * Monitor can be used to wait for changes of the states 'active' and 'loaded'
-   */
-  Object getStateLock();
-
-  /**
    * send a stop signal to the session event queue<br>
    * check {@link #isActive()} to wait until the queue has in fact closed
    */
