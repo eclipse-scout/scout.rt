@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -58,7 +58,6 @@ public interface IResourceLoader {
   /**
    * Gets the {@link IHttpResourceCache} to be used for this loader.
    *
-   * @param cacheKey
    * @return The {@link IHttpResourceCache} to store the {@link HttpCacheObject}s or <code>null</code> if no caching
    * should be supported for this {@link IResourceLoader}.
    */
