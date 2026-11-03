@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,10 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractSvgChartRenderer, Chart, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
+import {AbstractSvgChartRenderer, Chart, ChartValueGroup, LegendPositions, VennAsync3Calculator, VennCircle, VennCircleHelper} from '../index';
 import $ from 'jquery';
-import {ChartValueGroup} from './Chart';
-import {LegendPositions} from './AbstractSvgChartRenderer';
 import {arrays} from '@eclipse-scout/core';
 
 export class VennChartRenderer extends AbstractSvgChartRenderer {

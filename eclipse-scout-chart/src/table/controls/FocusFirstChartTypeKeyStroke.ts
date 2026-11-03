@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {focusUtils, keys, KeyStroke, ScoutKeyboardEvent} from '@eclipse-scout/core';
-import {ChartTableControl} from './ChartTableControl';
+import {ChartTableControl} from '../../index';
 
 /**
  * Focuses the first chart type if the focus is on the content container of the chart table control (which is the case when the table control opens).

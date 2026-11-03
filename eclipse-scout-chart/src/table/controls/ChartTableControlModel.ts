@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {TableControlModel} from '@eclipse-scout/core';
-import {TableControlChartAggregation, TableControlChartGroup, TableControlChartType} from './ChartTableControl';
+import {TableControlChartAggregation, TableControlChartGroup, TableControlChartType} from '../../index';
 
 export interface ChartTableControlModel extends TableControlModel {
   chartAggregation?: TableControlChartAggregation;
