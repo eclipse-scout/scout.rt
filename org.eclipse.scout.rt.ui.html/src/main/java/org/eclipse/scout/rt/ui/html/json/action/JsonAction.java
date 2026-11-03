@@ -78,6 +78,13 @@ public abstract class JsonAction<ACTION extends IAction> extends AbstractJsonWid
       }
     });
 
+    putJsonProperty(new JsonProperty<ACTION>(IAction.PROP_TOOLTIP_HTML_ENABLED, model) {
+      @Override
+      protected Boolean modelValue() {
+        return getModel().isTooltipHtmlEnabled();
+      }
+    });
+
     putJsonProperty(new JsonProperty<ACTION>("toggleAction", model) {
       @Override
       protected Boolean modelValue() {

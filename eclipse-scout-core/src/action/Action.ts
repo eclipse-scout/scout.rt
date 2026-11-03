@@ -8,7 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, TabbableItem,
+  AbstractLayout, ActionEventMap, ActionExecKeyStroke, ActionKeyStroke, ActionModel, Alignment, aria, DoubleClickSupport, EnumObject, HtmlComponent, Icon, InitModelOf, KeyStrokeContext, LoadingSupport, NullLayout, scout, strings,
+  TabbableItem,
   TooltipPosition, tooltips, TooltipSupport, Widget
 } from '../index';
 import $ from 'jquery';
@@ -41,6 +42,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
   textVisible: boolean;
   toggleAction: boolean;
   tooltipText: string;
+  tooltipHtmlEnabled : boolean = false;
   showTooltipWhenSelected: boolean;
   tooltipPosition: TooltipPosition;
   icon: Icon;
@@ -74,7 +76,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     this.showTooltipWhenSelected = true;
 
     this._doubleClickSupport = new DoubleClickSupport();
-    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'toggleAction']);
+    this._addCloneProperties(['actionStyle', 'horizontalAlignment', 'iconId', 'selected', 'preventDoubleClick', 'text', 'textPosition', 'htmlEnabled', 'tooltipText', 'tooltipHtmlEnabled', 'toggleAction']);
   }
 
   static ActionStyle = {
@@ -290,6 +292,15 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     this._updateTooltip();
   }
 
+  /** @see ActionModel.tooltipHtmlEnabled */
+  setTooltipHtmlEnabled(tooltipHtmlEnabled: boolean) {
+    this.setProperty('tooltipHtmlEnabled', tooltipHtmlEnabled);
+  }
+
+  protected _renderTooltipHtmlEnabled() {
+    this._updateTooltip();
+  }
+
   /**
    * Returns the text to show as a tooltip, which might be different from the `tooltipText` property.
    * If this value is falsy, the tooltip is not installed.
@@ -326,7 +337,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
 
   protected _updateAriaLabel() {
     let ariaLabel = this.text;
-    let ariaDesc = this.tooltipText;
+    let ariaDesc = this.tooltipHtmlEnabled ? strings.plainText(this.tooltipText) : this.tooltipText;
     if (ariaLabel) {
       if (this.textVisible) {
         // not needed if text is visible
@@ -376,6 +387,7 @@ export class Action extends Widget implements ActionModel, TabbableItem {
     return {
       parent: this,
       text: this._computeTooltipText(),
+      htmlEnabled: this.tooltipHtmlEnabled,
       $anchor: this.$container,
       arrowPosition: 50,
       arrowPositionUnit: '%',
