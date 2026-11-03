@@ -390,7 +390,6 @@ public class UiSession implements IUiSession {
     Cookie cookie = new Cookie(ObjectUtility.nvl(config.getName(), "JSESSIONID"), httpSession.getId());
     // The cookie must not expire too early so that it does not break the heart beat -> use a big max age.
     cookie.setMaxAge((int) TimeUnit.DAYS.toSeconds(365)); // 1 year
-    cookie.setComment(config.getComment());
     if (config.getDomain() != null) {
       cookie.setDomain(config.getDomain());
     }
