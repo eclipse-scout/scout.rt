@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {arrays, TableMatrix, TableMatrixKeyAxis, TableRow, TableUserFilter, TableUserFilterAddedEventData} from '@eclipse-scout/core';
-import {ChartTableUserFilterModel} from '../../index';
-import {TableControlDeterministicKey} from './ChartTableControl';
+import {ChartTableUserFilterModel, TableControlDeterministicKey} from '../../index';
 
 export class ChartTableUserFilter extends TableUserFilter implements ChartTableUserFilterModel {
   declare model: ChartTableUserFilterModel;
