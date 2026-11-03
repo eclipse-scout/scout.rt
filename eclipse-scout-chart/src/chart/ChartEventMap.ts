@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {Event as ScoutEvent, PropertyChangeEvent, WidgetEventMap} from '@eclipse-scout/core';
-import {AbstractChartRenderer, Chart} from '../index';
-import {ChartConfig, ChartData, ClickObject} from './Chart';
+import {AbstractChartRenderer, Chart, ChartConfig, ChartData, ClickObject} from '../index';
 
 export interface ChartValueClickEvent<C = Chart> extends ScoutEvent<C> {
   data: ClickObject;

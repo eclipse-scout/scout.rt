@@ -8,10 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {arrays, objects, strings} from '@eclipse-scout/core';
-import {AbstractSvgChartRenderer, Chart} from '../index';
+import {AbstractSvgChartRenderer, Chart, ChartValueGroup, ClickObject, LegendPositions} from '../index';
 import $ from 'jquery';
-import {ChartValueGroup, ClickObject} from './Chart';
-import {LegendPositions} from './AbstractSvgChartRenderer';
 
 export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
   segmentSelectorForAnimation: string;
