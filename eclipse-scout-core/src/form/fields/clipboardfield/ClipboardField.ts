@@ -278,6 +278,9 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
       Array.prototype.forEach.call(dataTransfer.items, (item: DataTransferItem) => {
         if (item.type === mimeTypes.TEXT_PLAIN) {
           item.getAsString(str => {
+            if (!str) {
+              return; // ignore empty text data from clipboard (indicates a local clipboard problem) - empty files are still allowed, see 'dataTransfer.files' below
+            }
             filesArgument.push(new Blob([str], {
               type: mimeTypes.TEXT_PLAIN
             }));
@@ -295,6 +298,9 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
             // attribute to the file object that is then used as a filename in session.uploadFiles().
             let lastModifiedDiff = startPasteTimestamp - file.lastModified;
             if (lastModifiedDiff < 1000) {
+              if (!file.size) {
+                return; // ignore empty image data from clipboard (indicates a local clipboard problem) - empty files are still allowed, see 'dataTransfer.files' below
+              }
               file.scoutName = Session.EMPTY_UPLOAD_FILENAME;
             }
             filesArgument.push(file);

@@ -1213,7 +1213,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
          * - Some Browsers (e.g. Edge) handle an empty string as filename as if the filename is not set and therefore introduce a default filename like 'blob'.
          *   To counter this, we introduce an empty filename string. The string consists of characters that can not occur in regular filenames, to prevent collisions.
          */
-        let filename = scout.nvl(value.scoutName, value.name, Session.EMPTY_UPLOAD_FILENAME) as string;
+        let filename = scout.nvl(value.scoutName, value.name) || Session.EMPTY_UPLOAD_FILENAME;
         formData.append('files', value, filename);
         acceptedFiles.push(value);
       }
