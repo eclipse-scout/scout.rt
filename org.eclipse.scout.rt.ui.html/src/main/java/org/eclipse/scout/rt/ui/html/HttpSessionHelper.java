@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -14,6 +14,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.slf4j.Logger;
@@ -54,6 +55,7 @@ public class HttpSessionHelper {
 
       sessionStore = createSessionStore(httpSession);
       httpSession.setAttribute(SESSION_STORE_ATTRIBUTE_NAME, sessionStore);
+      BEANS.get(SessionStoreHousekeeper.class).register(sessionStore);
       LOG.debug("Created new session store for HTTP session with ID {}", httpSession.getId());
 
       return sessionStore;

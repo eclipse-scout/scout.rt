@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock.WriteLock;
@@ -444,6 +445,65 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   }
 
   @Override
+  public void disposeOrphanedUiSessions(long maxSilentMillis) {
+    List<IUiSession> orphanedSessions = new ArrayList<>();
+
+    m_readLock.lock();
+    try {
+      for (IUiSession uiSession : m_uiSessionMap.values()) {
+        if (isOrphaned(uiSession, maxSilentMillis)) {
+          orphanedSessions.add(uiSession);
+        }
+      }
+    }
+    finally {
+      m_readLock.unlock();
+    }
+
+    // dispose sequentially and outside the store lock (dispose unregisters the UI session from this store)
+    for (IUiSession uiSession : orphanedSessions) {
+      try {
+        disposeOrphanedUiSession(uiSession, maxSilentMillis);
+      }
+      catch (RuntimeException e) {
+        LOG.warn("Session housekeeping: Failed to dispose orphaned UI session {}", uiSession.getUiSessionId(), e);
+      }
+    }
+  }
+
+  protected void disposeOrphanedUiSession(IUiSession uiSession, long maxSilentMillis) {
+    ReentrantLock uiSessionLock = uiSession.uiSessionLock();
+    // never block the housekeeping job: if the UI session is currently in use, it is checked again in the next run
+    if (!uiSessionLock.tryLock()) {
+      LOG.debug("Session housekeeping: UI session {} is locked, skipping", uiSession.getUiSessionId());
+      return;
+    }
+    try {
+      if (uiSession.isDisposed()) {
+        return;
+      }
+      // re-check: the UI session may have received a request since it was detected as orphaned
+      if (!isOrphaned(uiSession, maxSilentMillis)) {
+        return;
+      }
+      LOG.info("Session housekeeping: Disposing orphaned UI session {} (lastRequestTime={}, lastAccessedTime={})",
+          uiSession.getUiSessionId(), uiSession.getLastRequestTime(), uiSession.getLastAccessedTime());
+      uiSession.dispose();
+    }
+    finally {
+      uiSessionLock.unlock();
+    }
+  }
+
+  /**
+   * A UI session is orphaned if it did not receive any request (incl. startup and polling requests) for longer than
+   * {@code maxSilentMillis}.
+   */
+  protected boolean isOrphaned(IUiSession uiSession, long maxSilentMillis) {
+    return System.currentTimeMillis() - uiSession.getLastRequestTime() > maxSilentMillis;
+  }
+
+  @Override
   public void valueBound(HttpSessionBindingEvent event) {
     Assertions.assertTrue(m_httpSessionValid, "Binding to new HTTP session {} is not supported (was already bound to {})", event.getSession().getId(), m_httpSessionId);
   }
@@ -478,6 +538,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       }
 
       m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
+      BEANS.get(SessionStoreHousekeeper.class).unregister(this);
     }
   }
 

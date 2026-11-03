@@ -152,6 +152,7 @@ public class UiSession implements IUiSession {
   private volatile boolean m_disposed;
   private volatile IRegistrationHandle m_uiDataAvailableListener;
   private volatile long m_lastAccessedTime;
+  private volatile long m_lastRequestTime;
   private volatile RunMonitor m_pollerMonitor;
   private volatile boolean m_persistent;
 
@@ -223,6 +224,7 @@ public class UiSession implements IUiSession {
 
     // Set initial "touch" time
     touch();
+    touchRequest();
     m_sessionMetrics.sessionCreated(SESSION_TYPE);
 
     try {
@@ -590,6 +592,16 @@ public class UiSession implements IUiSession {
   @Override
   public long getLastAccessedTime() {
     return m_lastAccessedTime;
+  }
+
+  @Override
+  public void touchRequest() {
+    m_lastRequestTime = System.currentTimeMillis();
+  }
+
+  @Override
+  public long getLastRequestTime() {
+    return m_lastRequestTime;
   }
 
   @Override

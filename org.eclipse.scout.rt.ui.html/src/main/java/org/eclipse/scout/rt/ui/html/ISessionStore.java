@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -103,4 +103,10 @@ public interface ISessionStore {
    * way.
    */
   void unregisterUiSession(IUiSession uiSession);
+
+  /**
+   * Disposes orphaned UI sessions, i.e. UI sessions without any request (incl. startup and polling requests) for longer
+   * than {@code maxSilentMillis} (e.g. the browser tab was closed during startup, before it knew the UI session ID).
+   */
+  void disposeOrphanedUiSessions(long maxSilentMillis);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -40,8 +40,11 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
+import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.BackgroundPollingIntervalProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionTimeoutProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
@@ -51,6 +54,7 @@ import org.eclipse.scout.rt.ui.html.json.testing.TestEnvironmentUiSession;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -64,6 +68,12 @@ public class UiSessionInitAndDisposeTest {
 
   private List<IBean<?>> m_beans;
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
+
+  @Rule
+  public MockConfigPropertyRule<Long> m_backgroundPollingIntervalPropertyRule = new MockConfigPropertyRule<>(BackgroundPollingIntervalProperty.class, 1L);
+
+  @Rule
+  public MockConfigPropertyRule<Long> m_orphanedUiSessionTimeoutPropertyRule = new MockConfigPropertyRule<>(OrphanedUiSessionTimeoutProperty.class, 1L);
 
   @Before
   public void before() {
@@ -399,9 +409,9 @@ public class UiSessionInitAndDisposeTest {
     }
     JobTestUtil.waitForCondition(clientSession::isStopped);
 
-    //two calls UiSession.dispose; remove them from the protocol since they can occor any time in the list
+    //two calls UiSession.dispose; remove them from the protocol since they can occur any time in the list
     for (int i = 1; i <= 2; i++) {
-      assertTrue("" + (i == 1 ? "first" : "second") + " call to UiSession.dispose", m_protocol.remove("UiSession.dispose"));
+      assertTrue((i == 1 ? "first" : "second") + " call to UiSession.dispose", m_protocol.remove("UiSession.dispose"));
     }
     assertEquals(
         Arrays.asList(
@@ -534,6 +544,130 @@ public class UiSessionInitAndDisposeTest {
             "Desktop.execClosing",
             "ClientSession.stopped"),
         m_protocol);
+    m_protocol.clear();
+  }
+
+  /**
+   * The browser tab is closed or reloaded while the UI session is being initialized. The UI session is created and
+   * registered on the server, but the browser never receives the UI session ID and therefore never sends any further
+   * request (no poll, no unload). The session store housekeeping must dispose the orphaned UI session and stop the
+   * client session.
+   */
+  @Test
+  public void testStartupThenNoFurtherRequest() throws Exception {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+
+    //startup
+    final String clientSessionId;
+    final String uiSessionId;
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
+      final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
+      messageHandler.handlePost(req, resp);
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
+      uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
+      clientSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("clientSessionId");
+    }
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    assertEquals(1, store.getClientSessionMap().size());
+    assertNotNull(store.getClientSessionMap().get(clientSessionId));
+    assertEquals(1, store.getUiSessionMap().size());
+    assertNotNull(store.getUiSessionMap().get(uiSessionId));
+
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
+
+    assertEquals(
+        Arrays.asList(
+            "UiSession.init",
+            "UiSession.getOrCreateClientSession",
+            "ClientSession.execLoadSession",
+            "Desktop.execOpened",
+            "Desktop.execGuiAttached",
+            "UiSession.verifySubject"),
+        m_protocol);
+    m_protocol.clear();
+
+    //browser tab closed before startup response was received -> no further request
+    Thread.sleep(1500); // longer than the orphaned UI session timeout of 1 second
+    final SessionStoreHousekeeper housekeeper = BEANS.get(SessionStoreHousekeeper.class);
+    assertTrue(housekeeper.m_stores.contains(store));
+    housekeeper.sweep();
+
+    JobTestUtil.waitForCondition(() -> store.isEmpty() && !store.isHttpSessionValid() && clientSession.isStopped());
+    assertFalse(housekeeper.m_stores.contains(store));
+
+    assertEquals(
+        Arrays.asList(
+            "UiSession.dispose",
+            "Desktop.execGuiDetached", //called from UISession
+            "SessionStore.doHousekeeping",
+            "ClientSession.stopping",
+            "ClientSession.execStoreSession",
+            "Desktop.execClosing",
+            "ClientSession.stopped"),
+        m_protocol);
+    m_protocol.clear();
+  }
+
+  /**
+   * Poll requests update the last request time (but not the last accessed time). A polling UI session is therefore never
+   * disposed by the session store housekeeping, even if the user is idle.
+   */
+  @Test
+  public void testStartupThenPollRequestKeepsUiSession() throws Exception {
+    // orphaned UI session timeout must be longer than the poll wait time (min. 3 seconds, see JsonMessageRequestHandler#handlePollRequest)
+    m_orphanedUiSessionTimeoutPropertyRule.setValue(10L);
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    final UnloadRequestHandler unloadHandler = new UnloadRequestHandler();
+
+    // startup
+    final String uiSessionId;
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
+      final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
+      messageHandler.handlePost(req, resp);
+      String respContent = new String(out.getContent(), StandardCharsets.UTF_8);
+      uiSessionId = new JSONObject(respContent).getJSONObject("startupData").getString("uiSessionId");
+    }
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final IUiSession uiSession = store.getUiSessionMap().get(uiSessionId);
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().values().iterator().next();
+    final long lastAccessedTime = uiSession.getLastAccessedTime();
+    final long lastRequestTimeAfterStartup = uiSession.getLastRequestTime();
+    m_protocol.clear();
+
+    Thread.sleep(50); // make sure the poll request starts at a later time than the startup request
+    final long pollStartTime = System.currentTimeMillis();
+
+    // poll request (waits up to 3 seconds, the minimum poll wait time, see JsonMessageRequestHandler#handlePollRequest)
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      String jsonData = "{\"pollForBackgroundJobs\":true, \"uiSessionId\":\"$uiSessionId\"}"
+          .replace("$uiSessionId", uiSessionId);
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
+      final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
+      messageHandler.handlePost(req, resp);
+    }
+
+    // poll request updates the last request time, but not the last accessed time (user idle time)
+    assertEquals(lastAccessedTime, uiSession.getLastAccessedTime());
+    assertTrue(lastRequestTimeAfterStartup < pollStartTime);
+    assertTrue(uiSession.getLastRequestTime() >= pollStartTime);
+
+    BEANS.get(SessionStoreHousekeeper.class).sweep();
+
+    assertFalse(uiSession.isDisposed());
+    assertFalse(m_protocol.contains("UiSession.dispose"));
+    assertEquals(1, store.countUiSessions());
+
+    // cleanup: browser tab closed -> json unload
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionId, null);
+      final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
+      unloadHandler.handlePost(req, resp);
+    }
+    JobTestUtil.waitForCondition(clientSession::isStopped);
     m_protocol.clear();
   }
 
