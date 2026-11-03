@@ -152,6 +152,7 @@ public class UiSession implements IUiSession {
   private volatile boolean m_disposed;
   private volatile IRegistrationHandle m_uiDataAvailableListener;
   private volatile long m_lastAccessedTime;
+  private volatile long m_lastRequestTime;
   private volatile RunMonitor m_pollerMonitor;
   private volatile boolean m_persistent;
 
@@ -222,7 +223,7 @@ public class UiSession implements IUiSession {
     m_initialized = true;
 
     // Set initial "touch" time
-    touch();
+    touch(RequestType.STARTUP_REQUEST);
     m_sessionMetrics.sessionCreated(SESSION_TYPE);
 
     try {
@@ -584,12 +585,27 @@ public class UiSession implements IUiSession {
 
   @Override
   public void touch() {
-    m_lastAccessedTime = System.currentTimeMillis();
+    touch(null);
+  }
+
+  @Override
+  public void touch(RequestType requestType) {
+    long now = System.currentTimeMillis();
+    // Poll requests do not update the last accessed time (--> max user idle timeout)
+    if (requestType != RequestType.POLL_REQUEST) {
+      m_lastAccessedTime = now;
+    }
+    m_lastRequestTime = now;
   }
 
   @Override
   public long getLastAccessedTime() {
     return m_lastAccessedTime;
+  }
+
+  @Override
+  public long getLastRequestTime() {
+    return m_lastRequestTime;
   }
 
   @Override

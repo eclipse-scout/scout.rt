@@ -111,10 +111,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
           return true;
         }
 
-        // Touch the session (except for poll requests --> max idle timeout)
-        if (jsonRequest.getRequestType() != RequestType.POLL_REQUEST) {
-          uiSession.touch();
-        }
+        uiSession.touch(jsonRequest.getRequestType());
       }
 
       uiSession.verifySubject(req);
