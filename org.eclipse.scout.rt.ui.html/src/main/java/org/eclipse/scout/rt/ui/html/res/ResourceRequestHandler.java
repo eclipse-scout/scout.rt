@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,7 +83,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
     // Apply response interceptors
     cachedObject.applyHttpResponseInterceptors(req, resp);
 
-    if (!"HEAD".equals(req.getMethod())) {
+    if (!"HEAD".equals(req.getMethod()) && binaryResource.getContent() != null) {
       resp.getOutputStream().write(binaryResource.getContent());
     }
   }
@@ -154,7 +154,7 @@ public class ResourceRequestHandler extends AbstractUiServletRequestHandler {
    */
   protected void setHttpResponseHeaders(HttpServletResponse resp, BinaryResource resource) {
     // content-length
-    resp.setContentLength(resource.getContentLength());
+    resp.setContentLength(Math.max(0, resource.getContentLength()));
 
     // charset
     String charset = resource.getCharset();

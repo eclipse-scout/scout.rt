@@ -349,9 +349,12 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
         return;
       }
 
+      // Ignore files without data, except if they represent a real file with a name
+      let files = filesArgument.filter(file => file.size > 0 || (file.name && file.scoutName !== Session.EMPTY_UPLOAD_FILENAME));
+
       // upload paste event as files
-      if (filesArgument.length > 0 || Object.keys(additionalOptions).length > 0) {
-        this.session.uploadFiles(this, filesArgument, additionalOptions, this.maximumSize, this.allowedMimeTypes);
+      if (files.length > 0 || Object.keys(additionalOptions).length > 0) {
+        this.session.uploadFiles(this, files, additionalOptions, this.maximumSize, this.allowedMimeTypes);
       }
     };
 
