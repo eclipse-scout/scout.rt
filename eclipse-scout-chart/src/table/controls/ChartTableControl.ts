@@ -1199,9 +1199,6 @@ export class ChartTableControl extends TableControl implements ChartTableControl
         arrays.remove(checkedIndices, maxSegments - 1);
       }
       arrays.removeAll(checkedIndices, collapsedIndices);
-
-      // first dataset is hidden on pie charts
-      datasetIndex = 1;
     }
 
     let checkedItems = [];
