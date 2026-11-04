@@ -9,7 +9,7 @@
  */
 import {
   ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver, doValueMetaData,
-  InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer
+  InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer, ValueDoSerializer
 } from '../index';
 
 /**
@@ -30,7 +30,8 @@ export const dataObjects = {
     new MapDoNodeSerializer(),
     new SetDoNodeSerializer(),
     new NumberDoNodeSerializer(),
-    new ArrayDoNodeSerializer() // must be after Set
+    new ArrayDoNodeSerializer(), // must be after Set
+    ValueDoSerializer.get()
   ] as DoNodeSerializer<any>[],
 
   /**
