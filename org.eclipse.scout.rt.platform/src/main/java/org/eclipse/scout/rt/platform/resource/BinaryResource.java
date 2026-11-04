@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -23,9 +23,9 @@ import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
- * Wrapper for binary content (<code>byte[]</code>) with some meta data.
+ * Wrapper for binary content (<code>byte[]</code>) with some metadata.
  * <p>
- * All properties are final, thus the binary resource is somehow immutable with the exception of the content where the
+ * All properties are final, thus the binary resource is somehow immutable except the content where the
  * array could be directly manipulated. Due to performance considerations the content is not duplicated when retrieved.
  *
  * @since 5.0
@@ -58,6 +58,7 @@ public final class BinaryResource implements Serializable {
    *     <p>
    *     null contentType is replaced by {@link FileUtility#getMimeType(java.nio.file.Path)}
    * @param charset
+   *     The charset to use for {@link #getContentAsString()}.
    * @param content
    *     The resource's content as byte array. The fingerprint for the given content is calculated automatically.
    * @param lastModified
@@ -80,6 +81,7 @@ public final class BinaryResource implements Serializable {
       else if (content != null && content.length > 0) {
         File f = IOUtility.createTempFile(null, content);
         contentType = FileUtility.getMimeType(f.toPath());
+        //noinspection ResultOfMethodCallIgnored
         f.delete();
       }
       else {
@@ -164,7 +166,7 @@ public final class BinaryResource implements Serializable {
   }
 
   /**
-   * Convenience method to get the length of the byte array returend by {@link #getContent()}. If the content is
+   * Convenience method to get the length of the byte array returned by {@link #getContent()}. If the content is
    * <code>null</code>, this method returns <code>-1</code>.
    */
   public int getContentLength() {

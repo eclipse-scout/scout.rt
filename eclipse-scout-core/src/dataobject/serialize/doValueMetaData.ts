@@ -12,6 +12,14 @@ import {Constructor, DataObjectInventory, ObjectFactory, ObjectType, TypeDescrip
 export const doValueMetaData = {
   TYPE_META_DATA_KEY: 'scout.m.t',
 
+  createSimple(constructor: Constructor): DoValueMetaData {
+    return {type: constructor, typeName: null, args: []};
+  },
+
+  createArray(constructor: Constructor): DoValueMetaData {
+    return {type: Array, typeName: null, args: [doValueMetaData.createSimple(constructor)]};
+  },
+
   getFieldMetaData(prototype: object, fieldName: string): DoValueMetaData {
     if (!prototype || !fieldName) {
       return null;
@@ -62,7 +70,7 @@ export const doValueMetaData = {
     return TypeDescriptor.resolveType(objectType, {variantLenient: true});
   },
 
-  getArrayValueType(metaData: DoValueMetaData): DoValueMetaData {
+  getFirstTypeArg(metaData: DoValueMetaData): DoValueMetaData {
     return metaData?.args?.[0];
   },
 
