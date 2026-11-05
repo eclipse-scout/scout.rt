@@ -20,6 +20,7 @@ import org.junit.Test;
 /**
  * Tests for {@link DateProvider}
  */
+@SuppressWarnings("deprecation")
 public class DateProviderTest {
 
   @Test
@@ -52,7 +53,7 @@ public class DateProviderTest {
 
     GregorianCalendar returnedCalendar = new GregorianCalendar();
     returnedCalendar.setTime(returned);
-    assertEquals("Milliseconds value of truncated date must be 0", returnedCalendar.get(GregorianCalendar.MILLISECOND), 0);
+    assertEquals("Milliseconds value of truncated date must be 0", 0, returnedCalendar.get(GregorianCalendar.MILLISECOND));
   }
 
   @Test
