@@ -10,6 +10,8 @@
  */
 package org.eclipse.scout.rt.platform.util.date;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -81,4 +83,14 @@ public interface IDateProvider {
    * Provides the current calendar
    */
   Calendar currentCalendar();
+
+  /**
+   * Provides the current date without timezone
+   */
+  LocalDate currentLocalDate();
+
+  /**
+   * Provides the current date and time without timezone
+   */
+  LocalDateTime currentLocalDateTime();
 }
