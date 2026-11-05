@@ -552,7 +552,7 @@ export const scout = {
     scout.objectFactories.set(objectType, factory);
   },
 
-  cloneShallow(template: object, properties?: object, createUniqueId?: boolean): object {
+  cloneShallow<T extends object>(template: T, properties?: object, createUniqueId = true): T {
     scout.assertParameter('template', template);
     let clone = Object.create(Object.getPrototypeOf(template));
     Object.getOwnPropertyNames(template)
@@ -564,7 +564,7 @@ export const scout = {
         clone[key] = properties[key];
       }
     }
-    if (scout.nvl(createUniqueId, true)) {
+    if (createUniqueId) {
       clone.id = ObjectIdProvider.get().createUiSeqId();
     }
     if (clone.cloneOf === undefined) {

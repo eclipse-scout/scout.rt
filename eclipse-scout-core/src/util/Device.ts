@@ -13,7 +13,14 @@ import $ from 'jquery';
 let instance: Device;
 
 export interface DeviceModel extends ObjectModel<Device> {
-  userAgent: string;
+  userAgent?: string;
+  features?: Record<string, boolean>;
+  system?: DeviceSystem;
+  type?: DeviceType;
+  browser?: DeviceBrowser;
+  browserVersion?: number;
+  systemVersion?: number;
+  scrollbarWidth?: number;
 }
 
 export type DeviceSystem = EnumObject<typeof Device.System>;
@@ -28,6 +35,8 @@ export type DeviceBrowser = EnumObject<typeof Device.Browser>;
  */
 export class Device implements DeviceModel, ObjectWithType {
   declare model: DeviceModel;
+  declare initModel: Required<Pick<DeviceModel, 'userAgent'>>;
+
   objectType: string;
   userAgent: string;
   features: Record<string, boolean>;
@@ -612,6 +621,42 @@ export class Device implements DeviceModel, ObjectWithType {
       ' type=' + this.type +
       ' scrollbarWidth=' + this.scrollbarWidth +
       ' features=' + JSON.stringify(this.features) + ']';
+  }
+
+  /**
+   * Creates a clone of this {@link Device}.
+   * @see scout.cloneShallow
+   */
+  clone(model?: DeviceModel): Device {
+    const device = scout.cloneShallow(
+      this,
+      {
+        ...model,
+        features: {...model?.features}
+      },
+      false
+    );
+    Object.freeze(device);
+    return device;
+  }
+
+  /**
+   * Runs the given callback with the given {@link Device} and returns its result.
+   * The value returned by {@link Device.get()} will be the given {@link Device} during the callback and is reset after the callback has finished.
+   * Be aware that the given {@link Device} is only present during synchronous parts of the given callback.
+   * If the callback creates e.g. a {@link Promise} and runs code in a {@link Promise.then()} that relies on {@link Device.get()} this code must be called using {@link Device.withDevice()} again.
+   */
+  static withDevice<T>(action: () => T, device?: Device): T {
+    if (!device) {
+      return action();
+    }
+    const deviceOrig = instance;
+    instance = device;
+    try {
+      return action();
+    } finally {
+      instance = deviceOrig;
+    }
   }
 
   static get(): Device {

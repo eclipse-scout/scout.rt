@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -278,7 +278,7 @@ export class LookupCall<TKey> implements LookupCallModel<TKey>, ObjectWithType {
   clone(properties?: object): this {
     // Warning: This is _not_ a deep clone! (Because otherwise the entire session would be duplicated.)
     // Non-primitive properties must _only_ be added to the resulting clone during the 'prepareLookupCall' event!
-    return scout.cloneShallow(this, properties, true) as this;
+    return scout.cloneShallow(this, properties);
   }
 
   cloneForAll(): this {

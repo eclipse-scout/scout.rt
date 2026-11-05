@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -206,6 +206,76 @@ describe('Device', () => {
         expect(device.browser).toBe(expectedBrowser);
         expect(device.browserVersion).toEqual(expectedVersion);
       }
+    });
+  });
+
+  describe('withDevice', () => {
+
+    it('uses current device if no specific device is specified', () => {
+      const device = Device.get();
+      expect(device).toBeDefined();
+      Device.withDevice(() => expect(Device.get()).toBe(device));
+    });
+
+    it('resets device after callback', () => {
+      const device1 = Device.get();
+      const device2 = device1.clone();
+      const device3 = device2.clone();
+
+      expect(device2).not.toBe(device1);
+      expect(device3).not.toBe(device2);
+
+      Device.withDevice(
+        () => {
+          expect(Device.get()).toBe(device2);
+          Device.withDevice(
+            () => {
+              expect(Device.get()).toBe(device3);
+            },
+            device3
+          );
+          expect(Device.get()).toBe(device2);
+        },
+        device2
+      );
+      expect(Device.get()).toBe(device1);
+    });
+
+    it('resets device after callback failures', () => {
+      const device1 = Device.get();
+      const device2 = device1.clone();
+      const device3 = device1.clone();
+
+      expect(device2).not.toBe(device1);
+      expect(device3).not.toBe(device2);
+
+      try {
+        Device.withDevice(
+          () => {
+            expect(Device.get()).toBe(device2);
+            try {
+              Device.withDevice(
+                () => {
+                  expect(Device.get()).toBe(device3);
+                  throw 'Error in callback';
+                },
+                device3
+              );
+            } catch (e) {
+              expect(Device.get()).toBe(device2);
+              throw e;
+            }
+          },
+          device2
+        );
+      } catch (e) {
+        // nop
+      }
+      expect(Device.get()).toBe(device1);
+    });
+
+    it('returns result of callback', () => {
+      expect(Device.withDevice(() => 42)).toBe(42);
     });
   });
 });

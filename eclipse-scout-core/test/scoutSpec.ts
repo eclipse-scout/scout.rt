@@ -434,4 +434,27 @@ describe('scout', () => {
       }).visible).toBe(false);
     });
   });
+
+  describe('cloneShallow', () => {
+
+    it('creates unique ids if requested', () => {
+      const foo: object = {
+        id: 13,
+        bar: 42
+      };
+
+      spyOn(ObjectIdProvider.get(), 'createUiSeqId').and.returnValue('7');
+
+      expect(scout.cloneShallow(foo, {}, false)).toEqual({...foo, cloneOf: foo});
+      expect(scout.cloneShallow(foo, {}, '' as unknown as boolean)).toEqual({...foo, cloneOf: foo});
+      expect(scout.cloneShallow(foo, {}, 0 as unknown as boolean)).toEqual({...foo, cloneOf: foo});
+      expect(scout.cloneShallow(foo, {}, null)).toEqual({...foo, cloneOf: foo});
+
+      expect(scout.cloneShallow(foo, {}, true)).toEqual({...foo, cloneOf: foo, id: '7'});
+      expect(scout.cloneShallow(foo, {}, 'lorem' as unknown as boolean)).toEqual({...foo, cloneOf: foo, id: '7'});
+      expect(scout.cloneShallow(foo, {}, 1 as unknown as boolean)).toEqual({...foo, cloneOf: foo, id: '7'});
+      expect(scout.cloneShallow(foo, {}, undefined)).toEqual({...foo, cloneOf: foo, id: '7'});
+      expect(scout.cloneShallow(foo, {})).toEqual({...foo, cloneOf: foo, id: '7'});
+    });
+  });
 });
