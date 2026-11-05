@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Constructor, DataObjectInventory, ObjectFactory, ObjectType, TypeDescriptor} from '../../index';
+import {BaseDoEntity, Constructor, DataObjectInventory, ObjectFactory, ObjectType, TypeDescriptor} from '../../index';
 
 export const doValueMetaData = {
   TYPE_META_DATA_KEY: 'scout.m.t',
@@ -100,7 +100,15 @@ export const doValueMetaData = {
         return doConstructor;
       }
     }
-    return doValueMetaData.resolveToConstructor(obj.objectType) as Constructor;
+    const objectTypeConstructor = doValueMetaData.resolveToConstructor(obj.objectType) as Constructor;
+    if (objectTypeConstructor) {
+      return objectTypeConstructor;
+    }
+    if (obj instanceof BaseDoEntity && obj.constructor !== BaseDoEntity) {
+      // keep the class of a DO instance whose _type is missing or not registered
+      return obj.constructor as Constructor;
+    }
+    return null;
   },
 
   /**

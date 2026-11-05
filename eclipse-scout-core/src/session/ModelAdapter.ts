@@ -131,7 +131,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
    * Override this method to call _sync* methods of the ModelAdapter _before_ the widget is created.
    */
   protected _initProperties(model: ObjectModel) {
-    this._deserializeDataObjectsIn(model); // allowed to modify the model as it is a deepCopy already
+    this._deserializeDataObjectsIn(model);
   }
 
   protected _deserializeDataObjectsIn(obj: any) {
@@ -416,7 +416,7 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
   protected _syncPropertiesOnPropertyChange(newProperties: Record<string, any>) {
     const orderedPropertyNames = this._orderPropertyNamesOnSync(newProperties);
     orderedPropertyNames.forEach(propertyName => {
-      const value = this.isDataObjectProperty(propertyName) ? this._deserializeDataObject(newProperties[propertyName]) : newProperties[propertyName];
+      const value = newProperties[propertyName];
       const syncFuncName = '_sync' + strings.toUpperCaseFirstLetter(propertyName);
       if (this[syncFuncName]) {
         this[syncFuncName](value);
@@ -484,6 +484,8 @@ export class ModelAdapter extends EventEmitter implements ModelAdapterModel, Mod
    * Processes the JSON event from the server and calls the corresponding setter of the widget for each property.
    */
   onModelPropertyChange(event: RemoteEvent) {
+    // deserialize all DOs first so that addFilterForProperties already sees the deserialized version.
+    this._deserializeDataObjectsIn(event.properties);
     this.addFilterForProperties(event.properties);
     this._syncPropertiesOnPropertyChange(event.properties);
   }
