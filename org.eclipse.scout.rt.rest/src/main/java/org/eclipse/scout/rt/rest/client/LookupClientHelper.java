@@ -37,6 +37,7 @@ public class LookupClientHelper {
    * @param <RESTRICTION>
    *     Restriction object type
    */
+  // FIXME PBZ DEPS remove this method
   public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>> LookupResponse<LOOKUP_ROW> lookup(Class<? extends IRestClientHelper> clientHelperType, String resourcePath,
       String path, RESTRICTION restriction) {
     IRestClientHelper clientHelper = BEANS.get(clientHelperType);
