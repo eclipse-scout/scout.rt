@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {aria, Button, FormFieldTile, NullLayout, strings, tooltips} from '../../../index';
+import {aria, Button, FormFieldTile, NullLayout} from '../../../index';
 
 export class TileButton extends Button {
   $iconContainer: JQuery;
@@ -90,19 +90,6 @@ export class TileButton extends Button {
       super._renderSubmenuIcon();
     }
     // Do not render sub menu icon
-  }
-
-  /** @internal */
-  override _renderTooltipText() {
-    // Because tile buttons normally don't have a visible status, display the tooltip text as normal "hover" tooltip
-    if (strings.hasText(this.tooltipText)) {
-      tooltips.install(this.$container, {
-        parent: this,
-        text: this.tooltipText
-      });
-    } else {
-      tooltips.uninstall(this.$container);
-    }
   }
 
   protected override _renderLabelVisible() {
