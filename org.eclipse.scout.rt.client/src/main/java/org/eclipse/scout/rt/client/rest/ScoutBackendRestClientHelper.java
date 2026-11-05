@@ -27,6 +27,7 @@ import org.eclipse.scout.rt.platform.context.RunContext;
 import org.eclipse.scout.rt.rest.ServletConstants;
 import org.eclipse.scout.rt.rest.cancellation.RestRequestCancellationClientRequestFilter;
 import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
+import org.eclipse.scout.rt.rest.client.cancellation.CancellationResourceClient;
 import org.eclipse.scout.rt.rest.client.proxy.ErrorDoRestClientExceptionTransformer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
@@ -43,12 +44,16 @@ public class ScoutBackendRestClientHelper extends AbstractRestClientHelper {
   protected List<ClientRequestFilter> getRequestFiltersToRegister() {
     List<ClientRequestFilter> filters = super.getRequestFiltersToRegister();
     filters.add(BEANS.get(AuthenticationTokenClientRequestFilter.class));
-    filters.add(new RestRequestCancellationClientRequestFilter(BEANS.get(CancellationResourceClient.class)::cancel));
+    filters.add(new RestRequestCancellationClientRequestFilter(this::cancelRequest));
     // no classic IdSignatureClientRequestFilter; process resource will determine on its own if header should be added
     filters.add(BEANS.get(ServiceTunnelIdSignatureClientRequestFilter.class));
     filters.add(BEANS.get(SessionIdClientRequestFilter.class));
     filters.add(BEANS.get(NodeIdClientRequestFilter.class));
     return filters;
+  }
+
+  protected void cancelRequest(String requestId) {
+    BEANS.get(CancellationResourceClient.class).cancel(this, requestId);
   }
 
   @Override
