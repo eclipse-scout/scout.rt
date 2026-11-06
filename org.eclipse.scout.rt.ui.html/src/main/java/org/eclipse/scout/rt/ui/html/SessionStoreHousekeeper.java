@@ -21,7 +21,6 @@ import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionTimeoutProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingIntervalProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,7 +82,6 @@ public class SessionStoreHousekeeper {
   }
 
   protected void sweep() {
-    long maxSilentMillis = TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(OrphanedUiSessionTimeoutProperty.class));
     for (ISessionStore store : m_stores) {
       try {
         if (!isStoreAlive(store)) {
@@ -91,7 +89,7 @@ public class SessionStoreHousekeeper {
           m_stores.remove(store);
           continue;
         }
-        store.disposeOrphanedUiSessions(maxSilentMillis);
+        store.disposeOrphanedUiSessions();
       }
       catch (RuntimeException e) {
         LOG.warn("Session housekeeping failed for HTTP session {}", store.getHttpSessionId(), e);
