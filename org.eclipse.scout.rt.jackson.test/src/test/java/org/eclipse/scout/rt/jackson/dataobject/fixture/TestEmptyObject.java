@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,27 +9,23 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
-import java.io.IOException;
-import java.io.Serial;
-
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.ser.std.StdScalarSerializer;
 
 /**
  * Custom serializer writing completely empty object
  */
 class TestEmptyObjectSerializer extends StdScalarSerializer<TestEmptyObject> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
   public TestEmptyObjectSerializer() {
     super(TestEmptyObject.class);
   }
 
   @Override
-  public void serialize(TestEmptyObject value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+  public void serialize(TestEmptyObject value, JsonGenerator gen, SerializationContext ctxt) throws JacksonException {
     gen.writeStartObject();
     gen.writeEndObject();
   }
