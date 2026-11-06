@@ -68,6 +68,7 @@ import org.eclipse.scout.rt.platform.util.visitor.IBreadthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.IDepthFirstTreeVisitor;
 import org.eclipse.scout.rt.platform.util.visitor.TreeVisitResult;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
 
 /**
  * This class is used as a placeholder of virtual desktop while the desktop is loading until the desktop is set onto the
@@ -871,6 +872,21 @@ public class VirtualDesktop implements IDesktop {
   @Override
   public void reloadPageFromRoot(IPage<?> page) {
     forwardToRealDesktopIfAvailable(d -> d.reloadPageFromRoot(page));
+  }
+
+  @Override
+  public IUiDeviceType getDeviceType() {
+    return getFromRealDesktopOrElse(d -> d.getDeviceType(), null);
+  }
+
+  @Override
+  public void setDeviceType(IUiDeviceType deviceType) {
+    forwardToRealDesktopIfAvailable(d -> d.setDeviceType(deviceType));
+  }
+
+  @Override
+  public boolean userAgreedToReloadSessionAndSavedPendingWork(String formId) {
+    return getFromRealDesktopOrElse(d -> d.userAgreedToReloadSessionAndSavedPendingWork(formId), null);
   }
 
   @Override

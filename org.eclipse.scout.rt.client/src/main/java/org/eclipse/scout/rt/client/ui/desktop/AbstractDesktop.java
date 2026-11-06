@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -110,7 +111,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -119,8 +119,11 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.eclipse.scout.rt.shared.session.ISession;
+import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2157,6 +2160,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     String geolocationServiceAvailableStr = params.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
     boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
     setGeolocationServiceAvailable(geolocationServiceAvailable);
+    IUiDeviceType enforcedDeviceType = UiDeviceType.resolveValue(params.get(IDesktop.PROP_ENFORCED_DEVICE_TYPE));
+    setDeviceType(enforcedDeviceType);
 
     boolean handleDeepLink = params.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
     if (handleDeepLink) {
@@ -2621,6 +2626,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     @Override
+    public void setDeviceTypeFromUI(IUiDeviceType deviceType) {
+      setDeviceType(deviceType);
+    }
+
+    @Override
     public void setNavigationVisibleFromUI(boolean visible) {
       setNavigationVisible(visible);
     }
@@ -2663,6 +2673,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     @Override
     public void removedNotificationFromUI(IDesktopNotification notification) {
       AbstractDesktop.this.removeNotificationInternal(notification, false);
+    }
+
+    @Override
+    public void reloadSessionFromUI() {
+      AbstractDesktop.this.setForcedClosing(true);
+      ClientSessionProvider.currentSession().stop(AbstractClientSession.EXIT_CODE_RELOAD_SESSION);
     }
   }
 
@@ -2829,6 +2845,44 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public void setNativeNotificationDefaults(NativeNotificationDefaults nativeNotificationDefaults) {
     propertySupport.setProperty(PROP_NATIVE_NOTIFICATION_DEFAULTS, nativeNotificationDefaults);
+  }
+
+  @Override
+  public IUiDeviceType getDeviceType() {
+    return TypeCastUtility.castValue(propertySupport.getProperty(PROP_DEVICE_TYPE), IUiDeviceType.class);
+  }
+
+  @Override
+  public void setDeviceType(IUiDeviceType deviceType) {
+    propertySupport.setProperty(PROP_DEVICE_TYPE, deviceType);
+  }
+
+  @Override
+  public boolean userAgreedToReloadSessionAndSavedPendingWork(String formId) {
+    if (MessageBoxes.create()
+        .withYesButtonText(TEXTS.get("ui.ReloadSession"))
+        .withCancelButtonText(TEXTS.get("CancelButton"))
+        .withBody(TEXTS.get("ui.ReloadSessionHint")).show() == IMessageBox.CANCEL_OPTION) {
+      return false;
+    }
+    List<IForm> forms = getUnsavedForms().stream()
+        .filter(form -> ObjectUtility.notEquals(form.getFormId(), formId))
+        .toList();
+    if (forms.isEmpty()) {
+      return true;
+    }
+    try {
+      UnsavedFormChangesForm f = new UnsavedFormChangesForm(forms, false);
+      f.startNew();
+      f.waitFor();
+      if (f.getCloseSystemType() == IButton.SYSTEM_TYPE_CANCEL) {
+        return false;
+      }
+    }
+    catch (RuntimeException | PlatformError e) {
+      LOG.error("Error closing forms", e);
+    }
+    return true;
   }
 
   /**
