@@ -834,6 +834,7 @@ export const scrollbars = {
 
     // Animated
     scrollbars.animateScrollTop($scrollable, scrollTop);
+    // $scrollable.promise() is a genuine jQuery animation-queue promise (not $.Deferred-based), which has no finally()
     $scrollable.promise('scroll').always(() => {
       if (scrollbarElement) {
         scrollbarElement.notifyAfterScroll();
@@ -867,6 +868,7 @@ export const scrollbars = {
 
     // Animated
     scrollbars.animateScrollLeft($scrollable, scrollLeft);
+    // $scrollable.promise() is a genuine jQuery animation-queue promise (not $.Deferred-based), which has no finally()
     $scrollable.promise('scroll').always(() => {
       if (scrollbarElement) {
         scrollbarElement.notifyAfterScroll();
