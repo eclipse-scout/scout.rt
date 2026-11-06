@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -161,6 +161,16 @@ describe('MapDoNodeSerializer', () => {
 
     expect(fixture.stringRecordMap).toEqual({abc: 'def', ghi: 'jkl'}); // no BaseDoEntity is created as it is explicitly declared as Record
     expect(fixture.numRecordMap).toEqual({1: '11', 2: '22'}); // no BaseDoEntity is created as it is explicitly declared as Record
+  });
+
+  it('skips undefined values when deserializing records', () => {
+    const fixture = dataObjects.deserialize({
+      _type: 'scout.MapFixture01',
+      stringRecordMap: {abc: 'def', ghi: undefined, jkl: null}
+    }, MapFixture01Do);
+    expect(fixture).toBeInstanceOf(MapFixture01Do);
+    expect(fixture.stringRecordMap).toEqual({abc: 'def', jkl: null});
+    expect('ghi' in fixture.stringRecordMap).toBeFalse();
   });
 });
 

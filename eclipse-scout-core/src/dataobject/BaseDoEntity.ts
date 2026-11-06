@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Constructor, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, DoEntity, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
+import {Constructor, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, DoEntity, doValueMetaData, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
 import $ from 'jquery';
 
 /**
@@ -97,7 +97,9 @@ export class BaseDoEntity implements DoEntity {
   clone(model?: InitModelOf<this> | BaseDoEntity): this {
     const addModel = model instanceof BaseDoEntity ? model.toPojo() : model;
     const thisModel = this.toPojo();
-    return dataObjects.deserialize($.extend(thisModel, addModel)) as this;
+    const cloneModel = $.extend(thisModel, addModel);
+    const objectType = doValueMetaData.detectDataObjectClass(cloneModel) ? null : this.constructor as ObjectType<this>;
+    return dataObjects.deserialize(cloneModel, objectType) as this;
   }
 
   /**
@@ -105,7 +107,7 @@ export class BaseDoEntity implements DoEntity {
    * @param obj The object to compare against.
    * @returns true if the two are deeply equal.
    */
-  equals(obj: any) {
+  equals(obj: any): boolean {
     if (obj === this) {
       return true;
     }
@@ -134,6 +136,10 @@ export class BaseDoEntity implements DoEntity {
       }
     }
     return true;
+  }
+
+  toString(): string {
+    return JSON.stringify(this.toPojo());
   }
 
   /**
