@@ -36,6 +36,7 @@ import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.concurrent.ThreadInterruptedError;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionTimeoutProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.management.SessionMonitorMBean;
 import org.slf4j.Logger;
@@ -445,7 +446,8 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   }
 
   @Override
-  public void disposeOrphanedUiSessions(long maxSilentMillis) {
+  public void disposeOrphanedUiSessions() {
+    long maxSilentMillis = getOrphanedUiSessionTimeoutMillis();
     List<IUiSession> orphanedSessions = new ArrayList<>();
 
     m_readLock.lock();
@@ -469,6 +471,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         LOG.warn("Session housekeeping: Failed to dispose orphaned UI session {}", uiSession.getUiSessionId(), e);
       }
     }
+  }
+
+  protected long getOrphanedUiSessionTimeoutMillis() {
+    return TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(OrphanedUiSessionTimeoutProperty.class));
   }
 
   protected void disposeOrphanedUiSession(IUiSession uiSession, long maxSilentMillis) {

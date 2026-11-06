@@ -16,6 +16,7 @@ import java.util.Set;
 import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionTimeoutProperty;
 
 /**
  * Per-HTTP-session store for {@link IUiSession}s and {@link IClientSession}s.
@@ -106,7 +107,8 @@ public interface ISessionStore {
 
   /**
    * Disposes orphaned UI sessions, i.e. UI sessions without any request (incl. startup and polling requests) for longer
-   * than {@code maxSilentMillis} (e.g. the browser tab was closed during startup, before it knew the UI session ID).
+   * than {@link OrphanedUiSessionTimeoutProperty} (e.g. the browser tab was closed during startup, before it knew the UI
+   * session ID).
    */
-  void disposeOrphanedUiSessions(long maxSilentMillis);
+  void disposeOrphanedUiSessions();
 }

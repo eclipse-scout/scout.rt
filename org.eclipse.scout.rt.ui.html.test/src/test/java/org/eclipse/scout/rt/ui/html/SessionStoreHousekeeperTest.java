@@ -20,9 +20,10 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpSessionBindingListener;
 
 import org.eclipse.scout.rt.platform.BEANS;
-import org.eclipse.scout.rt.platform.config.CONFIG;
+import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionTimeoutProperty;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -30,6 +31,9 @@ import org.junit.runner.RunWith;
 public class SessionStoreHousekeeperTest {
 
   protected static final long MAX_SILENT_MILLIS = TimeUnit.MINUTES.toMillis(30);
+
+  @Rule
+  public MockConfigPropertyRule<Long> m_orphanedUiSessionTimeoutPropertyRule = new MockConfigPropertyRule<>(OrphanedUiSessionTimeoutProperty.class, TimeUnit.MILLISECONDS.toSeconds(MAX_SILENT_MILLIS));
 
   // --- SessionStore#disposeOrphanedUiSessions ---
 
@@ -40,7 +44,7 @@ public class SessionStoreHousekeeperTest {
     IUiSession session = mockSession(MAX_SILENT_MILLIS + 10_000);
     store.m_uiSessionMap.put("test", session);
 
-    store.disposeOrphanedUiSessions(MAX_SILENT_MILLIS);
+    store.disposeOrphanedUiSessions();
 
     verify(session).dispose();
   }
@@ -51,7 +55,7 @@ public class SessionStoreHousekeeperTest {
     IUiSession session = mockSession(MAX_SILENT_MILLIS - 10_000);
     store.m_uiSessionMap.put("test", session);
 
-    store.disposeOrphanedUiSessions(MAX_SILENT_MILLIS);
+    store.disposeOrphanedUiSessions();
 
     verify(session, never()).dispose();
   }
@@ -64,7 +68,7 @@ public class SessionStoreHousekeeperTest {
     when(session.getLastRequestTime()).thenReturn(System.currentTimeMillis() - MAX_SILENT_MILLIS - 10_000, System.currentTimeMillis());
     store.m_uiSessionMap.put("test", session);
 
-    store.disposeOrphanedUiSessions(MAX_SILENT_MILLIS);
+    store.disposeOrphanedUiSessions();
 
     verify(session, never()).dispose();
   }
@@ -77,7 +81,7 @@ public class SessionStoreHousekeeperTest {
     when(session.getLastAccessedTime()).thenReturn(System.currentTimeMillis() - TimeUnit.HOURS.toMillis(5));
     store.m_uiSessionMap.put("test", session);
 
-    store.disposeOrphanedUiSessions(MAX_SILENT_MILLIS);
+    store.disposeOrphanedUiSessions();
 
     verify(session, never()).dispose();
   }
@@ -121,7 +125,7 @@ public class SessionStoreHousekeeperTest {
     lockHolder.start();
     try {
       assertTrue(locked.await(5, TimeUnit.SECONDS));
-      store.disposeOrphanedUiSessions(MAX_SILENT_MILLIS);
+      store.disposeOrphanedUiSessions();
       verify(session, never()).dispose();
     }
     finally {
@@ -130,28 +134,28 @@ public class SessionStoreHousekeeperTest {
     }
 
     // next run: lock is free -> disposed
-    store.disposeOrphanedUiSessions(MAX_SILENT_MILLIS);
+    store.disposeOrphanedUiSessions();
     verify(session).dispose();
   }
 
   // --- SessionStoreHousekeeper#sweep ---
 
   @Test
-  public void testSweepPassesOrphanedUiSessionTimeout() {
+  public void testSweepDisposesOrphanedUiSessionsOfValidStore() {
     ISessionStore store = mockStore();
     SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper();
     housekeeper.m_stores.add(store);
 
     housekeeper.sweep();
 
-    verify(store).disposeOrphanedUiSessions(TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(OrphanedUiSessionTimeoutProperty.class)));
+    verify(store).disposeOrphanedUiSessions();
     assertTrue(housekeeper.m_stores.contains(store));
   }
 
   @Test
   public void testSweepDisposesSessionWithoutRequestLongerThanOrphanedUiSessionTimeout() {
     SessionStore store = new SessionStore(mock(HttpSession.class));
-    IUiSession session = mockSession(TimeUnit.SECONDS.toMillis(CONFIG.getPropertyValue(OrphanedUiSessionTimeoutProperty.class) + 10));
+    IUiSession session = mockSession(MAX_SILENT_MILLIS + 10_000);
     store.m_uiSessionMap.put("test", session);
     SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper();
     housekeeper.m_stores.add(store);
@@ -171,7 +175,7 @@ public class SessionStoreHousekeeperTest {
     housekeeper.sweep();
 
     assertFalse(housekeeper.m_stores.contains(store));
-    verify(store, never()).disposeOrphanedUiSessions(anyLong());
+    verify(store, never()).disposeOrphanedUiSessions();
   }
 
   @Test
@@ -184,7 +188,7 @@ public class SessionStoreHousekeeperTest {
     housekeeper.sweep();
 
     assertFalse(housekeeper.m_stores.contains(store));
-    verify(store, never()).disposeOrphanedUiSessions(anyLong());
+    verify(store, never()).disposeOrphanedUiSessions();
   }
 
   @Test
@@ -198,7 +202,7 @@ public class SessionStoreHousekeeperTest {
 
     housekeeper.sweep();
 
-    verify(store).disposeOrphanedUiSessions(anyLong());
+    verify(store).disposeOrphanedUiSessions();
   }
 
   // --- registration ---
