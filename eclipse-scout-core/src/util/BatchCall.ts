@@ -50,8 +50,8 @@ export class BatchCall<TKey, TValue> {
 
   /**
    * @param batchCall The callback that handles all the keys added to a batch.
-   * @param coalesceKeys If `true` (default), different key instances which result in the same serialized representation (according to {@link dataObjects.stringify}) are combined and only
-   * one of them will be passed to the given {@link BatchCallHandler}. This might be handy if a REST call is executed as part of the handler which requires a serialized represenation anyway but would like to ommit duplicates.
+   * @param coalesceKeys If `true` (default), different key instances which result in the same serialized representation (according to {@link dataObjects.stringify}, ignoring `_typeVersion`) are combined and only
+   * one of them will be passed to the given {@link BatchCallHandler}. This might be handy if a REST call is executed as part of the handler which requires a serialized representation anyway but would like to omit duplicates.
    * If `false`, different key instances are directly passed to the handler. Only same keys (according to
    * {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Equality_comparisons_and_sameness#same-value-zero_equality SameValueZero} which almost matches `===`) are combined.
    */
@@ -157,7 +157,8 @@ export class BatchCall<TKey, TValue> {
   }
 
   protected _serializeKey(key: TKey): string {
-    return dataObjects.stringify(key);
+    // _typeVersion is ignored like in BaseDoEntity.equals
+    return dataObjects.stringify(key, {retainTypeVersion: false});
   }
 }
 

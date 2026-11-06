@@ -112,7 +112,7 @@ export interface DataObjectDeserializerModel extends ObjectModel<DataObjectDeser
   /**
    * Controls the behavior when deserializing a property which is already `instanceof BaseDoEntity`.
    *
-   * If `true` (default) it is deserialized like a Pojo which means the resulting object is a deep copy and does not reference the original DO.
+   * If `true` (default) it is deserialized like a pojo which means the resulting object is a deep copy and does not reference the original DO.
    *
    * If `false` it is directly assigned to the resulting object which means no new instance is created and the new object shares the instance with the original DO.
    */

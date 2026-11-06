@@ -35,8 +35,20 @@ describe('BaseDoEntity', () => {
 
   describe('equals', () => {
 
+    /**
+     * Helper to create a DO. It is necessary to ensure the undefined properties are written to the object
+     * because BaseDoEntity uses $.extend in init which skips these properties (therefore scout.create cannot be used).
+     */
+    function createDo(properties: object): BaseDoEntity {
+      const dataObject = scout.create(BaseDoEntity);
+      Object.entries(properties).forEach(([key, value]) => {
+        dataObject[key] = value;
+      });
+      return dataObject;
+    }
+
     function expectDoEquals(a: object, b: object, equals: boolean) {
-      expect(scout.create(BaseDoEntity, a).equals(scout.create(BaseDoEntity, b))).toBe(equals);
+      expect(createDo(a).equals(createDo(b))).toBe(equals);
     }
 
     it('handles types correctly', () => {
@@ -78,12 +90,27 @@ describe('BaseDoEntity', () => {
         propObj: {dateProp: new Date(2026, 11)}
       });
       expect(firstDoStructure.equals(secondDoStructure)).toBeFalse();
+
+      const thirdDoStructure = scout.create(BaseDoEntityFixture01Do, {
+        arr: [1, 2, 3],
+        propObj: {dateProp: new Date(2026, 10)}
+      });
+      expect(thirdDoStructure.propObj).not.toBe(firstDoStructure.propObj);
+      expect(thirdDoStructure.arr).not.toBe(firstDoStructure.arr);
+      expect(firstDoStructure.equals(thirdDoStructure)).toBeTrue();
+      expect(thirdDoStructure.equals(firstDoStructure)).toBeTrue();
     });
 
     it('handles missing properties like undefined properties', () => {
       expectDoEquals({a: 1, b: false, c: 'c'}, {a: 1, b: false, c: 'c'}, true);
       expectDoEquals({a: 1, b: false, c: 'c'}, {a: 1, b: false, c: 'd'}, false);
-      expectDoEquals({a: undefined, b: false, c: 'c'}, {b: false, c: 'c'}, true);
+
+      const withUndefined = createDo({a: undefined, b: false, c: 'c'});
+      const withoutProperty = createDo({b: false, c: 'c'});
+      expect(Object.prototype.hasOwnProperty.call(withUndefined, 'a')).toBeTrue();
+      expect(Object.prototype.hasOwnProperty.call(withoutProperty, 'a')).toBeFalse();
+      expect(withUndefined.equals(withoutProperty)).toBeTrue();
+      expect(withoutProperty.equals(withUndefined)).toBeTrue();
     });
   });
 

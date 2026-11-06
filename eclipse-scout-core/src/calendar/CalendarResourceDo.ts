@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, ObjectOrModel, scout, typeName} from '../index';
+import {BaseDoEntity, typeName} from '../index';
 
 @typeName('scout.CalendarResource')
 export class CalendarResourceDo extends BaseDoEntity {
@@ -18,18 +18,4 @@ export class CalendarResourceDo extends BaseDoEntity {
   selectable: boolean;
   cssClass: string;
   order: number;
-
-  /**
-   * Creates a {@link CalendarResourceDo}.
-   * @param objectOrModel Possible inputs: {@link CalendarResourceDo} instances or models. Falsy input is directly returned.
-   */
-  static ensure(objectOrModel: ObjectOrModel<CalendarResourceDo>): CalendarResourceDo {
-    if (!objectOrModel) {
-      return objectOrModel as CalendarResourceDo;
-    }
-    if (objectOrModel instanceof CalendarResourceDo) {
-      return objectOrModel;
-    }
-    return scout.create(CalendarResourceDo, objectOrModel);
-  }
 }
