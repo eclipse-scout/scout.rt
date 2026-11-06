@@ -92,7 +92,7 @@ describe('dataObjects', () => {
       expect(dataObjects.entries(undefined)).toEqual([]);
     });
 
-    it('', () => {
+    it('skips internal properties', () => {
       const dataObject = scout.create(CodeDo, {
         _typeVersion: '12',
         _contributions: [scout.create(CodeDo, {iconId: 'asdf'})],

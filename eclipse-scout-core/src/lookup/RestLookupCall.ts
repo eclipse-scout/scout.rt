@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -156,6 +156,8 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
     // unused on Scout LookupRow
     delete clonedLookupRowDo._type;
+    delete clonedLookupRowDo._typeVersion;
+    delete clonedLookupRowDo._contributions;
 
     if (this.maxTextLength) {
       let text = clonedLookupRowDo.text;
