@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 @RunWith(PlatformTestRunner.class)
-public class SessionStoreHousekeeperTest {
+public class OrphanedUiSessionCleanupTest {
 
   protected static final long MAX_SILENT_MILLIS = TimeUnit.MINUTES.toMillis(30);
 
@@ -138,18 +138,18 @@ public class SessionStoreHousekeeperTest {
     verify(session).dispose();
   }
 
-  // --- SessionStoreHousekeeper#sweep ---
+  // --- OrphanedUiSessionCleanup#sweep ---
 
   @Test
   public void testSweepDisposesOrphanedUiSessionsOfValidStore() {
     ISessionStore store = mockStore();
-    SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper();
-    housekeeper.m_stores.add(store);
+    OrphanedUiSessionCleanup cleanup = new OrphanedUiSessionCleanup();
+    cleanup.m_stores.add(store);
 
-    housekeeper.sweep();
+    cleanup.sweep();
 
     verify(store).disposeOrphanedUiSessions();
-    assertTrue(housekeeper.m_stores.contains(store));
+    assertTrue(cleanup.m_stores.contains(store));
   }
 
   @Test
@@ -157,10 +157,10 @@ public class SessionStoreHousekeeperTest {
     SessionStore store = new SessionStore(mock(HttpSession.class));
     IUiSession session = mockSession(MAX_SILENT_MILLIS + 10_000);
     store.m_uiSessionMap.put("test", session);
-    SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper();
-    housekeeper.m_stores.add(store);
+    OrphanedUiSessionCleanup cleanup = new OrphanedUiSessionCleanup();
+    cleanup.m_stores.add(store);
 
-    housekeeper.sweep();
+    cleanup.sweep();
 
     verify(session).dispose();
   }
@@ -169,12 +169,12 @@ public class SessionStoreHousekeeperTest {
   public void testSweepRemovesStoreWithInvalidHttpSessionFlag() {
     ISessionStore store = mock(ISessionStore.class);
     when(store.isHttpSessionValid()).thenReturn(false);
-    SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper();
-    housekeeper.m_stores.add(store);
+    OrphanedUiSessionCleanup cleanup = new OrphanedUiSessionCleanup();
+    cleanup.m_stores.add(store);
 
-    housekeeper.sweep();
+    cleanup.sweep();
 
-    assertFalse(housekeeper.m_stores.contains(store));
+    assertFalse(cleanup.m_stores.contains(store));
     verify(store, never()).disposeOrphanedUiSessions();
   }
 
@@ -182,12 +182,12 @@ public class SessionStoreHousekeeperTest {
   public void testSweepRemovesStoreOfInvalidatedHttpSession() {
     ISessionStore store = mockStore();
     when(store.getHttpSession().getCreationTime()).thenThrow(new IllegalStateException("invalidated"));
-    SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper();
-    housekeeper.m_stores.add(store);
+    OrphanedUiSessionCleanup cleanup = new OrphanedUiSessionCleanup();
+    cleanup.m_stores.add(store);
 
-    housekeeper.sweep();
+    cleanup.sweep();
 
-    assertFalse(housekeeper.m_stores.contains(store));
+    assertFalse(cleanup.m_stores.contains(store));
     verify(store, never()).disposeOrphanedUiSessions();
   }
 
@@ -196,11 +196,11 @@ public class SessionStoreHousekeeperTest {
     ISessionStore failingStore = mock(ISessionStore.class);
     when(failingStore.isHttpSessionValid()).thenThrow(new RuntimeException("expected"));
     ISessionStore store = mockStore();
-    SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper();
-    housekeeper.m_stores.add(failingStore);
-    housekeeper.m_stores.add(store);
+    OrphanedUiSessionCleanup cleanup = new OrphanedUiSessionCleanup();
+    cleanup.m_stores.add(failingStore);
+    cleanup.m_stores.add(store);
 
-    housekeeper.sweep();
+    cleanup.sweep();
 
     verify(store).disposeOrphanedUiSessions();
   }
@@ -209,7 +209,7 @@ public class SessionStoreHousekeeperTest {
 
   @Test
   public void testRegisterDoesNothingIfDisabled() {
-    SessionStoreHousekeeper housekeeper = new SessionStoreHousekeeper() {
+    OrphanedUiSessionCleanup cleanup = new OrphanedUiSessionCleanup() {
       @Override
       protected long getInterval() {
         return 0;
@@ -217,25 +217,25 @@ public class SessionStoreHousekeeperTest {
     };
     ISessionStore store = mock(ISessionStore.class);
 
-    housekeeper.register(store);
+    cleanup.register(store);
 
-    assertFalse(housekeeper.m_stores.contains(store));
-    assertNull(housekeeper.m_job);
+    assertFalse(cleanup.m_stores.contains(store));
+    assertNull(cleanup.m_job);
   }
 
   @Test
   public void testHttpSessionHelperRegistersAndValueUnboundUnregistersStore() {
-    SessionStoreHousekeeper housekeeper = BEANS.get(SessionStoreHousekeeper.class);
+    OrphanedUiSessionCleanup cleanup = BEANS.get(OrphanedUiSessionCleanup.class);
     ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(mock(HttpSession.class));
     try {
-      assertTrue(housekeeper.m_stores.contains(store));
+      assertTrue(cleanup.m_stores.contains(store));
 
       ((HttpSessionBindingListener) store).valueUnbound(null);
 
-      assertFalse(housekeeper.m_stores.contains(store));
+      assertFalse(cleanup.m_stores.contains(store));
     }
     finally {
-      housekeeper.unregister(store);
+      cleanup.unregister(store);
     }
   }
 

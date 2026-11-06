@@ -590,12 +590,12 @@ public class UiSessionInitAndDisposeTest {
 
     //browser tab closed before startup response was received -> no further request
     Thread.sleep(1500); // longer than the orphaned UI session timeout of 1 second
-    final SessionStoreHousekeeper housekeeper = BEANS.get(SessionStoreHousekeeper.class);
-    assertTrue(housekeeper.m_stores.contains(store));
-    housekeeper.sweep();
+    final OrphanedUiSessionCleanup cleanup = BEANS.get(OrphanedUiSessionCleanup.class);
+    assertTrue(cleanup.m_stores.contains(store));
+    cleanup.sweep();
 
     JobTestUtil.waitForCondition(() -> store.isEmpty() && !store.isHttpSessionValid() && clientSession.isStopped());
-    assertFalse(housekeeper.m_stores.contains(store));
+    assertFalse(cleanup.m_stores.contains(store));
 
     assertEquals(
         Arrays.asList(
@@ -655,7 +655,7 @@ public class UiSessionInitAndDisposeTest {
     assertTrue(lastRequestTimeAfterStartup < pollStartTime);
     assertTrue(uiSession.getLastRequestTime() >= pollStartTime);
 
-    BEANS.get(SessionStoreHousekeeper.class).sweep();
+    BEANS.get(OrphanedUiSessionCleanup.class).sweep();
 
     assertFalse(uiSession.isDisposed());
     assertFalse(m_protocol.contains("UiSession.dispose"));
