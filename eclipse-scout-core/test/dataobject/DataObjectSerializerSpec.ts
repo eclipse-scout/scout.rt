@@ -198,6 +198,90 @@ describe('DataObjectSerializer', () => {
     expect(json).toBe(expected);
   });
 
+  describe('retainTypeVersion', () => {
+
+    function createFixture02Do(): Fixture02Do {
+      return dataObjects.deserialize({
+        _type: 'scout.Fixture02',
+        _typeVersion: 'scout-1.0.0',
+        nestedDate: '2024-07-30 07:51:39.708',
+        nestedObj: {
+          _type: 'scout.Fixture03',
+          _typeVersion: 'scout-2.0.0',
+          nestedNestedDate: '2024-07-30 08:51:39.708'
+        }
+      }, Fixture02Do);
+    }
+
+    function createFixture03Do(): Fixture03Do {
+      return dataObjects.deserialize({
+        _type: 'scout.Fixture03',
+        _typeVersion: 'scout-2.0.0',
+        nestedNestedDate: '2024-07-30 08:51:39.708'
+      }, Fixture03Do);
+    }
+
+    it('retains _typeVersion by default', () => {
+      const fixture = createFixture02Do();
+      expect(fixture._typeVersion).toBe('scout-1.0.0');
+      expect(fixture.nestedObj._typeVersion).toBe('scout-2.0.0');
+
+      const serialized = dataObjects.serialize(fixture);
+      expect(serialized._typeVersion).toBe('scout-1.0.0');
+      expect(serialized.nestedObj._typeVersion).toBe('scout-2.0.0');
+
+      const serializedExplicit = dataObjects.serialize(fixture, {retainTypeVersion: true});
+      expect(serializedExplicit).toEqual(serialized);
+    });
+
+    it('skips _typeVersion if retainTypeVersion is false', () => {
+      const serialized = dataObjects.serialize(createFixture02Do(), {retainTypeVersion: false});
+      expect(serialized).toEqual({
+        _type: 'scout.Fixture02',
+        nestedDate: '2024-07-30 07:51:39.708',
+        nestedObj: {
+          _type: 'scout.Fixture03',
+          nestedNestedDate: '2024-07-30 08:51:39.708'
+        }
+      });
+    });
+
+    it('skips _typeVersion in arrays, maps and sets', () => {
+      const expected = {
+        _type: 'scout.Fixture03',
+        nestedNestedDate: '2024-07-30 08:51:39.708'
+      };
+
+      const serializedArray = dataObjects.serialize([createFixture03Do()], {retainTypeVersion: false});
+      expect(serializedArray).toEqual([expected]);
+
+      const serializedMap = dataObjects.serialize(new Map([['key', createFixture03Do()]]), {retainTypeVersion: false});
+      expect(serializedMap).toEqual({key: expected});
+
+      const serializedSet = dataObjects.serialize(new Set([createFixture03Do()]), {retainTypeVersion: false});
+      expect(serializedSet).toEqual([expected]);
+    });
+
+    it('accepts a predicate', () => {
+      const serialized = dataObjects.serialize(createFixture02Do(), {retainTypeVersion: dataObject => dataObject instanceof Fixture03Do});
+      expect(serialized._typeVersion).toBeUndefined();
+      expect(serialized.hasOwnProperty('_typeVersion')).toBeFalse();
+      expect(serialized.nestedObj._typeVersion).toBe('scout-2.0.0');
+    });
+
+    it('is supported by stringify', () => {
+      const json = dataObjects.stringify(createFixture03Do(), {retainTypeVersion: false});
+      expect(json).toBe('{"_type":"scout.Fixture03","nestedNestedDate":"2024-07-30 08:51:39.708"}');
+    });
+
+    it('does not modify the data object', () => {
+      const fixture = createFixture02Do();
+      dataObjects.serialize(fixture, {retainTypeVersion: false});
+      expect(fixture._typeVersion).toBe('scout-1.0.0');
+      expect(fixture.nestedObj._typeVersion).toBe('scout-2.0.0');
+    });
+  });
+
   function _createFixture01Do(arr: Fixture02Do[], obj: Fixture03Do): Fixture01Do {
     const model = {
       propBool: true,
