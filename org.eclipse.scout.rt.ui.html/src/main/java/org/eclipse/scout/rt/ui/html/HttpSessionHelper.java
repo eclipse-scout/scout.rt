@@ -14,7 +14,6 @@ import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.platform.ApplicationScoped;
-import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.server.commons.HttpSessionMutex;
 import org.slf4j.Logger;
@@ -55,7 +54,6 @@ public class HttpSessionHelper {
 
       sessionStore = createSessionStore(httpSession);
       httpSession.setAttribute(SESSION_STORE_ATTRIBUTE_NAME, sessionStore);
-      BEANS.get(OrphanedUiSessionCleanup.class).register(sessionStore);
       LOG.debug("Created new session store for HTTP session with ID {}", httpSession.getId());
 
       return sessionStore;

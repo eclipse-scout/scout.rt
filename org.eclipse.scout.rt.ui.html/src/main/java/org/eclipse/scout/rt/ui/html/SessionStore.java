@@ -117,6 +117,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     final ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     m_readLock = lock.readLock();
     m_writeLock = lock.writeLock();
+    BEANS.get(OrphanedUiSessionCleanup.class).register(this);
     BEANS.get(SessionMonitorMBean.class).weakRegister(httpSession);
     m_sessionMetrics.sessionCreated(SESSION_TYPE);
   }

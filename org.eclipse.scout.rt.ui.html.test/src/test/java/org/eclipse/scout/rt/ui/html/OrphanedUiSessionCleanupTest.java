@@ -17,12 +17,15 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import jakarta.servlet.http.HttpSession;
-import jakarta.servlet.http.HttpSessionBindingListener;
 
-import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.BeanMetaData;
+import org.eclipse.scout.rt.platform.IBean;
+import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.mock.MockConfigPropertyRule;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionTimeoutProperty;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,6 +37,22 @@ public class OrphanedUiSessionCleanupTest {
 
   @Rule
   public MockConfigPropertyRule<Long> m_orphanedUiSessionTimeoutPropertyRule = new MockConfigPropertyRule<>(OrphanedUiSessionTimeoutProperty.class, TimeUnit.MILLISECONDS.toSeconds(MAX_SILENT_MILLIS));
+
+  protected OrphanedUiSessionCleanup m_cleanup;
+  protected IBean<?> m_cleanupBean;
+
+  @Before
+  public void before() {
+    // test-local instance: stores registered by the SessionStore constructor don't leak into the global bean
+    m_cleanup = spy(new OrphanedUiSessionCleanup());
+    doNothing().when(m_cleanup).ensureJobRunning();
+    m_cleanupBean = BeanTestingHelper.get().registerBean(new BeanMetaData(OrphanedUiSessionCleanup.class, m_cleanup));
+  }
+
+  @After
+  public void after() {
+    BeanTestingHelper.get().unregisterBean(m_cleanupBean);
+  }
 
   @Test
   public void testDisposeOrphanedUiSessions_DisposesSessionWithoutRequestLongerThanMaxSilent() {
@@ -216,19 +235,13 @@ public class OrphanedUiSessionCleanupTest {
   }
 
   @Test
-  public void testHttpSessionHelperRegistersAndValueUnboundUnregistersStore() {
-    OrphanedUiSessionCleanup cleanup = BEANS.get(OrphanedUiSessionCleanup.class);
-    ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(mock(HttpSession.class));
-    try {
-      assertTrue(cleanup.m_stores.contains(store));
+  public void testConstructorRegistersAndValueUnboundUnregistersStore() {
+    SessionStore store = new SessionStore(mock(HttpSession.class));
+    assertTrue(m_cleanup.m_stores.contains(store));
 
-      ((HttpSessionBindingListener) store).valueUnbound(null);
+    store.valueUnbound(null);
 
-      assertFalse(cleanup.m_stores.contains(store));
-    }
-    finally {
-      cleanup.unregister(store);
-    }
+    assertFalse(m_cleanup.m_stores.contains(store));
   }
 
   protected IUiSession mockSession(long lastRequestAgoMillis) {
