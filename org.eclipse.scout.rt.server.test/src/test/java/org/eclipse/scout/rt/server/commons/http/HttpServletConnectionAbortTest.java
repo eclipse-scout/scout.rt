@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,10 +11,8 @@ package org.eclipse.scout.rt.server.commons.http;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import org.eclipse.scout.rt.platform.util.IOUtility;
-import org.eclipse.scout.rt.server.commons.http.SocketWithInterception.ISocketWriteInterceptor;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.junit.After;
@@ -53,22 +51,10 @@ public class HttpServletConnectionAbortTest {
   }
 
   /**
-   * This test must not fail, see "MARKER:"
+   * Verifies that requests succeed when the servlet fully consumes the request body.
    */
   @Test
   public void testPostWithServerReadingInput() throws IOException {
-    m_client.withSocketWriteInterceptor(() -> new ISocketWriteInterceptor() {
-      @Override
-      public void write(OutputStream out, int b) throws IOException {
-        out.write(b);
-      }
-
-      @Override
-      public void write(OutputStream out, byte[] buf, int off, int len) throws IOException {
-        out.write(buf, off, len);
-      }
-    });
-
     byte[] reqBytes = new byte[1000];
     byte[] respBytes = new byte[1000];
 
@@ -98,43 +84,26 @@ public class HttpServletConnectionAbortTest {
   }
 
   /**
-   * This test may fail after some rounds because...
+   * This test may fail after some rounds because:
    * <ul>
-   * <li>on the line marked with "MARKER1:" the socket output is split into smaller packets as may a proxy or firewall
-   * do</li>
-   * <li>on the line marked with "MARKER2:" the input stream is never consumed</li>
+   * <li>the servlet writes and flushes the response without consuming the request body</li>
+   * <li>depending on timing, the server may close the connection while the client is still
+   * sending the request body</li>
+   * <li>this can result in a {@code SocketException} (for example {@code Broken pipe}) while
+   * the client is writing the request entity</li>
    * </ul>
+   * <p>
+   * Since the behavior depends on TCP timing, operating system, and HTTP client implementation,
+   * the test is not deterministic and is therefore ignored.
    */
   @Ignore
   @Test
   public void testPostWithoutServerReadingInput() throws IOException {
-    m_client.withSocketWriteInterceptor(() -> new ISocketWriteInterceptor() {
-      @Override
-      public void write(OutputStream out, int b) throws IOException {
-        out.write(b);
-      }
-
-      @Override
-      public void write(OutputStream out, byte[] buf, int off, int len) throws IOException {
-        /**** MARKER1 ****/
-        //out.write(b, off, len);
-
-        for (int i = 0; i < len; i++) {
-          out.write(buf[i]);
-        }
-      }
-    });
-
     byte[] reqBytes = new byte[1000];
     byte[] respBytes = new byte[1000];
 
     m_server.withServletPostHandler((req, resp) -> {
-      //consume input to avoid java.net.SocketException: Software caused connection abort: socket write error
-      /**** MARKER2 ****/
-      //IOUtility.readBytes(req.getInputStream(), req.getContentLength());
-
       resp.setContentType("application/octet-stream");
-      //resp.setHeader("Transfer-Encoding", "chunked");
       resp.getOutputStream().write(respBytes, 0, respBytes.length);
       resp.getOutputStream().flush();
     });
