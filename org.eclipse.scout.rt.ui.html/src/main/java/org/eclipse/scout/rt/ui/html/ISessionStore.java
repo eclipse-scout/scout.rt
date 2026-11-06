@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,6 +16,7 @@ import java.util.Set;
 import jakarta.servlet.http.HttpSession;
 
 import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionTimeoutProperty;
 
 /**
  * Per-HTTP-session store for {@link IUiSession}s and {@link IClientSession}s.
@@ -103,4 +104,11 @@ public interface ISessionStore {
    * way.
    */
   void unregisterUiSession(IUiSession uiSession);
+
+  /**
+   * Disposes orphaned UI sessions, i.e. UI sessions without any request (incl. startup and polling requests) for longer
+   * than {@link OrphanedUiSessionTimeoutProperty} (e.g. the browser tab was closed during startup, before it knew the UI
+   * session ID).
+   */
+  void disposeOrphanedUiSessions();
 }
