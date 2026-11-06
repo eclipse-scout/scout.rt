@@ -5,7 +5,11 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 import {BaseDoEntity, ObjectFactory, typeName} from '../../../eclipse-scout-core/src';
 import {Lib2Do, LibDo as OtherName} from 'lib';
@@ -17,3 +21,19 @@ export class Test2Do extends BaseDoEntity {
 }
 
 ObjectFactory.get().registerNamespace('test', {}); // declares namespace for current module
+
+@typeName('test.TestSpecialTypes')
+export class TestSpecialTypesDo extends BaseDoEntity {
+  arrUnknown: Array<unknown>;
+  arrUnion: Array<string | number>;
+  rec: Record<string, any>;
+}
+
+export enum ImportedStringEnum {
+  A = 'a',
+  B = 'b'
+}
+
+export type ImportedLiteralUnion = 'x' | 'y';
+
+export type ImportedDoAlias = Test2Do;

@@ -377,7 +377,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
   /**
    * Creates a {@link PageParamDo} from the given id or {@link PageParamDo}.
    * If the given id or param is an id, this id is wrapped in an {@link IdPageParamDo}.
-   * If the given id or param is a {@link PageParamDo} already, it is simply returned.
+   * If the given id or param is a {@link PageParamDo} already, it is copied.
    */
   protected _createChildPageParam(idOrPageParam?: string | PageParamDo): PageParamDo {
     if (!idOrPageParam) {

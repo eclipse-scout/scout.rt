@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {ColorScheme, FormFieldTile, PropertyChangeEvent} from '@eclipse-scout/core';
-import {Chart, ChartField, ChartFieldTileModel} from '../index';
-import {ChartConfig} from '../chart/Chart';
+import {Chart, ChartConfig, ChartField, ChartFieldTileModel} from '../index';
 
 export class ChartFieldTile extends FormFieldTile implements ChartFieldTileModel {
   declare model: ChartFieldTileModel;

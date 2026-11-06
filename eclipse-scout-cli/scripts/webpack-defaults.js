@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
 const DataObjectTransformer = require('./DataObjectTransformer');
-const ModuleNamespaceResolver = require('./ModuleNamespaceResolver');
+const ModuleResolver = require('./ModuleResolver');
 const CopyPlugin = require('copy-webpack-plugin');
 const {CycloneDxWebpackPlugin} = require('@cyclonedx/webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
@@ -87,14 +87,14 @@ module.exports = (env, args) => {
   };
 
   const transpileOnly = typeCheck === 'fork' ? true : !typeCheck;
-  const namespaceResolver = new ModuleNamespaceResolver();
+  const moduleResolver = new ModuleResolver();
   const getCustomTransformers = program => ({
     before: [ctx => {
-      const doTransformer = new DataObjectTransformer(program, ctx, namespaceResolver);
+      const doTransformer = new DataObjectTransformer(program, ctx, moduleResolver);
       return node => ts.visitNode(node, node => doTransformer.transform(node));
     }]
   });
-  getCustomTransformers.namespaceResolver = namespaceResolver; // for setDoTransformerOwnModuleNamespace below
+  getCustomTransformers.moduleResolver = moduleResolver; // for setDoTransformerOwnModuleNamespace below
   const tsOptions = {
     ...args.tsOptions,
     transpileOnly: transpileOnly,
@@ -366,7 +366,7 @@ function setDoTransformerOwnModuleNamespace(config, namespace) {
   config.module.rules
     .flatMap(r => r.use || [])
     .find(l => l.loader?.indexOf('ts-loader') >= 0)
-    .options.getCustomTransformers.namespaceResolver
+    .options.getCustomTransformers.moduleResolver
     .ownModuleNamespace = namespace;
 }
 
