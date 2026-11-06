@@ -35,8 +35,6 @@ public class OrphanedUiSessionCleanupTest {
   @Rule
   public MockConfigPropertyRule<Long> m_orphanedUiSessionTimeoutPropertyRule = new MockConfigPropertyRule<>(OrphanedUiSessionTimeoutProperty.class, TimeUnit.MILLISECONDS.toSeconds(MAX_SILENT_MILLIS));
 
-  // --- SessionStore#disposeOrphanedUiSessions ---
-
   @Test
   public void testDisposeOrphanedUiSessions_DisposesSessionWithoutRequestLongerThanMaxSilent() {
     // e.g. browser tab closed during startup: no request after the startup request
@@ -85,8 +83,6 @@ public class OrphanedUiSessionCleanupTest {
 
     verify(session, never()).dispose();
   }
-
-  // --- SessionStore#disposeOrphanedUiSession ---
 
   @Test
   public void testDisposeOrphanedUiSession_DoesNotDisposeAlreadyDisposedSession() {
@@ -137,8 +133,6 @@ public class OrphanedUiSessionCleanupTest {
     store.disposeOrphanedUiSessions();
     verify(session).dispose();
   }
-
-  // --- OrphanedUiSessionCleanup#sweep ---
 
   @Test
   public void testSweepDisposesOrphanedUiSessionsOfValidStore() {
@@ -205,8 +199,6 @@ public class OrphanedUiSessionCleanupTest {
     verify(store).disposeOrphanedUiSessions();
   }
 
-  // --- registration ---
-
   @Test
   public void testRegisterDoesNothingIfDisabled() {
     OrphanedUiSessionCleanup cleanup = new OrphanedUiSessionCleanup() {
@@ -238,8 +230,6 @@ public class OrphanedUiSessionCleanupTest {
       cleanup.unregister(store);
     }
   }
-
-  // --- helpers ---
 
   protected IUiSession mockSession(long lastRequestAgoMillis) {
     long lastRequestTime = System.currentTimeMillis() - lastRequestAgoMillis;
