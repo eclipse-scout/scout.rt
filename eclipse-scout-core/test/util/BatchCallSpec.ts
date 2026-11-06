@@ -266,5 +266,42 @@ describe('BatchCall', () => {
 
       expect(batchCallSpy).toHaveBeenCalledOnceWith([key1, key3, key4]);
     });
+
+    it('ignores _typeVersion of keys', async () => {
+      @typeName('scout.SpecVersionedKey')
+      class SpecVersionedKey extends BaseDoEntity {
+        nr: number;
+
+        static of(nr: number, typeVersion?: string) {
+          const key = scout.create(SpecVersionedKey, {nr});
+          key._typeVersion = typeVersion;
+          return key;
+        }
+      }
+
+      function keySpecBatchCall(keys: SpecVersionedKey[]): Promise<Map<SpecVersionedKey, string>> {
+        // simulate a backend response having a _typeVersion
+        return $.resolvedPromise(new Map(keys.map(key => [SpecVersionedKey.of(key.nr, 'scout-2.0.0'), `#${key.nr}`])));
+      }
+
+      const batchCallSpy = jasmine.createSpy('batchCall', keySpecBatchCall).and.callThrough();
+      const batchCall = new BatchCall(batchCallSpy);
+
+      let key1 = SpecVersionedKey.of(1);
+      let key2 = SpecVersionedKey.of(1, 'scout-1.0.0');
+      let key3 = SpecVersionedKey.of(2, 'scout-1.0.0');
+
+      batchCall.addKey(key1);
+      batchCall.addKey(key2);
+      batchCall.addKey(key3);
+
+      let result = await batchCall.promise();
+      expect(result.size).toBe(3);
+      expect(result.get(key1)).toBe('#1');
+      expect(result.get(key2)).toBe('#1');
+      expect(result.get(key3)).toBe('#2');
+
+      expect(batchCallSpy).toHaveBeenCalledOnceWith([key1, key3]);
+    });
   });
 });

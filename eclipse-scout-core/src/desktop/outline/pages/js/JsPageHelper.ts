@@ -377,7 +377,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
   /**
    * Creates a {@link PageParamDo} from the given id or {@link PageParamDo}.
    * If the given id or param is an id, this id is wrapped in an {@link IdPageParamDo}.
-   * If the given id or param is a {@link PageParamDo} already, it is simply returned.
+   * If the given id or param is a {@link PageParamDo} already, it is copied.
    */
   protected _createChildPageParam(idOrPageParam?: string | PageParamDo): PageParamDo {
     if (!idOrPageParam) {
@@ -401,6 +401,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
    * Creates a child page id for the given id or {@link PageParamDo}.
    * If the given id or param is an id already, it is simply returned.
    * If the given id or param is a {@link PageParamDo} it is stringified (see {@link dataObjects#stringify}) in order to create a child page id.
+   * The `_typeVersion` is ignored like in `BaseDoEntity.equals`.
    */
   protected _createChildPageId(idOrPageParam?: string | PageParamDo): string {
     if (!idOrPageParam) {
@@ -419,7 +420,7 @@ export class JsPageHelper implements JsPageHelperModel, ObjectWithType {
     }
 
     // stringify PageParamDo
-    return dataObjects.stringify(idOrPageParam);
+    return dataObjects.stringify(idOrPageParam, {retainTypeVersion: false});
   }
 
   /**

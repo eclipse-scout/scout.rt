@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, CodeDo, dataObjects, DoEntity, DoEntityWithContributions, scout, typeName} from '../../src/index';
+import {BaseDoEntity, CodeDo, dataObjects, DoEntity, DoEntityWithContributions, ObjectOrModel, scout, typeName} from '../../src/index';
 
 describe('dataObjects', () => {
 
@@ -92,7 +92,7 @@ describe('dataObjects', () => {
       expect(dataObjects.entries(undefined)).toEqual([]);
     });
 
-    it('', () => {
+    it('skips internal properties', () => {
       const dataObject = scout.create(CodeDo, {
         _typeVersion: '12',
         _contributions: [scout.create(CodeDo, {iconId: 'asdf'})],
@@ -377,6 +377,61 @@ describe('dataObjects', () => {
     it('null and undefined', () => {
       expect(dataObjects.deserialize(null)).toBeNull();
       expect(dataObjects.deserialize(undefined)).toBeUndefined();
+    });
+  });
+
+  describe('ensure', () => {
+    @typeName('scout.BaseDoEntityFixtureSub')
+    class BaseDoEntityFixtureSubDo extends BaseDoEntityFixtureDo {
+      subProp: string;
+    }
+
+    it('throws if doClass is missing', () => {
+      expect(() => dataObjects.ensure<BaseDoEntityFixtureDo>(null, {prop: 'a'})).toThrowError();
+      expect(() => dataObjects.ensure<BaseDoEntityFixtureDo>(undefined, {prop: 'a'})).toThrowError();
+    });
+
+    it('returns the input if it is an instance of the DO class', () => {
+      const dataObject = scout.create(BaseDoEntityFixtureDo, {prop: 'a'});
+      expect(dataObjects.ensure(BaseDoEntityFixtureDo, dataObject)).toBe(dataObject);
+    });
+
+    it('returns the input if it is an instance of a subclass of the DO class', () => {
+      const dataObject = scout.create(BaseDoEntityFixtureSubDo, {prop: 'a', subProp: 'b'});
+      expect(dataObjects.ensure(BaseDoEntityFixtureDo, dataObject)).toBe(dataObject);
+    });
+
+    it('creates a new DO from a model', () => {
+      const dataObject = dataObjects.ensure(BaseDoEntityFixtureDo, {prop: 'a'});
+      expect(dataObject).toBeInstanceOf(BaseDoEntityFixtureDo);
+      expect(dataObject.prop).toBe('a');
+      expect(dataObject._type).toBe('scout.BaseDoEntityFixture');
+    });
+
+    it('creates a new DO if the input is null or undefined', () => {
+      const dataObjectFromNull = dataObjects.ensure(BaseDoEntityFixtureDo, null);
+      expect(dataObjectFromNull).toBeInstanceOf(BaseDoEntityFixtureDo);
+      expect(dataObjectFromNull._type).toBe('scout.BaseDoEntityFixture');
+      expect(dataObjectFromNull.prop).toBeUndefined();
+
+      const dataObjectFromUndefined = dataObjects.ensure(BaseDoEntityFixtureDo, undefined);
+      expect(dataObjectFromUndefined).toBeInstanceOf(BaseDoEntityFixtureDo);
+      expect(dataObjectFromUndefined._type).toBe('scout.BaseDoEntityFixture');
+      expect(dataObjectFromUndefined.prop).toBeUndefined();
+      expect(dataObjectFromUndefined).not.toBe(dataObjectFromNull);
+    });
+
+    it('creates a new DO if the input is an instance of another DO class', () => {
+      const otherDataObject = scout.create(BaseDoEntityContribDo, {contribProp: 'a'});
+      const dataObject = dataObjects.ensure(BaseDoEntityFixtureDo, otherDataObject as any);
+      expect(dataObject).toBeInstanceOf(BaseDoEntityFixtureDo);
+      expect(dataObject as BaseDoEntity).not.toBe(otherDataObject);
+    });
+
+    it('infers the DO class as return type', () => {
+      const model: ObjectOrModel<BaseDoEntityFixtureDo> = {prop: 'a'};
+      const dataObject = dataObjects.ensure(BaseDoEntityFixtureDo, model);
+      expect(dataObject.prop).toBe('a');
     });
   });
 });

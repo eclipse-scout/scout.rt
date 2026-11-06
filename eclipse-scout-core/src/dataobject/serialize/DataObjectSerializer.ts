@@ -7,14 +7,25 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Constructor, DataObjectInventory, dataObjects, DoValueMetaData, doValueMetaData, ObjectFactory, objects, ObjectWithType} from '../../index';
+import {Constructor, DataObjectInventory, dataObjects, DoValueMetaData, doValueMetaData, InitModelOf, ObjectFactory, ObjectModel, objects, ObjectWithType, Predicate, scout} from '../../index';
 
-export class DataObjectSerializer implements ObjectWithType {
+export class DataObjectSerializer implements DataObjectSerializerModel, ObjectWithType {
+  declare model: DataObjectSerializerModel;
 
   id: string;
   objectType: string;
+  retainTypeVersion: Predicate<object>;
 
   protected _cycleDetector = new DoSerializerCycleDetector();
+
+  constructor(model?: InitModelOf<DataObjectSerializer>) {
+    if (objects.isFunction(model?.retainTypeVersion)) {
+      this.retainTypeVersion = model.retainTypeVersion;
+    } else {
+      const retain = scout.nvl(model?.retainTypeVersion, true);
+      this.retainTypeVersion = () => retain;
+    }
+  }
 
   serialize(value: any, valueMetaData?: DoValueMetaData): any {
     this._cycleDetector.push(value);
@@ -41,8 +52,10 @@ export class DataObjectSerializer implements ObjectWithType {
     const constructor = doValueMetaData.chooseDataObjectType(value, metaData);
     const serialized: any = {};
     const proto = constructor ? Object.getPrototypeOf(constructor).prototype : null;
+    const retainTypeVersion = this.retainTypeVersion(value);
     Object.keys(value)
       .filter(key => key !== 'objectType' /* Scout JS internal property */)
+      .filter(key => retainTypeVersion || key !== dataObjects._TYPE_VERSION_ATTRIBUTE_NAME)
       .forEach(key => {
         const convertedValue = this._convertFieldValue(proto, key, value[key]);
         if (convertedValue !== undefined) {
@@ -74,6 +87,16 @@ export class DataObjectSerializer implements ObjectWithType {
       }
     }
   }
+}
+
+export interface DataObjectSerializerModel extends ObjectModel<DataObjectSerializer> {
+  /**
+   * Controls whether the '_typeVersion' property is written when serializing DataObjects.
+   * The property can be given as a {@link boolean} or a {@link Predicate}, whose input is the DataObject to serialize.
+   * If `true`, an existing '_typeVersion' is part of the serialized result. If `false`, it is skipped.
+   * Default is `true`.
+   */
+  retainTypeVersion?: boolean | Predicate<object>;
 }
 
 export class DoSerializerCycleDetector {

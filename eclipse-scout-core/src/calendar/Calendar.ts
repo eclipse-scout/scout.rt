@@ -9,8 +9,8 @@
  */
 import {
   arrays, CalendarComponent, CalendarDirection, CalendarDisplayMode, CalendarEventMap, CalendarLayout, CalendarListComponent, CalendarModel, CalendarModesMenu, CalendarMoveData, CalendarResourceDo, CalendarSidebar, ContextMenuPopup,
-  DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, ObjectOrModel, objects, Point, PropertyChangeEvent, ResourcePanel, scout, scrollbars, strings, UuidPool,
-  ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
+  dataObjects, DateRange, dates, Device, EventHandler, events, GroupBox, HtmlComponent, InitModelOf, JsonDateRange, KeyStrokeContext, Menu, menus, ObjectOrModel, objects, Point, PropertyChangeEvent, ResourcePanel, scout, scrollbars,
+  strings, UuidPool, ViewportScroller, Widget, YearPanel, YearPanelDateSelectEvent
 } from '../index';
 import $ from 'jquery';
 
@@ -506,8 +506,8 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _setResources(resources: ObjectOrModel<CalendarResourceDo>[]) {
     const resourceDos = arrays.ensure(resources)
-      .map(r => CalendarResourceDo.ensure(r))
-      .filter(Boolean);
+      .filter(Boolean)
+      .map(r => dataObjects.ensure(CalendarResourceDo, r));
     this._setProperty('resources', resourceDos);
     this._updateLeafResources();
     this._updateResourcePanelDisplayable();

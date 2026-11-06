@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer, DoTypeResolver, doValueMetaData,
-  InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer, ValueDoSerializer
+  ArrayDoNodeSerializer, arrays, BaseDoEntity, Constructor, DataObjectDeserializer, DataObjectDeserializerModel, DataObjectSerializer, DataObjectSerializerModel, DateDoNodeSerializer, DefaultDoTypeResolver, DoEntity, DoNodeSerializer,
+  DoTypeResolver, doValueMetaData, InitModelOf, MapDoNodeSerializer, NumberDoNodeSerializer, objects, ObjectType, scout, SetDoNodeSerializer, ValueDoSerializer
 } from '../index';
 
 /**
@@ -56,10 +56,11 @@ export const dataObjects = {
    * Note: Like {@link JSON.stringify}, this method will convert `null` to the string `'null'`. If this is not desired, check the input before calling this method.
    *
    * @param dataObject The value to serialize. Can be primitives, arrays or objects/classes. Typically, a pojo or data object class extending {@link BaseDoEntity}.
+   * @param serializerModel Optional configuration object for the DataObjectSerializer.
    * @returns the JSON string.
    */
-  stringify(dataObject: any): string {
-    return JSON.stringify(dataObjects.serialize(dataObject));
+  stringify(dataObject: any, serializerModel?: DataObjectSerializerModel): string {
+    return JSON.stringify(dataObjects.serialize(dataObject, serializerModel));
   },
 
   /**
@@ -72,13 +73,14 @@ export const dataObjects = {
    * * Properties with value 'undefined' are not part of the result (skipped).
    *
    * @param dataObject The value to serialize. Can be primitives, arrays or objects/classes. Typically, a pojo or data object class extending {@link BaseDoEntity}.
+   * @param serializerModel Optional configuration object for the DataObjectSerializer.
    * @returns the input serialized. Typically, a pojo. Returns the unaltered input if the input is falsy.
    */
-  serialize(dataObject: any): any {
+  serialize(dataObject: any, serializerModel?: DataObjectSerializerModel): any {
     if (!dataObject) {
       return dataObject;
     }
-    return scout.create(DataObjectSerializer).serialize(dataObject);
+    return scout.create(DataObjectSerializer, serializerModel).serialize(dataObject);
   },
 
   /**
@@ -248,6 +250,23 @@ export const dataObjects = {
     }
     return Object.entries(dataObject)
       .filter(([k, v]) => k !== dataObjects._TYPE_ATTRIBUTE_NAME && k !== dataObjects._TYPE_VERSION_ATTRIBUTE_NAME && k !== dataObjects._CONTRIBUTIONS_ATTRIBUTE_NAME);
+  },
+
+  /**
+   * Creates a data object with given DO class if necessary.
+   *
+   * @param doClass The expected DO class. Mandatory.
+   * @param objectOrModel Model for the DO or the DO itself. If it is already the DO instance, it is directly returned and no new instance is created.
+   * Otherwise, a new DO instance of given class is created and initialized with the model (even if it is null or undefined).
+   * @returns The input objectOrModel if it is the expected DO, or a new DO otherwise. Never returns null or undefined.
+   * @throws Error if the doClass is missing.
+   */
+  ensure<T extends BaseDoEntity>(doClass: Constructor<T>, objectOrModel: NoInfer<T> | InitModelOf<T>): T {
+    scout.assertParameter('doClass', doClass);
+    if (objectOrModel instanceof doClass) {
+      return objectOrModel;
+    }
+    return scout.create(doClass, objectOrModel as InitModelOf<T>);
   }
 };
 
