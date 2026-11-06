@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -361,6 +361,7 @@ public class ScoutApacheConnectorTest {
     runTestUserAgent((helper, clientBuilder) -> { /* nop */ }, null, "Generic");
   }
 
+  @Test
   public void testJerseyDefaultUserAgent() {
     runTestUserAgent((helper, clientBuilder) -> {},
         builder -> builder.header(USER_AGENT, "Jersey/3.1.11 (Scout Apache HttpClient Connector)"),
