@@ -55,7 +55,7 @@ public class HttpSessionHelper {
 
       sessionStore = createSessionStore(httpSession);
       httpSession.setAttribute(SESSION_STORE_ATTRIBUTE_NAME, sessionStore);
-      BEANS.get(SessionStoreHousekeeper.class).register(sessionStore);
+      BEANS.get(OrphanedUiSessionCleanup.class).register(sessionStore);
       LOG.debug("Created new session store for HTTP session with ID {}", httpSession.getId());
 
       return sessionStore;

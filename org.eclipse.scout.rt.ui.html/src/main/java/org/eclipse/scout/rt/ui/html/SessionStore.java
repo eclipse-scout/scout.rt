@@ -468,7 +468,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
         disposeOrphanedUiSession(uiSession, maxSilentMillis);
       }
       catch (RuntimeException e) {
-        LOG.warn("Session housekeeping: Failed to dispose orphaned UI session {}", uiSession.getUiSessionId(), e);
+        LOG.warn("Orphaned UI session cleanup: Failed to dispose orphaned UI session {}", uiSession.getUiSessionId(), e);
       }
     }
   }
@@ -479,9 +479,9 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
   protected void disposeOrphanedUiSession(IUiSession uiSession, long maxSilentMillis) {
     ReentrantLock uiSessionLock = uiSession.uiSessionLock();
-    // never block the housekeeping job: if the UI session is currently in use, it is checked again in the next run
+    // never block the cleanup job: if the UI session is currently in use, it is checked again in the next run
     if (!uiSessionLock.tryLock()) {
-      LOG.debug("Session housekeeping: UI session {} is locked, skipping", uiSession.getUiSessionId());
+      LOG.debug("Orphaned UI session cleanup: UI session {} is locked, skipping", uiSession.getUiSessionId());
       return;
     }
     try {
@@ -492,7 +492,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       if (!isOrphaned(uiSession, maxSilentMillis)) {
         return;
       }
-      LOG.info("Session housekeeping: Disposing orphaned UI session {} (lastRequestTime={}, lastAccessedTime={})",
+      LOG.info("Orphaned UI session cleanup: Disposing orphaned UI session {} (lastRequestTime={}, lastAccessedTime={})",
           uiSession.getUiSessionId(), uiSession.getLastRequestTime(), uiSession.getLastAccessedTime());
       uiSession.dispose();
     }
@@ -544,7 +544,7 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
       }
 
       m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
-      BEANS.get(SessionStoreHousekeeper.class).unregister(this);
+      BEANS.get(OrphanedUiSessionCleanup.class).unregister(this);
     }
   }
 

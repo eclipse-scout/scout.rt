@@ -21,7 +21,7 @@ import org.eclipse.scout.rt.platform.job.FixedDelayScheduleBuilder;
 import org.eclipse.scout.rt.platform.job.IFuture;
 import org.eclipse.scout.rt.platform.job.JobInput;
 import org.eclipse.scout.rt.platform.job.Jobs;
-import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingIntervalProperty;
+import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.OrphanedUiSessionCleanupIntervalProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,12 +30,12 @@ import org.slf4j.LoggerFactory;
  * registered, but no longer used by a browser tab (e.g. because the tab was closed during startup and therefore could
  * not send an unload request), while the HTTP session is kept alive by other tabs.
  * <p>
- * Can be disabled by setting {@link SessionStoreHousekeepingIntervalProperty} to 0.
+ * Can be disabled by setting {@link OrphanedUiSessionCleanupIntervalProperty} to 0.
  */
 @ApplicationScoped
-public class SessionStoreHousekeeper {
+public class OrphanedUiSessionCleanup {
 
-  private static final Logger LOG = LoggerFactory.getLogger(SessionStoreHousekeeper.class);
+  private static final Logger LOG = LoggerFactory.getLogger(OrphanedUiSessionCleanup.class);
 
   protected final Set<ISessionStore> m_stores = ConcurrentHashMap.newKeySet();
   protected final Object m_jobLock = new Object();
@@ -63,7 +63,7 @@ public class SessionStoreHousekeeper {
         return;
       }
       m_job = Jobs.schedule(this::sweep, Jobs.newInput()
-          .withName("UI session housekeeping")
+          .withName("Orphaned UI session cleanup")
           .withExecutionHint(JobInput.EXECUTION_HINT_TESTING_DO_NOT_WAIT_FOR_THIS_JOB)
           .withExceptionHandling(BEANS.get(ExceptionHandler.class), true)
           .withExecutionTrigger(Jobs.newExecutionTrigger()
@@ -77,7 +77,7 @@ public class SessionStoreHousekeeper {
   }
 
   protected long getInterval() {
-    Integer interval = CONFIG.getPropertyValue(SessionStoreHousekeepingIntervalProperty.class);
+    Integer interval = CONFIG.getPropertyValue(OrphanedUiSessionCleanupIntervalProperty.class);
     return interval == null ? 0 : interval;
   }
 
@@ -85,14 +85,14 @@ public class SessionStoreHousekeeper {
     for (ISessionStore store : m_stores) {
       try {
         if (!isStoreAlive(store)) {
-          LOG.info("Session housekeeping: Removing session store of invalid HTTP session {}", store.getHttpSessionId());
+          LOG.info("Orphaned UI session cleanup: Removing session store of invalid HTTP session {}", store.getHttpSessionId());
           m_stores.remove(store);
           continue;
         }
         store.disposeOrphanedUiSessions();
       }
       catch (RuntimeException e) {
-        LOG.warn("Session housekeeping failed for HTTP session {}", store.getHttpSessionId(), e);
+        LOG.warn("Orphaned UI session cleanup failed for HTTP session {}", store.getHttpSessionId(), e);
       }
     }
   }

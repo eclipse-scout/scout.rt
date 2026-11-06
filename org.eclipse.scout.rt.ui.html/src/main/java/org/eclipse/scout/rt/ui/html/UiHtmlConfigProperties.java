@@ -170,16 +170,16 @@ public final class UiHtmlConfigProperties {
     }
   }
 
-  public static class SessionStoreHousekeepingIntervalProperty extends AbstractPositiveIntegerConfigProperty {
+  public static class OrphanedUiSessionCleanupIntervalProperty extends AbstractPositiveIntegerConfigProperty {
 
     @Override
     public String getKey() {
-      return "scout.ui.sessionstore.housekeepingInterval";
+      return "scout.ui.sessionstore.orphanedUiSessionCleanupInterval";
     }
 
     @Override
     public String description() {
-      return "Interval in seconds at which the session store housekeeping job checks for orphaned UI sessions.\n"
+      return "Interval in seconds at which the orphaned UI session cleanup job checks for orphaned UI sessions. Set to 0 to disable the job.\n"
           + "By default this property is set to 5 minutes.";
     }
 
@@ -200,7 +200,7 @@ public final class UiHtmlConfigProperties {
     @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
     public String description() {
       return String.format("""
-              Number of seconds without any request (incl. polling requests) after which a UI session is considered orphaned and disposed by the session store housekeeping job.
+              Number of seconds without any request (incl. polling requests) after which a UI session is considered orphaned and disposed by the orphaned UI session cleanup job.
               This affects UI sessions whose startup response never reached the browser, as well as UI sessions of browser tabs without active polling.
               The value must be clearly greater than the value of property '%s', otherwise UI sessions with a pending polling request might be disposed.
               By default this property is set to 30 minutes.""",
