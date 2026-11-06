@@ -248,6 +248,23 @@ export const dataObjects = {
     }
     return Object.entries(dataObject)
       .filter(([k, v]) => k !== dataObjects._TYPE_ATTRIBUTE_NAME && k !== dataObjects._TYPE_VERSION_ATTRIBUTE_NAME && k !== dataObjects._CONTRIBUTIONS_ATTRIBUTE_NAME);
+  },
+
+  /**
+   * Creates a data object with given DO class if necessary.
+   *
+   * @param doClass The expected DO class. Mandatory.
+   * @param objectOrModel Model for the DO or the DO itself. If it is already the DO instance, it is directly returned and no new instance is created.
+   * Otherwise, a new DO instance of given class is created and initialized with the model (even if it is null or undefined).
+   * @returns The input objectOrModel if it is the expected DO, or a new DO otherwise. Never returns null or undefined.
+   * @throws Error if the doClass is missing.
+   */
+  ensure<T extends BaseDoEntity>(doClass: Constructor<T>, objectOrModel: NoInfer<T> | InitModelOf<T>): T {
+    scout.assertParameter('doClass', doClass);
+    if (objectOrModel instanceof doClass) {
+      return objectOrModel;
+    }
+    return scout.create(doClass, objectOrModel as InitModelOf<T>);
   }
 };
 

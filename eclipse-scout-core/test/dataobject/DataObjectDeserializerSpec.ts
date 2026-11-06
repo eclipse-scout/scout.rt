@@ -58,28 +58,59 @@ describe('DataObjectDeserializer', () => {
 
     DataObjectInventory.get().add(NestedSpecDo, 'scout.NestedSpec', 'scout.scout.NestedSpecDo');
 
-    // deserialize an already deserialized BaseDoEntity, but now the _type is known
-    const secondPass = dataObjects.deserialize(firstPass) as NestedSpecDo;
-    expect(secondPass).toBeInstanceOf(NestedSpecDo);
-    expect(secondPass.num).toBe(1);
-    expect(secondPass.nested).toBeInstanceOf(NestedSpecDo);
-    expect(secondPass.nested._type).toBe('scout.NestedSpec');
-    expect(secondPass.nested.num).toBe(2);
-    expect(secondPass._type).toBe('scout.NestedSpec');
+    try {
+      // deserialize an already deserialized BaseDoEntity, but now the _type is known
+      const secondPass = dataObjects.deserialize(firstPass) as NestedSpecDo;
+      expect(secondPass).toBeInstanceOf(NestedSpecDo);
+      expect(secondPass.num).toBe(1);
+      expect(secondPass.nested).toBeInstanceOf(NestedSpecDo);
+      expect(secondPass.nested._type).toBe('scout.NestedSpec');
+      expect(secondPass.nested.num).toBe(2);
+      expect(secondPass._type).toBe('scout.NestedSpec');
 
-    // deserialize nested DOs: creates a deep copy by default -> nested differ
-    const thirdPass = dataObjects.deserialize(secondPass) as NestedSpecDo;
-    expect(thirdPass.nested).not.toBe(secondPass.nested);
-    expect(thirdPass).toBeInstanceOf(NestedSpecDo);
-    expect(thirdPass.nested).toBeInstanceOf(NestedSpecDo);
+      // deserialize nested DOs: creates a deep copy by default -> nested differ
+      const thirdPass = dataObjects.deserialize(secondPass) as NestedSpecDo;
+      expect(thirdPass.nested).not.toBe(secondPass.nested);
+      expect(thirdPass).toBeInstanceOf(NestedSpecDo);
+      expect(thirdPass.nested).toBeInstanceOf(NestedSpecDo);
 
-    // don't deserialize nested DOs nested are same
-    const fourthPass = dataObjects.deserialize(thirdPass, null, {deserializeBaseDoEntity: false}) as NestedSpecDo;
-    expect(fourthPass.nested).toBe(thirdPass.nested);
-    expect(fourthPass).toBeInstanceOf(NestedSpecDo);
-    expect(fourthPass.nested).toBeInstanceOf(NestedSpecDo);
+      // don't deserialize nested DOs nested are same
+      const fourthPass = dataObjects.deserialize(thirdPass, null, {deserializeBaseDoEntity: false}) as NestedSpecDo;
+      expect(fourthPass.nested).toBe(thirdPass.nested);
+      expect(fourthPass).toBeInstanceOf(NestedSpecDo);
+      expect(fourthPass.nested).toBeInstanceOf(NestedSpecDo);
+    } finally {
+      DataObjectInventory.get().remove(NestedSpecDo);
+    }
+  });
 
-    DataObjectInventory.get().remove(NestedSpecDo);
+  it('keeps the class of a DO instance without registered _type', () => {
+    class UnregisteredSpecDo extends BaseDoEntity {
+      num: number;
+    }
+
+    const instance = scout.create(UnregisteredSpecDo, {num: 1});
+    expect(instance._type).toBeUndefined();
+
+    const deserialized = dataObjects.deserialize(instance) as UnregisteredSpecDo;
+    expect(deserialized).toBeInstanceOf(UnregisteredSpecDo);
+    expect(deserialized).not.toBe(instance);
+    expect(deserialized.num).toBe(1);
+
+    const clone = instance.clone();
+    expect(clone).toBeInstanceOf(UnregisteredSpecDo);
+    expect(clone.num).toBe(1);
+  });
+
+  it('converts a generic BaseDoEntity without _type to the declared field type', () => {
+    const generic = scout.create(BaseDoEntity);
+    generic['nestedNestedDate'] = '2013-05-25 22:30:00.000Z';
+    const fixture = scout.create(Fixture01Do);
+    fixture.propObj = generic as Fixture03Do;
+
+    const deserialized = dataObjects.deserialize(fixture) as Fixture01Do;
+    expect(deserialized.propObj).toBeInstanceOf(Fixture03Do);
+    expect(deserialized.propObj.nestedNestedDate).toEqual(dates.parseJsonDate('2013-05-25 22:30:00.000Z'));
   });
 
   it('can deserialize based on _type', () => {

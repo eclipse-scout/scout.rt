@@ -76,8 +76,12 @@ export class MapDoNodeSerializer implements DoNodeSerializer<object> {
 
     const target = {};
     for (const [key, value] of Object.entries(record)) {
-      const mapKey = deserializer.deserialize(key, recordKeyType);
-      target[mapKey] = deserializer.deserialize(value, recordValueType);
+      if (value !== undefined) {
+        // As Records are no DO classes the properties are not initialized with undefined.
+        // Therefore, only keep existing properties to not pollute Object.keys, etc.
+        const mapKey = deserializer.deserialize(key, recordKeyType);
+        target[mapKey] = deserializer.deserialize(value, recordValueType);
+      }
     }
     return target;
   }
