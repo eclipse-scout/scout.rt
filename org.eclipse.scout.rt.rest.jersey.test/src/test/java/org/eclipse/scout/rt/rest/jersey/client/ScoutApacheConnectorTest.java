@@ -361,15 +361,16 @@ public class ScoutApacheConnectorTest {
     runTestUserAgent((helper, clientBuilder) -> { /* nop */ }, null, "Generic");
   }
 
+  @Test
   public void testJerseyDefaultUserAgent() {
     runTestUserAgent((helper, clientBuilder) -> {},
-        builder -> builder.header(USER_AGENT, "Jersey/3.1.11 (Scout Apache HttpClient Connector)"),
+        builder -> builder.header(USER_AGENT, "Jersey/4.0.0 (Scout Apache HttpClient Connector)"),
         "Generic");
 
     runTestUserAgent((helper, clientBuilder) -> {
           // enable suppress default user agent "Generic" by ScoutApacheConnector
           clientBuilder.property(RestClientProperties.SUPPRESS_DEFAULT_USER_AGENT, true);
-        }, builder -> builder.header(USER_AGENT, "Jersey/3.1.11 (Scout Apache HttpClient Connector)"),
+        }, builder -> builder.header(USER_AGENT, "Jersey/4.0.0 (Scout Apache HttpClient Connector)"),
         null);
   }
 
