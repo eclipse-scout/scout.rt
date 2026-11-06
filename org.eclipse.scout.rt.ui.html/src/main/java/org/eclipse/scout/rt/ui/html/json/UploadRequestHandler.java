@@ -121,7 +121,6 @@ public class UploadRequestHandler extends AbstractUiServletRequestHandler {
 
       // Touch the session
       uiSession.touch();
-      uiSession.touchRequest();
 
       // Associate subsequent processing with the uiSession.
       RunContexts.copyCurrent()

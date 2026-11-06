@@ -28,6 +28,7 @@ import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
 import org.eclipse.scout.rt.ui.html.json.InspectorInfo;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.JsonRequest;
+import org.eclipse.scout.rt.ui.html.json.JsonRequest.RequestType;
 import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.res.IUploadable;
@@ -89,26 +90,33 @@ public interface IUiSession {
   IClientSession getClientSession();
 
   /**
-   * All requests except the polling requests are calling this method from the {@link JsonMessageRequestHandler}
-   * <p>
-   * Note that {@link HttpSession#getLastAccessedTime()} is also updated on polling requests
+   * Same as {@link #touch(RequestType)} with {@code null} as request type.
    */
   void touch();
 
   /**
+   * Called for every request of this UI session (e.g. by {@link JsonMessageRequestHandler}), including polling
+   * requests. Always updates the {@link #getLastRequestTime() last request time}. The
+   * {@link #getLastAccessedTime() last accessed time} is updated for all requests except polling requests.
+   * <p>
+   * Note that {@link HttpSession#getLastAccessedTime()} is also updated on polling requests
+   *
+   * @param requestType
+   *          type of the current request, may be {@code null} (e.g. for non-JSON requests like file uploads)
+   */
+  void touch(RequestType requestType);
+
+  /**
    * @return the last access time in millis since 01.01.1970 of a request, except polling requests
    * <p>
-   * see {@link #touch()}
+   * see {@link #touch(RequestType)}
    */
   long getLastAccessedTime();
 
   /**
-   * Called by {@link JsonMessageRequestHandler} for every request of this UI session, including polling requests.
-   */
-  void touchRequest();
-
-  /**
    * @return the time in millis of the last request of any type (incl. the startup request and polling requests).
+   * <p>
+   * see {@link #touch(RequestType)}
    */
   long getLastRequestTime();
 
