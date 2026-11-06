@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -43,6 +43,7 @@ export class DesktopLayout extends AbstractLayout {
         let navigationSize = new Dimension(navigationWidth, containerSize.height)
           .subtract(htmlNavigation.margins());
         htmlNavigation.setSize(navigationSize);
+        navigationWidth = htmlNavigation.bounds({exact: true, includeMargin: true}).width;
       }
     }
 
@@ -60,6 +61,7 @@ export class DesktopLayout extends AbstractLayout {
           .subtract(htmlHeader.margins());
         if (!animated || fullWidthNavigation) {
           htmlHeader.setSize(headerSize);
+          headerHeight = htmlHeader.bounds({exact: true, includeMargin: true}).height;
         }
 
         if (animated) {
