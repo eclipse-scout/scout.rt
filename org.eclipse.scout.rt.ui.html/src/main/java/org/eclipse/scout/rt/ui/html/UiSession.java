@@ -223,8 +223,7 @@ public class UiSession implements IUiSession {
     m_initialized = true;
 
     // Set initial "touch" time
-    touch();
-    touchRequest();
+    touch(RequestType.STARTUP_REQUEST);
     m_sessionMetrics.sessionCreated(SESSION_TYPE);
 
     try {
@@ -586,17 +585,22 @@ public class UiSession implements IUiSession {
 
   @Override
   public void touch() {
-    m_lastAccessedTime = System.currentTimeMillis();
+    touch(null);
+  }
+
+  @Override
+  public void touch(RequestType requestType) {
+    long now = System.currentTimeMillis();
+    // Poll requests do not update the last accessed time (--> max user idle timeout)
+    if (requestType != RequestType.POLL_REQUEST) {
+      m_lastAccessedTime = now;
+    }
+    m_lastRequestTime = now;
   }
 
   @Override
   public long getLastAccessedTime() {
     return m_lastAccessedTime;
-  }
-
-  @Override
-  public void touchRequest() {
-    m_lastRequestTime = System.currentTimeMillis();
   }
 
   @Override
