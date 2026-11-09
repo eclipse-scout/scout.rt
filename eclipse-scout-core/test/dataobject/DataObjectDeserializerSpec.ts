@@ -440,7 +440,6 @@ describe('DataObjectDeserializer', () => {
   });
 });
 
-@typeName()
 export abstract class AbstractFixture01Do extends BaseDoEntity {
   abstractPropDate: Date;
 }
