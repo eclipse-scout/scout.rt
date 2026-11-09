@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -84,6 +84,20 @@ module.exports = class ModuleResolver {
     const typeReferenceResolver = this.getTypeReferenceResolverOfSourceFile(sourceFile, compilerOptions);
     this._typeReferenceResolversByFilePath.set(filePath, {file, typeReferenceResolver});
     return typeReferenceResolver;
+  }
+
+  /**
+   * @param node {ts.Node} A node of a file parsed by getTypeReferenceResolverOfModule or of a file provided by the compiler.
+   * @returns {boolean} false if the file containing the node changed or has been parsed again since the node was created.
+   * true for nodes of files provided by the compiler.
+   */
+  isUpToDate(node) {
+    const sourceFile = this.findSourceFile(node);
+    const cached = sourceFile ? this._typeReferenceResolversByFilePath.get(sourceFile.fileName) : null;
+    if (!cached) {
+      return true;
+    }
+    return cached.typeReferenceResolver.sourceFile === sourceFile && this._readFile(sourceFile.fileName) === cached.file;
   }
 
   /**
