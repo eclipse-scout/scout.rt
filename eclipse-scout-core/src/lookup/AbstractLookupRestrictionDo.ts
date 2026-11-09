@@ -7,9 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BaseDoEntity, typeName} from '../index';
+import {BaseDoEntity} from '../index';
 
-@typeName()
 export abstract class AbstractLookupRestrictionDo<TId> extends BaseDoEntity {
   ids: TId[];
   text: string;

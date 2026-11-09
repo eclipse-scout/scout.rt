@@ -15,9 +15,8 @@
 /* eslint-disable */
 
 import {BaseDoEntity, typeName} from '../../../eclipse-scout-core/src';
-import {ImportedDoAlias, ImportedLiteralUnion, ImportedStringEnum, Test2Do} from './Test2Do'; // reference to class in own module
-import {BuiltColor, BuiltDoAlias, BuiltEnum, BuiltIdTypeName, BuiltPermissionLevel} from 'libbuilt'; // reference to a built module (declaration files only)
-import {ImportedStringEnum as RenamedEnum, Test2Do as RenamedTest2Do} from './Test2Do';
+import {ImportedDoAlias, ImportedLiteralUnion, ImportedStringEnum, ImportedStringEnum as RenamedEnum, Test2Do, Test2Do as RenamedTest2Do} from './Test2Do'; // reference to class in own module
+import {BuiltColor, BuiltDo, BuiltDoAlias, BuiltEnum, BuiltIdTypeName, BuiltPermissionLevel} from 'libbuilt'; // reference to a built module (declaration files only)
 import {LibDo as RenamedLibDo} from 'lib';
 
 @typeName('test.Test')
@@ -168,4 +167,39 @@ export class TypeResolutionDo<T, D = Date, C extends Comparable<C> = null> exten
   renamedDo: RenamedTest2Do;
   renamedEnum: RenamedEnum;
   renamedExternalDo: RenamedLibDo;
+}
+
+// DOs detected by inheritance (no typeName decorator)
+export class ImportedSubclassDo extends Test2Do { // superclass imported from own module
+  importedSubclassProp: Date;
+}
+
+export class LocalSubclassDo extends ImportedSubclassDo { // superclass declared in same file
+  localSubclassProp: number;
+}
+
+export class RenamedSubclassDo extends RenamedLibDo { // superclass imported with alias from TS module
+  renamedSubclassProp: string;
+}
+
+export class BuiltSubclassDo extends BuiltDo { // superclass from built module (declaration files only)
+  builtSubclassProp: boolean;
+}
+
+// no DOs: properties remain untouched
+export class NoDo {
+  noDoProp: string;
+}
+
+export class NoDoSubclass extends Permission {
+  noDoProp: string;
+}
+
+export class GlobalSubclass extends Array<string> {
+  noDoProp: string;
+}
+
+export class MixinSubclass extends (class extends BaseDoEntity {
+}) {
+  noDoProp: string;
 }
