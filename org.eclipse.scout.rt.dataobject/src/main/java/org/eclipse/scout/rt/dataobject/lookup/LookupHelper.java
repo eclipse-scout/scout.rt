@@ -44,6 +44,7 @@ public class LookupHelper {
   protected static final String WILDCARD = "*";
   protected static final String WILDCARD_REPLACE = "@wildcard@";
   protected static final String MATCH_ALL_REGEX = ".*";
+  protected static final String DASH_REGEX = "[-‐‑‒–—﹘－]*";
 
   /**
    * Filter stream of {@code data} according to specified {@code restriction} and converts the stream to a
@@ -336,7 +337,12 @@ public class LookupHelper {
         return false;
       }
       String text = textAccessor.apply(data);
-      return text != null && pattern.matcher(text).matches();
+      if (text == null) {
+        return false;
+      }
+      // Replace format characters (e.g. soft hyphen)
+      text = text.replaceAll("\\p{Cf}", "");
+      return pattern.matcher(text).matches();
     };
   }
 
@@ -371,6 +377,8 @@ public class LookupHelper {
     }
     text = text.replace(wildcard, WILDCARD_REPLACE);
     text = StringUtility.escapeRegexMetachars(text);
+    // Dash matches all dashes (en dash, em dash, etc.)
+    text = text.replace("-", DASH_REGEX);
 
     // replace repeating wildcards to prevent regex DoS
     String duplicateWildcards = WILDCARD_REPLACE.concat(WILDCARD_REPLACE);
