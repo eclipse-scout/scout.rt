@@ -1,11 +1,16 @@
+
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 package org.eclipse.scout.rt.server.jaxws.consumer;
 
@@ -693,7 +698,15 @@ public abstract class AbstractJaxWsClientTest {
     }
   }
 
+  /**
+   * Walks the whole cause chain, return true if any cause is either a {@link SocketTimeoutException} or {@link HttpTimeoutException}.
+   */
   protected boolean isTimeoutCause(WebServiceException e) {
-    return e.getCause() instanceof SocketTimeoutException || e.getCause() instanceof HttpTimeoutException;
+    for (Throwable t = e.getCause(); t != null; t = t.getCause()) {
+      if (t instanceof SocketTimeoutException || t instanceof HttpTimeoutException) {
+        return true;
+      }
+    }
+    return false;
   }
 }
