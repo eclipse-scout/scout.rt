@@ -1,3 +1,12 @@
+/*
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
+ *
+ * This program and the accompanying materials are made
+ * available under the terms of the Eclipse Public License 2.0
+ * which is available at https://www.eclipse.org/legal/epl-2.0/
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -18,8 +27,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
  * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 /* eslint-disable */
-import { BaseDoEntity, typeName } from '../../../eclipse-scout-core/src';
-import { Test2Do } from './Test2Do'; // reference to class in own module
+import {BaseDoEntity, typeName} from '../../../eclipse-scout-core/src';
+import {Test2Do} from './Test2Do'; // reference to class in own module
+import {BuiltDo} from 'libbuilt'; // reference to a built module (declaration files only)
+import {LibDo as RenamedLibDo} from 'lib';
+
 let TestDo = class TestDo extends BaseDoEntity {
     num;
     id;
@@ -356,6 +368,57 @@ TypeResolutionDo = __decorate([
     typeName('test.TypeResolution')
 ], TypeResolutionDo);
 export { TypeResolutionDo };
+
+// DOs detected by inheritance (no typeName decorator)
+export class ImportedSubclassDo extends Test2Do {
+  importedSubclassProp;
+}
+
+__decorate([
+  Reflect.metadata("scout.m.t", Date)
+], ImportedSubclassDo.prototype, "importedSubclassProp", void 0);
+
+export class LocalSubclassDo extends ImportedSubclassDo {
+  localSubclassProp;
+}
+
+__decorate([
+  Reflect.metadata("scout.m.t", Number)
+], LocalSubclassDo.prototype, "localSubclassProp", void 0);
+
+export class RenamedSubclassDo extends RenamedLibDo {
+  renamedSubclassProp;
+}
+
+__decorate([
+  Reflect.metadata("scout.m.t", String)
+], RenamedSubclassDo.prototype, "renamedSubclassProp", void 0);
+
+export class BuiltSubclassDo extends BuiltDo {
+  builtSubclassProp;
+}
+
+__decorate([
+  Reflect.metadata("scout.m.t", Boolean)
+], BuiltSubclassDo.prototype, "builtSubclassProp", void 0);
+
+// no DOs: properties remain untouched
+export class NoDo {
+  noDoProp;
+}
+
+export class NoDoSubclass extends Permission {
+  noDoProp;
+}
+
+export class GlobalSubclass extends Array {
+  noDoProp;
+}
+
+export class MixinSubclass extends (class extends BaseDoEntity {
+}) {
+  noDoProp;
+}
 window["scout"]["DataObjectInventory"].get().add(TestDo, "test.Test", "test.TestDo");
 window["scout"]["DataObjectInventory"].get().add(SecondInSameFileDo, "test.SecondInSameFile", "test.SecondInSameFileDo");
 window["scout"]["DataObjectInventory"].get().add(ThirdInSameFileDo, "test.ThirdInSameFile", "test.ThirdInSameFileDo");

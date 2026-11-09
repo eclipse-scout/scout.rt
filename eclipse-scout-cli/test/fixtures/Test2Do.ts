@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,6 +27,15 @@ export class TestSpecialTypesDo extends BaseDoEntity {
   arrUnknown: Array<unknown>;
   arrUnion: Array<string | number>;
   rec: Record<string, any>;
+}
+
+export abstract class AbstractTestDo extends BaseDoEntity { // DO without typeName: metadata but no DataObjectInventory registration
+  abstractProp: string;
+}
+
+@typeName('test.DerivedFromAbstract')
+export class DerivedFromAbstractDo extends AbstractTestDo {
+  derivedProp: number;
 }
 
 export enum ImportedStringEnum {

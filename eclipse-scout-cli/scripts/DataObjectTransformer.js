@@ -20,9 +20,12 @@ const WRAPPER_TYPES = new Set(['NonNullable', 'Partial', 'Readonly', 'Required']
 // bigint is not supported
 const PRIMITIVE_KEYWORDS = new Map([[ts.SyntaxKind.StringKeyword, 'String'], [ts.SyntaxKind.NumberKeyword, 'Number'], [ts.SyntaxKind.BooleanKeyword, 'Boolean']]);
 const MAX_EVALUATION_DEPTH = 10;
+const BASE_DO_ENTITY = 'BaseDoEntity';
 
 /**
  * TypeScript transformer for DataObject which injects @Reflect.metadata('scout.m.t', dataType) decorators to all DO attributes.
+ * A class is a DO if it has a @typeName decorator or extends BaseDoEntity directly or indirectly.
+ * Only DOs with a @typeName decorator are registered in the DataObjectInventory.
  * These decorators store the data type information from the TS property declaration.
  * This allows to transfer the TypeScript data type information to the runtime which is used when (de)serializing a data object.
  *
@@ -58,7 +61,7 @@ module.exports = class DataObjectTransformer {
     if (ts.isClassDeclaration(node)) {
       const typeNameDecorator = node.modifiers?.find(m => ts.isDecorator(m) && m.expression?.expression?.escapedText === 'typeName');
       if (typeNameDecorator) {
-        // it is a data object: remember DataObjectInventory.add statement to add at the end to the source file
+        // remember DataObjectInventory.add statement to add at the end to the source file
         const className = node.symbol.escapedName;
         const classConstants = node.members
           .filter(n => ts.isPropertyDeclaration(n))
@@ -66,15 +69,16 @@ module.exports = class DataObjectTransformer {
         const typeName = this._getTypeNameFromDecorator(typeNameDecorator, className, classConstants);
         const namespace = this._detectExportInfoFor(node).namespace; // detectExportInfoOf() will not find anything because a ClassDeclaration node is passed here. But this is fine as the namespace of the own module is required here.
         this.doInventoryAddStatements.push(this._createDoInventoryAddStatement(className, typeName, namespace));
-
-        try {
-          this.currentClassTypeParams = this._buildTypeParamMap(node);
-          return this._visitChildren(node); // step into DO with typeName decorator
-        } finally {
-          this.currentClassTypeParams = null; // reset for next class
-        }
       }
-      return node; // no need to step into
+      if (!typeNameDecorator && !this._isDataObjectClass(node, new Set())) {
+        return node; // no need to step into
+      }
+      try {
+        this.currentClassTypeParams = this._buildTypeParamMap(node);
+        return this._visitChildren(node); // step into DO
+      } finally {
+        this.currentClassTypeParams = null; // reset for next class
+      }
     }
     if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node) || ts.isVariableStatement(node) || ts.isIdentifier(node) || ts.isTypeReferenceNode(node)
       || ts.isPropertySignature(node) || ts.isStringLiteral(node) || ts.isInterfaceDeclaration(node) || ts.isPropertyAssignment(node) || ts.isObjectLiteralExpression(node)
@@ -95,6 +99,37 @@ module.exports = class DataObjectTransformer {
       return ts.factory.replaceDecoratorsAndModifiers(node, newModifiers);
     }
     return node; // no need to step into
+  }
+
+  /**
+   * @param node {ts.ClassDeclaration}
+   * @param visited {Set<ts.ClassDeclaration>} The classes already visited to detect circular inheritance.
+   * @returns {boolean} true if the class is BaseDoEntity or extends it directly or indirectly.
+   * false if the superclass cannot be resolved (e.g. mixins, property access expressions or JavaScript modules without declaration files).
+   */
+  _isDataObjectClass(node, visited) {
+    if (node.name?.escapedText === BASE_DO_ENTITY) {
+      return true;
+    }
+    if (visited.has(node)) {
+      return false;
+    }
+    visited.add(node);
+    const superClass = node.heritageClauses
+      ?.find(clause => clause.token === ts.SyntaxKind.ExtendsKeyword)
+      ?.types[0]?.expression;
+    if (!superClass || !ts.isIdentifier(superClass)) {
+      return false;
+    }
+    if (superClass.escapedText === BASE_DO_ENTITY) {
+      return true;
+    }
+    const name = superClass.escapedText;
+    if (!this._isDeclaredInFile(node, name)) {
+      return false; // global classes like Array or Error
+    }
+    const declaration = this._findDeclaration(node, name);
+    return !!declaration && ts.isClassDeclaration(declaration) && this._isDataObjectClass(declaration, visited);
   }
 
   /**
@@ -640,7 +675,11 @@ module.exports = class DataObjectTransformer {
 
     const exportInfo = this._detectExportInfoFor(node);
     const qualifiedName = this._createObjectType(exportInfo.namespace, exportInfo.exportName);
-    // use objectType as string because e.g. of TS interfaces (which do not exist at RT) and that overwrites in ObjectFactory are taken into account.
+    // Use the objectType as string instead of a constructor reference because:
+    // - TS interfaces and ambient classes (.d.ts) do not exist at runtime.
+    // - Overwrites in the ObjectFactory are taken into account.
+    // - TS removes imports which are only used as type, even if a transformer adds references to them.
+    // - The metadata is evaluated on class definition: referenced classes might not be initialized yet (circular imports or declared further down in the same file).
     return ts.factory.createStringLiteral(qualifiedName);
   }
 

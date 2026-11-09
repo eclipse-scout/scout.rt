@@ -141,33 +141,33 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
   protected _createLookupRowFromDo(lookupRowDo: LookupRowDo<TKey>): LookupRow<TKey> {
     // propagate all properties from lookup row DO to scout lookup row (there might be custom ones on specific lookup row DOs)
-    let clonedLookupRowDo = $.extend({}, lookupRowDo) as LookupRowDo<TKey> & InitModelOf<LookupRow<TKey>>;
+    let lookupRowModel = $.extend({}, lookupRowDo) as LookupRowDo<TKey> & InitModelOf<LookupRow<TKey>>;
 
     // [text, enabled, active, iconId, cssClass, tooltipText, additionalTableRowData] are the same for LookupRow.ts and LookupRowDo.java
     // [backgroundColor, foregroundColor, font] currently not supported by LookupRowDo.java
 
     // id -> key
-    clonedLookupRowDo.key = clonedLookupRowDo.id;
-    delete clonedLookupRowDo.id;
+    lookupRowModel.key = lookupRowModel.id;
+    delete lookupRowModel.id;
 
     // parentId -> parentKey
-    clonedLookupRowDo.parentKey = clonedLookupRowDo.parentId;
-    delete clonedLookupRowDo.parentId;
+    lookupRowModel.parentKey = lookupRowModel.parentId;
+    delete lookupRowModel.parentId;
 
     // unused on Scout LookupRow
-    delete clonedLookupRowDo._type;
-    delete clonedLookupRowDo._typeVersion;
-    delete clonedLookupRowDo._contributions;
+    delete lookupRowModel._type;
+    delete lookupRowModel._typeVersion;
+    delete lookupRowModel._contributions;
 
     if (this.maxTextLength) {
-      let text = clonedLookupRowDo.text;
+      let text = lookupRowModel.text;
       if (text.length > this.maxTextLength) {
-        clonedLookupRowDo.text = text.substring(0, this.maxTextLength) + '...';
-        clonedLookupRowDo.tooltipText = text;
+        lookupRowModel.text = text.substring(0, this.maxTextLength) + '...';
+        lookupRowModel.tooltipText = text;
       }
     }
 
-    return scout.create((LookupRow<TKey>), clonedLookupRowDo);
+    return scout.create((LookupRow<TKey>), lookupRowModel);
   }
 
   protected _call(): JQuery.Promise<LookupResult<TKey>> {
@@ -240,7 +240,6 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 /**
  * @see "AbstractLookupRowDo.java"
  */
-@typeName()
 export class LookupRowDo<TKey> extends BaseDoEntity {
   id: TKey;
   parentId: TKey;

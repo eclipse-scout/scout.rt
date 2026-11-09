@@ -13,11 +13,11 @@ export const doValueMetaData = {
   TYPE_META_DATA_KEY: 'scout.m.t',
 
   createSimple(constructor: Constructor): DoValueMetaData {
-    return {type: constructor, typeName: null, args: []};
+    return {type: constructor, objectType: null, args: []};
   },
 
   createArray(constructor: Constructor): DoValueMetaData {
-    return {type: Array, typeName: null, args: [doValueMetaData.createSimple(constructor)]};
+    return {type: Array, objectType: null, args: [doValueMetaData.createSimple(constructor)]};
   },
 
   getFieldMetaData(prototype: object, fieldName: string): DoValueMetaData {
@@ -33,7 +33,7 @@ export const doValueMetaData = {
       return null;
     }
     if (typeof meta === 'string' || typeof meta === 'function') {
-      // string objectType. E.g. a TypeScript interface or constructor without typeArgs (e.g. Number)
+      // string objectType (e.g. a TypeScript interface or custom class) or constructor without typeArgs (e.g. Number)
       return {
         ...doValueMetaData.getObjectTypeInfo(meta),
         args: []
@@ -47,15 +47,14 @@ export const doValueMetaData = {
     };
   },
 
-  getObjectTypeInfo(objectType: ObjectType<any>): { type: Constructor<any>; typeName: string } {
+  getObjectTypeInfo(objectType: ObjectType<any>): { type: Constructor<any>; objectType: string } {
     if (typeof objectType === 'string') {
-      // string objectType. E.g. a TypeScript interface
+      // string objectType. E.g. a TypeScript interface or a custom class like 'myapp.MyTestDo'.
       const constructor = doValueMetaData.resolveToConstructor(objectType);
-      return {type: constructor, typeName: objectType};
+      return {type: constructor, objectType};
     }
     // constructor without typeArgs (e.g. Number)
-    const typeName = ObjectFactory.get().getObjectType(objectType);
-    return {type: objectType, typeName};
+    return {type: objectType, objectType: ObjectFactory.get().getObjectType(objectType)};
   },
 
   resolveToConstructor<T>(objectType: ObjectType<T>): Constructor<T> {
@@ -130,6 +129,6 @@ export type RawFieldMetaData = ObjectType | {
 
 export type DoValueMetaData<T = any> = {
   type: Constructor<T>;
-  typeName: string;
+  objectType: string;
   args: DoValueMetaData[];
 };

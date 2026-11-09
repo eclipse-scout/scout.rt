@@ -236,7 +236,6 @@ export class Fixture05Do extends BaseDoEntity {
   propObj2: Fixture06Do;
 }
 
-@typeName()
 export abstract class AbstractFixture06Do extends BaseDoEntity {
   abstractPropDate: Date;
 }

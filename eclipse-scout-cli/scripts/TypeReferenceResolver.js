@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -35,6 +35,7 @@ module.exports = class TypeReferenceResolver {
     const imports = this._findImportDeclarations(this.sourceFile);
     this._importsByName = this._computeImportMap(imports);
     this._localNames = this._computeLocalNames(this.sourceFile);
+    this._declarationsByExportName = new Map();
   }
 
   /**
@@ -87,6 +88,20 @@ module.exports = class TypeReferenceResolver {
   }
 
   _findExport(exportName, visited) {
+    const cached = this._declarationsByExportName.get(exportName);
+    if (cached && this.moduleResolver.isUpToDate(cached)) {
+      return cached;
+    }
+    const declaration = this._computeExport(exportName, visited);
+    if (declaration) {
+      this._declarationsByExportName.set(exportName, declaration);
+    } else {
+      this._declarationsByExportName.delete(exportName); // not cached: the result might be caused by a circular export
+    }
+    return declaration;
+  }
+
+  _computeExport(exportName, visited) {
     const key = this.sourceFile.fileName + '#' + exportName;
     if (visited.has(key)) {
       return null; // circular exports
