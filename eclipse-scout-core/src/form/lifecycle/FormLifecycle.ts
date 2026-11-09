@@ -45,6 +45,10 @@ export class FormLifecycle<TValidationResult extends ValidationResult = Validati
     return this.widget.ok();
   }
 
+  protected override _waitForPending(): Promise<boolean> {
+    return this.widget.waitForPendingPromises();
+  }
+
   override invalidElements(): ElementsValidationResult<TValidationResult> {
     return FormLifecycle.validateFormFields(this.widget);
   }

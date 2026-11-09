@@ -96,6 +96,12 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   }
 
   ok(): Promise<void> {
+    // 0. wait for pending work, cancel if it failed (the error has been handled by the consumer of the pending work)
+    return this._waitForPending()
+      .then(success => success ? this._okAfterPending() : undefined);
+  }
+
+  protected _okAfterPending(): Promise<void> {
     // 1. validate form
     return this._validateAndHandle()
       .then(status => {
@@ -166,6 +172,12 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   }
 
   save(): Promise<void> {
+    // 0. wait for pending work, cancel if it failed (the error has been handled by the consumer of the pending work)
+    return this._waitForPending()
+      .then(success => success ? this._saveAfterPending() : undefined);
+  }
+
+  protected _saveAfterPending(): Promise<void> {
     // 1. validate form
     return this._validateAndHandle()
       .then(status => {
@@ -182,6 +194,15 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
 
   protected _reset() {
     // NOP
+  }
+
+  /**
+   * Waits for pending asynchronous work of the widget before {@link ok} and {@link save} are executed.
+   *
+   * @returns a promise that never rejects. It resolves to true if the pending work completed successfully, false if {@link ok} or {@link save} should be cancelled.
+   */
+  protected _waitForPending(): Promise<boolean> {
+    return $.resolvedPromise(true);
   }
 
   protected _save(): Promise<void> {

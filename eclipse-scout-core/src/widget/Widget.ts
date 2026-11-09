@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext,
-  LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
-  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
+  AbortablePromise, Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
+  KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter,
+  scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
@@ -364,6 +364,30 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     this.destroying = false;
     this.destroyed = true;
     this.trigger('destroy');
+  }
+
+  /**
+   * Wraps the given promise in an {@link AbortablePromise} that is aborted with an {@link AbortError} when this widget is destroyed.
+   * If the widget is already destroyed, the returned promise is aborted immediately.
+   *
+   * Use it for asynchronous work whose result is irrelevant once the widget is gone, e.g. async work started by an event handler.
+   * {@link ErrorHandler} ignores {@link AbortError}s, so errors caused by accessing the destroyed widget are not reported.
+   *
+   * **Note:** aborting does not stop the underlying work, it only detaches the returned promise from it.
+   * A rejection of the given promise after the abort is ignored.
+   */
+  abortOnDestroy<T>(promise: PromiseLike<T>): AbortablePromise<T> {
+    scout.assertParameter('promise', promise);
+    const abortablePromise = AbortablePromise.of(promise);
+    if (this.destroyed) {
+      abortablePromise.abort();
+      return abortablePromise;
+    }
+    const destroyHandler = () => abortablePromise.abort();
+    this.one('destroy', destroyHandler);
+    const removeDestroyHandler = () => this.off('destroy', destroyHandler);
+    abortablePromise.then(removeDestroyHandler, removeDestroyHandler);
+    return abortablePromise;
   }
 
   /**

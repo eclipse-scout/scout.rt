@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {EventListener, EventSupport, Form, GlassPane, GroupBox, HtmlComponent, Menu, NullWidget, ObjectFactory, scout, StringField, TableRow, TreeVisitResult, Widget} from '../../src/index';
+import {AbortError, Deferred, EventListener, EventSupport, Form, GlassPane, GroupBox, HtmlComponent, Menu, NullWidget, ObjectFactory, scout, StringField, TableRow, TreeVisitResult, Widget} from '../../src/index';
 import {InitModelOf} from '../../src/scout';
 
 describe('Widget', () => {
@@ -1092,6 +1092,51 @@ describe('Widget', () => {
       expect(child.parent).toBe(another);
       expect(child.owner).toBe(another);
       expect(widget.children.length).toBe(0);
+    });
+  });
+
+  describe('abortOnDestroy', () => {
+    it('resolves with the value of the given promise', async () => {
+      let widget = createWidget({parent: parent});
+      await expectAsync(widget.abortOnDestroy(Promise.resolve('value'))).toBeResolvedTo('value');
+    });
+
+    it('rejects with the reason of the given promise', async () => {
+      let widget = createWidget({parent: parent});
+      let error = new Error('failed');
+      await expectAsync(widget.abortOnDestroy(Promise.reject(error))).toBeRejectedWith(error);
+    });
+
+    it('rejects with an AbortError when the widget is destroyed', async () => {
+      let widget = createWidget({parent: parent});
+      let deferred = new Deferred<string>();
+      let promise = widget.abortOnDestroy(deferred.promise());
+
+      widget.destroy();
+      await expectAsync(promise).toBeRejectedWith(new AbortError());
+
+      // Rejection of the original promise after the abort must not lead to an unhandled rejection
+      deferred.reject(new Error('Widget is destroyed'));
+      await sleep();
+    });
+
+    it('rejects with an AbortError if the widget is already destroyed', async () => {
+      let widget = createWidget({parent: parent});
+      widget.destroy();
+      await expectAsync(widget.abortOnDestroy(Promise.resolve('value'))).toBeRejectedWith(new AbortError());
+    });
+
+    it('removes the destroy listener when the promise is settled', async () => {
+      let widget = createWidget({parent: parent});
+      let destroyListenerCount = widget.events.count('destroy');
+
+      let resolved = widget.abortOnDestroy(Promise.resolve());
+      let rejected = widget.abortOnDestroy(Promise.reject(new Error('failed')));
+      expect(widget.events.count('destroy')).toBe(destroyListenerCount + 2);
+
+      await resolved;
+      await expectAsync(rejected).toBeRejected();
+      expect(widget.events.count('destroy')).toBe(destroyListenerCount);
     });
   });
 

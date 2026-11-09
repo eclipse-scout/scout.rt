@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortKeyStroke, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, ChildModelOf, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, EventHandler, FileChooser,
-  FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf, KeyStroke,
-  KeyStrokeContext, Lifecycle, MessageBox, MessageBoxController, MessageBoxes, MessageBoxOption, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status,
+  AbortablePromise, AbortKeyStroke, aria, AriaLabelledByInsertPosition, arrays, BusyIndicatorOptions, Button, ButtonSystemType, ChildModelOf, DialogLayout, DisabledStyle, DisplayParent, DisplayViewId, EnumObject, Event, EventHandler,
+  FileChooser, FileChooserController, FocusRule, FormController, FormEventMap, FormGrid, FormInvalidEvent, FormLayout, FormLifecycle, FormModel, FormRevealInvalidFieldEvent, GlassPaneRenderer, GroupBox, HtmlComponent, InitModelOf,
+  KeyStroke, KeyStrokeContext, Lifecycle, MessageBox, MessageBoxController, MessageBoxes, MessageBoxOption, ModelOf, NotificationBadgeStatus, ObjectOrChildModel, objects, Point, PopupWindow, PropertyChangeEvent, Rectangle, scout, Status,
   StatusOrModel, strings, TextListWithTitle, tooltips, TreeVisitResult, ValidationResult, webstorage, Widget, WrappedFormField
 } from '../index';
 import $ from 'jquery';
@@ -98,6 +98,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
   protected _resizeHandler: (Event) => boolean;
   protected _windowResizeHandler: () => void;
   protected _mainBoxSaveNeededChangeHandler: EventHandler<PropertyChangeEvent>;
+  protected _pendingPromises: Set<Promise<unknown>>;
 
   constructor() {
     super();
@@ -166,6 +167,7 @@ export class Form extends Widget implements FormModel, DisplayParent {
     this._resizeHandler = this._onResize.bind(this);
     this._windowResizeHandler = this._onWindowResize.bind(this);
     this._mainBoxSaveNeededChangeHandler = () => this.updateSaveNeeded();
+    this._pendingPromises = new Set();
   }
 
   static DisplayHint = {
@@ -466,8 +468,11 @@ export class Form extends Widget implements FormModel, DisplayParent {
             promises.push(...pendingFields.map(field => field.promise));
           }
 
-          if (promises.length) {
+          if (promises.length || this.hasPendingPromises()) {
             return $.promiseAll(promises)
+              // Wait for promises tracked during import (e.g. by property change handlers) so the form is complete when loading finishes.
+              // A failed tracked promise does not fail the load, the error is handled by the consumer of the tracked promise.
+              .then(() => this.waitForPendingPromises())
               .then(() => this._loadingDone());
           }
 
@@ -562,6 +567,51 @@ export class Form extends Widget implements FormModel, DisplayParent {
    */
   importData(): void | Promise<void> {
     // NOP
+  }
+
+  /**
+   * Registers asynchronous work that belongs to this form, typically started by an event handler (e.g. a value change handler)
+   * whose promise is not awaited by anyone.
+   *
+   * - {@link load}, {@link ok} and {@link save} wait until all tracked promises are settled.
+   *   If one of them is rejected, {@link ok} and {@link save} are cancelled and the form stays open.
+   * - {@link cancel}, {@link close} or destroying the form do not wait: the tracked promises are aborted with an {@link AbortError} (see {@link abortOnDestroy}),
+   *   which is ignored by the {@link ErrorHandler}.
+   *
+   * The form does not handle rejections. The returned promise must be handled by the caller as usual,
+   * e.g. using `void form.trackPromise(...)` to let the global error handler report it.
+   *
+   * @returns an {@link AbortablePromise} wrapping the given promise, aborted when the form is destroyed.
+   */
+  trackPromise<T>(promise: PromiseLike<T>): AbortablePromise<T> {
+    const abortablePromise = this.abortOnDestroy(promise);
+    this._pendingPromises.add(abortablePromise);
+    const remove = () => this._pendingPromises.delete(abortablePromise);
+    abortablePromise.then(remove, remove);
+    return abortablePromise;
+  }
+
+  /**
+   * @returns true if there are promises registered with {@link trackPromise} that are not settled yet.
+   */
+  hasPendingPromises(): boolean {
+    return this._pendingPromises.size > 0;
+  }
+
+  /**
+   * Waits until all promises registered with {@link trackPromise} are settled, including promises registered while waiting.
+   *
+   * @returns a promise that never rejects. It resolves to true if all tracked promises were fulfilled and false if at least one was rejected or aborted.
+   */
+  async waitForPendingPromises(): Promise<boolean> {
+    let success = true;
+    while (this._pendingPromises.size) {
+      const results = await Promise.allSettled([...this._pendingPromises]);
+      if (results.some(result => result.status === 'rejected')) {
+        success = false;
+      }
+    }
+    return success;
   }
 
   /**

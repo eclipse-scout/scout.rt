@@ -9,8 +9,8 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm, SpecLifecycle} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Deferred, Dimension, fields, FileChooser, Form, FormFieldMenu, FormLifecycle, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup,
-  PopupBlockerHandler, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WidgetModel, WrappedFormField
+  AbortError, App, CancelMenu, CloseMenu, Deferred, Dimension, fields, FileChooser, Form, FormFieldMenu, FormLifecycle, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline,
+  Page, Popup, PopupBlockerHandler, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WidgetModel, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
 
@@ -438,6 +438,166 @@ describe('Form', () => {
         .finally(done);
     });
 
+  });
+
+  describe('trackPromise', () => {
+    let form: SpecForm;
+    let field: StringField;
+
+    beforeEach(() => {
+      form = helper.createFormWithOneField();
+      field = form.rootGroupBox.fields[0] as StringField;
+    });
+
+    /**
+     * Simulates a value change handler that starts async work and does not await it.
+     */
+    function trackOnValueChange(work: () => Promise<void>) {
+      field.on('propertyChange:value', () => {
+        form.trackPromise(work()).catch(() => {
+          // tests check the consequences of a rejection, the error is reported by the global error handler in real code
+        });
+      });
+    }
+
+    it('returns the result of the given promise', async () => {
+      await expectAsync(form.trackPromise(Promise.resolve('value'))).toBeResolvedTo('value');
+      expect(form.hasPendingPromises()).toBe(false);
+    });
+
+    it('aborts the tracked promises when the form is closed', async () => {
+      let deferred = new Deferred<void>();
+      let promise = form.trackPromise(deferred.promise());
+      expect(form.hasPendingPromises()).toBe(true);
+
+      form.close();
+      await expectAsync(promise).toBeRejectedWith(new AbortError());
+      expect(form.hasPendingPromises()).toBe(false);
+
+      // Rejection after the abort must not lead to an unhandled rejection
+      deferred.reject(new Error('Form is destroyed'));
+      await sleep();
+    });
+
+    it('does not delay close', async () => {
+      await form.open();
+      form.trackPromise(new Deferred<void>().promise()).catch(() => {
+        // aborted on close
+      });
+
+      form.close();
+      expect(form.destroyed).toBe(true);
+    });
+
+    describe('waitForPendingPromises', () => {
+      it('resolves to true if there is nothing pending', async () => {
+        await expectAsync(form.waitForPendingPromises()).toBeResolvedTo(true);
+      });
+
+      it('resolves to false if a tracked promise is rejected', async () => {
+        form.trackPromise(Promise.reject(new Error('failed'))).catch(() => {
+          // tested by waitForPendingPromises
+        });
+        await expectAsync(form.waitForPendingPromises()).toBeResolvedTo(false);
+      });
+
+      it('waits for promises tracked while waiting', async () => {
+        let deferred1 = new Deferred<void>();
+        let deferred2 = new Deferred<void>();
+        form.trackPromise(deferred1.promise().then(() => {
+          void form.trackPromise(deferred2.promise());
+        }));
+
+        let promise = form.waitForPendingPromises();
+        deferred1.resolve();
+        await sleep();
+        await expectAsync(promise).toBePending();
+
+        deferred2.resolve();
+        await expectAsync(promise).toBeResolvedTo(true);
+      });
+    });
+
+    describe('load', () => {
+      it('waits for promises tracked during importData', async () => {
+        let deferred = new Deferred<void>();
+        trackOnValueChange(() => deferred.promise());
+        form.importData = () => field.setValue('imported');
+
+        let promise = form.load();
+        await sleep();
+        await expectAsync(promise).toBePending();
+        expect(form.formLoading).toBe(true);
+
+        deferred.resolve();
+        await promise;
+        expect(form.formLoaded).toBe(true);
+      });
+
+      it('completes if a tracked promise is rejected', async () => {
+        trackOnValueChange(() => Promise.reject(new Error('failed')));
+        form.importData = () => field.setValue('imported');
+
+        await form.load();
+        expect(form.formLoaded).toBe(true);
+      });
+    });
+
+    describe('save', () => {
+      it('waits for tracked promises before saving', async () => {
+        let deferred = new Deferred<void>();
+        let saveSpy = spyOn(form, '_save').and.callThrough();
+        trackOnValueChange(() => deferred.promise());
+        field.setValue('changed');
+
+        let promise = form.save();
+        await sleep();
+        expect(saveSpy).not.toHaveBeenCalled();
+
+        deferred.resolve();
+        await promise;
+        expect(saveSpy).toHaveBeenCalled();
+        expect(form.formSaved).toBe(true);
+      });
+
+      it('does not save if a tracked promise is rejected', async () => {
+        let saveSpy = spyOn(form, '_save').and.callThrough();
+        trackOnValueChange(() => Promise.reject(new Error('failed')));
+        field.setValue('changed');
+
+        await form.save();
+        expect(saveSpy).not.toHaveBeenCalled();
+        expect(form.formSaved).toBe(false);
+      });
+    });
+
+    describe('ok', () => {
+      it('waits for tracked promises before saving and closing', async () => {
+        await form.open();
+        let deferred = new Deferred<void>();
+        trackOnValueChange(() => deferred.promise());
+        field.setValue('changed');
+
+        let promise = form.ok();
+        await sleep();
+        expect(form.destroyed).toBe(false);
+
+        deferred.resolve();
+        await promise;
+        expect(form.formSaved).toBe(true);
+        expect(form.destroyed).toBe(true);
+      });
+
+      it('does not close if a tracked promise is rejected', async () => {
+        await form.open();
+        trackOnValueChange(() => Promise.reject(new Error('failed')));
+        field.setValue('changed');
+
+        await form.ok();
+        expect(form.formSaved).toBe(false);
+        expect(form.destroyed).toBe(false);
+      });
+    });
   });
 
   describe('whenSave', () => {
