@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  BenchColumnLayoutData, Desktop, DesktopDisplayStyle, DesktopHistoryState, Event, FileChooser, Form, KeyStroke, Menu, MessageBox, NativeNotificationDefaults, Popup, PropertyChangeEvent, ViewButton, Widget, WidgetEventMap
+  BenchColumnLayoutData, Desktop, DesktopDisplayStyle, DesktopHistoryState, DeviceType, Event, FileChooser, Form, KeyStroke, Menu, MessageBox, NativeNotificationDefaults, Popup, PropertyChangeEvent, ViewButton, Widget, WidgetEventMap
 } from '../index';
 
 export interface DesktopCancelFormsEvent<T = Desktop> extends Event<T> {
@@ -51,4 +51,5 @@ export interface DesktopEventMap extends WidgetEventMap {
   'propertyChange:theme': PropertyChangeEvent<string>;
   'propertyChange:viewButtons': PropertyChangeEvent<ViewButton[]>;
   'propertyChange:views': PropertyChangeEvent<Form[]>;
+  'propertyChange:deviceType': PropertyChangeEvent<DeviceType>;
 }

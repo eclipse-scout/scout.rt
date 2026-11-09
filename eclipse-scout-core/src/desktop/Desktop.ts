@@ -9,9 +9,9 @@
  */
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
-  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
-  GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
-  OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
+  DesktopNavigation, DesktopNotification, Device, DeviceType, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
+  FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel,
+  objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -64,6 +64,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   openUriHandler: OpenUriHandler;
   theme: string;
   dense: boolean;
+  deviceType: DeviceType;
   animateLayoutChange: boolean;
   url: URL;
   responsiveHandler: ResponsiveHandler;
@@ -224,6 +225,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     super._init(model);
     this.url = new URL();
     this._initTheme();
+    this._initDeviceType();
     this.formController = scout.create(DesktopFormController, {
       displayParent: this,
       session: this.session
@@ -1710,6 +1712,38 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     scout.reloadPage(reloadOptions);
   }
 
+  protected _initDeviceType() {
+    Device.get().on('propertyChange:enforcedType', event => {
+      this.setDeviceType(event.newValue);
+    });
+    this._setDeviceType(this.deviceType || Device.get().enforcedType);
+  }
+
+  /**
+   * Changes the current device type to an enforced value.
+   *
+   * The device type is stored in a persistent cookie called scout.ui.enforcedDeviceType.
+   * In order to activate it, the browser is reloaded so that it will be rendered for the new device type.
+   *
+   * Since it is a persistent cookie, the device type will be activated again the next time the app is started, unless the cookie is deleted.
+   * @see DesktopModel.deviceType
+   */
+  setDeviceType(enforcedDeviceTypeCandidate: DeviceType) {
+    // cleanup invalid values
+    let enforcedDeviceType: DeviceType;
+    if (scout.isOneOf(enforcedDeviceTypeCandidate, Object.values(Device.Type))) {
+      enforcedDeviceType = enforcedDeviceTypeCandidate;
+    } else {
+      enforcedDeviceType = null;
+    }
+    this.setProperty('deviceType', enforcedDeviceType);
+  }
+
+  protected _setDeviceType(deviceType: DeviceType) {
+    this._setProperty('deviceType', deviceType);
+    Device.get().setEnforcedType(deviceType);
+  }
+
   /**
    * Moves all the given overlays (popups, dialogs, message boxes etc.) before the target overlay and activates the focus context of the target overlay.
    *
@@ -1857,6 +1891,11 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     let $target = $(event.target);
     let focusedElement = scout.widget($target);
     this.setProperty('focusedElement', focusedElement);
+  }
+
+  override remove() {
+    super.remove();
+    Device.get().off('propertyChange:deviceType');
   }
 }
 
