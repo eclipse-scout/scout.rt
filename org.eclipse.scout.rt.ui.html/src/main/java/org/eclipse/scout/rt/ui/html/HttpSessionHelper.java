@@ -29,6 +29,26 @@ public class HttpSessionHelper {
   public static final String SESSION_STORE_ATTRIBUTE_NAME = "scout.htmlui.httpsession.sessionstore";
 
   /**
+   * @param sessionStore
+   *     optional session store of the given HTTP session. If not {@code null}, an HTTP session that is about to be
+   *     invalidated by the store is considered invalid as well (see {@link ISessionStore#isHttpSessionValid()}).
+   * @return {@code true} if the given HTTP session is valid, {@code false} if it is {@code null} or has
+   * been invalidated
+   */
+  public boolean isHttpSessionValid(HttpSession httpSession, ISessionStore sessionStore) {
+    if (httpSession == null || (sessionStore != null && !sessionStore.isHttpSessionValid())) {
+      return false;
+    }
+    try {
+      httpSession.getCreationTime(); // throws IllegalStateException if the HTTP session is invalid
+      return true;
+    }
+    catch (IllegalStateException e) { // NOSONAR
+      return false;
+    }
+  }
+
+  /**
    * Gets the session store from the given HTTP session. If there is no store available for the given session a new one
    * will be created.
    *

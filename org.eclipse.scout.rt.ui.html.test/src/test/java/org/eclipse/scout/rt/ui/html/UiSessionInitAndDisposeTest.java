@@ -39,12 +39,14 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.UnloadRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -68,6 +70,8 @@ public class UiSessionInitAndDisposeTest {
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
   private Consumer<IClientSession> m_afterGetOrCreateClientSession;
   private boolean m_persistentUiSessions;
+  private boolean m_synchronousHousekeeping;
+  private RuntimeException m_initFailure;
 
   @Before
   public void before() {
@@ -674,6 +678,33 @@ public class UiSessionInitAndDisposeTest {
     m_protocol.clear();
   }
 
+  /**
+   * An ordinary startup failure must be reported as such, even if the cleanup of the failed startup (session
+   * housekeeping) invalidates the HTTP session. Otherwise, a recurring startup error would lead to endless page reloads.
+   */
+  @Test
+  public void testStartupFailureWithImmediateHousekeeping() throws Exception {
+    m_synchronousHousekeeping = true;
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final List<FixtureClientSession> clientSessions = new ArrayList<>();
+    m_afterGetOrCreateClientSession = clientSession -> clientSessions.add((FixtureClientSession) clientSession);
+    m_initFailure = new RuntimeException("expected startup failure");
+
+    JSONObject response = startup(messageHandler, httpSession);
+
+    // original failure is reported, no reload
+    assertFalse(response.has("startupData"));
+    assertEquals(JsonResponse.ERR_STARTUP_FAILED, response.getJSONObject(JsonResponse.PROP_ERROR).getInt(JsonResponse.PROP_ERROR_CODE));
+    // the cleanup invalidated the HTTP session after the failure
+    assertFalse(store.isHttpSessionValid());
+    assertEquals(1, clientSessions.size());
+    final FixtureClientSession clientSession = clientSessions.get(0);
+    JobTestUtil.waitForCondition(() -> store.isEmpty() && clientSession.isStopped());
+    m_protocol.clear();
+  }
+
   protected JSONObject startup(JsonMessageRequestHandler messageHandler, HttpSession httpSession) throws IOException {
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
@@ -694,6 +725,16 @@ public class UiSessionInitAndDisposeTest {
     protected void doHousekeepingOutsideWriteLock(IClientSession clientSession) {
       writeToProtocol("SessionStore.doHousekeeping");
       super.doHousekeepingOutsideWriteLock(clientSession);
+    }
+
+    @Override
+    protected void startHousekeepingInsideWriteLock(IClientSession clientSession) {
+      if (m_synchronousHousekeeping && clientSession != null) {
+        // simulates a housekeeping delay of 0 (the write lock is reentrant)
+        doHousekeepingOutsideWriteLock(clientSession);
+        return;
+      }
+      super.startHousekeepingInsideWriteLock(clientSession);
     }
   }
 
@@ -731,6 +772,15 @@ public class UiSessionInitAndDisposeTest {
     @Override
     public boolean isPersistent() {
       return m_persistentUiSessions || super.isPersistent();
+    }
+
+    @Override
+    protected void storeHttpSessionIdInCookie(HttpServletResponse resp, HttpSession httpSession, UserAgent userAgent) {
+      if (m_initFailure != null) {
+        // fails after the client session was assigned to the UI session
+        throw m_initFailure;
+      }
+      super.storeHttpSessionIdInCookie(resp, httpSession, userAgent);
     }
   }
 

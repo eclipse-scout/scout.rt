@@ -279,8 +279,13 @@ public class UiSession implements IUiSession {
       LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
     catch (RuntimeException | PlatformError e) {
+      // Check the HTTP session before disposing: dispose() may trigger the session housekeeping which might invalidate the HTTP session
+      boolean httpSessionInvalid = !(e instanceof InvalidHttpSessionException) && !getHttpSessionHelper().isHttpSessionValid(req.getSession(false), m_sessionStore);
       //cleanup resources potentially allocated in the partly created UiSession
       dispose();
+      if (httpSessionInvalid) {
+        throw new InvalidHttpSessionException("HTTP session was invalidated while initializing the UI session", e);
+      }
       throw e;
     }
     finally {

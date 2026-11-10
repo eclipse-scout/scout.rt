@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,6 +39,11 @@ public interface ISessionStore {
 
   String getHttpSessionId();
 
+  /**
+   * @return {@code true} if the HTTP session is valid, {@code false} if it was invalidated or the store has
+   * already decided to invalidate it (the invalidation itself may not have happened yet). No new UI sessions can be
+   * registered if the HTTP session is not valid.
+   */
   boolean isHttpSessionValid();
 
   /**

@@ -385,45 +385,34 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
     HttpSession httpSession = req.getSession();
-    ISessionStore sessionStore = null;
-    IUiSession uiSession = null;
-    final long startNanos = System.nanoTime();
+    ISessionStore sessionStore;
     try {
       sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
+    }
+    catch (IllegalStateException e) {
+      if (!m_httpSessionHelper.isHttpSessionValid(httpSession, null)) {
+        throw new InvalidHttpSessionException("HTTP session was invalidated before creating the UI session", e);
+      }
+      throw e;
+    }
 
-      LOG.debug("Creating new UI session....");
-      uiSession = BEANS.get(IUiSession.class);
-      uiSession.init(req, resp, jsonStartupReq);
+    final long startNanos = System.nanoTime();
+    LOG.debug("Creating new UI session....");
+    IUiSession uiSession = BEANS.get(IUiSession.class);
+    // throws InvalidHttpSessionException if the HTTP session was invalidated during initialization (disposes the UI session if initialization fails)
+    uiSession.init(req, resp, jsonStartupReq);
+    try {
+      // throws InvalidHttpSessionException if the HTTP session is invalid or about to be invalidated
       sessionStore.registerUiSession(uiSession);
     }
     catch (RuntimeException | PlatformError e) {
-      // UiSession.init() already disposes the UI session if it fails, but registerUiSession() might fail as well
-      if (uiSession != null && uiSession.isInitialized() && !uiSession.isDisposed()) {
-        disposeUiSession(uiSession);
-      }
-      if (!(e instanceof InvalidHttpSessionException) && !isHttpSessionValid(httpSession, sessionStore)) {
-        // e.g. IllegalStateException thrown by the invalidated HTTP session
-        throw new InvalidHttpSessionException("HTTP session was invalidated while creating the UI session", e);
-      }
+      disposeUiSession(uiSession);
       throw e;
     }
 
     LOG.info("Created new UI session with ID {} in {} ms [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]",
         uiSession.getUiSessionId(), StringUtility.formatNanos(System.nanoTime() - startNanos), m_maxUserIdleTime, req.getSession().getMaxInactiveInterval());
     return uiSession;
-  }
-
-  protected boolean isHttpSessionValid(HttpSession httpSession, ISessionStore sessionStore) {
-    if (sessionStore != null && !sessionStore.isHttpSessionValid()) {
-      return false;
-    }
-    try {
-      httpSession.getCreationTime(); // throws IllegalStateException if the HTTP session is invalid
-      return true;
-    }
-    catch (IllegalStateException e) { // NOSONAR
-      return false;
-    }
   }
 
   protected void disposeUiSession(IUiSession uiSession) {
