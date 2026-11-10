@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import java.nio.ByteBuffer;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class SerializationUtilityTest1 {
+public class SerializationUtility1Test {
 
   private static final class FixtureClassWithSerialVersionUID1 implements Serializable {
     private static final long serialVersionUID = 0x1234567890123456L;
