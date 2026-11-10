@@ -67,6 +67,7 @@ public class UiSessionInitAndDisposeTest {
   private List<IBean<?>> m_beans;
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
   private Consumer<IClientSession> m_afterGetOrCreateClientSession;
+  private boolean m_persistentUiSessions;
 
   @Before
   public void before() {
@@ -606,6 +607,73 @@ public class UiSessionInitAndDisposeTest {
     m_protocol.clear();
   }
 
+  /**
+   * Same as {@link #testStartupWhileHttpSessionInvalidated()} but with a persistent UI session (iOS home screen mode).
+   * The client session created by the aborted startup was never registered and must be stopped even though persistent
+   * UI sessions normally keep their client session.
+   */
+  @Test
+  public void testPersistentStartupWhileHttpSessionInvalidated() throws Exception {
+    m_persistentUiSessions = true;
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final List<FixtureClientSession> clientSessions = new ArrayList<>();
+    m_afterGetOrCreateClientSession = clientSession -> {
+      clientSessions.add((FixtureClientSession) clientSession);
+      httpSession.invalidate();
+    };
+
+    JSONObject response = startup(messageHandler, httpSession);
+
+    assertTrue(response.getJSONObject("startupData").getBoolean("reloadPage"));
+    assertEquals(1, clientSessions.size());
+    final FixtureClientSession clientSession = clientSessions.get(0);
+    JobTestUtil.waitForCondition(() -> store.isEmpty() && clientSession.isStopped());
+    assertTrue(m_protocol.contains("UiSession.dispose"));
+    assertTrue(m_protocol.contains("SessionStore.doHousekeeping"));
+    m_protocol.clear();
+  }
+
+  /**
+   * A registered client session of a persistent UI session (iOS home screen mode) is kept when the UI session is
+   * unloaded (e.g. app switch).
+   */
+  @Test
+  public void testPersistentStartupThenBrowserTabClose() throws Exception {
+    m_persistentUiSessions = true;
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    final UnloadRequestHandler unloadHandler = new UnloadRequestHandler();
+
+    JSONObject startupData = startup(messageHandler, httpSession).getJSONObject("startupData");
+    final String uiSessionId = startupData.getString("uiSessionId");
+    final String clientSessionId = startupData.getString("clientSessionId");
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().get(clientSessionId);
+    assertNotNull(clientSession);
+    m_protocol.clear();
+
+    // app switch -> json unload
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + uiSessionId, null);
+      final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
+      unloadHandler.handlePost(req, resp);
+    }
+
+    Thread.sleep(3000); // longer than the session store housekeeping delay of 2 seconds
+    assertTrue(store.getUiSessionMap().isEmpty());
+    assertSame(clientSession, store.getClientSessionMap().get(clientSessionId));
+    assertTrue(store.isHttpSessionValid());
+    assertFalse(clientSession.isStopped());
+    assertFalse(m_protocol.contains("SessionStore.doHousekeeping"));
+
+    // cleanup
+    httpSession.invalidate();
+    JobTestUtil.waitForCondition(clientSession::isStopped);
+    m_protocol.clear();
+  }
+
   protected JSONObject startup(JsonMessageRequestHandler messageHandler, HttpSession httpSession) throws IOException {
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
@@ -658,6 +726,11 @@ public class UiSessionInitAndDisposeTest {
     public void verifySubject(HttpServletRequest request) {
       writeToProtocol("UiSession.verifySubject");
       super.verifySubject(request);
+    }
+
+    @Override
+    public boolean isPersistent() {
+      return m_persistentUiSessions || super.isPersistent();
     }
   }
 

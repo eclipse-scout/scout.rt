@@ -354,8 +354,9 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
           (preregisteredMap == null ? 0 : preregisteredMap.size()),
           (clientSession == null ? null : clientSession.getId()));
       if ((map == null || map.isEmpty()) && (preregisteredMap == null || preregisteredMap.isEmpty())) {
-        if (uiSession.isPersistent()) {
+        if (uiSession.isPersistent() && isClientSessionRegisteredInsideWriteLock(clientSession)) {
           // don't start housekeeping for persistent sessions to give the users more time on app switches in ios home screen mode
+          // (not applicable for client sessions which were never registered, e.g. created by an aborted startup, because they cannot be used anymore)
           return;
         }
         startHousekeepingInsideWriteLock(clientSession);
@@ -364,6 +365,16 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     finally {
       m_writeLock.unlock();
     }
+  }
+
+  /**
+   * <b>Important:</b>: This method must be called from within the write lock!
+   *
+   * @return {@code true} if the given client session is registered in this store (see
+   * {@link #registerUiSession(IUiSession)}), {@code false} otherwise
+   */
+  protected boolean isClientSessionRegisteredInsideWriteLock(IClientSession clientSession) {
+    return clientSession != null && m_clientSessionMap.get(clientSession.getId()) == clientSession;
   }
 
   /**
