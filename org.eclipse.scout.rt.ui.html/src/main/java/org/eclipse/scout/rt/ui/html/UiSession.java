@@ -614,7 +614,10 @@ public class UiSession implements IUiSession {
     }
     m_disposed = true;
 
-    sessionStore().unregisterUiSession(this); // also stops and removes client session if necessary
+    ISessionStore sessionStore = sessionStore();
+    if (sessionStore != null) { // null if init() failed before the store could be obtained (e.g. invalidated HTTP session)
+      sessionStore.unregisterUiSession(this); // also stops and removes client session if necessary
+    }
 
     uninstallUiDataAvailableListener();
     signalPoller(); // Notify waiting requests - should not delay web-container shutdown

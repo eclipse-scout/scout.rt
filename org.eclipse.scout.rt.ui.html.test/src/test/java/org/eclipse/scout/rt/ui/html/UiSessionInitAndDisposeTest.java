@@ -72,6 +72,7 @@ public class UiSessionInitAndDisposeTest {
   private boolean m_persistentUiSessions;
   private boolean m_synchronousHousekeeping;
   private RuntimeException m_initFailure;
+  private Runnable m_beforeSessionStoreLookup;
 
   @Before
   public void before() {
@@ -705,6 +706,35 @@ public class UiSessionInitAndDisposeTest {
     m_protocol.clear();
   }
 
+  /**
+   * The HTTP session is invalidated after the request handler obtained the session store but before the UI session
+   * obtains it. The UI session cannot get the session store and must still be cleaned up, and the UI is requested to
+   * reload the page.
+   */
+  @Test
+  public void testStartupWhileHttpSessionInvalidatedBeforeUiSessionGetsSessionStore() throws Exception {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    m_beforeSessionStoreLookup = () -> {
+      httpSession.invalidate();
+      // behave like an invalidated HTTP session of a servlet container
+      Mockito.doThrow(new IllegalStateException("invalidated")).when(httpSession).getAttribute(Mockito.anyString());
+      Mockito.doThrow(new IllegalStateException("invalidated")).when(httpSession).getCreationTime();
+    };
+
+    JSONObject response = startup(messageHandler, httpSession);
+
+    JSONObject startupData = response.getJSONObject("startupData");
+    assertTrue(startupData.getBoolean("reloadPage"));
+    assertFalse(startupData.has("uiSessionId"));
+    assertFalse(store.isHttpSessionValid());
+    assertTrue(store.isEmpty());
+    assertTrue(m_protocol.contains("UiSession.dispose"));
+    assertFalse(m_protocol.contains("UiSession.getOrCreateClientSession"));
+    m_protocol.clear();
+  }
+
   protected JSONObject startup(JsonMessageRequestHandler messageHandler, HttpSession httpSession) throws IOException {
     try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
       final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
@@ -749,6 +779,15 @@ public class UiSessionInitAndDisposeTest {
         m_afterGetOrCreateClientSession.accept(clientSession);
       }
       return clientSession;
+    }
+
+    @Override
+    protected String createUiSessionId(JsonStartupRequest jsonStartupReq) {
+      // called right before the session store is obtained in init()
+      if (m_beforeSessionStoreLookup != null) {
+        m_beforeSessionStoreLookup.run();
+      }
+      return super.createUiSessionId(jsonStartupReq);
     }
 
     @Override
