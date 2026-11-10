@@ -14,7 +14,7 @@ import static org.eclipse.scout.rt.platform.util.Assertions.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -49,7 +49,7 @@ import org.eclipse.scout.rt.platform.util.StreamUtility;
  */
 public class DoEntity implements IDoEntity {
 
-  private final Map<String, DoNode<?>> m_attributes = new LinkedHashMap<>();
+  private final Map<String, DoNode<?>> m_attributes = new HashMap<>();
 
   private List<IDoEntity> m_contributions; // lazy init, because contributions are used rarely
 
