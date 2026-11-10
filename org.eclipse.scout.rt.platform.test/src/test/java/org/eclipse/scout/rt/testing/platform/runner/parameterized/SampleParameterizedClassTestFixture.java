@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,11 +18,12 @@ import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 
 @Ignore("This class is not supposed to be executed as test. Its class structure is used by ParameterizedTestRunnerExtensionTest.")
-public class SampleParameterizedTestClass {
+@SuppressWarnings("JUnitMalformedDeclaration")
+public class SampleParameterizedClassTestFixture {
   static final String TEST_PARAMETER_NAME_1 = "Scenario 1";
   private final ParameterizedTestClassParameter m_testParameter;
 
-  public SampleParameterizedTestClass(ParameterizedTestClassParameter testParameter) {
+  public SampleParameterizedClassTestFixture(ParameterizedTestClassParameter testParameter) {
     m_testParameter = testParameter;
   }
 

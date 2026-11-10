@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,9 +31,9 @@ public class ParameterizedTestRunnerExtensionTest {
 
   @Before
   public void before() throws NoSuchMethodException, SecurityException {
-    m_testClass = new TestClass(SampleParameterizedTestClass.class);
-    m_parameterizedTestMethod = new FrameworkMethod(SampleParameterizedTestClass.class.getMethod("testSomething"));
-    m_nonParameterizedTestMethod = new FrameworkMethod(SampleParameterizedTestClass.class.getMethod("testSomethingNonParameterized"));
+    m_testClass = new TestClass(SampleParameterizedClassTestFixture.class);
+    m_parameterizedTestMethod = new FrameworkMethod(SampleParameterizedClassTestFixture.class.getMethod("testSomething"));
+    m_nonParameterizedTestMethod = new FrameworkMethod(SampleParameterizedClassTestFixture.class.getMethod("testSomethingNonParameterized"));
   }
 
   @Test
@@ -42,8 +42,8 @@ public class ParameterizedTestRunnerExtensionTest {
 
     Object createdTestInstance = ParameterizedTestRunnerExtension.createTest(m_testClass, testParameter);
     assertNotNull(createdTestInstance);
-    assertEquals(SampleParameterizedTestClass.class, createdTestInstance.getClass());
-    assertEquals(testParameter, ((SampleParameterizedTestClass) createdTestInstance).getTestParameter());
+    assertEquals(SampleParameterizedClassTestFixture.class, createdTestInstance.getClass());
+    assertEquals(testParameter, ((SampleParameterizedClassTestFixture) createdTestInstance).getTestParameter());
   }
 
   @Test
@@ -97,12 +97,12 @@ public class ParameterizedTestRunnerExtensionTest {
 
   @Test
   public void testDescribeChild() {
-    final String testName = SampleParameterizedTestClass.class.getSimpleName();
-    final List<IScoutTestParameter> parameterList = SampleParameterizedTestClass.getParameters();
+    final String testName = SampleParameterizedClassTestFixture.class.getSimpleName();
+    final List<IScoutTestParameter> parameterList = SampleParameterizedClassTestFixture.getParameters();
     ParameterizedFrameworkMethod parameterizedTestMethod = new ParameterizedFrameworkMethod(m_parameterizedTestMethod, 0);
 
     Description testDescription = ParameterizedTestRunnerExtension.describeParameterizedChild(m_testClass, parameterizedTestMethod, testName, parameterList);
-    String expectedTestDescription = testName + " [" + SampleParameterizedTestClass.TEST_PARAMETER_NAME_1 + "]";
+    String expectedTestDescription = testName + " [" + SampleParameterizedClassTestFixture.TEST_PARAMETER_NAME_1 + "]";
     assertTrue(testDescription.getDisplayName().startsWith(expectedTestDescription));
   }
 
