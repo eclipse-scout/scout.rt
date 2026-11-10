@@ -14,8 +14,10 @@ import java.util.Locale;
 import tools.jackson.databind.deser.jdk.JDKKeyDeserializer;
 
 /**
- * Custom map key deserializer for {@link Locale} that is based upon the {@link DoLocaleDeserializer} in order to handle
- * the root locale correctly.
+ * Custom map key deserializer for {@link Locale}.
+ * <p>
+ * Ensures compatibility with {@link LocaleMapKeySerializer} by delegating locale deserialization
+ * to {@link DoLocaleDeserializer}, including deserialization of {@code "und"} as {@link Locale#ROOT}.
  */
 public class LocaleMapKeyDeserializer extends JDKKeyDeserializer {
 

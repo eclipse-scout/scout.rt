@@ -655,7 +655,6 @@ public class JsonDataObjectsSerializationTest {
     JsonMapper defaultJacksonObjectMapper = createDefaultJacksonObjectMapperBuilder().disable(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS).build();
 
     // Jackson serializes the ROOT locale as empty string. Scout serializes it as "und".
-    // Additionally, Jackson currently serializes locales in the old format (de_CH instead of de-CH) if they are used as map key (issue 6320)
     String serializedDefaultJackson = defaultJacksonObjectMapper.writeValueAsString(pojo);
     assertJsonEquals("TestSerializeDeserialize_ROOT_Locale_defaultJackson.json", serializedDefaultJackson);
     TestPojoWithLocaleProperties deserializedDefaultJackson = defaultJacksonObjectMapper.readValue(serializedDefaultJackson, TestPojoWithLocaleProperties.class);

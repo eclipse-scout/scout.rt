@@ -3,6 +3,6 @@
   "locale2" : "de-CH",
   "localeStringMap" : {
     "" : "Root",
-    "de_CH" : "German, Switzerland"
+    "de-CH" : "German, Switzerland"
   }
 }

@@ -18,8 +18,10 @@ import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.deser.jdk.JDKFromStringDeserializer;
 
 /**
- * Custom deserializer for {@link Locale} that specifically only handles deserializing "und" into the
- * {@link Locale#ROOT} value. All other values are deserialized using the default implementation.
+ * Custom deserializer for {@link Locale}.
+ * <p>
+ * Ensures compatibility with {@link DoLocaleSerializer} by deserializing {@code "und"} as {@link Locale#ROOT}.
+ * All other values are deserialized using the default Jackson implementation.
  */
 public class DoLocaleDeserializer extends JDKFromStringDeserializer {
 

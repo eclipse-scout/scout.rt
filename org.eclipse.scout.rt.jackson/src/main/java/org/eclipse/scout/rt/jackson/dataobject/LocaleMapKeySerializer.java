@@ -15,12 +15,15 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.ser.jdk.JDKStringLikeSerializer;
 
 /**
- * Custom serializer for map keys of type {@link Locale} using {@link Locale#toLanguageTag()} instead of
- * {@link Locale#toString()} default Jackson behavior.
+ * Custom serializer for map keys of type {@link Locale}.
  * <p>
- * TODO rsb: Check if this class is still needed when Jackson is upgraded (issue 6320)
+ * Serializes locales in the same way as Jackson, except for {@link Locale#ROOT},
+ * which is serialized as {@code "und"} instead of an empty string.
+ *
+ * @see JDKStringLikeSerializer#localeToString(Locale)
  */
 public class LocaleMapKeySerializer extends ValueSerializer<Locale> {
 
