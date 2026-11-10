@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,11 +11,11 @@ package org.eclipse.scout.rt.chart.ui.html.json;
 
 import org.eclipse.scout.rt.chart.client.ui.basic.chart.IChart;
 import org.eclipse.scout.rt.chart.client.ui.basic.table.controls.IChartTableControl;
+import org.eclipse.scout.rt.chart.client.ui.basic.table.userfilter.ChartTableUserFilterState;
 import org.eclipse.scout.rt.chart.client.ui.form.fields.chartfield.IChartField;
 import org.eclipse.scout.rt.chart.client.ui.form.fields.tile.AbstractChartTile;
 import org.eclipse.scout.rt.chart.ui.html.json.basic.chart.JsonChart;
 import org.eclipse.scout.rt.chart.ui.html.json.basic.table.controls.JsonChartTableControl;
-import org.eclipse.scout.rt.chart.ui.html.json.basic.table.userfilter.ChartTableUserFilterState;
 import org.eclipse.scout.rt.chart.ui.html.json.basic.table.userfilter.JsonChartTableUserFilter;
 import org.eclipse.scout.rt.chart.ui.html.json.form.fields.chartfield.JsonChartField;
 import org.eclipse.scout.rt.chart.ui.html.json.tile.JsonChartFieldTile;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -22,6 +22,10 @@ import org.eclipse.scout.rt.dataobject.TypeVersion;
 @TypeName("scout.ChartTableControlConfig")
 @TypeVersion(Scout_25_2_001.class)
 public class ChartTableControlConfigDo extends DoEntity implements IChartTableControlConfigDo {
+
+  public DoValue<Boolean> selected() {
+    return doValue("selected");
+  }
 
   public DoValue<ChartTableControlChartTypeId> chartTypeId() {
     return doValue("chartTypeId");
@@ -54,6 +58,22 @@ public class ChartTableControlConfigDo extends DoEntity implements IChartTableCo
   /* **************************************************************************
    * GENERATED CONVENIENCE METHODS
    * *************************************************************************/
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public ChartTableControlConfigDo withSelected(Boolean selected) {
+    selected().set(selected);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public Boolean getSelected() {
+    return selected().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public boolean isSelected() {
+    return nvl(getSelected());
+  }
 
   @Generated("DoConvenienceMethodsGenerator")
   public ChartTableControlConfigDo withChartTypeId(ChartTableControlChartTypeId chartTypeId) {

@@ -60,6 +60,7 @@ export class TableMatrix {
 
     // copy column for later access
     dataAxis.column = data;
+    dataAxis.axisGroup = dataGroup;
 
     // data always is number
     dataAxis.format = n => locale.decimalFormat.format(n);
@@ -108,6 +109,7 @@ export class TableMatrix {
     // collect all axis
     this._allAxis.push(keyAxis);
     keyAxis.column = axis;
+    keyAxis.axisGroup = axisGroup;
 
     // normalized string data
     keyAxis.normTable = [];
@@ -500,30 +502,22 @@ export class TableMatrix {
   }
 
   /**
-   * @returns Array holding an entry for each column. Each entry consists of an array with the column at index 0 and the count at index 1.
+   * @returns A list of [Column, Count] tuples, consisting of an entry for each column.
+   *          Each entry consists of tuple with the column at index 0 and the number of unique cell values at index 1.
    */
-  columnCount(filterNumberColumns?: boolean): Array<Array<Column<any> | number>> {
-    let columns = this.columns(filterNumberColumns),
-      colCount: Array<Array<Column<any> | any[] | number>> = [],
-      count = 0;
+  columnCount(filterNumberColumns?: boolean): TableMatrixColumnCount {
+    const columns = this.columns(filterNumberColumns);
+    const result: TableMatrixColumnCount = [];
 
-    for (let c = 0; c < columns.length; c++) {
-      let column = columns[c];
-      colCount.push([column, []]);
-
-      let values = colCount[count][1] as any[];
-      for (let r = 0; r < this._rows.length; r++) {
-        let row = this._rows[r];
-        let cellValue = column.cellValueOrTextForCalculation(row);
-        if (values.indexOf(cellValue) === -1) {
-          values.push(cellValue);
-        }
+    for (const column of columns) {
+      const distinctValues = new Set<any>();
+      for (const row of this._rows) {
+        distinctValues.add(column.cellValueOrTextForCalculation(row));
       }
-
-      colCount[count][1] = values.length;
-      count++;
+      result.push([column, distinctValues.size]);
     }
-    return colCount as Array<Array<Column<any> | number>>;
+
+    return result;
   }
 
   isEmpty(): boolean {
@@ -587,6 +581,8 @@ export type TableMatrixKeyAxis = number[] & {
   min: number;
   /** The biggest numeric key in this axis */
   max: number;
+  /** The group type that was specified when creating this axis */
+  axisGroup: TableMatrixNumberGroup | TableMatrixDateGroup;
   /** Converts any value to a numeric key */
   norm(f: any): number;
   /** Formats the given numeric key ({@link norm}) for display */
@@ -610,6 +606,8 @@ export type TableMatrixDataAxis = {
   total: number;
   min: number;
   max: number;
+  /** The group type that was specified when creating this axis */
+  axisGroup: TableMatrixNumberGroup;
   /** Converts any value to a numeric key */
   norm(f: any): number;
   /** Formats the given numeric key ({@link norm}) for display */
@@ -619,3 +617,6 @@ export type TableMatrixDataAxis = {
 };
 
 export type TableMatrixResult = Record<string, number[]> & { length: number; getValue(keys: number[]): number[] };
+
+/** A list of [Column, Count] tuples */
+export type TableMatrixColumnCount = [Column<any>, number][];
