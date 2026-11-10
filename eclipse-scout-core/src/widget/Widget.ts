@@ -2372,11 +2372,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   scrollToTop(options?: ScrollOptions) {
     if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToTop.bind(this));
+      this.session.layoutValidator.schedulePostValidateFunction(() => this.scrollToTop(options));
       return;
     }
     if (this.getDelegateScrollable()) {
-      this.getDelegateScrollable().scrollToTop();
+      this.getDelegateScrollable().scrollToTop(options);
       return;
     }
     let $scrollable = this.get$Scrollable();
@@ -2389,11 +2389,11 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   scrollToBottom(options?: ScrollOptions) {
     if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToBottom.bind(this));
+      this.session.layoutValidator.schedulePostValidateFunction(() => this.scrollToBottom(options));
       return;
     }
     if (this.getDelegateScrollable()) {
-      this.getDelegateScrollable().scrollToBottom();
+      this.getDelegateScrollable().scrollToBottom(options);
       return;
     }
     let $scrollable = this.get$Scrollable();
