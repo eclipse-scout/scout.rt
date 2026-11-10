@@ -128,6 +128,12 @@ export interface ActionModel extends WidgetModel {
    */
   tooltipText?: string;
   /**
+   * Defines whether HTML code in the {@link tooltipText} property should be interpreted. If set to false, the HTML will be encoded.
+   *
+   * Default is false.
+   */
+  tooltipHtmlEnabled?: boolean;
+  /**
    * Configures whether the tooltip should be displayed when hovered even if the action is selected.
    *
    * Default is true.

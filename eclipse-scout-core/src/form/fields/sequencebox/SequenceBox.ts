@@ -22,6 +22,7 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
   htmlBody: HtmlComponent;
   boxErrorStatus: StatusOrModel;
   boxTooltipText: string;
+  boxTooltipHtmlEnabled: boolean;
   boxMenus: Menu[];
   boxMenusVisible: boolean;
 
@@ -51,6 +52,7 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
     this._initDateFields();
     this.setErrorStatus(this.errorStatus);
     this.setTooltipText(this.tooltipText);
+    this.setTooltipHtmlEnabled(this.tooltipHtmlEnabled);
     this.setMenus(this.menus);
     this.setMenusVisible(this.menusVisible);
   }
@@ -147,7 +149,7 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
 
   protected _onFieldPropertyChange(event: PropertyChangeEvent<any, FormField>) {
     let visibilityChanged = (event.propertyName === 'visible');
-    if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'visible', 'menus', 'menusVisible'])) {
+    if (scout.isOneOf(event.propertyName, ['errorStatus', 'tooltipText', 'tooltipHtmlEnabled', 'visible', 'menus', 'menusVisible'])) {
       this._handleStatus(visibilityChanged);
     } else if (event.propertyName === 'value') {
       this._onFieldValueChange(event as PropertyChangeEvent<any, ValueField<any>>);
@@ -187,9 +189,11 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
 
     if (this._lastVisibleField.hasStatusTooltip()) {
       this.setTooltipText(this._lastVisibleField.tooltipText);
+      this.setTooltipHtmlEnabled(this._lastVisibleField.tooltipHtmlEnabled);
       this._isTooltipTextOverwritten = true;
     } else {
       this.setTooltipText(this.boxTooltipText);
+      this.setTooltipHtmlEnabled(this.boxTooltipHtmlEnabled);
       this._isTooltipTextOverwritten = false;
     }
 
@@ -304,6 +308,20 @@ export class SequenceBox extends CompositeField implements SequenceBoxModel {
     if (this._isOverwritingStatusFromField || !this._isTooltipTextOverwritten) {
       // prevent setting value if directly changed on seq box and is already overwritten
       super.setTooltipText(tooltipText);
+    }
+  }
+
+  override setTooltipHtmlEnabled(tooltipHtmlEnabled: boolean) {
+    if (this._isOverwritingStatusFromField && !this._isTooltipTextOverwritten) {
+      // was not overwritten, will be overwritten now -> backup old value
+      this.boxTooltipHtmlEnabled = this.tooltipHtmlEnabled;
+    } else if (!this._isOverwritingStatusFromField) {
+      // directly changed on seq box -> update backed-up value
+      this.boxTooltipHtmlEnabled = tooltipHtmlEnabled;
+    }
+    if (this._isOverwritingStatusFromField || !this._isTooltipTextOverwritten) {
+      // prevent setting value if directly changed on seq box and is already overwritten
+      super.setTooltipHtmlEnabled(tooltipHtmlEnabled);
     }
   }
 

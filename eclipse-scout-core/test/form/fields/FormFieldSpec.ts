@@ -256,6 +256,72 @@ describe('FormField', () => {
 
   });
 
+  describe('property tooltipHtmlEnabled', () => {
+
+    it('if false, encodes html in tooltip', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>'
+      });
+      field.render();
+      field.fieldStatus.doAction();
+      expect(field.fieldStatus.tooltip.htmlEnabled).toBe(false);
+      expect(field.fieldStatus.tooltip.$content.html()).toBe('&lt;b&gt;text&lt;/b&gt;');
+    });
+
+    it('if true, does not encode html in tooltip', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>',
+        tooltipHtmlEnabled: true
+      });
+      field.render();
+      field.fieldStatus.doAction();
+      expect(field.fieldStatus.tooltip.htmlEnabled).toBe(true);
+      expect(field.fieldStatus.tooltip.$content.html()).toBe('<b>text</b>');
+    });
+
+    it('can be changed dynamically', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        tooltipText: '<b>text</b>'
+      });
+      field.render();
+      field.setTooltipHtmlEnabled(true);
+      field.fieldStatus.doAction();
+      expect(field.fieldStatus.tooltip.htmlEnabled).toBe(true);
+      expect(field.fieldStatus.tooltip.$content.html()).toBe('<b>text</b>');
+
+      field.setTooltipHtmlEnabled(false); // closes tooltip
+      field.fieldStatus.doAction();
+      expect(field.fieldStatus.tooltip.htmlEnabled).toBe(false);
+      expect(field.fieldStatus.tooltip.$content.html()).toBe('&lt;b&gt;text&lt;/b&gt;');
+    });
+
+    it('also affects error status tooltip', () => {
+      let field = scout.create(StringField, {
+        parent: session.desktop,
+        errorStatus: {
+          message: '<b>error</b>',
+          severity: Status.Severity.ERROR
+        },
+        tooltipHtmlEnabled: true
+      });
+      field.render();
+      // Tooltip is already open because tooltip.autoRemove is false on severity error
+      expect(field.fieldStatus.tooltip.htmlEnabled).toBe(true);
+      expect(field.fieldStatus.tooltip.$content.html()).toBe('<b>error</b>');
+
+      field.setTooltipHtmlEnabled(false);
+      expect(field.fieldStatus.tooltip.htmlEnabled).toBe(false);
+      expect(field.fieldStatus.tooltip.$content.html()).toBe('&lt;b&gt;error&lt;/b&gt;');
+
+      field.setTooltipHtmlEnabled(true);
+      expect(field.fieldStatus.tooltip.htmlEnabled).toBe(true);
+      expect(field.fieldStatus.tooltip.$content.html()).toBe('<b>error</b>');
+    });
+  });
+
   describe('property menus', () => {
     let formField, model;
 
