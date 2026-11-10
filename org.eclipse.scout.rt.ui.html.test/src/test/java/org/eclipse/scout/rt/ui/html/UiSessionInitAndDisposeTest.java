@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -53,6 +54,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +66,7 @@ public class UiSessionInitAndDisposeTest {
 
   private List<IBean<?>> m_beans;
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
+  private Consumer<IClientSession> m_afterGetOrCreateClientSession;
 
   @Before
   public void before() {
@@ -537,6 +540,81 @@ public class UiSessionInitAndDisposeTest {
     m_protocol.clear();
   }
 
+  /**
+   * A startup request arrives after the session store decided to invalidate the HTTP session (no more client sessions)
+   * but before the HTTP session is actually invalidated. The UI session must not be registered, no client session must
+   * be created and the UI is requested to reload the page.
+   */
+  @Test
+  public void testStartupWhileHttpSessionInvalidationPending() {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    final SessionStore store = (SessionStore) BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final List<JSONObject> responses = new ArrayList<>();
+    // getCreationTime() is called by SessionStore#checkHttpSessionOutsideWriteLock after the write lock was released and before the HTTP session is invalidated
+    Mockito.when(httpSession.getCreationTime()).thenAnswer(invocation -> {
+      if (responses.isEmpty()) {
+        responses.add(startup(messageHandler, httpSession));
+      }
+      return 0L;
+    });
+
+    store.checkHttpSessionOutsideWriteLock();
+
+    assertEquals(1, responses.size());
+    JSONObject startupData = responses.get(0).getJSONObject("startupData");
+    assertTrue(startupData.getBoolean("reloadPage"));
+    assertFalse(startupData.has("uiSessionId"));
+    assertTrue(store.isEmpty());
+    assertFalse(store.isHttpSessionValid());
+    assertEquals(
+        Arrays.asList(
+            "UiSession.init",
+            "UiSession.getOrCreateClientSession",
+            "UiSession.dispose"),
+        m_protocol);
+    m_protocol.clear();
+  }
+
+  /**
+   * The HTTP session is invalidated after the UI session was preregistered (client session already created) but before
+   * the UI session is registered. The UI session and the client session must be disposed and the UI is requested to
+   * reload the page.
+   */
+  @Test
+  public void testStartupWhileHttpSessionInvalidated() throws Exception {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final List<FixtureClientSession> clientSessions = new ArrayList<>();
+    m_afterGetOrCreateClientSession = clientSession -> {
+      clientSessions.add((FixtureClientSession) clientSession);
+      httpSession.invalidate();
+    };
+
+    JSONObject response = startup(messageHandler, httpSession);
+
+    JSONObject startupData = response.getJSONObject("startupData");
+    assertTrue(startupData.getBoolean("reloadPage"));
+    assertFalse(startupData.has("uiSessionId"));
+    assertEquals(1, clientSessions.size());
+    final FixtureClientSession clientSession = clientSessions.get(0);
+    JobTestUtil.waitForCondition(() -> store.isEmpty() && clientSession.isStopped());
+    assertFalse(store.isHttpSessionValid());
+    assertTrue(m_protocol.contains("UiSession.dispose"));
+    assertFalse(m_protocol.contains("UiSession.verifySubject"));
+    m_protocol.clear();
+  }
+
+  protected JSONObject startup(JsonMessageRequestHandler messageHandler, HttpSession httpSession) throws IOException {
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", "{\"startup\":true}");
+      final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
+      messageHandler.handlePost(req, resp);
+      return new JSONObject(new String(out.getContent(), StandardCharsets.UTF_8));
+    }
+  }
+
   @IgnoreBean
   private class FixtureSessionStore extends SessionStore {
     public FixtureSessionStore(HttpSession httpSession) {
@@ -557,7 +635,11 @@ public class UiSessionInitAndDisposeTest {
     @Override
     protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
       writeToProtocol("UiSession.getOrCreateClientSession");
-      return super.getOrCreateClientSession(httpSession, req, jsonStartupReq);
+      IClientSession clientSession = super.getOrCreateClientSession(httpSession, req, jsonStartupReq);
+      if (m_afterGetOrCreateClientSession != null) {
+        m_afterGetOrCreateClientSession.accept(clientSession);
+      }
+      return clientSession;
     }
 
     @Override

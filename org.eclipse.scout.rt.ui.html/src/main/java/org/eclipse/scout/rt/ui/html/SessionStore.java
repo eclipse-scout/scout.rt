@@ -60,6 +60,11 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   private final HttpSession m_httpSession;
   private final String m_httpSessionId; // because getId() cannot be called on an invalid session
   private volatile boolean m_httpSessionValid = true;
+  /**
+   * Set (inside the write lock) as soon as it was decided to invalidate the HTTP session. The invalidation itself
+   * happens outside the write lock, see {@link #checkHttpSessionOutsideWriteLock()}.
+   */
+  private volatile boolean m_httpSessionInvalidationPending;
 
   /**
    * key = clientSessionId
@@ -131,7 +136,16 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
 
   @Override
   public final boolean isHttpSessionValid() {
-    return m_httpSessionValid;
+    return m_httpSessionValid && !m_httpSessionInvalidationPending;
+  }
+
+  /**
+   * <b>Important:</b>: This method must be called from within the write lock!
+   */
+  protected void assertHttpSessionValidInsideWriteLock(String uiSessionId) {
+    if (!isHttpSessionValid()) {
+      throw new InvalidHttpSessionException(String.format("Cannot register UI session with ID %s because the HTTP session with ID %s is invalid or about to be invalidated.", uiSessionId, m_httpSessionId));
+    }
   }
 
   /**
@@ -231,10 +245,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
     Assertions.assertNotNull(uiSession);
     String uiSessionId = uiSession.getUiSessionId();
     Assertions.assertNotNull(uiSessionId);
-    Assertions.assertTrue(m_httpSessionValid, "Preregister UI session with ID {} to an already used http session with ID {} is not supported.", uiSessionId, m_httpSessionId);
     LOG.debug("Pre-register UI session with ID {}", uiSessionId);
     m_writeLock.lock();
     try {
+      assertHttpSessionValidInsideWriteLock(uiSessionId);
       Assertions.assertFalse(m_uiSessionMap.containsKey(uiSessionId), "This session store already contains the uiSessionId '{}'", uiSessionId);
       m_preregisteredUiSessionMap.put(uiSessionId, uiSession);
 
@@ -271,10 +285,10 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   @Override
   public void registerUiSession(final IUiSession uiSession) {
     Assertions.assertNotNull(uiSession);
-    Assertions.assertTrue(m_httpSessionValid, "Register UI session with ID {} to an already used http session with ID {} is not supported.", uiSession.getUiSessionId(), m_httpSessionId);
     LOG.debug("Register UI session with ID {} in store (clientSessionId={})", uiSession.getUiSessionId(), uiSession.getClientSessionId());
     m_writeLock.lock();
     try {
+      assertHttpSessionValidInsideWriteLock(uiSession.getUiSessionId());
       IClientSession clientSession = uiSession.getClientSession();
 
       // Remove preregistered mappings
@@ -484,9 +498,11 @@ public class SessionStore implements ISessionStore, HttpSessionBindingListener {
   protected void checkHttpSessionOutsideWriteLock() {
     m_writeLock.lock();
     try {
-      if (!(m_clientSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && m_httpSessionValid)) {
+      if (!(m_clientSessionMap.isEmpty() && m_preregisteredUiSessionMap.isEmpty() && isHttpSessionValid())) {
         return;
       }
+      // Prevent new UI sessions from being registered before the HTTP session is invalidated outside the write lock
+      m_httpSessionInvalidationPending = true;
       // Check if everything was cleaned up correctly ("leak detection").
       int uiSessionMapSize = m_uiSessionMap.size();
       int uiSessionsByClientSessionSize = m_uiSessionsByClientSession.size();
