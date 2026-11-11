@@ -496,11 +496,11 @@ export class TableFooter extends Widget implements TableFooterModel {
         .data('animationComplete', complete)
         .removeClass('hiding')
         .setVisible(true)
+        .cssMarginX(null) // reset margin _before_ revalidating the layout to prevent false fit assumption
         .cssWidthToContentAnimated({
           progress: this.revalidateLayout.bind(this),
           complete: complete
-        })
-        .cssMarginX(null);
+        });
 
     } else {
       $info.stop()
