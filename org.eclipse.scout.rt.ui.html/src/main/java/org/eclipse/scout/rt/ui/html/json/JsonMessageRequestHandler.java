@@ -131,7 +131,7 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         LOG.debug("Connection error detected: exception class={}, message={}.", e.getClass().getSimpleName(), e.getMessage(), e);
         // no need to send any response here as the connection is broken anyway. May throw IllegalStateException otherwise which hides the original exception.
       }
-      else if (jsonRequest == null || uiSession == null || jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
+      else if (jsonRequest != null && jsonRequest.getRequestType() == RequestType.STARTUP_REQUEST) {
         // Send a special error code when an error happens during initialization, because
         // the UI has no translated texts to show in this case.
         LOG.error("Error while initializing UI session", e);
