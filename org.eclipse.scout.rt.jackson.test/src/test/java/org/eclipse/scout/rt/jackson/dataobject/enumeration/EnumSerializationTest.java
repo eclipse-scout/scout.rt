@@ -73,6 +73,12 @@ public class EnumSerializationTest {
   }
 
   @Test
+  public void testSerializeDeserialize_PlainEnumWithCustomToString() {
+    assertEquals("\"VALUE\"", m_dataObjectMapper.writeValue(PlainEnum.VALUE));
+    assertEquals(PlainEnum.VALUE, m_dataObjectMapper.readValue("\"VALUE\"", PlainEnum.class));
+  }
+
+  @Test
   public void testSerializeDeserialize_EntityWithInvalidEnum() throws Exception {
     String json = m_testHelper.readResourceAsString(toURL("TestEntityWithInvalidEnumDo.json"));
     assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEntityWithEnumDo.class));
@@ -134,5 +140,14 @@ public class EnumSerializationTest {
 
   protected URL toURL(String resourceName) {
     return EnumSerializationTest.class.getResource(resourceName);
+  }
+
+  private enum PlainEnum {
+    VALUE;
+
+    @Override
+    public String toString() {
+      return "custom-value";
+    }
   }
 }

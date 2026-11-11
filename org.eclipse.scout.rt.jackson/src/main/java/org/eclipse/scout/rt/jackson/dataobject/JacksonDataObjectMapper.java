@@ -38,6 +38,7 @@ import tools.jackson.core.StreamReadConstraints;
 import tools.jackson.core.StreamWriteConstraints;
 import tools.jackson.core.json.JsonFactory;
 import tools.jackson.core.json.JsonFactoryBuilder;
+import tools.jackson.databind.cfg.EnumFeature;
 import tools.jackson.databind.deser.DeserializerFactory;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -153,6 +154,7 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
         .addModule(scoutDataObjectModule)
         .defaultDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)) // TODO [23.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
         .deactivateDefaultTyping() // disabled for security reasons
+        .disable(EnumFeature.WRITE_ENUMS_USING_TO_STRING, EnumFeature.READ_ENUMS_USING_TO_STRING)
         .deserializerFactory(createDeserializerFactory());
   }
 

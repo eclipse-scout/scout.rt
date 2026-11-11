@@ -217,19 +217,20 @@
         <version>${master_plugin_jandex_version}</version>
       </dependency>
 
-      <!-- scribejava-apis still uses old Jackson2. fix version to resolve any dependency convergences -->
-      <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
-        <artifactId>jackson-bom</artifactId>
-        <version>2.22.4</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-
+      <!-- Jackson 3 BOM also manages jackson-annotations; keep it first so its version takes precedence. -->
       <dependency>
         <groupId>tools.jackson</groupId>
         <artifactId>jackson-bom</artifactId>
         <version>${jackson.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <!-- scribejava-apis still uses old Jackson2. fix version to resolve any dependency convergences -->
+      <dependency>
+        <groupId>com.fasterxml.jackson</groupId>
+        <artifactId>jackson-bom</artifactId>
+        <version>2.23.0</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
