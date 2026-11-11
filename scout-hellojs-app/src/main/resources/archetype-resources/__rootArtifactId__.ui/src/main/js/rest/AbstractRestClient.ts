@@ -12,27 +12,27 @@ export abstract class AbstractRestClient implements ObjectWithType {
     this.targetUrl = targetUrl;
   }
 
-  protected _loadItem<TItem extends BaseDoEntity>(id: string): JQuery.Promise<TItem, AjaxError> {
+  protected _loadItem<TItem extends BaseDoEntity>(id: string): Promise<TItem> {
     return ajax.getDataObject(this.targetUrl + id)
       .then((res: AbstractItemResponse<TItem>) => res.items[0]);
   }
 
-  protected _listItems<TItem extends BaseDoEntity>(restriction: BaseDoEntity): JQuery.Promise<TItem[], AjaxError> {
+  protected _listItems<TItem extends BaseDoEntity>(restriction: BaseDoEntity): Promise<TItem[]> {
     return ajax.postDataObject(this.targetUrl + 'list', restriction)
       .then((res: AbstractItemResponse<TItem>) => res.items);
   }
 
-  protected _createItem<TItem extends BaseDoEntity>(data: BaseDoEntity): JQuery.Promise<TItem, AjaxError> {
+  protected _createItem<TItem extends BaseDoEntity>(data: BaseDoEntity): Promise<TItem> {
     return ajax.postDataObject(this.targetUrl, data)
       .then((res: AbstractItemResponse<TItem>) => this._triggerDataChange(res.items[0]));
   }
 
-  protected _storeItem<TItem extends BaseDoEntity>(id: string, data: BaseDoEntity): JQuery.Promise<TItem, AjaxError> {
+  protected _storeItem<TItem extends BaseDoEntity>(id: string, data: BaseDoEntity): Promise<TItem> {
     return ajax.putDataObject(this.targetUrl + id, data)
       .then((res: AbstractItemResponse<TItem>) => this._triggerDataChange(res.items[0]));
   }
 
-  protected _removeItem(id: string): JQuery.Promise<void, AjaxError> {
+  protected _removeItem(id: string): Promise<void> {
     return ajax.removeDataObject(this.targetUrl + id)
       .then(() => this._triggerDataChange());
   }

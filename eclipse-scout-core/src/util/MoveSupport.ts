@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {App, ErrorHandler, Event, EventEmitter, EventMap, events, graphics, InitModelOf, Insets, keys, Point, Rectangle, scout, scrollbars, Session, ViewportScroller, ViewportScrollerModel, Widget} from '../index';
+import {ErrorHandler, Event, EventEmitter, EventMap, events, graphics, InitModelOf, Insets, keys, Point, Rectangle, scout, scrollbars, Session, ViewportScroller, ViewportScrollerModel, Widget} from '../index';
 import $ from 'jquery';
 
 export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
@@ -419,8 +419,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
         }, error => {
           scout.create(ErrorHandler, {displayError: false}).handle(error);
           this.cancel();
-        })
-        .catch(error => App.get().errorHandler.handle(error));
+        });
     } else {
       this._restoreStyles();
       this._moveData = null;
@@ -449,7 +448,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
     $('iframe').removeClass('dragging-in-progress');
   }
 
-  protected _moveToTarget(targetBounds: Rectangle): JQuery.Promise<void> {
+  protected _moveToTarget(targetBounds: Rectangle): Promise<void> {
     if (!this._moveData.$clone) {
       return $.resolvedPromise();
     }
@@ -507,7 +506,7 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
    * @returns the target offset bounds to where the element should be moved, or null if the
    *          operation should be ended without animation.
    */
-  protected _dragEnd(event: JQuery.MouseUpEvent): JQuery.Promise<Rectangle> {
+  protected _dragEnd(event: JQuery.MouseUpEvent): Promise<Rectangle> {
     let info = this._moveData.draggedElementInfo;
     return $.resolvedPromise(new Rectangle(info.bounds.x, info.bounds.y, info.bounds.width, info.bounds.height));
   }

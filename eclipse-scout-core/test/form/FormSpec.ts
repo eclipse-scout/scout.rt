@@ -9,7 +9,7 @@
  */
 import {FormSpecHelper, OutlineSpecHelper, SpecForm, SpecLifecycle} from '../../src/testing/index';
 import {
-  App, CancelMenu, CloseMenu, Dimension, fields, FileChooser, Form, FormFieldMenu, FormLifecycle, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup,
+  App, CancelMenu, CloseMenu, Deferred, Dimension, fields, FileChooser, Form, FormFieldMenu, FormLifecycle, FormModel, InitModelOf, MessageBox, NotificationBadgeStatus, NullWidget, NumberField, ObjectFactory, OkMenu, Outline, Page, Popup,
   PopupBlockerHandler, Rectangle, ResetMenu, SaveMenu, scout, SearchMenu, SequenceBox, Session, SplitBox, Status, StringField, strings, TabBox, TabItem, webstorage, WidgetModel, WrappedFormField
 } from '../../src/index';
 import {DateField, GroupBox} from '../../src';
@@ -69,7 +69,7 @@ describe('Form', () => {
           expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('adds it to the desktop if no display parent is provided', done => {
@@ -79,7 +79,7 @@ describe('Form', () => {
           expect(session.desktop.dialogs.indexOf(form) > -1).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('adds it to the provided display parent', done => {
@@ -94,7 +94,7 @@ describe('Form', () => {
           expect(parentForm.dialogs.indexOf(form) > -1).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('does not load the form multiple times', async () => {
@@ -144,7 +144,7 @@ describe('Form', () => {
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('closes the form even if opening is still pending', done => {
@@ -156,7 +156,7 @@ describe('Form', () => {
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
 
       // Close immediately without waiting for the open promise to resolve
       form.close();
@@ -177,7 +177,7 @@ describe('Form', () => {
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
   });
@@ -198,7 +198,7 @@ describe('Form', () => {
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
   });
@@ -264,6 +264,25 @@ describe('Form', () => {
 
       return promise;
     });
+
+    it('waits for importData to complete if a promise is returned', async () => {
+      const def = new Deferred<void>();
+
+      class AsyncImportForm extends Form {
+        override importData() {
+          return def.promise();
+        }
+      }
+
+      let form = scout.create(AsyncImportForm, {parent: session.desktop});
+
+      let promise = form.load();
+      await sleep(); // Simulate long-running import
+      await expectAsync(promise).toBePending();
+
+      def.resolve();
+      await expectAsync(promise).toBeResolved();
+    });
   });
 
   describe('busy', () => {
@@ -274,7 +293,7 @@ describe('Form', () => {
       return undefined;
     });
 
-    function expectDesktopBusyWhileValidating(op: () => JQuery.Promise<any>) {
+    function expectDesktopBusyWhileValidating(op: () => Promise<any>) {
       let validatorCalled = false;
       form.addValidator(f => {
         // validator is executed while saving
@@ -289,7 +308,7 @@ describe('Form', () => {
       });
     }
 
-    function expectDesktopBusyWhileLoading(op: () => JQuery.Promise<any>) {
+    function expectDesktopBusyWhileLoading(op: () => Promise<any>) {
       expect(form.session.desktop.busy).toBe(false);
       let formLoadingCalled = false;
       form.one('propertyChange:formLoading', e => {
@@ -303,27 +322,27 @@ describe('Form', () => {
     }
 
     it('is active during save', done => {
-      expectDesktopBusyWhileValidating(() => form.save()).always(done);
+      expectDesktopBusyWhileValidating(() => form.save()).finally(done);
     });
 
     it('is active during ok', done => {
-      expectDesktopBusyWhileValidating(() => form.ok()).always(done);
+      expectDesktopBusyWhileValidating(() => form.ok()).finally(done);
     });
 
     it('is active during validate', done => {
-      expectDesktopBusyWhileValidating(() => form.validate()).always(done);
+      expectDesktopBusyWhileValidating(() => form.validate()).finally(done);
     });
 
     it('is active during cancel', done => {
-      expectDesktopBusyWhileValidating(() => form.lifecycle['_okAfterAskIfSaveNeeded']()).always(done);
+      expectDesktopBusyWhileValidating(() => form.lifecycle['_okAfterAskIfSaveNeeded']()).finally(done);
     });
 
     it('is active during load', done => {
-      expectDesktopBusyWhileLoading(() => form.load()).always(done);
+      expectDesktopBusyWhileLoading(() => form.load()).finally(done);
     });
 
     it('is active during reset', done => {
-      expectDesktopBusyWhileLoading(() => form.reset()).always(done);
+      expectDesktopBusyWhileLoading(() => form.reset()).finally(done);
     });
 
     it('is removed on validation message', done => {
@@ -339,7 +358,7 @@ describe('Form', () => {
       expect(form.session.desktop.busy).toBe(false);
       form.save().then(() => {
         expect(form.session.desktop.busy).toBe(false);
-      }).always(done);
+      }).finally(done);
     });
 
     afterEach(() => form.close());
@@ -364,7 +383,7 @@ describe('Form', () => {
           expect(form.formSaved).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('is marked saved after save', done => {
@@ -378,7 +397,7 @@ describe('Form', () => {
           expect(field.saveNeeded).toBe(false);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('is not marked saved on error', done => {
@@ -395,7 +414,7 @@ describe('Form', () => {
           // it should not be marked saved because the save returned an error
           expect(field.saveNeeded).toBe(true);
         })
-        .always(done);
+        .finally(done);
       jasmine.clock().tick(1000);
       helper.closeMessageBoxes();
       jasmine.clock().tick(1000);
@@ -416,7 +435,7 @@ describe('Form', () => {
           expect(saveCalled).toBe(false);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
   });
@@ -436,7 +455,7 @@ describe('Form', () => {
           expect(saveCalled).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
 
       form.touch();
       form.save();
@@ -466,7 +485,7 @@ describe('Form', () => {
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('closes the form even if opening is still pending', done => {
@@ -488,7 +507,7 @@ describe('Form', () => {
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
 
       // Abort immediately without waiting for the open promise to resolve
       form.abort();
@@ -511,7 +530,7 @@ describe('Form', () => {
           expect(form.destroyed).toBe(true);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('activates the form if it is still open after close', done => {
@@ -533,7 +552,7 @@ describe('Form', () => {
           expect(desktop.activeForm).toBe(form);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 
@@ -674,7 +693,7 @@ describe('Form', () => {
           expect($('.glasspane').length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     }
   });
 
@@ -694,7 +713,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('is not required if form is just rendered', () => {
@@ -721,7 +740,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('not same as parent if display parent is outline', done => {
@@ -743,7 +762,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('blocks desktop if modal and displayParent is desktop', done => {
@@ -761,7 +780,7 @@ describe('Form', () => {
           expect($('.glasspane').length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('blocks detail form and outline if modal and displayParent is outline', done => {
@@ -783,7 +802,7 @@ describe('Form', () => {
           expect($('.glasspane').length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('blocks form if modal and displayParent is form', done => {
@@ -805,7 +824,7 @@ describe('Form', () => {
           expect($('.glasspane').length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('does not block child popup if dialog is modal', done => {
@@ -833,7 +852,7 @@ describe('Form', () => {
           expect($('.glasspane').length).toBe(0);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('does not block child popup if dialog is modal and displayParent a view', done => {
@@ -871,7 +890,7 @@ describe('Form', () => {
           view.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('blocks form display parent even if form is opened by multiple popups', async () => {
@@ -1132,7 +1151,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 
@@ -1320,10 +1339,9 @@ describe('Form', () => {
           expect(form.widget('savemenu').enabledComputed).toBe(false);
           expect(form.widget('searchmenu').enabledComputed).toBe(false);
 
-          return form.close().then(() => {
-            expect(session.desktop.activeForm).toBe(null);
-            done();
-          });
+          form.close();
+          expect(session.desktop.activeForm).toBe(null);
+          done();
         })
         .catch(fail);
     });
@@ -1346,7 +1364,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('can be toggled dynamically', done => {
@@ -1365,7 +1383,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('sets size to prefSize when set to false', done => {
@@ -1383,7 +1401,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('sets size to previous size when set to false when modified before', done => {
@@ -1405,7 +1423,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('removes resize handles', done => {
@@ -1424,7 +1442,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 
@@ -1494,7 +1512,7 @@ describe('Form', () => {
           form.close();
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
   });
 
@@ -1571,7 +1589,7 @@ describe('Form', () => {
           expect(form.saveNeeded).toBe(false);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('turns false when no fields require to be saved anymore', () => {
@@ -1695,7 +1713,7 @@ describe('Form', () => {
           this.widget('TabField', StringField).setValue('hello');
         }
 
-        protected override _load(): JQuery.Promise<object> {
+        protected override _load(): Promise<object> {
           this.widget('TabField', StringField).setValue('there');
           return super._load();
         }
@@ -1711,7 +1729,7 @@ describe('Form', () => {
           expect(form.saveNeeded).toBe(false);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('works if fields are changed dynamically', () => {
@@ -2023,7 +2041,7 @@ describe('Form', () => {
           expect(form.saveNeeded).toBe(false);
         })
         .catch(fail)
-        .always(done);
+        .finally(done);
     });
 
     it('considers natural form bounds', async () => {
@@ -2204,115 +2222,95 @@ describe('Form', () => {
       expect(form._showFormInvalidMessageBox).toHaveBeenCalledTimes(1);
     });
 
-    it('returns false if mandatory field is empty', done => {
-      jasmine.clock().install();
-
+    it('returns false if mandatory field is empty', async () => {
       numberField.setValue(42);
 
-      form.validate()
-        .then(status => {
-          expect(status.isValid()).toBeFalse();
-        })
-        .catch(fail)
-        .then(done);
+      const validatePromise = form.validate().then(status => {
+        expect(status.isValid()).toBeFalse();
+      });
 
-      jasmine.clock().tick(1000);
+      await session.desktop.when('propertyChange:messageBoxes');
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
-      jasmine.clock().uninstall();
+
+      await validatePromise;
     });
 
-    it('returns false if field is invalid', done => {
-      jasmine.clock().install();
-
+    it('returns false if field is invalid', async () => {
       mandatoryStringField.setValue('whatever');
       numberField.setValue('whatever');
 
-      form.validate()
-        .then(status => {
-          expect(status.isValid()).toBeFalse();
-        })
-        .catch(fail)
-        .then(done);
+      const validatePromise = form.validate().then(status => {
+        expect(status.isValid()).toBeFalse();
+      });
 
-      jasmine.clock().tick(1000);
+      await session.desktop.when('propertyChange:messageBoxes');
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
-      jasmine.clock().uninstall();
+
+      await validatePromise;
     });
 
-    it('waits for all validators to complete and returns true if all are valid', done => {
-      jasmine.clock().install();
-
+    it('waits for all validators to complete and returns true if all are valid', async () => {
       mandatoryStringField.setValue('whatever');
       numberField.setValue(42);
 
-      const deferred1 = $.Deferred();
-      const deferred2 = $.Deferred();
-      const deferred3 = $.Deferred();
+      const deferred1 = new Deferred<Status>();
+      const deferred2 = new Deferred<Status>();
+      const deferred3 = new Deferred<Status>();
 
       form.setValidators([f => deferred1.promise(), f => deferred2.promise(), f => deferred3.promise()]);
 
       const validate = form.validate();
-      validate
-        .then(status => {
-          expect(status.isValid()).toBeTrue();
-        })
-        .catch(fail)
-        .then(done);
+      const resultPromise = validate.then(status => {
+        expect(status.isValid()).toBeTrue();
+      });
 
-      jasmine.clock().tick(1000);
-      expect(validate.state()).toBe('pending');
+      await Promise.resolve();
+      await expectAsync(validate).toBePending();
 
       deferred1.resolve(Status.ok());
       deferred2.resolve(Status.ok());
-      jasmine.clock().tick(1000);
-      expect(validate.state()).toBe('pending');
+      await Promise.resolve();
+      await expectAsync(validate).toBePending();
 
       deferred3.resolve(Status.ok());
-      jasmine.clock().tick(1000);
-      expect(validate.state()).toBe('resolved');
-
-      jasmine.clock().uninstall();
+      // resultPromise is chained off the same "validate" promise, registered after trackState()'s own .then() -> by
+      // the time resultPromise settles, state.value has already been updated (promise reactions run in registration order).
+      await resultPromise;
+      await expectAsync(validate).toBeResolved();
     });
 
-    it('waits for all validators to complete and returns false if at least one is invalid', done => {
-      jasmine.clock().install();
-
+    it('waits for all validators to complete and returns false if at least one is invalid', async () => {
       mandatoryStringField.setValue('whatever');
       numberField.setValue(42);
 
-      const deferred1 = $.Deferred();
-      const deferred2 = $.Deferred();
-      const deferred3 = $.Deferred();
+      const deferred1 = new Deferred<Status>();
+      const deferred2 = new Deferred<Status>();
+      const deferred3 = new Deferred<Status>();
 
       form.setValidators([f => deferred1.promise(), f => deferred2.promise(), f => deferred3.promise()]);
 
       const validate = form.validate();
-      validate
-        .then(status => {
-          expect(status.isValid()).toBeFalse();
-        })
-        .catch(fail)
-        .then(done);
+      const resultPromise = validate.then(status => {
+        expect(status.isValid()).toBeFalse();
+      });
 
-      jasmine.clock().tick(1000);
-      expect(validate.state()).toBe('pending');
+      await Promise.resolve();
+      await expectAsync(validate).toBePending();
 
       deferred1.resolve(Status.ok());
       deferred2.resolve(Status.error());
-      jasmine.clock().tick(1000);
-      expect(validate.state()).toBe('pending');
+      await Promise.resolve();
+      await expectAsync(validate).toBePending();
 
       deferred3.resolve(Status.ok());
-      jasmine.clock().tick(1000);
-      expect(validate.state()).toBe('pending');
+      await Promise.resolve();
+      await expectAsync(validate).toBePending();
 
+      await session.desktop.when('propertyChange:messageBoxes');
       helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
-      expect(validate.state()).toBe('resolved');
+      await expectAsync(validate).toBeResolved();
 
-      jasmine.clock().uninstall();
+      await resultPromise;
     });
 
     it('waits for all async field validators to complete', async () => {
@@ -2388,8 +2386,9 @@ describe('Form', () => {
       throwInLoad = false;
       throwInPostLoad = false;
       throwInSave = false;
+      postLoadPromise: Promise<void>;
 
-      protected override _load(): JQuery.Promise<object> {
+      override _load(): Promise<object> {
         expect(this.session.desktop.busy).toBe(true);
         if (this.throwInLoad) {
           return $.rejectedPromise('load');
@@ -2397,7 +2396,11 @@ describe('Form', () => {
         return $.resolvedPromise({});
       }
 
-      protected override _postLoad(): JQuery.Promise<void> {
+      override _handleLoadError(error: any): Promise<void> {
+        return super._handleLoadError(error);
+      }
+
+      protected override _postLoad(): Promise<void> {
         expect(this.session.desktop.busy).toBe(true);
         if (this.throwInPostLoad) {
           return $.rejectedPromise('postLoad');
@@ -2405,17 +2408,25 @@ describe('Form', () => {
         return $.resolvedPromise();
       }
 
-      protected override _save(data: object): JQuery.Promise<void> {
+      protected override _save(data: object): Promise<void> {
         expect(this.session.desktop.busy).toBe(true);
         if (this.throwInSave) {
           return $.rejectedPromise('save');
         }
         return $.resolvedPromise();
       }
+
+      override _handleSaveError(error: any): Promise<void> {
+        return super._handleSaveError(error);
+      }
+
+      override _onLifecyclePostLoad(): Promise<void> {
+        this.postLoadPromise = super._onLifecyclePostLoad();
+        return this.postLoadPromise;
+      }
     }
 
     beforeEach(() => {
-      jasmine.clock().install();
       catchCalled = false;
       form = scout.create(FixtureErrorForm, {
         parent: session.desktop,
@@ -2432,135 +2443,235 @@ describe('Form', () => {
     afterEach(() => {
       // reset session of the error handler
       App.get().errorHandler.session = originalErrorHandlerSession;
-      jasmine.clock().uninstall();
     });
 
-    it('is automatically handled in load', done => {
+    it('rejects load if _load fails', async () => {
       expect(session.desktop.busy).toBe(false);
 
       form.throwInLoad = true;
-      form.load()
-        .then(fail)
-        .catch(e => {
-          expect(e).toEqual('load');
-          catchCalled = true;
-        })
-        .always(() => {
-          expect(catchCalled).toBe(true);
-          expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
-          done();
-        });
-
-      jasmine.clock().tick(1000);
-
-      const messageBoxes = helper.findMessageBoxes();
-      expect(messageBoxes.size).toBe(1);
+      await expectAsync(form.load()).toBeRejectedWith('load'); // Global rejection handler will display message box
+      expect(form.destroyed).toBe(true);
       expect(session.desktop.busy).toBe(false);
-
-      const messageBox: MessageBox = messageBoxes.values().next().value;
-      expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
-
-      helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
     });
 
-    it('is automatically handled in postLoad', done => {
+    it('rejects load if _load fails synchronously', async () => {
+      let error = null;
+      form._load = () => {
+        throw 'Something went wrong';
+      };
+      form.render();
+      try {
+        await form.load()
+          .catch(e => {
+            error = e;
+          });
+      } catch (error0) {
+        // should not happen
+        fail();
+      }
+      expect(form.destroyed).toBe(true);
+      expect(error).toBe('Something went wrong');
+    });
+
+    it('does not reject load if error happens in postLoad', async () => {
       form.throwInPostLoad = true;
+      let event;
       form.on('error', e => {
-        expect(e.phase).toBe('postLoad');
-        expect(e.error).toBe('postLoad');
-        done();
+        event = e;
       });
-      form.load()
-        .catch(fail); // error in postLoad does not reject the load promise
-      jasmine.clock().tick(1000);
+      await form.load();
+      expect(form.destroyed).toBe(false);
+      expect(event.phase).toBe('postLoad');
+      expect(event.error).toBe('postLoad');
+
+      await expectAsync(form.postLoadPromise).toBeRejectedWith('postLoad');// Global rejection handler will display message box
     });
 
-    it('is automatically handled in save', done => {
+    it('rejects save if _save fails', async () => {
       expect(session.desktop.busy).toBe(false);
 
       form.throwInSave = true;
-      form.load()
-        .then(() => {
-          form.touch();
-          form.ok()
-            .then(fail)
-            .catch(e => {
-              catchCalled = true;
-              expect(e).toEqual('save');
-            })
-            .always(() => {
-              expect(catchCalled).toBe(true);
-              expect(form.formSaved).toBe(false); // save failed: do not mark as stored
-              expect(App.get().errorHandler.handleErrorInfo).toHaveBeenCalledTimes(1);
-              done();
-            });
-        })
-        .catch(fail);
-
-      jasmine.clock().tick(1000);
-
-      const messageBoxes = helper.findMessageBoxes();
-      expect(messageBoxes.size).toBe(1);
+      await form.load();
+      form.touch();
+      await expectAsync(form.ok()).toBeRejectedWith('save'); // Global rejection handler will display message box
       expect(session.desktop.busy).toBe(false);
-
-      const messageBox: MessageBox = messageBoxes.values().next().value;
-      expect(messageBox.$container.children('.glasspane').length).toBe(0); // not blocked
-
-      helper.closeMessageBoxes();
-      jasmine.clock().tick(1000);
+      expect(form.formSaved).toBe(false); // save failed: do not mark as stored
     });
 
-    it('load error handling can be exchanged', done => {
+    it('triggers event on load error', async () => {
       form.throwInLoad = true;
       let numHandled = 0;
       form.on('error', e => {
         numHandled++;
-        e.preventDefault(); // disable default error handling
       });
-      form.load()
-        .then(fail)
-        .catch(e => {
-          catchCalled = true;
-          expect(form.session.desktop.busy).toBe(false);
-          expect(e).toBe('load');
-          expect(numHandled).toBe(1);
-        })
-        .always(() => {
-          expect(catchCalled).toBe(true);
-          expect(App.get().errorHandler.handleErrorInfo).not.toHaveBeenCalled();
-          done();
-        });
-      jasmine.clock().tick(1000);
+      await expectAsync(form.load()).toBeRejectedWith('load'); // Global rejection handler will display message box
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
     });
 
-    it('save error handling can be exchanged', done => {
+    it('does not reject load if error event is prevented', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        e.preventDefault(); // Resolves promise
+      });
+      await expectAsync(form.load()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(false);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('prevents form open if load error occurs', async () => {
+      form.throwInLoad = true;
+      await expectAsync(form.open()).toBeRejectedWith('load');
+      expect(form.rendered).toBe(false);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('does not prevent form open if load error event is prevented', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        e.preventDefault(); // Resolves promise
+      });
+      await expectAsync(form.open()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.rendered).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be converted by _handleLoadError', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      const orig = form._handleLoadError;
+      form._handleLoadError = error => {
+        numHandled++;
+        return orig.call(form, 'converted'); // super._handleLoadError(error), will close form
+      };
+      await expectAsync(form.load()).toBeRejectedWith('converted');
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be converted by _handleLoadError synchronously', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      const orig = form._handleLoadError;
+      form._handleLoadError = error => {
+        numHandled++;
+        form.close();
+        throw 'converted'; // Can throw sync because _handleErrorInternal is only called by async code so an error will be converted to a rejected promise automatically
+      };
+      await expectAsync(form.load()).toBeRejectedWith('converted');
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(true);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be resolved by _handleLoadError', async () => {
+      form.throwInLoad = true;
+      let numHandled = 0;
+      form._handleLoadError = error => {
+        numHandled++;
+        return Promise.resolve();
+      };
+      await expectAsync(form.load()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.destroyed).toBe(false);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('triggers event on save error', async () => {
       form.throwInSave = true;
       let numHandled = 0;
       form.on('error', e => {
         numHandled++;
         expect(e.phase).toBe('save');
-        e.preventDefault(); // disable default error handling
       });
-      form.load()
-        .then(() => {
-          form.touch();
-          form.ok()
-            .then(fail)
-            .catch(e => {
-              catchCalled = true;
-              expect(form.session.desktop.busy).toBe(false);
-              expect(e).toEqual('save');
-              expect(numHandled).toBe(1);
-            })
-            .always(() => {
-              expect(catchCalled).toBe(true);
-              expect(App.get().errorHandler.handleErrorInfo).not.toHaveBeenCalled();
-              done();
-            });
-        })
-        .catch(fail);
-      jasmine.clock().tick(1000);
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.save()).toBeRejectedWith('save');
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('does not reject save if error event is prevented', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        expect(e.phase).toBe('save');
+        e.preventDefault(); // Resolves promise
+      });
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.save()).toBeResolved();
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('triggers event on save error during ok', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        expect(e.phase).toBe('save');
+      });
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.ok()).toBeRejectedWith('save');
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('does not reject ok if error event is prevented', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form.on('error', e => {
+        numHandled++;
+        expect(e.phase).toBe('save');
+        e.preventDefault(); // Resolves promise
+      });
+      await form.load();
+      form.touch();
+
+      await expectAsync(form.ok()).toBeResolved();
+      expect(form.session.desktop.busy).toBe(false);
+      expect(numHandled).toBe(1);
+    });
+
+    it('can be converted by _handleSaveError', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form._handleSaveError = error => {
+        numHandled++;
+        return Promise.reject('converted');
+      };
+      form.touch();
+      await expectAsync(form.save()).toBeRejectedWith('converted');
+      expect(numHandled).toBe(1);
+      expect(form.session.desktop.busy).toBe(false);
+    });
+
+    it('can be resolved by _handleSaveError', async () => {
+      form.throwInSave = true;
+      let numHandled = 0;
+      form._handleSaveError = error => {
+        numHandled++;
+        return Promise.resolve();
+      };
+      form.touch();
+      await expectAsync(form.save()).toBeResolved();
+      expect(numHandled).toBe(1);
+      expect(form.session.desktop.busy).toBe(false);
     });
   });
 
