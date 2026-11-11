@@ -38,6 +38,7 @@ import tools.jackson.core.StreamReadConstraints;
 import tools.jackson.core.StreamWriteConstraints;
 import tools.jackson.core.json.JsonFactory;
 import tools.jackson.core.json.JsonFactoryBuilder;
+import tools.jackson.databind.deser.DeserializerFactory;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
@@ -152,13 +153,17 @@ public class JacksonDataObjectMapper implements IDataObjectMapper {
         .addModule(scoutDataObjectModule)
         .defaultDateFormat(new SimpleDateFormat(IValueFormatConstants.DEFAULT_DATE_PATTERN)) // TODO [23.0] pbz: [JSON] check if it can be moved to ScoutDataObjectModule class
         .deactivateDefaultTyping() // disabled for security reasons
-        .deserializerFactory(new ScoutDeserializerFactory());
+        .deserializerFactory(createDeserializerFactory());
   }
 
   protected JsonFactoryBuilder createJsonFactoryBuilder() {
     return JsonFactory.builder()
         .streamReadConstraints(CONFIG.getPropertyValue(StreamReadConstraintsConfigProperty.class))
         .streamWriteConstraints(CONFIG.getPropertyValue(StreamWriteConstraintsConfigProperty.class));
+  }
+
+  protected DeserializerFactory createDeserializerFactory() {
+    return new ScoutDeserializerFactory();
   }
 
   /**

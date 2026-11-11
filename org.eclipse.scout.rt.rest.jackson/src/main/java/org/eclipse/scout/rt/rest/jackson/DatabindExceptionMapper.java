@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 import tools.jackson.databind.DatabindException;
 
 /**
- * Override Jackson JsonMappingExceptionMapper implementation registered in JacksonFeature
+ * Override Jackson DatabindExceptionMapper implementation registered in JacksonFeature
  *
  * @see <a href="https://github.com/FasterXML/jackson-jaxrs-providers/issues/22">jackson-jaxrs-providers - Issue #22</a>
  */

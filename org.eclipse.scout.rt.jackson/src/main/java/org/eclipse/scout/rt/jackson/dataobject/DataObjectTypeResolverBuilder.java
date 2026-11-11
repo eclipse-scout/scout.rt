@@ -14,16 +14,19 @@ import java.util.Collection;
 
 import org.eclipse.scout.rt.dataobject.DataObjectInventory;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 import org.eclipse.scout.rt.platform.util.LazyValue;
 
 import tools.jackson.core.JacksonException;
 import tools.jackson.core.JsonGenerator;
 import tools.jackson.core.type.WritableTypeId;
+import tools.jackson.databind.DatabindContext;
 import tools.jackson.databind.DeserializationContext;
 import tools.jackson.databind.JavaType;
 import tools.jackson.databind.SerializationContext;
 import tools.jackson.databind.jsontype.NamedType;
+import tools.jackson.databind.jsontype.PolymorphicTypeValidator;
 import tools.jackson.databind.jsontype.TypeDeserializer;
 import tools.jackson.databind.jsontype.TypeIdResolver;
 import tools.jackson.databind.jsontype.TypeSerializer;
@@ -42,7 +45,26 @@ public class DataObjectTypeResolverBuilder extends StdTypeResolverBuilder {
 
   @Override
   public TypeSerializer buildTypeSerializer(SerializationContext ctxt, JavaType baseType, Collection<NamedType> subtypes) {
-    return useForType(baseType) ? new DataObjectAsPropertyTypeSerializer(_customIdResolver, getTypeProperty()) : null;
+    if (!useForType(baseType)) {
+      return null;
+    }
+    TypeIdResolver idResolver = idResolver(ctxt, baseType, subTypeValidator(ctxt), subtypes, true, false);
+    return new DataObjectAsPropertyTypeSerializer(idResolver, getTypeProperty());
+  }
+
+  /**
+   * Jackson only instantiates type id resolvers returned as class by
+   * {@link tools.jackson.databind.AnnotationIntrospector#findTypeIdResolver(tools.jackson.databind.cfg.MapperConfig, tools.jackson.databind.introspect.Annotated)}
+   * (using reflection). Therefore, the {@link DataObjectTypeIdResolver} is created here as Scout bean instead.
+   */
+  @Override
+  protected TypeIdResolver idResolver(DatabindContext ctxt, JavaType baseType, PolymorphicTypeValidator subtypeValidator, Collection<NamedType> subtypes, boolean forSer, boolean forDeser) {
+    if (_customIdResolver != null) {
+      return _customIdResolver;
+    }
+    DataObjectTypeIdResolver idResolver = BEANS.get(DataObjectTypeIdResolver.class);
+    idResolver.init(baseType);
+    return idResolver;
   }
 
   protected boolean useForType(JavaType t) {

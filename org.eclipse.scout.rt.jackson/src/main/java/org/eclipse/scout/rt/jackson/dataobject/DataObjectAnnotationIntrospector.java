@@ -75,13 +75,4 @@ public class DataObjectAnnotationIntrospector extends JacksonAnnotationIntrospec
 
     return super.findTypeResolverBuilder(config, ann);
   }
-
-  @Override
-  public Object findTypeIdResolver(MapperConfig<?> config, Annotated ann) {
-    if (ann instanceof AnnotatedClass ac && IDataObject.class.isAssignableFrom(ac.getRawType())) {
-      return DataObjectTypeIdResolver.class;
-    }
-
-    return super.findTypeIdResolver(config, ann);
-  }
 }

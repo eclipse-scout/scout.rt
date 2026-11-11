@@ -143,6 +143,12 @@ public class DataObjectDeserializers extends Deserializers.Base {
     return super.findTreeNodeDeserializer(nodeType, config, beanDescRef);
   }
 
+  /**
+   * Intentionally returns {@code false}: This method is only used by Jackson to validate polymorphic type ids (see
+   * {@code BasicPolymorphicTypeValidator.Builder#allowSubTypesWithExplicitDeserializer()}), which is not used by Scout
+   * (default typing is disabled, data object types are resolved by {@link DataObjectTypeIdResolver}). Returning
+   * {@code false} is the safe choice, since claiming support for types could incorrectly mark them as safe.
+   */
   @Override
   public boolean hasDeserializerFor(DeserializationConfig config, Class<?> valueType) {
     return false;
