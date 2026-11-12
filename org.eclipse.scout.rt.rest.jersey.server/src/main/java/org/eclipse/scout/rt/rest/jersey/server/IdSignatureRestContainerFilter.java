@@ -124,7 +124,7 @@ public class IdSignatureRestContainerFilter implements IRestContainerRequestFilt
       //noinspection deprecation
       return BEANS.get(JacksonIdSignatureDataObjectMapper.class)
           .getObjectMapper()
-          .readerFor(resultType);
+          .readerFor(r.getValueType());
     }
   }
 

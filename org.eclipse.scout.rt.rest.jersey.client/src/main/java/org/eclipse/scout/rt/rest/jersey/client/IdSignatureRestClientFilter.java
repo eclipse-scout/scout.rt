@@ -92,7 +92,7 @@ public class IdSignatureRestClientFilter implements IGlobalRestRequestFilter, IG
       //noinspection deprecation
       return BEANS.get(JacksonIdSignatureDataObjectMapper.class)
           .getObjectMapper()
-          .readerFor(resultType);
+          .readerFor(r.getValueType());
     }
   }
 
