@@ -51,6 +51,7 @@ public interface IMimeMagic {
       // magic bytes of EML files are simply ascii bytes of the first header
       "52656365697665643A", // Received:
       "46726F6D3A", // From:
+      "546F3A", // To:
       "582D556E73656E743A", // X-Unsent:
       "466F727761726420746F", // Forward to
       "232120726E657773", // #! rnews
