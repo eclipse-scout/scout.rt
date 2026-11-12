@@ -8,9 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {aria, arrays, objects, scout} from '@eclipse-scout/core';
-import {AbstractSvgChartRenderer, Chart} from '../index';
+import {AbstractSvgChartRenderer, Chart, UpdateChartOptions} from '../index';
 import $ from 'jquery';
-import {UpdateChartOptions} from './Chart';
 
 export class FulfillmentChartRenderer extends AbstractSvgChartRenderer {
   animationTriggered: boolean;

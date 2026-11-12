@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,8 +9,7 @@
  */
 import {aria, ObjectIdProvider, strings, styles} from '@eclipse-scout/core';
 import $ from 'jquery';
-import {AbstractChartRenderer, Chart} from '../index';
-import {ClickObject} from './Chart';
+import {AbstractChartRenderer, Chart, ClickObject} from '../index';
 
 export class AbstractSvgChartRenderer extends AbstractChartRenderer {
   chartBox: ChartBox;
