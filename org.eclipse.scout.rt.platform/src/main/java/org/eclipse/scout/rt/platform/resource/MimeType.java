@@ -197,6 +197,9 @@ public enum MimeType implements IMimeType {
     return m_type;
   }
 
+  /**
+   * @return File extension without leading dot. E.g. "html" or "jpg".
+   */
   @Override
   public String getFileExtension() {
     return m_fileExtension;
