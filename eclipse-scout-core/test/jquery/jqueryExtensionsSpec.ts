@@ -303,6 +303,42 @@ describe('jquery-scout', () => {
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
+    it('calls the handler when the animation of a pseudo-element ends', async () => {
+      $style.append('.spec-animate-before::before {content: \'\'; animation: spec-fade 50ms;}');
+      let handler = jasmine.createSpy('handler');
+      $e.addClass('spec-animate-before');
+      $e.oneAnimationEnd(handler);
+      expect(handler).not.toHaveBeenCalled();
+
+      await whenNativeAnimationEvent($e); // the animationend event of a pseudo-element has the element as target
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the handler when the animations of the element and its pseudo-element end', async () => {
+      $style.append('.spec-animate-after::after {content: \'\'; animation: spec-fade 100ms;}');
+      let handler = jasmine.createSpy('handler');
+      $e.addClass('spec-animate spec-animate-after');
+      $e.oneAnimationEnd(handler);
+
+      await whenNativeAnimationEvent($e); // animation of the element
+      expect(handler).not.toHaveBeenCalled();
+      await whenNativeAnimationEvent($e); // animation of the pseudo-element
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the handler even if the animation of a pseudo-element has already ended when the listener is added', async () => {
+      $style.append('.spec-animate-before::before {content: \'\'; animation: spec-fade 10ms;}');
+      let handler = jasmine.createSpy('handler');
+      $e.addClass('spec-animate-before');
+      await whenNativeAnimationEvent($e);
+
+      $e.oneAnimationEnd(handler);
+      expect(handler).toHaveBeenCalledTimes(0);
+
+      await sleep();
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
     it('calls the handler even if the animation is disabled', async () => {
       let handler = jasmine.createSpy('handler');
       $e.css('animation-duration', '0s'); // disabled before the animation is started

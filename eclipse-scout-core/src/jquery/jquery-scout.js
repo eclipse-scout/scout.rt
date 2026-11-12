@@ -910,6 +910,21 @@ $.fn.addClassForAnimation = function(className, options) {
   return this;
 };
 
+const PSEUDO_ELEMENTS = ['::before', '::after'];
+
+/**
+ * @returns the animations of the element and its pseudo-elements, without the animations of its descendants
+ */
+function getOwnAnimations(element) {
+  if (Device.get().supportsGetAnimationsPseudoElementOption()) {
+    return [
+      ...element.getAnimations(),
+      ...PSEUDO_ELEMENTS.flatMap(pseudoElement => element.getAnimations({pseudoElement}))
+    ];
+  }
+  return element.getAnimations({subtree: true}).filter(animation => animation.effect?.target === element);
+}
+
 $.fn.oneAnimationEnd = function(handler, triggerOnError = false) {
   if (!handler) {
     return this;
@@ -921,7 +936,7 @@ $.fn.oneAnimationEnd = function(handler, triggerOnError = false) {
     return this;
   }
 
-  const activeAnimations = element.getAnimations();
+  const activeAnimations = getOwnAnimations(element);
   if (activeAnimations.length > 0) {
     // Wait for the animation.finished promise instead of listening for the animationend event
     // This has multiple advantages:
@@ -941,8 +956,7 @@ $.fn.oneAnimationEnd = function(handler, triggerOnError = false) {
     // If there is one, we assume
     // - the animation has already run (can happen when having a breakpoint at oneAnimationEnd right after the animation class was added)
     // - or the animation was disabled by setting duration to 0s
-    const computedStyle = window.getComputedStyle(element);
-    const hasAnimation = computedStyle.animationName !== 'none';
+    const hasAnimation = [null, ...PSEUDO_ELEMENTS].some(pseudoElement => window.getComputedStyle(element, pseudoElement).animationName !== 'none');
     if (hasAnimation) {
       // Don't call the handler immediately to prevent endless loops
       // e.g. if oneAnimationEnd is called if an element has an animate-class which would be removed by another animationEnd callback which has not been called yet

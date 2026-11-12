@@ -572,6 +572,24 @@ export class Device implements DeviceModel, ObjectWithType {
     });
   }
 
+  /**
+   * @returns true if {@link Element.getAnimations} supports the option `pseudoElement` to return the animations of a specific pseudo-element.
+   */
+  supportsGetAnimationsPseudoElementOption(): boolean {
+    return this.supportsFeature('_getAnimationsPseudoElementOption', property => {
+      // The getter is only called if the browser knows the option
+      let supported = false;
+      let options: GetAnimationsOptions & { pseudoElement?: string } = {
+        get pseudoElement() {
+          supported = true;
+          return undefined;
+        }
+      };
+      document.documentElement.getAnimations(options);
+      return supported;
+    });
+  }
+
   checkCssValue(property: string, value: string, checkFunc: Predicate<string>): boolean {
     // Check if property is supported at all, otherwise div.style[property] would just add it and checkFunc would always return true
     if (document.body.style[property] === undefined) {
