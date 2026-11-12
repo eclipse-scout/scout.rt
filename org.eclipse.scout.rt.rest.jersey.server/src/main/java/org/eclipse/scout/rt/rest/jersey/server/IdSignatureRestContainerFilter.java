@@ -121,6 +121,8 @@ public class IdSignatureRestContainerFilter implements IRestContainerRequestFilt
 
     @Override
     public ObjectReader modify(EndpointConfigBase<?> endpoint, MultivaluedMap<String, String> httpHeaders, JavaType resultType, ObjectReader r, JsonParser p) {
+      // The parser stays bound to Jersey's original mapper. Deserializers must use ctxt.readValue(p, ...)
+      // instead of p.readValueAs(...) to use the signature mapper's deserialization context.
       //noinspection deprecation
       return BEANS.get(JacksonIdSignatureDataObjectMapper.class)
           .getObjectMapper()

@@ -34,7 +34,7 @@ public class EnumDeserializer extends StdDeserializer<IEnum> {
 
   @Override
   public IEnum deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
-    String rawValue = p.readValueAs(String.class);
+    String rawValue = ctxt.readValue(p, String.class);
     try {
       return m_enumResolver.get().resolve(m_enumType, rawValue);
     }

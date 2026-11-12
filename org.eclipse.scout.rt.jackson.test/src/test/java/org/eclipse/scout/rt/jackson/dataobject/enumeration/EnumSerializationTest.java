@@ -24,6 +24,10 @@ import org.eclipse.scout.rt.dataobject.fixture.FixtureEnum;
 import org.eclipse.scout.rt.jackson.dataobject.JacksonDataObjectMapper;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumDo;
 import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEntityWithEnumMapKeyDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEnumDo;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEnumDo.FixtureEnum1;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEnumDo.FixtureEnum2;
+import org.eclipse.scout.rt.jackson.dataobject.fixture.TestEnumDo.FixtureEnum3;
 import org.eclipse.scout.rt.jackson.testing.DataObjectSerializationTestHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformException;
@@ -70,12 +74,6 @@ public class EnumSerializationTest {
 
     TestEntityWithEnumDo marshalled = m_dataObjectMapper.readValue(expectedJson, TestEntityWithEnumDo.class);
     assertEquals(FixtureEnum.ONE, marshalled.getValue());
-  }
-
-  @Test
-  public void testSerializeDeserialize_PlainEnumWithCustomToString() {
-    assertEquals("\"VALUE\"", m_dataObjectMapper.writeValue(PlainEnum.VALUE));
-    assertEquals(PlainEnum.VALUE, m_dataObjectMapper.readValue("\"VALUE\"", PlainEnum.class));
   }
 
   @Test
@@ -138,16 +136,41 @@ public class EnumSerializationTest {
     m_testHelper.assertJsonEquals(json, objectMapper.writerFor(type).writeValueAsString(marshalled));
   }
 
-  protected URL toURL(String resourceName) {
-    return EnumSerializationTest.class.getResource(resourceName);
+  @Test
+  public void testEnumImplementations() throws Exception {
+    TestEnumDo enumDo = BEANS.get(TestEnumDo.class)
+        .withFixtureEnum1(FixtureEnum1.ONE)
+        .withFixtureEnum2(FixtureEnum2.TWO)
+        .withFixtureEnum3(FixtureEnum3.ONE);
+    String json = m_dataObjectMapper.writeValue(enumDo);
+
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestEnumImplementations.json"));
+    m_testHelper.assertJsonEquals(expectedJson, json);
+
+    TestEnumDo marshalled = m_dataObjectMapper.readValue(json, TestEnumDo.class);
+    assertEquals(enumDo, marshalled);
   }
 
-  private enum PlainEnum {
-    VALUE;
+  @Test
+  public void testGenericEnum() {
+    TestEnumDo enumDo = BEANS.get(TestEnumDo.class).withAnyEnum(FixtureEnum1.ONE);
+    // untyped enums cannot be serialized by jackson
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.writeValue(enumDo));
+  }
 
-    @Override
-    public String toString() {
-      return "custom-value";
-    }
+  @Test
+  public void testGenericIEnum() throws Exception {
+    TestEnumDo enumDo = BEANS.get(TestEnumDo.class).withAnyIEnum(FixtureEnum3.ONE);
+    String json = m_dataObjectMapper.writeValue(enumDo);
+
+    String expectedJson = m_testHelper.readResourceAsString(toURL("TestGenericIEnum.json"));
+    m_testHelper.assertJsonEquals(expectedJson, json);
+
+    // untyped IEnums cannot be deserialized by jackson
+    assertThrows(PlatformException.class, () -> m_dataObjectMapper.readValue(json, TestEnumDo.class));
+  }
+
+  protected URL toURL(String resourceName) {
+    return EnumSerializationTest.class.getResource(resourceName);
   }
 }
