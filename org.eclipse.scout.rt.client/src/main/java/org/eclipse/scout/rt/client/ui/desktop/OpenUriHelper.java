@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -30,24 +30,37 @@ public class OpenUriHelper {
       // Because the resource is bound to the HTTP session the download would not be possible
       return OpenUriAction.DOWNLOAD;
     }
-    if (resource != null) {
-      if (isImage(resource)) {
-        return getOpenUriActionImage();
-      }
-      if (isVideo(resource)) {
-        return getOpenUriActionVideo();
-      }
-      if (isHtmlPage(resource)) {
-        return getOpenUriActionHtmlPage();
-      }
-      if (isZipArchive(resource)) {
-        return getOpenUriActionZipArchive();
-      }
-      if (isPdf(resource)) {
-        return getOpenUriActionPdf();
-      }
+    if (resource == null) {
+      return getOpenUriActionDefault();
+    }
+    if (isSvg(resource)) {
+      return getOpenUriActionSvg();
+    }
+    if (isImage(resource)) {
+      return getOpenUriActionImage();
+    }
+    if (isVideo(resource)) {
+      return getOpenUriActionVideo();
+    }
+    if (isHtmlPage(resource)) {
+      return getOpenUriActionHtmlPage();
+    }
+    if (isZipArchive(resource)) {
+      return getOpenUriActionZipArchive();
+    }
+    if (isPdf(resource)) {
+      return getOpenUriActionPdf();
     }
     return getOpenUriActionDefault();
+  }
+
+  protected boolean isSvg(BinaryResource resource) {
+    return MimeType.SVG.getType().equals(resource.getContentType());
+  }
+
+  protected IOpenUriAction getOpenUriActionSvg() {
+    // SVG file must not be opened directly because it could contain malicious JavaScript which would be executed in the context of the current http session -> always download
+    return OpenUriAction.DOWNLOAD;
   }
 
   protected boolean isImage(BinaryResource resource) {
@@ -71,14 +84,12 @@ public class OpenUriHelper {
   }
 
   protected IOpenUriAction getOpenUriActionHtmlPage() {
-    // HTML files must not be opened directly because it could
-    // contain malicious JavaScript which will be executed in the context
-    // of the current http session -> always download
+    // HTML file must not be opened directly because it could contain malicious JavaScript which will be executed in the context of the current http session -> always download
     return OpenUriAction.DOWNLOAD;
   }
 
   protected boolean isZipArchive(BinaryResource resource) {
-    return MimeType.ZIP.equals(MimeType.convertToMimeType(resource.getContentType()));
+    return MimeType.ZIP.getType().equals(resource.getContentType());
   }
 
   protected IOpenUriAction getOpenUriActionZipArchive() {
@@ -86,7 +97,7 @@ public class OpenUriHelper {
   }
 
   protected boolean isPdf(BinaryResource resource) {
-    return MimeType.PDF.equals(MimeType.convertToMimeType(resource.getContentType()));
+    return MimeType.PDF.getType().equals(resource.getContentType());
   }
 
   protected IOpenUriAction getOpenUriActionPdf() {
