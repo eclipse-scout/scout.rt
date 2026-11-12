@@ -142,6 +142,15 @@ public class JacksonDataObjectMapperTest {
   }
 
   @Test
+  public void testReadValueWithTrailingTokens() {
+    assertEquals(Integer.valueOf(42), m_mapper.readValue("42 \n", Integer.class));
+    assertThrows(PlatformException.class, () -> m_mapper.readValue("42 43", Integer.class));
+    assertThrows(PlatformException.class, () -> m_mapper.readValue(
+        new ByteArrayInputStream("42 43".getBytes(StandardCharsets.UTF_8)), Integer.class));
+    assertThrows(PlatformException.class, () -> m_mapper.readValueRaw("{} {}"));
+  }
+
+  @Test
   public void testToString() {
     // register DataObjectMapper using default (non-testing) JacksonDataObjectMapper implementation of IDataObjectMapper
     List<IBean<?>> registeredBeans = BEANS.get(BeanTestingHelper.class).registerBeans(
