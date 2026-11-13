@@ -1,0 +1,6 @@
+{
+  "_type" : "TestEnum",
+  "fixtureEnum1" : "ONE",
+  "fixtureEnum2" : "TWO",
+  "fixtureEnum3" : "oneStringValue"
+}
