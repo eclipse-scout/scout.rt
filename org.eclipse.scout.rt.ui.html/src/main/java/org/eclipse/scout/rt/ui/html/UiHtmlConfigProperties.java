@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -167,6 +167,49 @@ public final class UiHtmlConfigProperties {
     @Override
     public Integer getDefaultValue() {
       return 30;
+    }
+  }
+
+  public static class OrphanedUiSessionCleanupIntervalProperty extends AbstractPositiveIntegerConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.ui.sessionstore.orphanedUiSessionCleanupInterval";
+    }
+
+    @Override
+    public String description() {
+      return "Interval in seconds at which the orphaned UI session cleanup job checks for orphaned UI sessions. Set to 0 to disable the job.\n"
+          + "By default this property is set to 5 minutes.";
+    }
+
+    @Override
+    public Integer getDefaultValue() {
+      return (int) TimeUnit.MINUTES.toSeconds(5);
+    }
+  }
+
+  public static class OrphanedUiSessionTimeoutProperty extends AbstractPositiveLongConfigProperty {
+
+    @Override
+    public String getKey() {
+      return "scout.ui.sessionstore.orphanedUiSessionTimeout";
+    }
+
+    @Override
+    @SuppressWarnings("findbugs:VA_FORMAT_STRING_USES_NEWLINE")
+    public String description() {
+      return String.format("""
+              Number of seconds without any request (incl. polling requests) after which a UI session is considered orphaned and disposed by the orphaned UI session cleanup job.
+              This affects UI sessions whose startup response never reached the browser, as well as UI sessions of browser tabs without active polling.
+              The value must be clearly greater than the value of property '%s', otherwise UI sessions with a pending polling request might be disposed.
+              By default this property is set to 30 minutes.""",
+          BEANS.get(BackgroundPollingIntervalProperty.class).getKey());
+    }
+
+    @Override
+    public Long getDefaultValue() {
+      return TimeUnit.MINUTES.toSeconds(30);
     }
   }
 
