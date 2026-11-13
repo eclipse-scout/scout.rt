@@ -269,8 +269,14 @@ export class EventSupport {
       return;
     }
 
-    event = event || {} as Event;
+    event = event || new Event();
     event.type = type;
+
+    if (this._eventListenersByType.size === 0) {
+      // There are no event handlers registered.
+      // return after event.type is set to make trigger() behave the same with and without listeners.
+      return;
+    }
 
     // get relevant types, always add all-events-listeners, i.e. listeners registered for type = null
     const relevantTypes = new Set([null, event.type]);
