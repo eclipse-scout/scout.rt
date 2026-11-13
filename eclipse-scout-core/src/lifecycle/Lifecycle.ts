@@ -21,7 +21,7 @@ import $ from 'jquery';
  * - invalidElementsWarningTextKey
  * - saveChangesQuestionTextKey
  */
-export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status; promise?: JQuery.Promise<void> }> extends EventEmitter implements LifecycleModel, ObjectWithType {
+export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status; promise?: Promise<void> }> extends EventEmitter implements LifecycleModel, ObjectWithType {
   declare model: LifecycleModel;
   declare initModel: SomeRequired<this['model'], 'widget'>;
   declare eventMap: LifecycleEventMap<TValidationResult>;
@@ -38,7 +38,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   saveChangesQuestionTextKey: string;
   askIfNeedSave: boolean;
   askIfNeedSaveText: string;
-  handlers: Record<string, () => JQuery.Promise<void>>;
+  handlers: Record<string, () => Promise<void>>;
 
   constructor() {
     super();
@@ -78,24 +78,24 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     }
   }
 
-  load(): JQuery.Promise<void> {
+  load(): Promise<void> {
     return this._load().then(() => {
       this.markAsSaved();
       this.trigger('postLoad');
     });
   }
 
-  protected _load(): JQuery.Promise<void> {
+  protected _load(): Promise<void> {
     return this.handlers.load().then(() => {
       this.trigger('load');
     });
   }
 
-  protected _defaultLoad(): JQuery.Promise<void> {
+  protected _defaultLoad(): Promise<void> {
     return $.resolvedPromise();
   }
 
-  ok(): JQuery.Promise<void> {
+  ok(): Promise<void> {
     // 1. validate form
     return this._validateAndHandle()
       .then(status => {
@@ -105,19 +105,20 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
 
         // 2. check if save is required
         if (!this.saveNeeded()) {
-          return this.close();
+          this.close();
+          return;
         }
 
         // 3. perform save operation
         return this._save()
           .then(() => {
             this.markAsSaved();
-            return this.close();
+            this.close();
           });
       });
   }
 
-  cancel(): JQuery.Promise<void> {
+  cancel(): Promise<void> {
     let showMessageBox = this.saveNeeded() && this.askIfNeedSave;
     if (showMessageBox) {
       return this._showYesNoCancelMessageBox(
@@ -125,14 +126,15 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
         this._okAfterAskIfSaveNeeded.bind(this),
         this.close.bind(this));
     }
-    return this.close();
+    this.close();
+    return $.resolvedPromise();
   }
 
-  protected _okAfterAskIfSaveNeeded(): JQuery.Promise<void> {
+  protected _okAfterAskIfSaveNeeded(): Promise<void> {
     return this.ok();
   }
 
-  protected _showYesNoCancelMessageBox(message: string, yesAction: () => JQuery.Promise<void>, noAction: () => JQuery.Promise<void>): JQuery.Promise<void> {
+  protected _showYesNoCancelMessageBox(message: string, yesAction: () => Promise<void>, noAction: () => Promise<void> | void): Promise<void> {
     return MessageBoxes.createYesNoCancel(this.widget)
       .withHeader(message)
       .buildAndOpen()
@@ -146,7 +148,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
       });
   }
 
-  reset(): JQuery.Promise<void> {
+  reset(): Promise<void> {
     this._reset();
 
     // reload the state
@@ -155,16 +157,15 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     });
   }
 
-  close(): JQuery.Promise<void> {
-    return this._close();
+  close() {
+    this._close();
   }
 
-  protected _close(): JQuery.Promise<void> {
+  protected _close() {
     this.trigger('close');
-    return $.resolvedPromise();
   }
 
-  save(): JQuery.Promise<void> {
+  save(): Promise<void> {
     // 1. validate form
     return this._validateAndHandle()
       .then(status => {
@@ -183,13 +184,13 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     // NOP
   }
 
-  protected _save(): JQuery.Promise<void> {
+  protected _save(): Promise<void> {
     return this.handlers.save().then(() => {
       this.trigger('save');
     });
   }
 
-  protected _defaultSave(): JQuery.Promise<void> {
+  protected _defaultSave(): Promise<void> {
     return $.resolvedPromise();
   }
 
@@ -208,7 +209,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     this.askIfNeedSave = askIfNeedSave;
   }
 
-  protected _validateAndHandle(): JQuery.Promise<Status> {
+  protected _validateAndHandle(): Promise<Status> {
     return this._validate()
       .then(status => this._handleValidationResult(status))
       .catch(error => {
@@ -219,7 +220,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
       });
   }
 
-  protected _handleValidationResult(status: Status): JQuery.Promise<Status> {
+  protected _handleValidationResult(status: Status): Promise<Status> {
     // 1. reveal first invalid element if available
     const elementToReveal = this._findElementToReveal(status);
     if (elementToReveal) {
@@ -251,18 +252,18 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
     return invalidElementsStatus?.elementsValidationResult.invalidElements[0];
   }
 
-  protected _handleInvalid(status: Status): JQuery.Promise<Status> {
+  protected _handleInvalid(status: Status): Promise<Status> {
     return $.resolvedPromise(status); // default no handling
   }
 
   /**
    * @returns a promise resolved with the validation result as {@link Status}.
    */
-  validate(): JQuery.Promise<Status> {
+  validate(): Promise<Status> {
     return this._validateAndHandle();
   }
 
-  protected _validate(): JQuery.Promise<Status> {
+  protected _validate(): Promise<Status> {
     return this._validateElements().then(elementStatus => {
       if (elementStatus.isError()) {
         return elementStatus;
@@ -280,7 +281,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
   /**
    * Validates all elements (i.e. form-fields) covered by the lifecycle and checks for missing or invalid elements.
    */
-  protected _validateElements(): JQuery.Promise<Status> {
+  protected _validateElements(): Promise<Status> {
     const validationResult = this.invalidElements();
     if (validationResult.pendingElements.length > 0) {
       return $.promiseAll(validationResult.pendingElements.map(element => element.promise))
@@ -310,7 +311,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
    * with a specific element or field. For instance, you could validate if an internal member variable of a Lifecycle
    * or Form is set.
    */
-  protected _validateWidget(): Status | JQuery.Promise<Status> {
+  protected _validateWidget(): Status | Promise<Status> {
     return Status.ok();
   }
 
@@ -412,7 +413,7 @@ export abstract class Lifecycle<TValidationResult extends { errorStatus?: Status
    * Note: in contrast to events, handlers can control the flow of the lifecycle. They also have a return value where events have none.
    *   Only one handler can be registered for each type.
    */
-  handle(type: 'load' | 'save', func: () => JQuery.Promise<void>) {
+  handle(type: 'load' | 'save', func: () => Promise<void>) {
     let supportedTypes = ['load', 'save'];
     if (supportedTypes.indexOf(type) === -1) {
       throw new Error('Cannot register handler for unsupported type \'' + type + '\'');

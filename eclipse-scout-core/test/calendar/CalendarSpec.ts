@@ -15,15 +15,11 @@ describe('Calendar', () => {
 
   beforeEach(() => {
     setFixtures(sandbox());
-    jasmine.Ajax.install();
-    jasmine.clock().install();
     session = sandboxSession();
   });
 
   afterEach(() => {
     session = null;
-    jasmine.Ajax.uninstall();
-    jasmine.clock().uninstall();
   });
 
   class SpecCalendar extends Calendar {
@@ -654,12 +650,12 @@ describe('Calendar', () => {
 
     const createCalendarResource = (name = 'Test calendar', visible = true, selectable = true): CalendarResourceDo => {
       let resourceId = UuidPool.take(session);
-      return {
+      return scout.create(CalendarResourceDo, {
         resourceId: resourceId,
         name: name,
         visible: visible,
         selectable: selectable
-      };
+      });
     };
 
     const getCurrentResourceIdFor = (comp: CalendarComponent): string | number => {
@@ -798,12 +794,13 @@ describe('Calendar', () => {
     describe('resource panel visible', () => {
 
       const isResourcePanelVisible = (calendar: Calendar): boolean => {
-        return calendar.calendarSidebar.resoucePanel.$container.height() > 40;
+        return calendar.calendarSidebar.splitter.$container.isVisible();
       };
 
       it('should hide resource panel when no calendar is set', () => {
         // Arrange
         let calendar = initCalendar();
+        calendar.calendarSidebar.revalidateLayout();
 
         // Act
         let menuVisible = isResourcePanelVisible(calendar);
@@ -816,6 +813,7 @@ describe('Calendar', () => {
         // Arrange
         let calRes = createCalendarResource('Calendar');
         let calendar = initCalendar(calRes);
+        calendar.calendarSidebar.revalidateLayout();
 
         // Act
         let menuVisible = isResourcePanelVisible(calendar);
@@ -824,12 +822,12 @@ describe('Calendar', () => {
         expect(menuVisible).toBe(false);
       });
 
-      it('should make resource panel visible when more than one calendar is set', () => {
+      it('should make resource panel visible when more than one calendar is set', async () => {
         // Arrange
         let businessRes = createCalendarResource('Business calendar');
         let otherRes = createCalendarResource('Other calendar');
         let calendar = initCalendar(businessRes, otherRes);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         let menuVisible = isResourcePanelVisible(calendar);
@@ -838,17 +836,17 @@ describe('Calendar', () => {
         expect(menuVisible).toBe(true);
       });
 
-      it('should make resource panel visible when an additional calendar is added', () => {
+      it('should make resource panel visible when an additional calendar is added', async () => {
         // Arrange
         let businessRes = createCalendarResource('Business calendar');
         let otherRes = createCalendarResource('Other calendar');
         let calendar = initCalendar(businessRes);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         let panelVisibleFirst = isResourcePanelVisible(calendar);
         calendar.setResources([...calendar.resources, otherRes]);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
         let panelVisibleAfter = isResourcePanelVisible(calendar);
 
         // Assert
@@ -939,12 +937,12 @@ describe('Calendar', () => {
         });
       };
 
-      it('should not be possible to uncheck the last checked resource', () => {
+      it('should not be possible to uncheck the last checked resource', async () => {
         // Arrange
         let resource1 = createCalendarResource('Calendar 1');
         let resource2 = createCalendarResource('Calendar 2');
         let calendar = initCalendar(resource1, resource2);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource1.resourceId);
@@ -955,7 +953,7 @@ describe('Calendar', () => {
         expect(resource2.visible).toBe(true);
       });
 
-      it('should not be possible to uncheck the last visible resource when in group', () => {
+      it('should not be possible to uncheck the last visible resource when in group', async () => {
         // Arrange
         let parentResource = createCalendarResource('Parent calendar');
         let resource1 = createCalendarResource('Calendar 1');
@@ -963,7 +961,7 @@ describe('Calendar', () => {
         let resource2 = createCalendarResource('Calendar 2');
         resource2.parentId = parentResource.resourceId;
         let calendar = initCalendar(parentResource, resource1, resource2);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource1.resourceId);
@@ -974,7 +972,7 @@ describe('Calendar', () => {
         expect(resource2.visible).toBe(true);
       });
 
-      it('should not be possible to uncheck the resource group when the group includes of the last selected resource', () => {
+      it('should not be possible to uncheck the resource group when the group includes of the last selected resource', async () => {
         // Arrange
         let parentResource = createCalendarResource('Parent calendar');
         let resource1 = createCalendarResource('Calendar 1');
@@ -982,7 +980,7 @@ describe('Calendar', () => {
         let resource2 = createCalendarResource('Calendar 2');
         resource2.parentId = parentResource.resourceId;
         let calendar = initCalendar(parentResource, resource1, resource2);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, parentResource.resourceId);
@@ -992,7 +990,7 @@ describe('Calendar', () => {
         expect(resource2.visible).toBe(true);
       });
 
-      it('should not hide a resource when its double clicked', () => {
+      it('should not hide a resource when its double clicked', async () => {
         // Arrange
         let parentResource = createCalendarResource('Parent calendar');
         let resource1 = createCalendarResource('Calendar 1');
@@ -1000,7 +998,7 @@ describe('Calendar', () => {
         let resource2 = createCalendarResource('Calendar 2');
         resource2.parentId = parentResource.resourceId;
         let calendar = initCalendar(parentResource, resource1, resource2);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource2.resourceId);
@@ -1012,11 +1010,11 @@ describe('Calendar', () => {
         expect(resource2.visible).toBe(false);
       });
 
-      it('should not be possible to unselect the only calendar', () => {
+      it('should not be possible to unselect the only calendar', async () => {
         // Arrange
         let resource1 = createCalendarResource('Calendar 1');
         let calendar = initCalendar(resource1);
-        jasmine.clock().tick(500); // await the lookup
+        await calendar.calendarSidebar.resoucePanel.treeBox.when('lookupCallDone');
 
         // Act
         clickTreeNodeForResourceId(calendar, resource1.resourceId);

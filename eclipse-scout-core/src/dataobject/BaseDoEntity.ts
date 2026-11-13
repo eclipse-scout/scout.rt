@@ -7,23 +7,27 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Constructor, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
+import {Constructor, dataObjects, DataObjectVisitor, dataObjectVisitors, DeepPartial, DoContributionClassOrType, DoEntity, doValueMetaData, InitModelOf, objectFactoryHints, objects, ObjectType} from '../index';
 import $ from 'jquery';
 
 /**
  * Base class for all data objects.
  */
 @objectFactoryHints({ensureObjectType: false})
-export class BaseDoEntity {
-  declare model: DeepPartial<Omit<this, 'init' | 'getContribution' | 'addContribution' | 'removeContribution' | 'toPojo' | 'clone' | 'equals' | 'model'>>;
+export class BaseDoEntity implements DoEntity {
+  declare model: DeepPartial<Omit<this, 'model' | 'init' | 'getContribution' | 'getContributions' | 'addContribution' | 'removeContribution'
+    | 'contribution' | 'toPojo' | 'clone' | 'equals' | 'visit'>>;
 
   _type?: string;
+  _typeVersion?: string;
   _contributions?: BaseDoEntity[];
 
   init(model: InitModelOf<this>) {
     if (objects.isPojo(model)) {
-      const tmpInstance = dataObjects.deserialize(model, this.constructor as ObjectType<this>);
+      const tmpInstance = dataObjects.deserialize(model, this.constructor as ObjectType<this>, {deserializeBaseDoEntity: false /* do not create deep copies for BaseDoEntities*/});
       $.extend(this, tmpInstance);
+    } else if (model instanceof BaseDoEntity) {
+      $.extend(this, model);
     }
   }
 
@@ -93,7 +97,9 @@ export class BaseDoEntity {
   clone(model?: InitModelOf<this> | BaseDoEntity): this {
     const addModel = model instanceof BaseDoEntity ? model.toPojo() : model;
     const thisModel = this.toPojo();
-    return dataObjects.deserialize($.extend(thisModel, addModel)) as this;
+    const cloneModel = $.extend(thisModel, addModel);
+    const objectType = doValueMetaData.detectDataObjectClass(cloneModel) ? null : this.constructor as ObjectType<this>;
+    return dataObjects.deserialize(cloneModel, objectType) as this;
   }
 
   /**
@@ -101,8 +107,39 @@ export class BaseDoEntity {
    * @param obj The object to compare against.
    * @returns true if the two are deeply equal.
    */
-  equals(obj: any) {
-    return objects.equalsRecursive(this, obj, true /* prevent stackoverflow as this is called in equals */);
+  equals(obj: any): boolean {
+    if (obj === this) {
+      return true;
+    }
+    if (!objects.isObject(obj)) {
+      return false;
+    }
+    if (Object.getPrototypeOf(obj) !== Object.getPrototypeOf(this)) {
+      return false;
+    }
+
+    const propertiesToCompare = new Set(Object.keys(this).concat(Object.keys(obj)));
+
+    // special handling for _typeVersion
+    const hasTypeVersion = propertiesToCompare.delete(dataObjects._TYPE_VERSION_ATTRIBUTE_NAME);
+    if (hasTypeVersion) {
+      const otherTypeVersion = obj[dataObjects._TYPE_VERSION_ATTRIBUTE_NAME];
+      if (otherTypeVersion && this._typeVersion && otherTypeVersion !== this._typeVersion) {
+        // must only match if both have a version, otherwise it should be ignored
+        return false;
+      }
+    }
+
+    for (const key of propertiesToCompare) {
+      if (!objects.equalsRecursive(obj[key], this[key])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  toString(): string {
+    return JSON.stringify(this.toPojo());
   }
 
   /**

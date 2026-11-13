@@ -33,7 +33,6 @@ describe('LookupCall', () => {
       expect(lookupCall instanceof StaticLookupCall).toBe(true);
 
       let lookupCallGeneric = LookupCall.ensure((StaticLookupCall<number>), session);
-      lookupCallGeneric.getByKey(3);
       expect(lookupCallGeneric instanceof StaticLookupCall).toBe(true);
     });
 

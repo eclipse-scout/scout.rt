@@ -9,11 +9,14 @@
  */
 package org.eclipse.scout.rt.rest.resource;
 
+import static org.hamcrest.CoreMatchers.is;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import jakarta.ws.rs.Consumes;
@@ -32,12 +35,12 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Context;
 
 import org.eclipse.scout.rt.api.data.ApiExposed;
+import org.eclipse.scout.rt.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.rest.IRestResource;
 import org.eclipse.scout.rt.rest.RestApplicationScope;
 import org.eclipse.scout.rt.rest.RestApplicationScopes;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
-import org.hamcrest.CoreMatchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ErrorCollector;
@@ -50,6 +53,33 @@ public abstract class AbstractRestResourceAnnotationTest {
   public ErrorCollector m_errorCollector = new ErrorCollector();
 
   protected abstract String getPackageNamePrefix();
+
+  @Test
+  public void testMapReturnValue() {
+    List<IRestResource> resources = BEANS.all(IRestResource.class);
+    resources.stream()
+        .map(IRestResource::getClass)
+        .filter(this::acceptResourceForMapReturnValueCheck)
+        .flatMap(resourceClass -> Arrays.stream(resourceClass.getMethods()))
+        .filter(this::acceptMethodForMapReturnValueCheck)
+        .forEach(this::testMethodForMapReturnValue);
+  }
+
+  protected boolean acceptResourceForMapReturnValueCheck(Class<? extends IRestResource> resource) {
+    return resource.getName().startsWith(getPackageNamePrefix());
+  }
+
+  protected boolean acceptMethodForMapReturnValueCheck(Method m) {
+    // public check is implicit
+    return !Modifier.isStatic(m.getModifiers()) && getHttpMethodAnnotations().anyMatch(m::isAnnotationPresent);
+  }
+
+  protected void testMethodForMapReturnValue(Method m) {
+    String doMapEntitySimpleName = DoMapEntity.class.getSimpleName();
+    String msg = m.getDeclaringClass().getName() + "#" + m.getName() + " returns a Map which is not supported. Use a " + doMapEntitySimpleName + " instead. "
+        + "Can be created using " + doMapEntitySimpleName + "#of";
+    m_errorCollector.checkThat(msg, Map.class.isAssignableFrom(m.getReturnType()), is(false));
+  }
 
   @Test
   public void testApiExposedAnnotation() {
@@ -70,7 +100,7 @@ public abstract class AbstractRestResourceAnnotationTest {
       return;
     }
 
-    m_errorCollector.checkThat(m.getDeclaringClass().getName() + "#" + m.getName() + " is missing an " + ApiExposed.class.getSimpleName() + " annotation", m.getAnnotation(ApiExposed.class) != null, CoreMatchers.is(true));
+    m_errorCollector.checkThat(m.getDeclaringClass().getName() + "#" + m.getName() + " is missing an " + ApiExposed.class.getSimpleName() + " annotation", m.getAnnotation(ApiExposed.class) != null, is(true));
   }
 
   protected boolean acceptResourceForApiExposedAnnotationCheck(Class<? extends IRestResource> resource) {
@@ -102,7 +132,7 @@ public abstract class AbstractRestResourceAnnotationTest {
       return;
     }
 
-    m_errorCollector.checkThat(m.getDeclaringClass().getName() + "#" + m.getName() + " is missing an " + Consumes.class.getSimpleName() + " annotation", m.getAnnotation(Consumes.class) != null, CoreMatchers.is(true));
+    m_errorCollector.checkThat(m.getDeclaringClass().getName() + "#" + m.getName() + " is missing an " + Consumes.class.getSimpleName() + " annotation", m.getAnnotation(Consumes.class) != null, is(true));
   }
 
   protected boolean acceptResourceForConsumesAnnotationCheck(Class<? extends IRestResource> resource) {
@@ -131,6 +161,6 @@ public abstract class AbstractRestResourceAnnotationTest {
   }
 
   protected void testPathAnnotation(Class<? extends IRestResource> resource) {
-    m_errorCollector.checkThat(resource.getName() + " is missing a " + Path.class.getSimpleName() + " annotation", resource.getAnnotation(Path.class) != null, CoreMatchers.is(true));
+    m_errorCollector.checkThat(resource.getName() + " is missing a " + Path.class.getSimpleName() + " annotation", resource.getAnnotation(Path.class) != null, is(true));
   }
 }

@@ -63,7 +63,7 @@ export class CalendarSidebarLayout extends AbstractLayout {
       this._validateSplitterPosition(htmlComp, this.splitter, availableSize);
     }
 
-    // Calculate new heigths for ui elements
+    // Calculate new heights for ui elements
     let yearPanelHeight = this.splitter.position - 8; // Margin
     let resourcePanelMargin = (this.splitter.collapsed ? this._calculateCollapsedLabelHeight() : 0) + 20;
     let resourcePanelHeight = availableSize.height - yearPanelHeight - resourcePanelMargin;

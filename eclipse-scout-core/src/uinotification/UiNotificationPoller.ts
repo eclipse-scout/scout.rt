@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo,
+  ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, Event, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo,
   UiNotificationDo, UiNotificationPollerEventMap, UiNotificationRequest, UiNotificationResponse, UiNotificationSystem
 } from '../index';
 import $ from 'jquery';
@@ -48,6 +48,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
   url: string;
   system: UiNotificationSystem;
   protected _call: AjaxCall;
+  protected _pollTimeoutId: number;
 
   constructor() {
     super();
@@ -106,10 +107,14 @@ export class UiNotificationPoller extends PropertyEventEmitter {
       return;
     }
     this._call?.abort();
+    clearTimeout(this._pollTimeoutId);
+    this._pollTimeoutId = null;
     this.setStatus(BackgroundJobPollingStatus.STOPPED);
   }
 
   poll() {
+    clearTimeout(this._pollTimeoutId);
+    this._pollTimeoutId = null;
     this._poll();
     this.setStatus(BackgroundJobPollingStatus.RUNNING);
   }
@@ -118,7 +123,9 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     if (this.status === BackgroundJobPollingStatus.STOPPED) {
       return;
     }
-    setTimeout(() => {
+    clearTimeout(this._pollTimeoutId);
+    this._pollTimeoutId = setTimeout(() => {
+      this._pollTimeoutId = null;
       if (this.status === BackgroundJobPollingStatus.STOPPED) {
         return;
       }
@@ -195,7 +202,7 @@ export class UiNotificationPoller extends PropertyEventEmitter {
 
     if (notifications.length) {
       $.log.isInfoEnabled() && $.log.info(`Dispatching UI notifications with ids ${notifications.map(n => n.id)}.`);
-      this.trigger('notifications', {notifications});
+      this.trigger('notifications', new Event({notifications, source: this}));
     }
 
     this._schedulePoll();

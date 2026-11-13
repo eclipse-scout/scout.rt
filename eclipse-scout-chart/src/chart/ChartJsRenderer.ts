@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -265,7 +265,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }, config);
     config.options.animation.duration = this.animationDuration;
 
-    this.chartJs = new ChartJs(this.$canvas[0].getContext('2d'), config as ChartConfiguration) as ChartJsChart;
+    this.chartJs = new ChartJs<ChartJsType>(this.$canvas[0].getContext('2d'), config as ChartConfiguration) as ChartJsChart;
     this._adjustSize(this.chartJs.config, this.chartJs.chartArea, {isDatasetVisible: i => this.chartJs.getDatasetMeta(i).visible});
     this.refresh();
   }
