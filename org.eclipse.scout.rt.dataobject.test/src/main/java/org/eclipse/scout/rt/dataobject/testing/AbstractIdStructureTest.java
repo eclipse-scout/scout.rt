@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.dataobject.testing;
 
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -28,6 +29,7 @@ import org.eclipse.scout.rt.dataobject.id.ICompositeId;
 import org.eclipse.scout.rt.dataobject.id.IId;
 import org.eclipse.scout.rt.dataobject.id.IRootId;
 import org.eclipse.scout.rt.dataobject.id.IdFactory;
+import org.eclipse.scout.rt.dataobject.id.IdTypeName;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.inventory.ClassInventory;
@@ -103,6 +105,23 @@ public abstract class AbstractIdStructureTest {
 
     // invoke with test values
     testOfTypeMockValues(parameterTypes, of);
+  }
+
+  @Test
+  public void validateIdTypeName() {
+    IdTypeName idTypeName = getIdClass().getAnnotation(IdTypeName.class);
+    assumeTrue(idTypeName != null);
+    String typeName = idTypeName.value();
+    if (typeName.contains(".")) {
+      typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
+    }
+    else {
+      fail("Missing namespace in ID type name '" + typeName + "', check class " + getIdClass().getName());
+    }
+    String expected = getIdClass().getSimpleName();
+    if (!expected.equals(typeName)) {
+      fail("Wrong ID type name, expected='" + expected + "' actual='" + typeName + "', check class " + getIdClass().getName());
+    }
   }
 
   protected void testOfTypeNullValues(List<Class<?>> parameterTypes, Method of) throws IllegalAccessException, InvocationTargetException {
