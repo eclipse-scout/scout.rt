@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -537,7 +537,7 @@ public class UiNotificationRegistry {
   }
 
   /**
-   * Removes all expires ui notifications.
+   * Removes all expired ui notifications.
    *
    * @see UiNotificationMessageDo#getTimeout(), {@link UiNotificationDo#creationTime()}
    */
@@ -556,7 +556,7 @@ public class UiNotificationRegistry {
         int oldSize = notifications.size();
         if (notifications.removeIf(elem -> elem.getNotification().getCreationTime().getTime() + elem.getTimeout() < now)) {
           int newSize = notifications.size();
-          LOG.info("Removed {} expired notifications for topic {}. New size: {}.", oldSize - newSize, entry.getKey(), newSize);
+          LOG.debug("Removed {} expired notifications for topic {}. New size: {}.", oldSize - newSize, entry.getKey(), newSize);
           if (newSize == 0) {
             // Remove topic if there are no notifications left
             it.remove();
