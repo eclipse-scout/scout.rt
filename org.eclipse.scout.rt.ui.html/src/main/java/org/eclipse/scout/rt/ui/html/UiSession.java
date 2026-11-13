@@ -279,8 +279,13 @@ public class UiSession implements IUiSession {
       LOG.info("UiSession with ID {} initialized", m_uiSessionId);
     }
     catch (RuntimeException | PlatformError e) {
+      // Check the HTTP session before disposing: dispose() may trigger the session housekeeping which might invalidate the HTTP session
+      boolean httpSessionInvalid = !(e instanceof InvalidHttpSessionException) && !getHttpSessionHelper().isHttpSessionValid(req.getSession(false), m_sessionStore);
       //cleanup resources potentially allocated in the partly created UiSession
       dispose();
+      if (httpSessionInvalid) {
+        throw new InvalidHttpSessionException("HTTP session was invalidated while initializing the UI session", e);
+      }
       throw e;
     }
     finally {
@@ -609,7 +614,10 @@ public class UiSession implements IUiSession {
     }
     m_disposed = true;
 
-    sessionStore().unregisterUiSession(this); // also stops and removes client session if necessary
+    ISessionStore sessionStore = sessionStore();
+    if (sessionStore != null) { // null if init() failed before the store could be obtained (e.g. invalidated HTTP session)
+      sessionStore.unregisterUiSession(this); // also stops and removes client session if necessary
+    }
 
     uninstallUiDataAvailableListener();
     signalPoller(); // Notify waiting requests - should not delay web-container shutdown

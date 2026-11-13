@@ -35,6 +35,7 @@ import org.eclipse.scout.rt.ui.html.AbstractUiServletRequestHandler;
 import org.eclipse.scout.rt.ui.html.HttpSessionHelper;
 import org.eclipse.scout.rt.ui.html.ISessionStore;
 import org.eclipse.scout.rt.ui.html.IUiSession;
+import org.eclipse.scout.rt.ui.html.InvalidHttpSessionException;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.BackgroundPollingIntervalProperty;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.MaxUserIdleTimeProperty;
 import org.eclipse.scout.rt.ui.html.UiServlet;
@@ -102,7 +103,13 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         }
         validateNonce(jsonStartupRequest);
         // Always create a new UI Session on startup
-        uiSession = createUiSession(req, resp, jsonStartupRequest);
+        try {
+          uiSession = createUiSession(req, resp, jsonStartupRequest);
+        }
+        catch (InvalidHttpSessionException e) {
+          handleInvalidHttpSessionOnStartup(req, resp, jsonStartupRequest, e);
+          return true;
+        }
       }
       else {
         // Get and validate existing UI session
@@ -378,17 +385,68 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
 
   protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
     HttpSession httpSession = req.getSession();
-    ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
+    ISessionStore sessionStore;
+    try {
+      sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
+    }
+    catch (IllegalStateException e) {
+      if (!m_httpSessionHelper.isHttpSessionValid(httpSession, null)) {
+        throw new InvalidHttpSessionException("HTTP session was invalidated before creating the UI session", e);
+      }
+      throw e;
+    }
 
     final long startNanos = System.nanoTime();
     LOG.debug("Creating new UI session....");
     IUiSession uiSession = BEANS.get(IUiSession.class);
+    // throws InvalidHttpSessionException if the HTTP session was invalidated during initialization (disposes the UI session if initialization fails)
     uiSession.init(req, resp, jsonStartupReq);
-    sessionStore.registerUiSession(uiSession);
+    try {
+      // throws InvalidHttpSessionException if the HTTP session is invalid or about to be invalidated
+      sessionStore.registerUiSession(uiSession);
+    }
+    catch (RuntimeException | PlatformError e) {
+      disposeUiSession(uiSession);
+      throw e;
+    }
 
     LOG.info("Created new UI session with ID {} in {} ms [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]",
         uiSession.getUiSessionId(), StringUtility.formatNanos(System.nanoTime() - startNanos), m_maxUserIdleTime, req.getSession().getMaxInactiveInterval());
     return uiSession;
+  }
+
+  protected void disposeUiSession(IUiSession uiSession) {
+    final ReentrantLock uiSessionLock = uiSession.uiSessionLock();
+    uiSessionLock.lock();
+    try {
+      uiSession.dispose();
+    }
+    catch (RuntimeException | PlatformError e) {
+      LOG.warn("Failed to dispose UI session with ID {}", uiSession.getUiSessionId(), e);
+    }
+    finally {
+      uiSessionLock.unlock();
+    }
+  }
+
+  /**
+   * The HTTP session was invalidated (e.g. by the session housekeeping) while the UI session was being created. The UI
+   * is asked to reload the page which will then use a new HTTP session.
+   */
+  protected void handleInvalidHttpSessionOnStartup(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq, InvalidHttpSessionException e) throws IOException {
+    LOG.info("HTTP session was invalidated while creating the UI session, the UI is requested to reload the page.");
+    LOG.debug("Details", e);
+    HttpSession httpSession = req.getSession(false);
+    if (httpSession != null) {
+      try {
+        // make sure the reloaded page does not use the same HTTP session again
+        httpSession.invalidate();
+      }
+      catch (IllegalStateException ex) { // NOSONAR
+        // already invalid
+      }
+    }
+    writeJsonResponse(resp, m_jsonRequestHelper.createReloadPageStartupResponse(jsonStartupReq.getClientSessionId()));
   }
 
   /**

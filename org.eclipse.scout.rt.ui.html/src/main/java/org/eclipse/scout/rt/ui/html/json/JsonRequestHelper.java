@@ -124,6 +124,18 @@ public class JsonRequestHelper {
   }
 
   /**
+   * @return {@link JSONObject} which represents a startup response that makes the UI reload the page (e.g. because
+   * the HTTP session was invalidated while the UI session was being created).
+   */
+  public JSONObject createReloadPageStartupResponse(String clientSessionId) {
+    final JsonResponse response = new JsonResponse();
+    response.markAsStartupResponse();
+    response.getStartupData().put("reloadPage", true);
+    response.getStartupData().put("clientSessionId", clientSessionId);
+    return response.toJson();
+  }
+
+  /**
    * @return {@link JSONObject} to respond to a ping request.
    */
   public JSONObject createPingResponse() {
