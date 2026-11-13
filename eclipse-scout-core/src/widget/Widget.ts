@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -2352,7 +2352,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   scrollToTop(options?: ScrollOptions) {
     if (this.getDelegateScrollable()) {
-      this.getDelegateScrollable().scrollToTop();
+      this.getDelegateScrollable().scrollToTop(options);
       return;
     }
     let $scrollable = this.get$Scrollable();
@@ -2360,7 +2360,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return;
     }
     if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToTop.bind(this));
+      this.session.layoutValidator.schedulePostValidateFunction(() => this.scrollToTop(options));
       return;
     }
     scrollbars.scrollTop($scrollable, 0, options);
@@ -2368,7 +2368,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
 
   scrollToBottom(options?: ScrollOptions) {
     if (this.getDelegateScrollable()) {
-      this.getDelegateScrollable().scrollToBottom();
+      this.getDelegateScrollable().scrollToBottom(options);
       return;
     }
     let $scrollable = this.get$Scrollable();
@@ -2376,7 +2376,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       return;
     }
     if (!this.rendered) {
-      this.session.layoutValidator.schedulePostValidateFunction(this.scrollToBottom.bind(this));
+      this.session.layoutValidator.schedulePostValidateFunction(() => this.scrollToBottom(options));
       return;
     }
     scrollbars.scrollToBottom($scrollable, options);
