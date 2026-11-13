@@ -9,27 +9,45 @@
  */
 package org.eclipse.scout.rt.dataobject.testing.signature;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.*;
 import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
+import org.eclipse.scout.rt.dataobject.AttributeName;
+import org.eclipse.scout.rt.dataobject.DataObjectAttributeDescriptor;
+import org.eclipse.scout.rt.dataobject.DataObjectInventory;
+import org.eclipse.scout.rt.dataobject.DoEntity;
+import org.eclipse.scout.rt.dataobject.DoNode;
 import org.eclipse.scout.rt.dataobject.IDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.IPrettyPrintDataObjectMapper;
 import org.eclipse.scout.rt.dataobject.TypeVersion;
 import org.eclipse.scout.rt.dataobject.testing.TestingResourceHelper;
 import org.eclipse.scout.rt.platform.BEANS;
+import org.eclipse.scout.rt.platform.IgnoreBean;
+import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.FileUtility;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ErrorCollector;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.helpers.MessageFormatter;
 
 /**
  * Abstract test implementation for generating data object signatures for each module.
@@ -38,7 +56,7 @@ import org.slf4j.LoggerFactory;
  * migrations) before committing an updated signature file.
  * <p>
  * Due to the importance of a proper review the test is not self-healing, i.e. does not overwrite the existing signature
- * file. Instead a new file is created which should, after all test output is considered, be the new signature file.
+ * file. Instead, a new file is created which should, after all test output is considered, be the new signature file.
  * <p>
  * Each module containing data objects with {@link TypeVersion} annotation must subclass this test.
  */
@@ -46,6 +64,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractDataObjectSignatureTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(AbstractDataObjectSignatureTest.class);
+
+  @Rule
+  public ErrorCollector m_errorCollector = new ErrorCollector();
 
   /**
    * @return Filename prefix of signature file.
@@ -151,5 +172,129 @@ public abstract class AbstractDataObjectSignatureTest {
       filename = FileUtility.getFilenameParts(getFilename())[0] + "-to-be-reviewed.json";
     }
     BEANS.get(TestingResourceHelper.class).writeTestResource(getResourceBaseClass(), filename, signature);
+  }
+
+  /**
+   * Validates all registered {@link DoEntity instances.
+   */
+  @Test
+  public void validateDataObjects() {
+    Map<String, Class<? extends IDoEntity>> typeNameToClassMap = BEANS.get(DataObjectInventory.class).getTypeNameToClassMap();
+    typeNameToClassMap.values().stream()
+        .filter(this::acceptDataObject)
+        .forEach(this::validateDataObject);
+  }
+
+  protected void validateDataObject(Class<? extends IDoEntity> clazz) {
+    LOG.debug("Validate DoEntity class {}", clazz);
+    validateTypeName(clazz);
+    validateClassName(clazz);
+
+    if (clazz.isAnnotationPresent(IgnoreBean.class)) {
+      LOG.debug("Skip validating DoEntity class {} with {} annotation", clazz, IgnoreBean.class.getSimpleName());
+      return;
+    }
+
+    IDoEntity instance = BEANS.get(clazz);
+    Map<String, DataObjectAttributeDescriptor> attributesDescriptions = BEANS.get(DataObjectInventory.class).getAttributesDescription(clazz);
+    for (Entry<String, DataObjectAttributeDescriptor> entry : attributesDescriptions.entrySet()) {
+      LOG.debug("Validate DoEntity attribute {} of class {}", entry.getKey(), clazz);
+      validateAttribute(instance, entry.getKey(), entry.getValue());
+    }
+  }
+
+  /**
+   * Validates type name against class name (type name should be "namespace." + class name without 'Do' suffix
+   */
+  protected void validateTypeName(Class<? extends IDoEntity> clazz) {
+    String typeName = BEANS.get(DataObjectInventory.class).toTypeName(clazz);
+    if (typeName == null) {
+      addError("Missing type name in data object, check class {}", clazz.getName());
+      return;
+    }
+    else if (typeName.contains(".")) {
+      typeName = typeName.substring(typeName.lastIndexOf('.') + 1);
+    }
+    else {
+      addError("Missing namespace in data object type name '{}', check class {}", typeName, clazz.getName());
+    }
+    String expected = StringUtility.removeSuffixes(clazz.getSimpleName(), "Do");
+    if (!expected.equals(typeName)) {
+      addError("Wrong data object type name, expected='{}' actual='{}', check class {}", expected, typeName, clazz.getName());
+    }
+  }
+
+  /**
+   * Validates class name against a set of allowed suffixes.
+   */
+  protected void validateClassName(Class<? extends IDoEntity> clazz) {
+    String name = clazz.getSimpleName();
+    if (getAllowedDataObjectSuffixes().stream().noneMatch(name::endsWith)) {
+      addError("Wrong data object class name, data objects should end with suffix {}, check class {}", getAllowedDataObjectSuffixes(), clazz.getName());
+    }
+  }
+
+  protected Set<String> getAllowedDataObjectSuffixes() {
+    return CollectionUtility.hashSet("Do", "Request", "Response", "Include");
+  }
+
+  protected void validateAttribute(IDoEntity instance, String attributeName, DataObjectAttributeDescriptor descriptor) {
+    Method attributeAccessor = descriptor.getAccessor();
+    try {
+      DoNode<?> node = (DoNode<?>) attributeAccessor.invoke(instance);
+      if (node == null) {
+        addError("accessor method returns null instead of a DoNode. Class={}, attributeName={}, accessorMethodName={}",
+            instance.getClass(),
+            attributeName,
+            attributeAccessor.getName());
+        return;
+      }
+      if (ObjectUtility.notEquals(attributeName, node.getAttributeName())) {
+        addError("Name of attribute does not match name of accessor method or @AttributeName annotation value. Class={}, attributeName={}, accessorMethodName={}, annotationValue={}",
+            instance.getClass(),
+            node.getAttributeName(),
+            attributeAccessor.getName(),
+            getAttributeNameAnnotationValue(attributeAccessor));
+      }
+
+      validateAttributeType(instance, attributeName, descriptor);
+    }
+    catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+      throw BEANS.get(PlatformExceptionTranslator.class).translate(e);
+    }
+  }
+
+  protected void validateAttributeType(IDoEntity instance, String attributeName, DataObjectAttributeDescriptor descriptor) {
+    // check for Map types using data object as map key
+    if (descriptor.getType().getActualTypeArguments()[0] instanceof ParameterizedType parameterizedType) {
+      if (parameterizedType.getRawType() == Map.class) {
+        Type mapKeyType = parameterizedType.getActualTypeArguments()[0];
+        if (DoEntity.class.isAssignableFrom((Class) mapKeyType) && mapKeyType != Object.class) {
+          addError("Using DoEntity as key of a map is not supported within data object. Class={}, attributeName={}, type={}", instance.getClass(), attributeName, parameterizedType);
+        }
+      }
+    }
+  }
+
+  protected String getAttributeNameAnnotationValue(Method attributeAccessor) {
+    AttributeName annotation = attributeAccessor.getAnnotation(AttributeName.class);
+    if (annotation != null) {
+      return annotation.value();
+    }
+    return null;
+  }
+
+  protected void addError(String message, Object... args) {
+    m_errorCollector.addError(new AssertionError(MessageFormatter.arrayFormat(message, args).getMessage()));
+  }
+
+  /**
+   * Validates that basic DoEntity class was not replaced or changed.
+   */
+  @Test
+  public void validateDoEntityNotReplaced() {
+    Class<?> doEntityClass = BEANS.get(DoEntity.class).getClass();
+    assertTrue(DoEntity.class == doEntityClass, "DoEntity class should not be replaced by {}", doEntityClass);
+    assertNull(BEANS.get(DataObjectInventory.class).toTypeName(DoEntity.class), "TypeName for DoEntity should be null");
   }
 }
