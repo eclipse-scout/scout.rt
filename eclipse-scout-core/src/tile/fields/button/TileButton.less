@@ -110,8 +110,8 @@
     }
   }
 
-  &:active:not(.disabled),
-  &.active:not(.disabled) {
+  &:active:not(.disabled):not(:has(> .tile-button > .status:active)),
+  &.active:not(.disabled):not(:has(> .tile-button > .status.active)) {
     --tile-background-color: @tile-button-default-active-background-color;
   }
 
@@ -138,8 +138,8 @@
       }
     }
 
-    &:active:not(.disabled),
-    &.active:not(.disabled) {
+    &:active:not(.disabled):not(:has(> .tile-button > .status:active)),
+    &.active:not(.disabled):not(:has(> .tile-button > .status.active)) {
       --tile-background-color: @tile-button-default-inverted-active-background-color;
 
       & > .tile-button {
@@ -171,8 +171,8 @@
       }
     }
 
-    &:active:not(.disabled),
-    &.active:not(.disabled) {
+    &:active:not(.disabled):not(:has(> .tile-button > .status:active)),
+    &.active:not(.disabled):not(:has(> .tile-button > .status.active)) {
       --tile-background-color: @tile-button-alternative-inverted-active-background-color;
 
       & > .tile-button {
