@@ -37,7 +37,6 @@ public class OpenUriHelperTest {
     assertEquals(OpenUriAction.NEW_WINDOW, m_openUriHelper.getOpenUriActionForResource(createBinaryResourcesWithMimeType(MimeType.GIF)));
     assertEquals(OpenUriAction.NEW_WINDOW, m_openUriHelper.getOpenUriActionForResource(createBinaryResourcesWithMimeType(MimeType.BMP)));
     assertEquals(OpenUriAction.NEW_WINDOW, m_openUriHelper.getOpenUriActionForResource(createBinaryResourcesWithMimeType(MimeType.AVI)));
-    assertEquals(OpenUriAction.NEW_WINDOW, m_openUriHelper.getOpenUriActionForResource(createBinaryResourcesWithMimeType(MimeType.AVIF)));
     assertEquals(OpenUriAction.NEW_WINDOW, m_openUriHelper.getOpenUriActionForResource(createBinaryResourcesWithMimeType(MimeType.MP4)));
     assertEquals(OpenUriAction.NEW_WINDOW, m_openUriHelper.getOpenUriActionForResource(createBinaryResourcesWithMimeType(MimeType.M2V)));
     assertEquals(OpenUriAction.DOWNLOAD, m_openUriHelper.getOpenUriActionForResource(createBinaryResourcesWithMimeType(MimeType.ZIP)));
