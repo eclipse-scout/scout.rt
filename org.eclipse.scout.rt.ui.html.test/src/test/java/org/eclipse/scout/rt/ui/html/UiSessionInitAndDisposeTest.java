@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -38,12 +39,14 @@ import org.eclipse.scout.rt.platform.IgnoreBean;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.job.Jobs;
 import org.eclipse.scout.rt.server.commons.BufferedServletOutputStream;
+import org.eclipse.scout.rt.shared.ui.UserAgent;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.job.JobTestUtil;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
 import org.eclipse.scout.rt.testing.platform.runner.RunWithNewPlatform;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.json.JsonMessageRequestHandler;
+import org.eclipse.scout.rt.ui.html.json.JsonResponse;
 import org.eclipse.scout.rt.ui.html.json.JsonStartupRequest;
 import org.eclipse.scout.rt.ui.html.json.UnloadRequestHandler;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
@@ -64,6 +67,9 @@ public class UiSessionInitAndDisposeTest {
 
   private List<IBean<?>> m_beans;
   private List<String> m_protocol = Collections.synchronizedList(new ArrayList<>());
+  private volatile HttpSessionInvalidationPoint m_httpSessionInvalidationPoint;
+  private volatile FixtureClientSession m_createdClientSession;
+  private volatile boolean m_persistentUiSession;
 
   @Before
   public void before() {
@@ -99,6 +105,34 @@ public class UiSessionInitAndDisposeTest {
   public void after() {
     BeanTestingHelper.get().unregisterBeans(m_beans);
     m_protocol.clear();
+    m_httpSessionInvalidationPoint = null;
+    m_createdClientSession = null;
+    m_persistentUiSession = false;
+  }
+
+  /**
+   * Points during the UI session startup at which a test can request the HTTP session to be invalidated (see
+   * {@link #m_httpSessionInvalidationPoint}).
+   */
+  private enum HttpSessionInvalidationPoint {
+    PREREGISTRATION,
+    CLIENT_SESSION_CREATED,
+    STORE_HTTP_SESSION_ID_IN_COOKIE,
+    START_DESKTOP,
+    REGISTRATION
+  }
+
+  /**
+   * Invalidates the given HTTP session only if the test requested the invalidation at the given point.
+   *
+   * @return {@code true} if the HTTP session was invalidated
+   */
+  private boolean invalidateHttpSessionIfRequested(HttpSessionInvalidationPoint point, HttpSession httpSession) {
+    if (m_httpSessionInvalidationPoint != point) {
+      return false;
+    }
+    httpSession.invalidate();
+    return true;
   }
 
   private void writeToProtocol(String line) {
@@ -157,6 +191,95 @@ public class UiSessionInitAndDisposeTest {
             "SessionStore.doHousekeeping"),
         m_protocol);
     m_protocol.clear();
+  }
+
+  @Test
+  public void testStartupWhileHttpSessionIsInvalidated() throws IOException {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    m_httpSessionInvalidationPoint = HttpSessionInvalidationPoint.CLIENT_SESSION_CREATED;
+    assertStartupFailsWithSessionTimeout(httpSession);
+  }
+
+  @Test
+  public void testStartupWhileHttpSessionIsInvalidatedDuringRegistration() throws IOException {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    m_httpSessionInvalidationPoint = HttpSessionInvalidationPoint.REGISTRATION;
+    assertStartupFailsWithSessionTimeout(httpSession);
+  }
+
+  @Test
+  public void testStartupOfPersistentUiSessionWhileHttpSessionIsInvalidatedDuringRegistration() throws IOException {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    m_persistentUiSession = true; // like iOS home screen mode, no housekeeping is started for the client session
+    m_httpSessionInvalidationPoint = HttpSessionInvalidationPoint.REGISTRATION;
+    assertStartupFailsWithSessionTimeout(httpSession);
+  }
+
+  @Test
+  public void testStartupWhileHttpSessionIsInvalidatedDuringPreregistration() throws IOException {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    m_httpSessionInvalidationPoint = HttpSessionInvalidationPoint.PREREGISTRATION;
+    assertEquals(JsonResponse.ERR_SESSION_TIMEOUT, startup(httpSession).getJSONObject("error").getInt("code"));
+    assertNull(m_createdClientSession);
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    assertTrue(store.isEmpty());
+  }
+
+  @Test
+  public void testStartupFailsBecauseHttpSessionIsInvalidated() throws IOException {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    m_httpSessionInvalidationPoint = HttpSessionInvalidationPoint.STORE_HTTP_SESSION_ID_IN_COOKIE;
+    assertStartupFailsWithSessionTimeout(httpSession);
+  }
+
+  @Test
+  public void testStartupWithExistingClientSessionWhileHttpSessionIsInvalidated() throws IOException {
+    final HttpSession httpSession = JsonTestUtility.createHttpSession(new Object());
+    final JSONObject startupData = startup(httpSession, "{\"startup\":true}").getJSONObject("startupData");
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    final FixtureClientSession clientSession = (FixtureClientSession) store.getClientSessionMap().get(startupData.getString("clientSessionId"));
+
+    // browser tab reload -> unload
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/unload/" + startupData.getString("uiSessionId"), null);
+      new UnloadRequestHandler().handlePost(req, JsonTestUtility.createHttpServletResponse(out));
+    }
+    JobTestUtil.waitForCondition(() -> Jobs.getJobManager()
+        .getFutures(Jobs.newFutureFilterBuilder().andMatchExecutionSemaphore(clientSession.getModelJobSemaphore()).toFilter())
+        .isEmpty());
+
+    m_httpSessionInvalidationPoint = HttpSessionInvalidationPoint.START_DESKTOP;
+    final JSONObject response = startup(httpSession, "{\"startup\":true, \"clientSessionId\":\"" + clientSession.getId() + "\"}");
+
+    assertEquals(JsonResponse.ERR_SESSION_TIMEOUT, response.getJSONObject("error").getInt("code"));
+    assertFalse(store.isHttpSessionValid());
+    JobTestUtil.waitForCondition(clientSession::isStopped);
+    assertTrue(store.getUiSessionMap().isEmpty());
+  }
+
+  private void assertStartupFailsWithSessionTimeout(HttpSession httpSession) throws IOException {
+    final JSONObject response = startup(httpSession);
+
+    assertEquals(JsonResponse.ERR_SESSION_TIMEOUT, response.getJSONObject("error").getInt("code"));
+    final ISessionStore store = BEANS.get(HttpSessionHelper.class).getSessionStore(httpSession);
+    assertFalse(store.isHttpSessionValid());
+    assertNotNull(m_createdClientSession);
+    JobTestUtil.waitForCondition(() -> m_createdClientSession.isStopped());
+    assertTrue(store.getUiSessionMap().isEmpty());
+  }
+
+  private JSONObject startup(HttpSession httpSession) throws IOException {
+    return startup(httpSession, "{\"startup\":true}");
+  }
+
+  private JSONObject startup(HttpSession httpSession, String jsonData) throws IOException {
+    final JsonMessageRequestHandler messageHandler = new JsonMessageRequestHandler();
+    try (BufferedServletOutputStream out = new BufferedServletOutputStream()) {
+      final HttpServletRequest req = JsonTestUtility.createHttpServletRequest(httpSession, "/json", jsonData);
+      final HttpServletResponse resp = JsonTestUtility.createHttpServletResponse(out);
+      messageHandler.handlePost(req, resp);
+      return new JSONObject(new String(out.getContent(), StandardCharsets.UTF_8));
+    }
   }
 
   @Test
@@ -399,9 +522,9 @@ public class UiSessionInitAndDisposeTest {
     }
     JobTestUtil.waitForCondition(clientSession::isStopped);
 
-    //two calls UiSession.dispose; remove them from the protocol since they can occor any time in the list
+    //two calls UiSession.dispose; remove them from the protocol since they can occur any time in the list
     for (int i = 1; i <= 2; i++) {
-      assertTrue("" + (i == 1 ? "first" : "second") + " call to UiSession.dispose", m_protocol.remove("UiSession.dispose"));
+      assertTrue((i == 1 ? "first" : "second") + " call to UiSession.dispose", m_protocol.remove("UiSession.dispose"));
     }
     assertEquals(
         Arrays.asList(
@@ -549,6 +672,18 @@ public class UiSessionInitAndDisposeTest {
       writeToProtocol("SessionStore.doHousekeeping");
       super.doHousekeepingOutsideWriteLock(clientSession);
     }
+
+    @Override
+    public IClientSession preregisterUiSession(IUiSession uiSession, String clientSessionId) {
+      invalidateHttpSessionIfRequested(HttpSessionInvalidationPoint.PREREGISTRATION, getHttpSession());
+      return super.preregisterUiSession(uiSession, clientSessionId);
+    }
+
+    @Override
+    public void registerUiSession(IUiSession uiSession) {
+      invalidateHttpSessionIfRequested(HttpSessionInvalidationPoint.REGISTRATION, getHttpSession());
+      super.registerUiSession(uiSession);
+    }
   }
 
   @IgnoreBean
@@ -557,7 +692,34 @@ public class UiSessionInitAndDisposeTest {
     @Override
     protected IClientSession getOrCreateClientSession(HttpSession httpSession, HttpServletRequest req, JsonStartupRequest jsonStartupReq) {
       writeToProtocol("UiSession.getOrCreateClientSession");
-      return super.getOrCreateClientSession(httpSession, req, jsonStartupReq);
+      IClientSession clientSession = super.getOrCreateClientSession(httpSession, req, jsonStartupReq);
+      m_createdClientSession = (FixtureClientSession) clientSession;
+      invalidateHttpSessionIfRequested(HttpSessionInvalidationPoint.CLIENT_SESSION_CREATED, httpSession);
+      return clientSession;
+    }
+
+    @Override
+    protected void storeHttpSessionIdInCookie(HttpServletResponse resp, HttpSession httpSession, UserAgent userAgent) {
+      if (invalidateHttpSessionIfRequested(HttpSessionInvalidationPoint.STORE_HTTP_SESSION_ID_IN_COOKIE, httpSession)) {
+        throw new IllegalStateException("Session already invalidated"); // like a servlet container would
+      }
+      super.storeHttpSessionIdInCookie(resp, httpSession, userAgent);
+    }
+
+    @Override
+    protected void startDesktop(Map<String, String> sessionStartupParams) {
+      if (m_httpSessionInvalidationPoint == HttpSessionInvalidationPoint.START_DESKTOP) {
+        // invalidation in a model job cancels the model jobs of the client session, including the one the startup is waiting for
+        BEANS.get(UiJobs.class).awaitAndGet(ModelJobs.schedule(
+            () -> invalidateHttpSessionIfRequested(HttpSessionInvalidationPoint.START_DESKTOP, sessionStore().getHttpSession()),
+            ModelJobs.newInput(ClientRunContexts.copyCurrent().withSession(getClientSession(), true))));
+      }
+      super.startDesktop(sessionStartupParams);
+    }
+
+    @Override
+    public boolean isPersistent() {
+      return m_persistentUiSession || super.isPersistent();
     }
 
     @Override
