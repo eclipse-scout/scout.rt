@@ -1298,31 +1298,40 @@ public class UiSession implements IUiSession {
       return;
     }
 
-    LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);
-    final long maxPollWait = pollWaitSeconds * 1000L;
-    final long t0 = System.currentTimeMillis();
-    long pollWait = maxPollWait;
-    boolean wait = true;
-    while (wait) {
-      // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
-      Object notificationToken = m_pollerQueue.poll(pollWait, TimeUnit.MILLISECONDS);
-      long elapsed = System.currentTimeMillis() - t0;
-      // Calculate remaining poll wait time
-      pollWait = maxPollWait - elapsed;
-      if (notificationToken == null || pollWait < 100 || m_disposed || !m_currentJsonResponse.isEmpty()) {
-        // Stop wait loop for one of the following reasons:
-        // 1. Timeout has occurred -> return always, even with empty answer
-        // 2. Remaining poll wait time would less than 100 ms -> same as no. 1
-        // 3. Session is disposed
-        // 4. Poller was wakened up by m_modelJobFinishedListener and JsonResponse is not empty
-        wait = false;
-      }
-      else {
-        // Continue wait loop, because timeout has not yet elapsed and JsonResponse is empty
-        LOG.trace("Background job terminated, but there is nothing to respond. Going back to sleep for max. {} ms.", pollWait);
+    UiPollerRegistry pollerRegistry = BEANS.get(UiPollerRegistry.class);
+    // Register before checking the shutdown flag to not miss a shutdown signal
+    pollerRegistry.register(this);
+    try {
+      LOG.trace("Wait for max. {} seconds until background job terminates or wait timeout occurs...", pollWaitSeconds);
+      final long maxPollWait = pollWaitSeconds * 1000L;
+      final long t0 = System.currentTimeMillis();
+      long pollWait = maxPollWait;
+      boolean wait = !pollerRegistry.isShutdown();
+      while (wait) {
+        // Wait until notified by m_modelJobFinishedListener (when a background job has finished) or a timeout occurs
+        Object notificationToken = m_pollerQueue.poll(pollWait, TimeUnit.MILLISECONDS);
+        long elapsed = System.currentTimeMillis() - t0;
+        // Calculate remaining poll wait time
+        pollWait = maxPollWait - elapsed;
+        if (notificationToken == null || pollWait < 100 || m_disposed || pollerRegistry.isShutdown() || !m_currentJsonResponse.isEmpty()) {
+          // Stop wait loop for one of the following reasons:
+          // 1. Timeout has occurred -> return always, even with empty answer
+          // 2. Remaining poll wait time would less than 100 ms -> same as no. 1
+          // 3. Session is disposed
+          // 4. Server is shutting down (pending poll requests would block a graceful shutdown)
+          // 5. Poller was wakened up by m_modelJobFinishedListener and JsonResponse is not empty
+          wait = false;
+        }
+        else {
+          // Continue wait loop, because timeout has not yet elapsed and JsonResponse is empty
+          LOG.trace("Background job terminated, but there is nothing to respond. Going back to sleep for max. {} ms.", pollWait);
+        }
       }
     }
-    if (!m_disposed) {
+    finally {
+      pollerRegistry.unregister(this);
+    }
+    if (!m_disposed && !pollerRegistry.isShutdown()) {
       // Wait a short additional time to allow some sort of "coalescing background job result".
       // This prevents too many short polling requests if many jobs finish at the same time.
       Thread.sleep(ADDITIONAL_POLLING_DELAY);

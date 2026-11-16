@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,6 +15,7 @@ import static org.mockito.Mockito.mock;
 
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.Subject;
@@ -47,8 +48,10 @@ import org.eclipse.scout.rt.testing.shared.TestingUtility;
 import org.eclipse.scout.rt.ui.html.UiHtmlConfigProperties.SessionStoreHousekeepingDelayProperty;
 import org.eclipse.scout.rt.ui.html.fixtures.SessionStoreTestForm;
 import org.eclipse.scout.rt.ui.html.fixtures.SessionStoreTestForm.CloseAction;
+import org.eclipse.scout.rt.ui.html.json.JsonRequest;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
 import org.hamcrest.MatcherAssert;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -317,5 +320,36 @@ public class UiSessionTest {
 
     assertNotEquals(oldSubject, subject);
     JsonTestUtility.endRequest(uiSession);
+  }
+
+  @Test
+  public void testWaitForBackgroundJobsReleasedOnPollerRegistryShutdown() throws Exception {
+    UiPollerRegistry pollerRegistry = new UiPollerRegistry();
+    List<IBean<?>> beans = BeanTestingHelper.get().registerBeans(new BeanMetaData(UiPollerRegistry.class).withInitialInstance(pollerRegistry));
+    try {
+      UiSession uiSession = (UiSession) JsonTestUtility.createAndInitializeUiSession();
+      JsonTestUtility.endRequest(uiSession);
+      JsonRequest pollRequest = new JsonRequest(new JSONObject().put(JsonRequest.PROP_UI_SESSION_ID, uiSession.getUiSessionId()).put(JsonRequest.PROP_POLL, true));
+
+      CountDownLatch pollerStarted = new CountDownLatch(1);
+      IFuture<Void> poller = Jobs.schedule(() -> {
+        pollerStarted.countDown();
+        uiSession.waitForBackgroundJobs(pollRequest, 60);
+      }, Jobs.newInput());
+      assertTrue(pollerStarted.await(5, TimeUnit.SECONDS));
+      JobTestUtil.waitForCondition(() -> pollerRegistry.m_waitingSessions.contains(uiSession));
+
+      pollerRegistry.shutdown();
+      poller.awaitDoneAndGet(5, TimeUnit.SECONDS);
+
+      // Subsequent pollers must not block anymore
+      long t0 = System.nanoTime();
+      uiSession.waitForBackgroundJobs(pollRequest, 60);
+      assertTrue(System.nanoTime() - t0 < TimeUnit.SECONDS.toNanos(5));
+      uiSession.dispose();
+    }
+    finally {
+      BeanTestingHelper.get().unregisterBeans(beans);
+    }
   }
 }

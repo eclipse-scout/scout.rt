@@ -21,6 +21,8 @@ import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
@@ -53,6 +55,7 @@ import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.GracefulHandler;
 import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.Uptime;
+import org.eclipse.jetty.util.component.Graceful;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationAutoCreateSelfSignedCertificateProperty;
@@ -93,6 +96,7 @@ import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationThreadPool
 import org.eclipse.scout.rt.app.ApplicationProperties.ScoutApplicationUseTlsProperty;
 import org.eclipse.scout.rt.app.handler.ScoutJettyErrorHandler;
 import org.eclipse.scout.rt.app.servlet.ScoutServletContextHandler;
+import org.eclipse.scout.rt.jetty.IGracefulShutdownListener;
 import org.eclipse.scout.rt.jetty.IServletContributor;
 import org.eclipse.scout.rt.jetty.IServletFilterContributor;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
@@ -221,8 +225,17 @@ public class Application {
     server.setHandler(handler);
 
     server.setStopTimeout(CONFIG.getPropertyValue(ScoutApplicationStopTimeoutProperty.class));
+    installGracefulShutdownNotifier(server);
 
     return server;
+  }
+
+  /**
+   * Installs a {@link Graceful} bean which notifies all {@link IGracefulShutdownListener}s as soon as the graceful
+   * shutdown of the server is initiated (i.e. before waiting for active requests to complete).
+   */
+  protected void installGracefulShutdownNotifier(Server server) {
+    server.addBean(new P_GracefulShutdownNotifier());
   }
 
   protected ServerConnector createHttpServerConnector(Server server) {
@@ -665,6 +678,34 @@ public class Application {
       response.getHeaders().add(new HttpField(HttpHeader.LOCATION, redirectUri.toString()));
       callback.succeeded();
       return true;
+    }
+  }
+
+  /**
+   * Notifies all {@link IGracefulShutdownListener}s when {@link Graceful#shutdown()} is called by the {@link Server}.
+   */
+  protected static class P_GracefulShutdownNotifier implements Graceful {
+
+    private final AtomicBoolean m_shutdown = new AtomicBoolean();
+
+    @Override
+    public CompletableFuture<Void> shutdown() {
+      if (m_shutdown.compareAndSet(false, true)) {
+        for (IGracefulShutdownListener listener : BEANS.all(IGracefulShutdownListener.class)) {
+          try {
+            listener.onGracefulShutdown();
+          }
+          catch (RuntimeException e) {
+            LOG.warn("Error while notifying graceful shutdown listener {}", listener, e);
+          }
+        }
+      }
+      return CompletableFuture.completedFuture(null);
+    }
+
+    @Override
+    public boolean isShutdown() {
+      return m_shutdown.get();
     }
   }
 }
