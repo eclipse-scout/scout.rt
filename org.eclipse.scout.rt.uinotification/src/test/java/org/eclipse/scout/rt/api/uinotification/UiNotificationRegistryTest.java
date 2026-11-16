@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -475,6 +475,19 @@ public class UiNotificationRegistryTest {
 
     assertNull(m_registry.getListeners("topic"));
     assertEquals(true, completed.getValue());
+  }
+
+  @Test
+  public void testGetOrWaitReleasedOnShutdown() throws Exception {
+    CompletableFuture<List<UiNotificationDo>> future = m_registry.getOrWait(Arrays.asList(createGetAllTopic("topic")), null, TimeUnit.MINUTES.toMillis(1));
+    assertFalse(future.isDone());
+
+    m_registry.shutdown();
+    assertTrue(future.get(5, TimeUnit.SECONDS).isEmpty());
+    assertNull(m_registry.getListeners("topic"));
+
+    // Subsequent calls must not wait anymore
+    assertTrue(m_registry.getOrWait(Arrays.asList(createGetAllTopic("topic")), null, TimeUnit.MINUTES.toMillis(1)).isDone());
   }
 
   /**

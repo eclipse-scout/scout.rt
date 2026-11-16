@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -79,6 +80,8 @@ public class UiNotificationRegistry {
   private long m_cleanupJobInterval = CONFIG.getPropertyValue(RegistryCleanupJobIntervalProperty.class);
   private IUiNotificationClusterService m_clusterService;
   private Date m_lastCreationTime;
+  private final Set<CompletableFuture<List<UiNotificationDo>>> m_waitingFutures = ConcurrentHashMap.newKeySet();
+  private volatile boolean m_shutdown;
 
   public UiNotificationRegistry() {
     m_clusterService = BEANS.opt(IUiNotificationClusterService.class);
@@ -105,7 +108,7 @@ public class UiNotificationRegistry {
    */
   public CompletableFuture<List<UiNotificationDo>> getOrWait(List<TopicDo> topics, String user, long timeout) {
     List<UiNotificationDo> notifications = get(topics, user);
-    if (!notifications.isEmpty() || timeout <= 0) {
+    if (!notifications.isEmpty() || timeout <= 0 || isShutdown()) {
       if (LOG.isDebugEnabled()) {
         LOG.debug("Returning {} notifications for topics {} and user {} without waiting.", notifications.size(), getNotificationTopics(notifications), user);
       }
@@ -124,13 +127,20 @@ public class UiNotificationRegistry {
     };
     List<String> topicNames = topics.stream().map(topic -> topic.getName()).collect(Collectors.toList());
     addListeners(topicNames, listener);
+    m_waitingFutures.add(future);
+    if (isShutdown()) {
+      // Shutdown happened concurrently, don't wait
+      future.complete(new ArrayList<>());
+    }
 
     LOG.trace("Waiting for new notifications for topics {} and user {}.", topicNames, user);
 
     return future.thenApply(uiNotificationDos -> {
+      m_waitingFutures.remove(future);
       removeListeners(topicNames, user, listener);
       return uiNotificationDos;
     }).orTimeout(timeout, TimeUnit.MILLISECONDS).exceptionally(throwable -> {
+      m_waitingFutures.remove(future);
       removeListeners(topicNames, user, listener);
       if (throwable instanceof TimeoutException) {
         LOG.debug("Timeout reached, stop waiting");
@@ -140,6 +150,28 @@ public class UiNotificationRegistry {
       }
       return new ArrayList<>();
     });
+  }
+
+  /**
+   * @return <code>true</code> if {@link #shutdown()} was called. {@link #getOrWait(List, String, long)} does not wait
+   * anymore in this case.
+   */
+  public boolean isShutdown() {
+    return m_shutdown;
+  }
+
+  /**
+   * Completes all futures returned by {@link #getOrWait(List, String, long)} that are still waiting with an empty list
+   * of notifications, and ensures that subsequent calls return immediately. Should be called when the servlet container
+   * initiates a graceful shutdown, because otherwise the waiting requests delay the shutdown until the wait timeout has
+   * elapsed (or the container's stop timeout is reached).
+   */
+  public void shutdown() {
+    m_shutdown = true;
+    LOG.info("Releasing {} waiting UI notification request(s) due to shutdown", m_waitingFutures.size());
+    for (CompletableFuture<List<UiNotificationDo>> future : m_waitingFutures) {
+      future.complete(new ArrayList<>());
+    }
   }
 
   /**
