@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.session.ClientSessionStopHelper;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.IPlatform.State;
 import org.eclipse.scout.rt.platform.Order;
@@ -103,6 +105,9 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
         validateNonce(jsonStartupRequest);
         // Always create a new UI Session on startup
         uiSession = createUiSession(req, resp, jsonStartupRequest);
+        if (uiSession == null) {
+          return true;
+        }
       }
       else {
         // Get and validate existing UI session
@@ -376,15 +381,45 @@ public class JsonMessageRequestHandler extends AbstractUiServletRequestHandler {
     }
   }
 
-  protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) {
+  /**
+   * Creates, initializes and registers a new UI session.
+   *
+   * @return the new UI session or <code>null</code> if the HTTP session was invalidated while the UI session was being
+   * initialized. In this case, a session timeout response has already been written.
+   */
+  protected IUiSession createUiSession(HttpServletRequest req, HttpServletResponse resp, JsonStartupRequest jsonStartupReq) throws IOException {
     HttpSession httpSession = req.getSession();
     ISessionStore sessionStore = m_httpSessionHelper.getSessionStore(httpSession);
 
     final long startNanos = System.nanoTime();
     LOG.debug("Creating new UI session....");
     IUiSession uiSession = BEANS.get(IUiSession.class);
-    uiSession.init(req, resp, jsonStartupReq);
-    sessionStore.registerUiSession(uiSession);
+    try {
+      uiSession.init(req, resp, jsonStartupReq);
+      sessionStore.registerUiSession(uiSession);
+    }
+    catch (RuntimeException | PlatformError e) {
+      if (sessionStore.isHttpSessionValid()) {
+        throw e;
+      }
+      //noinspection PlaceholderCountMatchesArgumentCount
+      LOG.info("Initialization of UI session with ID {} failed because HTTP session with ID {} was invalidated", uiSession.getUiSessionId(), sessionStore.getHttpSessionId(), LOG.isDebugEnabled() ? e : null);
+    }
+    // Checked after registering, because the HTTP session may be invalidated concurrently (during initialization or registration)
+    if (!sessionStore.isHttpSessionValid()) {
+      LOG.info("HTTP session with ID {} was invalidated while initializing UI session with ID {}", sessionStore.getHttpSessionId(), uiSession.getUiSessionId());
+      IClientSession clientSession = uiSession.getClientSession();
+      uiSession.dispose();
+      // Non-persistent client sessions are stopped by the session housekeeping, which is started by dispose().
+      // For persistent UI sessions (iOS home screen mode), no housekeeping is started. Their client sessions are normally
+      // stopped when the HTTP session is invalidated (SessionStore.valueUnbound). This has already happened here, and a
+      // client session created during this startup was never registered in the session store, so it must be stopped explicitly.
+      if (clientSession != null && uiSession.isPersistent()) {
+        BEANS.get(ClientSessionStopHelper.class).scheduleStop(clientSession, true, "HTTP session invalidated during UI session startup");
+      }
+      handleSessionTimeout(resp, jsonStartupReq);
+      return null;
+    }
 
     LOG.info("Created new UI session with ID {} in {} ms [maxIdleTime={}s, httpSession.maxInactiveInterval={}s]",
         uiSession.getUiSessionId(), StringUtility.formatNanos(System.nanoTime() - startNanos), m_maxUserIdleTime, req.getSession().getMaxInactiveInterval());
