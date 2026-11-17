@@ -274,15 +274,64 @@ public abstract class AbstractDataObjectSignatureTest {
   }
 
   protected void validateAttributeType(IDoEntity instance, String attributeName, DataObjectAttributeDescriptor descriptor) {
-    // check for Map types using data object as map key
-    if (descriptor.getType().getActualTypeArguments()[0] instanceof ParameterizedType parameterizedType) {
-      if (parameterizedType.getRawType() == Map.class) {
-        Type mapKeyType = parameterizedType.getActualTypeArguments()[0];
-        if (DoEntity.class.isAssignableFrom((Class) mapKeyType) && mapKeyType != Object.class) {
-          addError("Using DoEntity as key of a map is not supported within data object. Class={}, attributeName={}, type={}", instance.getClass(), attributeName, parameterizedType);
+    validateAttributeType(instance, attributeName, descriptor.getType(), CollectionUtility.hashSet());
+  }
+
+  protected void validateAttributeType(IDoEntity instance, String attributeName, Type type, Set<Type> visited) {
+    if (!visited.add(type)) {
+      return;
+    }
+    if (type instanceof ParameterizedType parameterizedType) {
+      Type[] arguments = parameterizedType.getActualTypeArguments();
+      if (parameterizedType.getRawType() == Map.class && isEntityMapKey(arguments[0])) {
+        addError("Using IDoEntity as key of a map is not supported within data object. Class={}, attributeName={}, type={}", instance.getClass(), attributeName, parameterizedType);
+      }
+      for (Type argument : arguments) {
+        validateAttributeType(instance, attributeName, argument, visited);
+      }
+    }
+    else if (type instanceof java.lang.reflect.WildcardType wildcardType) {
+      for (Type bound : wildcardType.getUpperBounds()) {
+        validateAttributeType(instance, attributeName, bound, visited);
+      }
+      for (Type bound : wildcardType.getLowerBounds()) {
+        validateAttributeType(instance, attributeName, bound, visited);
+      }
+    }
+    else if (type instanceof java.lang.reflect.TypeVariable<?> typeVariable) {
+      for (Type bound : typeVariable.getBounds()) {
+        validateAttributeType(instance, attributeName, bound, visited);
+      }
+    }
+  }
+
+  protected boolean isEntityMapKey(Type type) {
+    if (type instanceof Class<?> clazz) {
+      return IDoEntity.class.isAssignableFrom(clazz);
+    }
+    if (type instanceof ParameterizedType parameterizedType) {
+      return isEntityMapKey(parameterizedType.getRawType());
+    }
+    if (type instanceof java.lang.reflect.WildcardType wildcardType) {
+      for (Type bound : wildcardType.getUpperBounds()) {
+        if (isEntityMapKey(bound)) {
+          return true;
+        }
+      }
+      for (Type bound : wildcardType.getLowerBounds()) {
+        if (isEntityMapKey(bound)) {
+          return true;
         }
       }
     }
+    else if (type instanceof java.lang.reflect.TypeVariable<?> typeVariable) {
+      for (Type bound : typeVariable.getBounds()) {
+        if (isEntityMapKey(bound)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   protected String getAttributeNameAnnotationValue(Method attributeAccessor) {
