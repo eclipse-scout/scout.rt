@@ -1909,10 +1909,10 @@ public class JsonDataObjectsSerializationTest {
     dateUUIDMap.put(DATE_TRUNCATED, UUID_2);
     mapDo.withDateUUIDMapAttribute(dateUUIDMap);
 
-    Locale deCh = new Locale("de", "CH");
-    Locale enUs = new Locale("en", "US");
-    Locale frCh = new Locale("fr", "CH");
-    Locale en = new Locale("en");
+    Locale deCh = Locale.of("de", "CH");
+    Locale enUs = Locale.of("en", "US");
+    Locale frCh = Locale.of("fr", "CH");
+    Locale en = Locale.of("en");
     Map<Locale, Locale> localeLocaleMap = new LinkedHashMap<>();
     localeLocaleMap.put(deCh, frCh);
     localeLocaleMap.put(enUs, en);
@@ -1940,6 +1940,23 @@ public class JsonDataObjectsSerializationTest {
 
     TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
     assertEqualsWithComparisonFailure(mapDo, marshalled);
+  }
+
+  @Test
+  public void testSerializeDeserialize_TestMapDoLinkedHashMap() throws Exception {
+    LinkedHashMap<FixtureUuId, TestItemDo> map = new LinkedHashMap<>();
+    map.put(FixtureUuId.of("4f42ca50-04d3-449f-a03a-02251e92865c"), BEANS.get(TestItemDo.class).withId("one"));
+    map.put(FixtureUuId.of("afcc72f6-8c99-4523-9157-92dbc313e205"), BEANS.get(TestItemDo.class).withId("two"));
+    map.put(FixtureUuId.of("22ffac92-cf04-4dd1-8b8b-81528ea74348"), BEANS.get(TestItemDo.class).withId("three"));
+
+    TestMapDo item = BEANS.get(TestMapDo.class).withFixtureUuidTestItemDoLinkedMapAttribute(map);
+    String json = s_dataObjectMapper.writeValueAsString(item);
+    assertJsonEquals("TestMapDoLinkedHashMap.json", json);
+
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+    assertEqualsWithComparisonFailure(item, marshalled);
+    assertTrue(marshalled.getFixtureUuidTestItemDoLinkedMapAttribute() instanceof LinkedHashMap);
+    assertEquals(List.of("one", "two", "three"), marshalled.getFixtureUuidTestItemDoLinkedMapAttribute().values().stream().map(TestItemDo::getId).toList());
   }
 
   /**

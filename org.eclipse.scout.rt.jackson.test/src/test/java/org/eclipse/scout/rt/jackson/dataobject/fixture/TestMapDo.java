@@ -10,6 +10,7 @@
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 
 @TypeName("TestMap")
 public class TestMapDo extends DoEntity {
@@ -73,6 +75,10 @@ public class TestMapDo extends DoEntity {
   // testing a more complex scenario for value serializer determined in DoEntitySerializer#serializeMap
   public DoValue<Map<String, Map<String, List<TestItemDo>>>> stringMapStringMapStringListTestItemDoMapAttribute() {
     return doValue("stringMapStringMapStringListTestItemDoMapAttribute");
+  }
+
+  public DoValue<LinkedHashMap<FixtureUuId, TestItemDo>> fixtureUuidTestItemDoLinkedMapAttribute() {
+    return doValue("fixtureUuidTestItemDoLinkedMapAttribute");
   }
 
   /* **************************************************************************
@@ -209,5 +215,16 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<String, Map<String, List<TestItemDo>>> getStringMapStringMapStringListTestItemDoMapAttribute() {
     return stringMapStringMapStringListTestItemDoMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withFixtureUuidTestItemDoLinkedMapAttribute(LinkedHashMap<FixtureUuId, TestItemDo> fixtureUuidTestItemDoLinkedMapAttribute) {
+    fixtureUuidTestItemDoLinkedMapAttribute().set(fixtureUuidTestItemDoLinkedMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public LinkedHashMap<FixtureUuId, TestItemDo> getFixtureUuidTestItemDoLinkedMapAttribute() {
+    return fixtureUuidTestItemDoLinkedMapAttribute().get();
   }
 }
