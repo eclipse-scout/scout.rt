@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ export class ArrayDoNodeSerializer implements DoNodeSerializer<Array<any>> {
   }
 
   serialize(array: Array<any>, metaData: DoValueMetaData, serializer: DataObjectSerializer): any {
-    const arrayValueType = doValueMetaData.getArrayValueType(metaData);
+    const arrayValueType = doValueMetaData.getFirstTypeArg(metaData);
     return array.map(e => serializer.serialize(e, arrayValueType));
   }
 
@@ -25,7 +25,7 @@ export class ArrayDoNodeSerializer implements DoNodeSerializer<Array<any>> {
   }
 
   deserialize(array: Array<any>, metaData: DoValueMetaData, deserializer: DataObjectDeserializer): Array<any> {
-    const arrayValueType = doValueMetaData.getArrayValueType(metaData);
+    const arrayValueType = doValueMetaData.getFirstTypeArg(metaData);
     return array.map(e => deserializer.deserialize(e, arrayValueType));
   }
 }

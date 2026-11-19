@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,6 +11,14 @@ import {BaseDoEntity, Constructor, DataObjectInventory, ObjectFactory, ObjectTyp
 
 export const doValueMetaData = {
   TYPE_META_DATA_KEY: 'scout.m.t',
+
+  createSimple(constructor: Constructor): DoValueMetaData {
+    return {type: constructor, typeName: null, args: []};
+  },
+
+  createArray(constructor: Constructor): DoValueMetaData {
+    return {type: Array, typeName: null, args: [doValueMetaData.createSimple(constructor)]};
+  },
 
   getFieldMetaData(prototype: object, fieldName: string): DoValueMetaData {
     if (!prototype || !fieldName) {
@@ -62,7 +70,7 @@ export const doValueMetaData = {
     return TypeDescriptor.resolveType(objectType, {variantLenient: true});
   },
 
-  getArrayValueType(metaData: DoValueMetaData): DoValueMetaData {
+  getFirstTypeArg(metaData: DoValueMetaData): DoValueMetaData {
     return metaData?.args?.[0];
   },
 
@@ -85,9 +93,6 @@ export const doValueMetaData = {
   },
 
   detectDataObjectClass(obj: any): Constructor {
-    if (obj instanceof BaseDoEntity) {
-      return obj.constructor as Constructor;
-    }
     const typeName = obj._type;
     if (typeof typeName === 'string') {
       const doConstructor = DataObjectInventory.get().toConstructor(typeName);
@@ -95,7 +100,15 @@ export const doValueMetaData = {
         return doConstructor;
       }
     }
-    return doValueMetaData.resolveToConstructor(obj.objectType) as Constructor;
+    const objectTypeConstructor = doValueMetaData.resolveToConstructor(obj.objectType) as Constructor;
+    if (objectTypeConstructor) {
+      return objectTypeConstructor;
+    }
+    if (obj instanceof BaseDoEntity && obj.constructor !== BaseDoEntity) {
+      // keep the class of a DO instance whose _type is missing or not registered
+      return obj.constructor as Constructor;
+    }
+    return null;
   },
 
   /**

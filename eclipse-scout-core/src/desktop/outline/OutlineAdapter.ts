@@ -290,7 +290,7 @@ export class OutlineAdapter extends TreeAdapter {
     pageModel.jsPageObjectType = pageModel.jsPageObjectType || PageResolver.get(this.session).findObjectTypeForPageParam(pageParam);
     if (!pageModel.jsPageObjectType) {
       if (pageParam) {
-        throw new Error('Could not resolve page objectType for pageParam ' + JSON.stringify(pageParam));
+        throw new Error('Could not resolve page objectType for pageParam ' + dataObjects.stringify(pageParam));
       }
       throw new Error('jsPageObjectType not set');
     }
@@ -298,8 +298,7 @@ export class OutlineAdapter extends TreeAdapter {
     let jsPageModel = this._createJsPageModel(pageModel, pageParam);
     if (pageModel.jsPageModel) {
       // If the jsPageModel contains data objects, deserialize them if possible.
-      // Create POJOs for objects whose _type attribute cannot be resolved to a class to maintain backward compatibility.
-      let deserializedJsPageModel = dataObjects.deserialize(pageModel.jsPageModel, null, {createPojoIfDoIsUnknown: true});
+      let deserializedJsPageModel = this._deserializeDataObject(pageModel.jsPageModel);
       delete deserializedJsPageModel._type; // _type should not be written to page if present
       jsPageModel = $.extend({}, deserializedJsPageModel, jsPageModel);
     }
@@ -338,7 +337,7 @@ export class OutlineAdapter extends TreeAdapter {
 
   protected override _initNodeModel(nodeModel?: TreeNodeModel): ChildModelOf<Page> {
     const model = super._initNodeModel(nodeModel) as ChildModelOf<Page>;
-    model.pageParam = dataObjects.deserialize(model.pageParam);
+    model.pageParam = this._deserializeDataObject(model.pageParam);
     model.overviewIconId = model.overviewIconId || null;
     return model;
   }

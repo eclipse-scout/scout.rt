@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, ChartModel, FulfillmentChartRenderer, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
+import {AbstractChartRenderer, ChartEventMap, ChartJsRenderer, ChartLayout, ChartModel, FulfillmentChartRenderer, GreenAreaPosition, SalesfunnelChartRenderer, SpeedoChartRenderer, VennChartRenderer} from '../index';
 import {aria, arrays, ColorScheme, colorSchemes, DeepPartial, EnumObject, HtmlComponent, InitModelOf, objects, Widget} from '@eclipse-scout/core';
-import {GreenAreaPosition} from './SpeedoChartRenderer';
 import {CategoryScaleOptions, ChartConfiguration, ChartOptions, LinearScaleOptions, LogarithmicScaleOptions, RadialLinearScaleOptions, ScaleType, TimeScaleOptions as ChartJsTimeScaleOptions} from 'chart.js';
 import $ from 'jquery';
 
