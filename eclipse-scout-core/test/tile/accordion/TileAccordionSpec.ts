@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -683,6 +683,48 @@ describe('TileAccordion', () => {
       expect(filteredTileCount).toBe(0);
       expect(accordion.getTileCount()).toBe(0);
       expect(accordion.getFilteredTileCount()).toBe(0);
+    });
+  });
+
+  describe('setTiles', () => {
+
+    it('reorders groups when tiles are reordered', () => {
+      let accordion = createAccordion(4);
+      let [groupD, groupA, groupB, groupC] = accordion.groups;
+      groupD.setTitle('D');
+      groupA.setTitle('A');
+      groupB.setTitle('B');
+      groupC.setTitle('C');
+      let [tileA1, tileA2, tileB1, tileB2, tileC1, tileC2] = [
+        createTile({id: 'A1'}), createTile({id: 'A2'}),
+        createTile({id: 'B1'}), createTile({id: 'B2'}),
+        createTile({id: 'C1'}), createTile({id: 'C2'})
+      ];
+      groupA.body.insertTiles([tileA1, tileA2]);
+      groupB.body.insertTiles([tileB1, tileB2]);
+      groupC.body.insertTiles([tileC1, tileC2]);
+
+      expect(accordion.getTiles().map(tile => tile.id)).toEqual(['A1', 'A2', 'B1', 'B2', 'C1', 'C2']);
+      expect(accordion.groups.map(group => group.title)).toEqual(['D', 'A', 'B', 'C']);
+
+      // Set reverse order -> groups should be reversed as well
+      accordion.setTiles([tileC2, tileC1, tileB2, tileB1, tileA2, tileA1]);
+      expect(accordion.getTiles().map(tile => tile.id)).toEqual(['C2', 'C1', 'B2', 'B1', 'A2', 'A1']);
+      expect(accordion.groups.map(group => group.title)).toEqual(['C', 'B', 'A', 'D']);
+
+      // Set mixed order -> groups are ordered by first occurrence, tiles of the same group are moved near each other
+      accordion.setTiles([tileC1, tileA2, tileB1, tileA1, tileB2, tileC2]);
+      expect(accordion.getTiles().map(tile => tile.id)).toEqual(['C1', 'C2', 'A2', 'A1', 'B1', 'B2']);
+      expect(accordion.groups.map(group => group.title)).toEqual(['C', 'A', 'B', 'D']);
+
+      // Add new tile
+      let tileD1 = createTile({id: 'D1'});
+      // Cannot just set new tiles without assigning them a group first
+      expect(() => accordion.setTiles([tileA1, tileA2, tileD1, tileB1, tileB2, tileC1, tileC2])).toThrowError('No group found for tile D1');
+      groupD.body.insertTile(tileD1);
+      accordion.setTiles([tileA1, tileA2, tileD1, tileB1, tileB2, tileC1, tileC2]);
+      expect(accordion.getTiles().map(tile => tile.id)).toEqual(['A1', 'A2', 'D1', 'B1', 'B2', 'C1', 'C2']);
+      expect(accordion.groups.map(group => group.title)).toEqual(['A', 'D', 'B', 'C']);
     });
   });
 });
