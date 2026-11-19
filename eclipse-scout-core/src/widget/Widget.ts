@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext,
-  LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
-  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
+  AbortError, Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
+  KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter,
+  scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
@@ -406,6 +406,15 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
         // Disconnect child from parent and re-connect to owner
         child.setParent(child.owner);
       }
+    }
+  }
+
+  /**
+   * @throws AbortError if the widget is {@link destroyed} or {@link destroying}
+   */
+  throwAbortIfDestroyed() {
+    if (this.destroying || this.destroyed) {
+      throw new AbortError();
     }
   }
 
