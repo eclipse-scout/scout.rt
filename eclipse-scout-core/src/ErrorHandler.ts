@@ -140,6 +140,10 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   // Signature matches the "window.onerror" event handler
   // https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
   protected _onWindowError(errorMessage: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error) {
+    if (this.isIgnorableError(error)) {
+      $.log.isDebugEnabled() && $.log.debug('Ignored error', error);
+      return true; // prevent the browser from logging the error
+    }
     try {
       if (this._isIgnorableScriptError(errorMessage, fileName, lineNumber, columnNumber, error)) {
         this.handleErrorInfo({
@@ -196,14 +200,19 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   }
 
   /**
+   * @returns true if the given error is an expected cancellation that does not need to be reported, e.g. an {@link AbortError}.
+   * Such errors are ignored by {@link handleErrorInfo} and by the global error handlers.
+   */
+  isIgnorableError(error: any): boolean {
+    return error instanceof AbortError;
+  }
+
+  /**
    * @returns true if the given rejection reason is an expected cancellation that does not need to be reported:
-   * no reason (`undefined` or `null`, used for control flow, e.g. the user clicked "No"),
-   * an {@link AbortError} or an {@link AjaxError} of an aborted request (`textStatus === 'abort'`, e.g. a superseded {@link AjaxCall}).
+   * no reason (`undefined` or `null`, used for control flow, e.g. the user clicked "No") or an ignorable error (see {@link isIgnorableError}).
    */
   isIgnorableRejection(reason: any): boolean {
-    return reason === undefined || reason === null
-      || reason instanceof AbortError
-      || reason instanceof AjaxError && reason.textStatus === 'abort';
+    return reason === undefined || reason === null || this.isIgnorableError(reason);
   }
 
   /**
@@ -219,6 +228,20 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
   handle(error: any): Promise<ErrorInfo> {
     return this.analyzeError(error)
       .then(this.handleErrorInfo.bind(this));
+  }
+
+  /**
+   * Handles the error like {@link handle}, unless it is an {@link AbortError}.
+   * In that case, a promise rejected with the error is returned.
+   *
+   * Use it in a `catch()` in the middle of a promise chain to skip the following `then()` steps if the chain has been aborted,
+   * e.g. `.catch(error => errorHandler.handleOrAbort(error)).then(() => ...`.
+   */
+  handleOrAbort(error: any): Promise<ErrorInfo> {
+    if (error instanceof AbortError) {
+      return $.rejectedPromise(error);
+    }
+    return this.handle(error);
   }
 
   /**
@@ -397,6 +420,10 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
    * - If there is a scout session and the flag "sendError" is set, the error is sent to the UI server.
    */
   handleErrorInfo(errorInfo: ErrorInfo): Promise<ErrorInfo> {
+    if (this.isIgnorableError(errorInfo.error)) {
+      $.log.isDebugEnabled() && $.log.debug('Ignored error', errorInfo.error);
+      return $.resolvedPromise(errorInfo);
+    }
     if (ErrorHandler.isConsumed(errorInfo.error)) {
       $.log.info(`Error has already been consumed, ignoring it. Code ${errorInfo.code}.`);
       return $.resolvedPromise(errorInfo);
