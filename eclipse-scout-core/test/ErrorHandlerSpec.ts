@@ -36,6 +36,10 @@ describe('ErrorHandler', () => {
     override _logErrorInfo(errorInfo: ErrorInfo, prefix?: string) {
       super._logErrorInfo(errorInfo, prefix);
     }
+
+    override _onWindowError(errorMessage: string, fileName?: string, lineNumber?: number, columnNumber?: number, error?: Error) {
+      return super._onWindowError(errorMessage, fileName, lineNumber, columnNumber, error);
+    }
   }
 
   function createRejectionEvent(reason: any): PromiseRejectionEvent {
@@ -45,10 +49,23 @@ describe('ErrorHandler', () => {
     } as unknown as PromiseRejectionEvent;
   }
 
+  describe('isIgnorableError', () => {
+    it('returns true for expected cancellations', () => {
+      expect(errorHandler.isIgnorableError(new AbortError())).toBeTrue();
+    });
+
+    it('returns false for errors without a reason and other errors', () => {
+      expect(errorHandler.isIgnorableError(undefined)).toBeFalse();
+      expect(errorHandler.isIgnorableError(null)).toBeFalse();
+      expect(errorHandler.isIgnorableError(new AjaxError({jqXHR: null, textStatus: 'abort', errorThrown: null, requestOptions: null}))).toBeFalse();
+      expect(errorHandler.isIgnorableError(new AjaxError({jqXHR: null, textStatus: 'error', errorThrown: null, requestOptions: null}))).toBeFalse();
+      expect(errorHandler.isIgnorableError(new Error('abort'))).toBeFalse();
+    });
+  });
+
   describe('isIgnorableRejection', () => {
     it('returns true for expected cancellations', () => {
       expect(errorHandler.isIgnorableRejection(new AbortError())).toBeTrue();
-      expect(errorHandler.isIgnorableRejection(new AjaxError({jqXHR: null, textStatus: 'abort', errorThrown: null, requestOptions: null}))).toBeTrue();
     });
 
     it('returns true for rejections without a reason', () => {
@@ -209,6 +226,78 @@ describe('ErrorHandler', () => {
       await handler.handle(error);
 
       expect(session.desktop.messageBoxes.length).toBe(0);
+    });
+
+    it('ignores ignorable errors', async () => {
+      handler.displayError = true;
+      handler.session = session;
+      let error = new AbortError();
+
+      await handler.handle(error);
+
+      expect(handler._logErrorInfo).not.toHaveBeenCalled();
+      expect(ErrorHandler.isConsumed(error)).toBeFalse();
+      expect(session.desktop.messageBoxes.length).toBe(0);
+    });
+  });
+
+  describe('handleOrAbort', () => {
+    it('returns a rejected promise for AbortError', async () => {
+      let handler = scout.create(FixtureErrorHandler, {displayError: false});
+      spyOn(handler, 'handle');
+      let error = new AbortError();
+
+      await expectAsync(handler.handleOrAbort(error)).toBeRejectedWith(error);
+      expect(handler.handle).not.toHaveBeenCalled();
+    });
+
+    it('handles other ignorable errors instead of rejecting them', async () => {
+      let handler = scout.create(FixtureErrorHandler, {displayError: false});
+      spyOn(handler, 'isIgnorableError').and.returnValue(true);
+      let error = new Error('ignorable');
+
+      let errorInfo = await handler.handleOrAbort(error);
+
+      expect(errorInfo.error).toBe(error);
+    });
+
+    it('handles other errors', async () => {
+      let handler = scout.create(FixtureErrorHandler, {displayError: false});
+      spyOn(handler, '_logErrorInfo');
+      let error = new Error('to be handled');
+
+      let errorInfo = await handler.handleOrAbort(error);
+
+      expect(errorInfo.error).toBe(error);
+      expect(ErrorHandler.isConsumed(error)).toBeTrue();
+    });
+  });
+
+  describe('_onWindowError', () => {
+    it('ignores ignorable errors and prevents the browser from logging them', () => {
+      let handler = scout.create(FixtureErrorHandler);
+      spyOn(handler, 'handleErrorInfo');
+      spyOn(handler, 'analyzeError');
+
+      let result = handler._onWindowError('Uncaught [object Object]', 'file.js', 1, 1, new AbortError() as unknown as Error);
+
+      expect(result).toBeTrue();
+      expect(handler.handleErrorInfo).not.toHaveBeenCalled();
+      expect(handler.analyzeError).not.toHaveBeenCalled();
+    });
+
+    it('handles other errors', async () => {
+      let handler = scout.create(FixtureErrorHandler, {displayError: false});
+      let handled = new Promise<ErrorInfo>(resolve => spyOn(handler, 'handleErrorInfo').and.callFake(info => {
+        resolve(info);
+        return Promise.resolve(info);
+      }));
+      let error = new Error('window error');
+
+      let result = handler._onWindowError(error.message, 'file.js', 1, 1, error);
+
+      expect(result).toBeUndefined();
+      expect((await handled).error).toBe(error);
     });
   });
 
