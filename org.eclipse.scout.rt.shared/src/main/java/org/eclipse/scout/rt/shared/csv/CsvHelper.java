@@ -31,12 +31,14 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.exception.ProcessingException;
 import org.eclipse.scout.rt.platform.nls.NlsLocale;
 import org.eclipse.scout.rt.platform.util.BomInputStreamReader;
+import org.eclipse.scout.rt.platform.util.BooleanUtility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.NumberFormatProvider;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -54,11 +56,13 @@ public class CsvHelper {
    */
   public static final String IGNORED_COLUMN_NAME = "null";
   private static final Logger LOG = LoggerFactory.getLogger(CsvHelper.class);
+  public static final Function<Character, Boolean> DEFAULT_NEW_LINE_FUNCTION = ch -> ch == '\n' || ch == '\r';
 
   private final Locale m_locale;
   private final char m_separatorChar;// ";"
   private final char m_textDelimiterChar;// "\""
   private final String m_lineSeparator;// "\n"
+  private final Function<Character, Boolean> m_isEndOfLine; // ch -> ch == '\n' || ch == '\r'
   private int m_colCount;
   private List<String> m_colNames;
   private List<String> m_colTypes;
@@ -75,11 +79,16 @@ public class CsvHelper {
   }
 
   public CsvHelper(Locale locale, char separatorChar, char textDelimiterChar, String lineSeparator) {
+    this(locale, separatorChar, textDelimiterChar, lineSeparator, DEFAULT_NEW_LINE_FUNCTION);
+  }
+
+  public CsvHelper(Locale locale, char separatorChar, char textDelimiterChar, String lineSeparator, Function<Character, Boolean> isEndOfLine) {
     m_locale = locale == null ? NlsLocale.get() : locale;
     m_separatorChar = separatorChar != 0x00 ? separatorChar : ';';
     m_textDelimiterChar = textDelimiterChar != 0x00 ? textDelimiterChar : '"';
     m_lineSeparator = lineSeparator != null ? lineSeparator : "\n";
     m_colFormat = new ArrayList<>();
+    m_isEndOfLine = isEndOfLine != null ? isEndOfLine : DEFAULT_NEW_LINE_FUNCTION;
   }
 
   public Locale getLocale() {
@@ -100,6 +109,10 @@ public class CsvHelper {
 
   public boolean isEncodeLineSeparator() {
     return m_encodeLineSeparator;
+  }
+
+  public boolean isEndOfLine(char ch) {
+    return BooleanUtility.nvl(m_isEndOfLine.apply(ch));
   }
 
   /**
@@ -426,7 +439,7 @@ public class CsvHelper {
     String token;
     int ch = reader.read();
 
-    while (ch == '\n' || ch == '\r') {
+    while (isEndOfLine((char) ch)) {
       ch = reader.read();
     }
     if (ch < 0) {
@@ -443,7 +456,7 @@ public class CsvHelper {
         curBuf.append((char) ch);
       }
       else {// ch<0 or out of string or end of line
-        if (ch == getSeparatorChar() || ch < 0 || ch == '\n' || ch == '\r') {
+        if (ch == getSeparatorChar() || ch < 0 || isEndOfLine((char) ch)) {
           // consume token
           token = curBuf.toString();
           curBuf.setLength(0);
@@ -464,7 +477,7 @@ public class CsvHelper {
           token = decodeText(token);
           cellList.add(token);
           // check if end of current line
-          if (ch < 0 || ch == '\n' || ch == '\r') {
+          if (ch < 0 || isEndOfLine((char) ch)) {
             break;
           }
         }

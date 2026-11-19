@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -299,6 +300,26 @@ public class CsvHelperTest {
         doTestImportData(true, charset);
       }
     }
+  }
+
+  @Test
+  public void testEndOfLineDefault() {
+    CsvHelper csvHelper = new CsvHelper();
+    String testInputLine = "1,2,3#4,5,6\n7,8,9,10,11";
+    Object[][] expectedData = new Object[][]{{"1", "2", "3#4", "5", "6"}, {"7", "8", "9", "10", "11"}};
+
+    Object[][] actualData = csvHelper.importData(new StringReader(testInputLine), 0, null, Integer.MAX_VALUE);
+    assertEquals(expectedData, actualData);
+  }
+
+  @Test
+  public void testEndOfLine() {
+    CsvHelper csvHelper = new CsvHelper(null, (char) 0, (char) 0, null, ch -> ch == '#');
+    String testInputLine = "1;2;3#4;5;6\n7;8;9;10;11";
+    Object[][] expectedData = new Object[][]{{"1", "2", "3"}, {"4", "5", "6\n7", "8", "9", "10", "11"}};
+
+    Object[][] actualData = csvHelper.importData(new StringReader(testInputLine), 0, null, Integer.MAX_VALUE);
+    assertEquals(expectedData, actualData);
   }
 
   protected void addIfSupported(String charset, List<Charset> charsets) {
