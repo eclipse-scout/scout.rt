@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,34 +9,30 @@
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
-import java.io.Serial;
-
 import org.eclipse.scout.rt.dataobject.DoValue;
 
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.jsontype.TypeSerializer;
-import com.fasterxml.jackson.databind.ser.std.ReferenceTypeSerializer;
-import com.fasterxml.jackson.databind.type.ReferenceType;
-import com.fasterxml.jackson.databind.util.NameTransformer;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.ValueSerializer;
+import tools.jackson.databind.jsontype.TypeSerializer;
+import tools.jackson.databind.ser.std.ReferenceTypeSerializer;
+import tools.jackson.databind.type.ReferenceType;
+import tools.jackson.databind.util.NameTransformer;
 
 /**
  * Serializer for {@link DoValue} objects wrapping a value object.
  */
 public class DoValueSerializer extends ReferenceTypeSerializer<DoValue<?>> {
-  @Serial
-  private static final long serialVersionUID = 1L;
 
-  public DoValueSerializer(ReferenceType fullType, boolean staticTyping, TypeSerializer vts, JsonSerializer<Object> ser) {
+  public DoValueSerializer(ReferenceType fullType, boolean staticTyping, TypeSerializer vts, ValueSerializer<Object> ser) {
     super(fullType, staticTyping, vts, ser);
   }
 
-  public DoValueSerializer(DoValueSerializer base, BeanProperty property, TypeSerializer vts, JsonSerializer<?> valueSer, NameTransformer unwrapper, Object suppressableValue, boolean suppressNulls) {
+  public DoValueSerializer(DoValueSerializer base, BeanProperty property, TypeSerializer vts, ValueSerializer<?> valueSer, NameTransformer unwrapper, Object suppressableValue, boolean suppressNulls) {
     super(base, property, vts, valueSer, unwrapper, suppressableValue, suppressNulls);
   }
 
   @Override
-  protected ReferenceTypeSerializer<DoValue<?>> withResolved(BeanProperty prop, TypeSerializer vts, JsonSerializer<?> valueSer, NameTransformer unwrapper) {
+  protected ReferenceTypeSerializer<DoValue<?>> withResolved(BeanProperty prop, TypeSerializer vts, ValueSerializer<?> valueSer, NameTransformer unwrapper) {
     if ((_property == prop) && (_valueTypeSerializer == vts) && (_valueSerializer == valueSer) && (_unwrapper == unwrapper)) {
       return this;
     }

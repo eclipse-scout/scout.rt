@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,13 +37,15 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.KeyDeserializer;
-import com.fasterxml.jackson.databind.SerializationConfig;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import tools.jackson.databind.BeanDescription;
+import tools.jackson.databind.DeserializationConfig;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.KeyDeserializer;
+import tools.jackson.databind.SerializationConfig;
+import tools.jackson.databind.ValueDeserializer;
+import tools.jackson.databind.ValueSerializer;
 
 public class QualifiedIIdSerializationTest {
 
@@ -115,7 +117,7 @@ public class QualifiedIIdSerializationTest {
   protected static class QualifiedIIdSerializationTest_DataObjectSerializerProvider implements IDataObjectSerializerProvider {
 
     @Override
-    public JsonSerializer<?> findSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc) {
+    public ValueSerializer<?> findSerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
         return new QualifiedIIdSerializer(moduleContext);
       }
@@ -124,7 +126,7 @@ public class QualifiedIIdSerializationTest {
     }
 
     @Override
-    public JsonDeserializer<?> findDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
+    public ValueDeserializer<?> findDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class) || type.hasRawClass(IId.class)) {
         return new QualifiedIIdDeserializer(moduleContext, type.getRawClass().asSubclass(IId.class));
       }
@@ -132,7 +134,7 @@ public class QualifiedIIdSerializationTest {
     }
 
     @Override
-    public JsonSerializer<?> findKeySerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription beanDesc) {
+    public ValueSerializer<?> findKeySerializer(ScoutDataObjectModuleContext moduleContext, JavaType type, SerializationConfig config, BeanDescription.Supplier beanDescRef, JsonFormat.Value formatOverrides) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class)) {
         return new QualifiedIIdMapKeySerializer(moduleContext);
       }
@@ -140,7 +142,7 @@ public class QualifiedIIdSerializationTest {
     }
 
     @Override
-    public KeyDeserializer findKeyDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
+    public KeyDeserializer findKeyDeserializer(ScoutDataObjectModuleContext moduleContext, JavaType type, DeserializationConfig config, BeanDescription.Supplier beanDescRef) {
       if (type.hasRawClass(FixtureStringId.class) || type.hasRawClass(FixtureUuId.class) || type.hasRawClass(FixtureCompositeId.class) || type.hasRawClass(IId.class)) {
         return new QualifiedIIdMapKeyDeserializer(moduleContext, type.getRawClass().asSubclass(IId.class));
       }

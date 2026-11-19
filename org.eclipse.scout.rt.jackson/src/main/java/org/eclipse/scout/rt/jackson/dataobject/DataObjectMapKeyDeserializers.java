@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,11 @@ package org.eclipse.scout.rt.jackson.dataobject;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Bean;
 
-import com.fasterxml.jackson.databind.BeanDescription;
-import com.fasterxml.jackson.databind.DeserializationConfig;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.KeyDeserializer;
-import com.fasterxml.jackson.databind.deser.KeyDeserializers;
+import tools.jackson.databind.BeanDescription.Supplier;
+import tools.jackson.databind.DeserializationConfig;
+import tools.jackson.databind.JavaType;
+import tools.jackson.databind.KeyDeserializer;
+import tools.jackson.databind.deser.KeyDeserializers;
 
 /**
  * Class that defines API for extensions that can provide additional deserializers for deserializer Map keys of various
@@ -40,9 +40,9 @@ public class DataObjectMapKeyDeserializers implements KeyDeserializers {
   }
 
   @Override
-  public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, BeanDescription beanDesc) {
+  public KeyDeserializer findKeyDeserializer(JavaType type, DeserializationConfig config, Supplier beanDescRef) {
     for (IDataObjectSerializerProvider provider : BEANS.all(IDataObjectSerializerProvider.class)) {
-      KeyDeserializer deserializer = provider.findKeyDeserializer(getModuleContext(), type, config, beanDesc);
+      KeyDeserializer deserializer = provider.findKeyDeserializer(getModuleContext(), type, config, beanDescRef);
       if (deserializer != null) {
         return deserializer;
       }
