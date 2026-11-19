@@ -9,10 +9,13 @@
  */
 package org.eclipse.scout.rt.platform.reflect;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -28,7 +31,6 @@ import org.eclipse.scout.rt.platform.Replace;
 import org.eclipse.scout.rt.platform.classid.ClassId;
 import org.eclipse.scout.rt.platform.exception.PlatformExceptionTranslator;
 import org.eclipse.scout.rt.platform.extension.InjectFieldTo;
-import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
 import org.eclipse.scout.rt.platform.util.CompositeObject;
 import org.eclipse.scout.rt.platform.util.StringUtility;
@@ -45,6 +47,11 @@ public final class ConfigurationUtility {
    * cache the result for all classes
    */
   private static final ConcurrentHashMap<Class, Class[]> declaredPublicClassesCache = new ConcurrentHashMap<>();
+
+  /**
+   * Cache for declared methods of a class.
+   */
+  private static final Map<Class<?>, Method[]> S_DECLARED_METHOD_CACHE = new ConcurrentHashMap<>();
 
   private ConfigurationUtility() {
   }
@@ -210,30 +217,42 @@ public final class ConfigurationUtility {
    * @return true if the declared method is overwritten in implementationType
    */
   public static boolean isMethodOverwrite(Class<?> declaringType, String methodName, Class[] parameterTypes, Class<?> implementationType) {
-    Assertions.assertNotNull(declaringType, "declaringType must not be null");
-    Assertions.assertNotNull(methodName, "methodName must not be null");
-    Method declaredMethod;
-    try {
-      declaredMethod = declaringType.getDeclaredMethod(methodName, parameterTypes);
-    }
-    catch (NoSuchMethodException | SecurityException e) {
-      LOG.error("cannot find declared method {}.{}", declaringType.getName(), methodName, e);
+    assertNotNull(declaringType, "declaringType must not be null");
+    assertNotNull(methodName, "methodName must not be null");
+    Method declaredMethod = getDeclaredMethod(declaringType, methodName, parameterTypes);
+    if (declaredMethod == null) {
+      LOG.error("cannot find declared method {}.{}", declaringType.getName(), methodName);
       return false;
     }
     Class<?> c = implementationType;
     while (c != null && c != declaringType) {
-      try {
-        //check if method is avaliable
-        c.getDeclaredMethod(declaredMethod.getName(), declaredMethod.getParameterTypes());
+      Method method = getDeclaredMethod(c, declaredMethod.getName(), declaredMethod.getParameterTypes());
+      if (method != null) {
         return true;
       }
-      catch (NoSuchMethodException | SecurityException e) { // NOSONAR
-        //nop
-      }
-      //up
       c = c.getSuperclass();
     }
     return false;
+  }
+
+  /**
+   * @return {@link Method} of class {@code clazz} with given {@code methodName} and {@code parameterTypes} or
+   * {@code null} if no matching method could be found.
+   */
+  public static Method getDeclaredMethod(Class<?> clazz, String methodName, Class[] parameterTypes) {
+    for (Method method : getAllDeclaredMethods(clazz)) {
+      if (method.getName().equals(methodName) && Arrays.equals(method.getParameterTypes(), parameterTypes)) {
+        return method;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * @return array of {@link Method} containing all declared methods of given {@code clazz}.
+   */
+  public static Method[] getAllDeclaredMethods(Class<?> clazz) {
+    return S_DECLARED_METHOD_CACHE.computeIfAbsent(clazz, Class::getDeclaredMethods);
   }
 
   /**
