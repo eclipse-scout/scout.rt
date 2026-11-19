@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Call, Deferred} from '../../src/index';
+import {AbortError, Call, Deferred} from '../../src/index';
 import {InitModelOf, scout} from '../../src/scout';
 
 describe('Call', () => {
@@ -80,6 +80,24 @@ describe('Call', () => {
         deferred.reject();
       }
       return deferred.promise();
+    }
+  }
+
+  class ControlledCall extends Call {
+    implDeferred: Deferred<any>;
+    implCalls = 0;
+    abortRunningCall = true;
+
+    override _callImpl() {
+      this.implCalls++;
+      this.implDeferred = new Deferred();
+      return this.implDeferred.promise();
+    }
+
+    protected override _abortImpl() {
+      if (this.abortRunningCall) {
+        this.implDeferred?.reject('aborted');
+      }
     }
   }
 
@@ -187,5 +205,37 @@ describe('Call', () => {
     expect(call.callAndGetRetry()).toBe(20);
     expect(call.callAndGetRetry()).toBe(20);
     expect(call.callAndGetRetry()).toBe(20);
+  });
+
+  describe('abort', () => {
+    it('rejects with an AbortError if aborted while the request is running', async () => {
+      let call = scout.create(ControlledCall);
+      let promise = call.call();
+      call.abort();
+
+      await expectAsync(promise).toBeRejectedWith(jasmine.any(AbortError));
+    });
+
+    it('rejects with an AbortError if aborted while waiting for a retry', async () => {
+      let call = scout.create(ControlledCall, {retryIntervals: [1000]});
+      let promise = call.call();
+      call.implDeferred.reject('error');
+      await sleep(); // let the failure be processed so the retry gets scheduled
+      expect(call.callTimeoutId).toBeTruthy();
+      call.abort();
+
+      await expectAsync(promise).toBeRejectedWith(jasmine.any(AbortError));
+      expect(call.implCalls).toBe(1);
+    });
+
+    it('rejects with an AbortError if aborted after the request completed', async () => {
+      let call = scout.create(ControlledCall);
+      call.abortRunningCall = false; // aborting a completed request has no effect
+      let promise = call.call();
+      call.abort();
+      call.implDeferred.resolve('data');
+
+      await expectAsync(promise).toBeRejectedWith(jasmine.any(AbortError));
+    });
   });
 });
