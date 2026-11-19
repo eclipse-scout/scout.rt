@@ -9,8 +9,8 @@
  */
 
 import {
-  ajax, AjaxCall, AjaxError, BaseDoEntity, ErrorHandler, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PermissionModel, PropertyEventEmitter,
-  scout, SomeRequired, typeName, UiNotificationEvent, uiNotifications
+  ajax, AjaxCall, BaseDoEntity, ErrorHandler, EventHandler, InitModelOf, ObjectModel, Permission, PermissionCollection, PermissionCollectionModel, PermissionCollectionType, PermissionLevel, PermissionModel, PropertyEventEmitter, scout,
+  SomeRequired, typeName, UiNotificationEvent, uiNotifications
 } from '../index';
 import $ from 'jquery';
 
@@ -67,7 +67,7 @@ export class AccessControl extends PropertyEventEmitter implements AccessControl
     this._reloadTimeoutId = setTimeout(() => {
       this._reloadTimeoutId = -1;
       this._load()
-        .catch((error: AjaxError) => {
+        .catch(error => {
           // Log error
           scout.create(ErrorHandler, {displayError: false}).handle(error);
         });

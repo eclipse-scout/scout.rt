@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session, TopicDo,
-  UiNotificationDo, UiNotificationPollerEventMap, UiNotificationRequest, UiNotificationResponse, UiNotificationSystem
+  AbortError, ajax, AjaxCall, AjaxError, App, arrays, BackgroundJobPollingStatus, config, ConfigProperties, ErrorHandler, InitModelOf, JsonErrorResponse, LogLevel, MainConfigProperties, objects, PropertyEventEmitter, scout, Session,
+  TopicDo, UiNotificationDo, UiNotificationPollerEventMap, UiNotificationRequest, UiNotificationResponse, UiNotificationSystem
 } from '../index';
 import $ from 'jquery';
 
@@ -218,15 +218,13 @@ export class UiNotificationPoller extends PropertyEventEmitter {
     }
   }
 
-  protected _onError(error: AjaxError) {
+  protected _onError(error: AjaxError | AbortError) {
     if (this._call.pendingCall || this._call.callTimeoutId) {
       // Poller has probably been aborted but already been restarted or scheduled for a retry (callTimeoutId is set) -> ignore error and don't reschedule poll
       return;
     }
-    if (error.textStatus === 'abort' || this._call.aborted) {
+    if (error instanceof AbortError) {
       // Don't report errors if polling was aborted.
-      // Checking the aborted flag is necessary because textStatus may be wrong if AjaxCall was aborted between two retries (textStatus is only set to aborted if the actual request was aborted).
-      // This ensures no error is reported even if poller was stopped between two retries.
       if (this.status === BackgroundJobPollingStatus.STOPPED) {
         return;
       }
