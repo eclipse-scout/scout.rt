@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -313,6 +313,11 @@ export class TileAccordion<TTile extends Tile = Tile> extends Accordion implemen
       let group = this.getGroupById(id);
       group.body.setTiles(tilesPerGroup[id]);
     }
+
+    // Reorder groups in the order they appear in the list of tiles (first occurrence).
+    let groups = new Set(tiles.map(tile => this.getGroupByTile(tile))); // Set maintains insertion order and removes duplicates
+    this.groups.forEach(group => groups.add(group)); // keep unused groups
+    this.setGroups([...groups]);
   }
 
   getTiles(): TTile[] {
