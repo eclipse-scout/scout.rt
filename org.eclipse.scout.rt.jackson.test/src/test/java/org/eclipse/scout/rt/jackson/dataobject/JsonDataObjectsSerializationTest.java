@@ -5,7 +5,11 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
@@ -46,6 +50,7 @@ import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
@@ -147,6 +152,7 @@ import org.eclipse.scout.rt.platform.BeanMetaData;
 import org.eclipse.scout.rt.platform.IBean;
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResources;
+import org.eclipse.scout.rt.platform.util.Assertions;
 import org.eclipse.scout.rt.platform.util.Assertions.AssertionException;
 import org.eclipse.scout.rt.platform.util.Base64Utility;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -2230,6 +2236,49 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
     assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
     assertEquals(Integer.valueOf(42), marshalled.getCount());
+  }
+
+  /**
+   * A {@link DoMapEntity} resolved by its type attribute (deserializer handles {@link DoEntity}) must use the generic
+   * type parameter of its class for the map values (values without type attribute).
+   */
+  @Test
+  public void testDeserialize_DoMapEntityResolvedByTypeName() throws Exception {
+    String json = """
+        {
+          "_type" : "TestDoMapEntity",
+          "mapAttribute1" : { "id" : "id-1", "stringAttribute" : "value-1" },
+          "mapAttribute2" : { "id" : "id-2", "stringAttribute" : "value-2" }
+        }
+        """;
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+
+    TestDoMapEntityDo mapDo = Assertions.assertInstance(marshalled, TestDoMapEntityDo.class);
+    assertEquals(TestItemDo.class, mapDo.getNode("mapAttribute1").get().getClass());
+    assertEquals(TestItemDo.class, mapDo.getNode("mapAttribute2").get().getClass());
+    assertEquals("value-1", mapDo.get("mapAttribute1").getStringAttribute());
+    assertEquals("value-2", mapDo.get("mapAttribute2").getStringAttribute());
+  }
+
+  /**
+   * Same as {@link #testDeserialize_DoMapEntityResolvedByTypeName()} but with the {@link DoMapEntity} as value of an
+   * untyped attribute of a raw {@link DoEntity}.
+   */
+  @Test
+  public void testDeserialize_DoMapEntityResolvedByTypeNameInUntypedAttribute() throws Exception {
+    String json = """
+        {
+          "untyped" : {
+            "_type" : "TestDoMapEntity",
+            "mapAttribute1" : { "id" : "id-1", "stringAttribute" : "value-1" }
+          }
+        }
+        """;
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+
+    TestDoMapEntityDo mapDo = Assertions.assertInstance(marshalled.get("untyped"), TestDoMapEntityDo.class);
+    assertEquals(TestItemDo.class, mapDo.getNode("mapAttribute1").get().getClass());
+    assertEquals("value-1", mapDo.get("mapAttribute1").getStringAttribute());
   }
 
   @Test(expected = ClassCastException.class)
