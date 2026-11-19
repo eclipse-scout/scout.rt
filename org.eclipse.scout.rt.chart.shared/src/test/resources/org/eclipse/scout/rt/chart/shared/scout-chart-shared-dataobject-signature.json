@@ -30,6 +30,10 @@
       "_type" : "scout.AttributeDataObjectSignature",
       "name" : "chartTypeId",
       "valueType" : "ID[scout.ChartTableControlChartTypeId]"
+    }, {
+      "_type" : "scout.AttributeDataObjectSignature",
+      "name" : "selected",
+      "valueType" : "CLASS[java.lang.Boolean]"
     } ],
     "typeName" : "scout.ChartTableControlConfig",
     "typeVersion" : "scout-25.2.001"
