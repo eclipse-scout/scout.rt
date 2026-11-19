@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -131,7 +131,7 @@ public class PublishInput {
   /**
    * Sets multiple properties to be included as message property.
    * <p>
-   * This is a convenience method calling {@link #withProperties(String, String)} multiple times.
+   * This is a convenience method calling {@link #withProperty(String, String)} multiple times.
    */
   public PublishInput withProperties(final Map<String, String> props) {
     if (props != null) {

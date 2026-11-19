@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -132,6 +132,11 @@ public class JmsMomImplementor implements IMomImplementor {
   public static final String JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT = "scout.mom.jms.requestCancellationMessageConsumerJobReceiveTimeout";
 
   /**
+   * Key to set {@link #m_requestMaxMessageSize}
+   */
+  public static final String JMS_REQUEST_MAX_MESSAGE_SIZE = "scout.mom.jms.requestMaxMessageSize";
+
+  /**
    * Key to set {@link #m_subscriptionAwaitStartedSeconds}, if value is not set {@link #WAIT_TIME_INFINITE} is used as a
    * default to wait infinitely (the {@link #WAIT_TIME_INFINITE} value may also be used to configure an infinite wait
    * time)
@@ -169,6 +174,7 @@ public class JmsMomImplementor implements IMomImplementor {
   protected long m_messageConsumerJobReceiveTimeout = 0L;
   protected long m_replyMessageConsumerJobReceiveTimeout = 0L;
   protected long m_requestCancellationMessageConsumerJobReceiveTimeout = 0L;
+  protected long m_requestMaxMessageSize = 0L;
 
   @Override
   public void init(final Map<Object, Object> properties) throws Exception {
@@ -180,6 +186,7 @@ public class JmsMomImplementor implements IMomImplementor {
       m_messageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
       m_replyMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REPLY_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
       m_requestCancellationMessageConsumerJobReceiveTimeout = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REQUEST_CANCELLATION_MESSAGE_CONSUMER_JOB_RECEIVE_TIMEOUT), Long.class), 0L);
+      m_requestMaxMessageSize = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_REQUEST_MAX_MESSAGE_SIZE), Long.class), 0L);
       m_subscriptionAwaitStartedSeconds = NumberUtility.nvl(TypeCastUtility.castValue(properties.get(JMS_SUBSCRIPTION_AWAIT_STARTED_TIMEOUT), Integer.class), WAIT_TIME_INFINITE);
       m_contextEnvironment = createContextEnvironment(properties);
       m_connectionFactory = createConnectionFactory(properties);
@@ -465,6 +472,7 @@ public class JmsMomImplementor implements IMomImplementor {
 
       // send request message
       JmsMessageWriter messageWriter = JmsMessageWriter.newInstance(sessionProvider.getSession(), resolveMarshaller(destination))
+          .withMaxMessageSize(m_requestMaxMessageSize)
           .writeReplyTo(temporaryQueue)
           .writeReplyId(replyId)
           .writeProperties(input.getProperties())
@@ -673,6 +681,7 @@ public class JmsMomImplementor implements IMomImplementor {
   public <DTO> void send(IJmsSessionProvider sessionProvider, IDestination<DTO> destination, DTO transferObject, PublishInput input) throws JMSException {
     Session session = sessionProvider.getSession();
     JmsMessageWriter messageWriter = JmsMessageWriter.newInstance(session, resolveMarshaller(destination))
+        .withMaxMessageSize(m_requestMaxMessageSize)
         .writeTransferObject(transferObject)
         .writeReplyTo(resolveJmsDestination(input.getReplyTo(), session))
         .writeProperties(input.getProperties());
