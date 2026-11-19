@@ -196,11 +196,13 @@ public class SmtpHelper {
     if (readTimeout != null) {
       props.setProperty(propertyBaseName + ".timeout", Integer.toString(readTimeout));
     }
+    if (config.isUseUtf8()) {
+      props.setProperty("mail.mime.allowutf8", "true");
+    }
 
     if (!CollectionUtility.isEmpty(config.getAdditionalSessionProperties())) {
       props.putAll(config.getAdditionalSessionProperties());
     }
-
     LOG.debug("Session created with properties {}", props);
 
     return Session.getInstance(props, null);

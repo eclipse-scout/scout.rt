@@ -961,13 +961,17 @@ public class MailHelper {
    */
   @SuppressWarnings("squid:S1166")
   public boolean isEmailAddressValid(String emailAddress) {
+    return isEmailAddressValid(emailAddress, true);
+  }
+
+  public boolean isEmailAddressValid(String emailAddress, boolean utf8) {
     if (StringUtility.isNullOrEmpty(emailAddress)) {
       return false;
     }
 
     try {
       new InternetAddress(BEANS.get(MailIDNConverter.class).toASCII(emailAddress), true);
-      return true;
+      return utf8 || StandardCharsets.US_ASCII.newEncoder().canEncode(emailAddress);
     }
     catch (AddressException | IllegalArgumentException e) {
       return false;
