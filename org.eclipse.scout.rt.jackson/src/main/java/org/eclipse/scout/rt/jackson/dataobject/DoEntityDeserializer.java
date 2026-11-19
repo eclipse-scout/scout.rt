@@ -5,7 +5,11 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
@@ -252,9 +256,15 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
   }
 
   protected AttributeType findResolvedFallbackAttributeType(IDoEntity entityInstance, String attributeName, JsonToken currentToken) {
-    if (DoMapEntity.class.isAssignableFrom(m_handledClass)) {
+    if (entityInstance instanceof DoMapEntity || DoMapEntity.class.isAssignableFrom(m_handledClass)) {
       // try to resolve DoMap generic type
-      JavaType entityType = findResolvedDoMapEntityType();
+      // Use the class of the entity instance if it is a DoMapEntity differing from the handled class: the instance may be more specific (e.g. resolved
+      // by the type attribute of an untyped attribute value, the handled class is DoEntity in this case and has no generic type parameter).
+      // Otherwise, use the handled type: it may contain generic type bindings not available on the raw class.
+      JavaType doMapEntityType = entityInstance instanceof DoMapEntity && entityInstance.getClass() != m_handledClass
+          ? TypeFactory.defaultInstance().constructType(entityInstance.getClass())
+          : m_handledType;
+      JavaType entityType = findResolvedDoMapEntityType(doMapEntityType);
       // if unknown (e.g. Object) fallback to default handling according to JSON token
       if (entityType.getRawClass() != Object.class) {
         return AttributeType.ofDoValue(entityType);
@@ -282,7 +292,14 @@ public class DoEntityDeserializer extends StdDeserializer<IDoEntity> {
    * Lookup generic type parameter of DoMapEntity super class
    */
   protected JavaType findResolvedDoMapEntityType() {
-    JavaType type = m_handledType;
+    return findResolvedDoMapEntityType(m_handledType);
+  }
+
+  /**
+   * Lookup generic type parameter of DoMapEntity super class of the given type
+   */
+  protected JavaType findResolvedDoMapEntityType(JavaType doMapEntityType) {
+    JavaType type = doMapEntityType;
     while (type.getRawClass() != DoMapEntity.class) {
       if (type.getRawClass() == Object.class) {
         // Fallback: object-like JSON structure is deserialized as raw DoEntity
