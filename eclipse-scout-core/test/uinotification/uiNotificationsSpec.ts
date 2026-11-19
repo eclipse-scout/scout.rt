@@ -304,7 +304,7 @@ describe('uiNotifications', () => {
     });
 
     it('is resolved if there are already notifications in the history', async () => {
-      uiNotifications.subscribe('aaa', () => undefined);
+      const firstSubscription = uiNotifications.subscribe('aaa', () => undefined);
 
       let response = scout.create(UiNotificationResponse, {
         notifications: [{
@@ -319,6 +319,8 @@ describe('uiNotifications', () => {
         status: 200,
         responseText: dataObjects.stringify(response)
       });
+      // Subscribing restarts the poller, which would abort the call before the response is processed
+      await firstSubscription;
 
       const topic = await uiNotifications.subscribe('aaa', () => undefined);
       expect(topic).toEqual('aaa');

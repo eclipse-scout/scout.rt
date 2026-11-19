@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {abortableContext, CallModel, Deferred, InitModelOf, objects, ObjectWithType, scout, strings} from '../index';
+import {abortableContext, AbortError, CallModel, Deferred, InitModelOf, objects, ObjectWithType, scout, strings} from '../index';
 import $ from 'jquery';
 
 /**
@@ -119,11 +119,11 @@ export abstract class Call implements CallModel, ObjectWithType {
    *     | (promise)
    *     |   ^
    *     v   |
-   *   +--------+           +---------+           .---------------.  (yes)
-   *   | call() | . . . . . | _call() | ------>  <    success?     > ------> [RESOLVE]
-   *   +--------+           +---------+           '---------------'
-   *                             ^                       |(no)
-   *                             |                       |
+   *   +--------+           +---------+           .---------------.  (yes)            .---------------.  (no)
+   *   | call() | . . . . . | _call() | ------>  <    success?     > ------------->  <    aborted?     > ------> [RESOLVE]
+   *   +--------+           +---------+           '---------------'                   '---------------'
+   *                             ^                       |(no)                              |(yes)
+   *                             |                       |                                  +-------> [REJECT]
    *                             |                       v
    *                             |                .---------------.  (yes)
    *                             |               <    aborted?     > ------> [REJECT]
@@ -148,7 +148,7 @@ export abstract class Call implements CallModel, ObjectWithType {
    * Aborts the call. If the request is currently running, it is aborted (interrupted).
    * If a retry is scheduled, that retry is cancelled.
    *
-   * The promise returned by call() is REJECTED.
+   * The promise returned by {@link call} is rejected with an {@link AbortError}.
    */
   abort() {
     this._checkInitialized();
@@ -186,6 +186,14 @@ export abstract class Call implements CallModel, ObjectWithType {
   protected abstract _callImpl(): PromiseLike<any>;
 
   protected _onCallDone(result?: any) {
+    // Aborted after the response arrived -> REJECT
+    if (this.aborted) {
+      $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Call aborted');
+      this._setResult(new AbortError());
+      this._reject();
+      return;
+    }
+
     // Call successful -> RESOLVE
     this._resolve();
   }
@@ -194,6 +202,7 @@ export abstract class Call implements CallModel, ObjectWithType {
     // Aborted? -> REJECT
     if (this.aborted) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Call aborted');
+      this._setResult(new AbortError());
       this._reject();
       return;
     }
@@ -245,6 +254,7 @@ export abstract class Call implements CallModel, ObjectWithType {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Cancelled scheduled retry');
       clearTimeout(this.callTimeoutId);
       this.callTimeoutId = null;
+      this._setResult(new AbortError());
       this._reject();
       return;
     }

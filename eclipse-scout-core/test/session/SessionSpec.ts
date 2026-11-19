@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {BackgroundJobPollingStatus, Device, RemoteEvent, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
+import {AbortError, BackgroundJobPollingStatus, Device, RemoteEvent, RemoteRequest, Session, TextMap, TextMapType, texts, UserAgent} from '../../src/index';
 import {LocaleSpecHelper} from '../../src/testing';
 
 describe('Session', () => {
@@ -590,6 +590,33 @@ describe('Session', () => {
       expect(session._processSuccessResponse).not.toHaveBeenCalled(); // <--
       expect(session._processErrorJsonResponse).not.toHaveBeenCalled();
       expect(session._processErrorResponse).not.toHaveBeenCalled();
+    });
+
+    it('remembers an aborted user request to retry it', async () => {
+      let session = createSession() as SandboxSession & { _retryRequest: RemoteRequest };
+      spyOn(session, '_processErrorResponse').and.callThrough();
+      send(session, '1', 'nodeClick');
+      await sleep();
+      expect(jasmine.Ajax.requests.count()).toBe(1);
+      expect(session.areRequestsPending()).toBe(true);
+
+      session.ready = true;
+      session.offline = true; // goOffline() sets the flag before aborting the calls
+      session.abortAllAjaxCalls();
+      await sleep();
+      expect(session.areRequestsPending()).toBe(false);
+      expect(session._processErrorResponse).toHaveBeenCalledWith(jasmine.any(AbortError), jasmine.anything());
+      expect(session._retryRequest).toBeTruthy();
+      expect(session._retryRequest.events[0].type).toBe('nodeClick');
+    });
+
+    it('shows a fatal message if a request is aborted before the session is ready', () => {
+      let session = createSession();
+      session.ready = false;
+      spyOn(session, 'showFatalMessage').and.returnValue(Promise.resolve());
+
+      session._processErrorResponse(new AbortError(), null);
+      expect(session.showFatalMessage).toHaveBeenCalledWith(jasmine.objectContaining({body: '0 Connection interrupted'}), '0.net');
     });
   });
 

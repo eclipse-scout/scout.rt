@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  ajax, AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil,
+  AbortError, ajax, AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil,
   FocusManager, fonts, icons, InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions,
   objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings,
   UserAgent, webstorage, Widget
@@ -389,7 +389,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       });
     }
 
-    function onAjaxFail(ajaxError: AjaxError): Promise<any> {
+    function onAjaxFail(ajaxError: AjaxError | AbortError): Promise<any> {
       this._processErrorResponse(ajaxError, request);
       return $.rejectedPromise(ajaxError);
     }
@@ -785,7 +785,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       success = this.responseQueue.process(data);
     }
 
-    function onAjaxFail(ajaxError: AjaxError) {
+    function onAjaxFail(ajaxError: AjaxError | AbortError) {
       if (busyHandling) {
         this._setBusy(false);
       }
@@ -943,7 +943,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       }
     }
 
-    function onAjaxFail(ajaxError: AjaxError) {
+    function onAjaxFail(ajaxError: AjaxError | AbortError) {
       this.backgroundJobPollingSupport.setFailed();
       this._processErrorResponse(ajaxError, request);
     }
@@ -1003,17 +1003,18 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
   }
 
-  protected _processErrorResponse(error: AjaxError, request: RemoteRequest) {
-    let {jqXHR, textStatus, errorThrown} = error;
-    $.log.error('errorResponse: status=' + jqXHR.status + ', textStatus=' + textStatus + ', errorThrown=' + errorThrown);
+  protected _processErrorResponse(error: AjaxError | AbortError, request: RemoteRequest) {
+    const aborted = error instanceof AbortError;
+    const status = aborted ? 0 : error.jqXHR.status;
+    let errorThrown = aborted ? null : error.errorThrown;
+    if (!aborted) {
+      $.log.error('errorResponse: status=' + status + ', textStatus=' + error.textStatus + ', errorThrown=' + errorThrown);
+    }
 
-    let offlineError = AjaxCall.isOfflineError(error);
-    if (offlineError) {
+    if (aborted || AjaxCall.isOfflineError(error)) {
       if (this.ready) {
         this.goOffline();
-        if (request && !request.pollForBackgroundJobs && !this._retryRequest) {
-          this._retryRequest = request;
-        }
+        this._setRetryRequest(request);
         return;
       }
       // Not ready yet (startup request)
@@ -1023,12 +1024,21 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     // Show error message
     let boxOptions = {
       header: this.optText('ui.NetworkError', 'Network error'),
-      body: strings.join(' ', (jqXHR.status + '') || '', errorThrown),
+      body: strings.join(' ', (status + '') || '', errorThrown),
       yesButtonText: this.optText('ui.Reload', 'Reload'),
       yesButtonAction: () => scout.reloadPage(),
       iconId: icons.SLIPPERY
     };
-    this.showFatalMessage(boxOptions, jqXHR.status + '.net');
+    this.showFatalMessage(boxOptions, status + '.net');
+  }
+
+  /**
+   * Remembers the request to send it again when the session is online again.
+   */
+  protected _setRetryRequest(request: RemoteRequest) {
+    if (request && !request.pollForBackgroundJobs && !this._retryRequest) {
+      this._retryRequest = request;
+    }
   }
 
   protected _processErrorJsonResponse(jsonError: JsonErrorResponse): boolean {
