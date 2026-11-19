@@ -8,8 +8,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AdapterData, AjaxError, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest, RemoteResponse, scout,
-  Session, SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
+  AbortError, AdapterData, AjaxError, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest,
+  RemoteResponse, scout, Session, SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
 } from '../index';
 import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
 import 'jasmine-jquery';
@@ -32,7 +32,7 @@ declare global {
 
     override _processErrorJsonResponse(jsonError: JsonErrorResponse);
 
-    override _processErrorResponse(error: AjaxError, request: RemoteRequest);
+    override _processErrorResponse(error: AjaxError | AbortError, request: RemoteRequest);
 
     override _setBusy(busy: boolean);
   }
