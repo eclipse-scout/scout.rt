@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, objects, Permission, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
+import {Deferred, FullModelOf, InitModelOf, ObjectModel, ObjectOrModel, objects, Permission, PermissionLevel, PropertyChangeEvent, PropertyEventEmitter, PropertyEventMap, scout} from '../index';
 
 export class PermissionCollection extends PropertyEventEmitter implements PermissionCollectionModel {
   declare self: PermissionCollection;
@@ -59,9 +59,9 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
    * Quick implies is executed synchronously while non-quick implies is executed asynchronously.
    */
   implies(permission: Permission, quick: true): boolean;
-  implies(permission: Permission, quick?: false): JQuery.Promise<boolean>;
-  implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean>;
-  implies(permission: Permission, quick?: boolean): boolean | JQuery.Promise<boolean> {
+  implies(permission: Permission, quick?: false): Promise<boolean>;
+  implies(permission: Permission, quick?: boolean): boolean | Promise<boolean>;
+  implies(permission: Permission, quick?: boolean): boolean | Promise<boolean> {
     if (!permission) {
       return quick ? false : $.resolvedPromise(false);
     }
@@ -82,9 +82,9 @@ export class PermissionCollection extends PropertyEventEmitter implements Permis
           return false;
         }
 
-        const deferred = $.Deferred();
+        const deferred = new Deferred<boolean>();
         // collect all promises
-        const impliedPromises: JQuery.Promise<void>[] = [];
+        const impliedPromises: Promise<void>[] = [];
         for (const p of permissions) {
           impliedPromises.push(p.implies(permission, false)
             .then(implies => {

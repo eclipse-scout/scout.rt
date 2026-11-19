@@ -70,6 +70,7 @@ export * from './aria/TreeGridAriaRules';
 export * from './aria/ListBoxAriaRules';
 export * from './aria/HorizontalListBoxAriaRules';
 export * from './aria/VoidGridAriaRules';
+export * from './util/promises'; // Other utilities may need Deferred while evaluating (e.g. fonts.ts)
 export * from './util/abortableContext';
 export * from './util/arrays';
 export * from './util/BinaryResource';
@@ -100,7 +101,6 @@ export * from './util/numbers';
 export * from './util/RoundingMode';
 export * from './util/objects';
 export * from './util/PromiseCreator';
-export * from './util/promises';
 export * from './util/Range';
 export * from './resizable/Resizable';
 export * from './resizable/ResizableModel';

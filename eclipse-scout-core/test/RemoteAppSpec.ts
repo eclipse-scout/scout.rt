@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper, TestingApp} from '../src/testing/index';
-import {App} from '../src';
+import {App, Deferred} from '../src';
 
 describe('RemoteApp', () => {
   let session: SandboxSession;
@@ -37,7 +37,7 @@ describe('RemoteApp', () => {
       app._createSession = options => session;
       let loaded = false;
       session.start = () => {
-        let def = $.Deferred();
+        let def = new Deferred<void>();
         setTimeout(() => {
           loaded = true;
           def.resolve();
@@ -53,28 +53,27 @@ describe('RemoteApp', () => {
         .catch(fail);
     });
 
-    it('is not executed when session startup fails', done => {
+    it('is not executed when session startup fails', async () => {
       let app = new TestingApp();
-      jasmine.clock().install();
-      app.init()
-        .catch(() => {
-          expect(app.initialized).toBe(false);
-          done();
-        });
+      let initPromise = app.init();
       app._createSession = options => session;
       let loaded = false;
       session.start = () => {
-        let def = $.Deferred();
+        let def = new Deferred<void>();
         setTimeout(() => {
           loaded = true;
           def.reject();
         });
         return def.promise();
       };
-      jasmine.clock().tick(10);
+
+      // Let the rejected startup promise propagate to the error handler, which renders a message box
+      await sleep(10);
       helper.closeMessageBoxes();
-      jasmine.clock().tick(10);
-      jasmine.clock().uninstall();
+
+      await initPromise.catch(() => {
+        expect(app.initialized).toBe(false);
+      });
     });
   });
 });

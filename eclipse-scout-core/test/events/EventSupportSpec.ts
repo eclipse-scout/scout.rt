@@ -347,22 +347,14 @@ describe('EventSupport', () => {
 
   describe('when', () => {
 
-    beforeEach(() => {
-      jasmine.clock().install();
-    });
-
-    afterEach(() => {
-      jasmine.clock().uninstall();
-    });
-
-    it('is resolved on the next event', () => {
+    it('is resolved on the next event', async () => {
       const eventSupport = new EventSupport();
       let fooCount = 0;
       let barCount = 0;
 
       eventSupport.trigger('foo');
       eventSupport.trigger('bar');
-      jasmine.clock().tick(10);
+      await Promise.resolve();
       expect(fooCount).toBe(0);
       expect(barCount).toBe(0);
 
@@ -370,18 +362,18 @@ describe('EventSupport', () => {
       eventSupport.when('bar').then(() => barCount++);
 
       eventSupport.trigger('foo');
-      jasmine.clock().tick(10);
+      await Promise.resolve();
       expect(fooCount).toBe(1);
       expect(barCount).toBe(0);
 
       eventSupport.trigger('bar');
-      jasmine.clock().tick(10);
+      await Promise.resolve();
       expect(fooCount).toBe(1);
       expect(barCount).toBe(1);
 
       eventSupport.trigger('foo');
       eventSupport.trigger('bar');
-      jasmine.clock().tick(10);
+      await Promise.resolve();
       expect(fooCount).toBe(1);
       expect(barCount).toBe(1);
 
@@ -390,7 +382,7 @@ describe('EventSupport', () => {
 
       eventSupport.trigger('foo');
       eventSupport.trigger('bar');
-      jasmine.clock().tick(10);
+      await Promise.resolve();
       expect(fooCount).toBe(2);
       expect(barCount).toBe(2);
     });

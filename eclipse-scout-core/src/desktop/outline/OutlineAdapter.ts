@@ -211,7 +211,7 @@ export class OutlineAdapter extends TreeAdapter {
     }
 
     // Wait for the requests to complete
-    this.session.listen().done(function(selectedPage) {
+    this.session.listen().then(function(selectedPage) {
       if (selectedPage.detailFormResolved) {
         // No need to update detail content again if resolved is true
         return;

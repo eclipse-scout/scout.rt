@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
+  AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, Deferred, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
   DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
   GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
   OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
@@ -1427,7 +1427,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     });
   }
 
-  cancelViews(forms: Form[]): JQuery.Promise<void> {
+  cancelViews(forms: Form[]): Promise<void> {
     let event = this.trigger('cancelForms', {
       forms: forms
     });
@@ -1437,7 +1437,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     return $.resolvedPromise();
   }
 
-  protected _cancelViews(forms: Form[]): JQuery.Promise<void> {
+  protected _cancelViews(forms: Form[]): Promise<void> {
     // do not cancel forms when the form child hierarchy does not get canceled.
     forms = forms.filter((form: Form) => !arrays.find(form.views, view => view.modal));
 
@@ -1460,7 +1460,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     });
 
     // initialize with a resolved promise in case there are no unsaved forms.
-    let waitFor: JQuery.Promise<Form[]> = $.resolvedPromise();
+    let waitFor: Promise<Form[]> = $.resolvedPromise();
     if (unsavedForms.length > 0) {
       let unsavedFormChangesForm = scout.create(UnsavedFormChangesForm, {
         parent: this,
@@ -1470,7 +1470,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
       });
       unsavedFormChangesForm.open();
       // promise that is resolved when the UnsavedFormChangesForm is stored and rejected if it is cancelled
-      const deferred = $.Deferred();
+      const deferred = new Deferred<Form[]>();
       waitFor = deferred.promise();
 
       unsavedFormChangesForm.whenSave().then(() => {

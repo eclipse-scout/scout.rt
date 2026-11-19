@@ -329,12 +329,13 @@ export class VennChartRenderer extends AbstractSvgChartRenderer {
 
     // remove labels and legends
     let that = this;
-    this.$svg.children('.venn-legend, .venn-label, .venn-axis-white, .label-line')
+    let $legendsAndLabels = this.$svg.children('.venn-legend, .venn-label, .venn-axis-white, .label-line');
+    $legendsAndLabels
       .stop()
       .animateSVG('opacity', 1, 0, null, true)
       .promise()
-      .done(function() {
-        this.remove();
+      .then(() => {
+        $legendsAndLabels.remove();
         that.animationTriggered = false;
       });
 

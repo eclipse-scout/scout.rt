@@ -443,7 +443,7 @@ export class SpeedoChartRenderer extends AbstractSvgChartRenderer {
         tabIndex: 0
       }, this._createAnimationObjectWithTabIndexRemoval(tweenOut))
       .promise()
-      .done(() => {
+      .then(() => {
         this._remove(afterRemoveFunc);
         this.animationTriggered = false;
       });

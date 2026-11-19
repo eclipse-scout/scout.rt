@@ -111,7 +111,7 @@ export class TileGridLayout extends LogicalGridLayout {
 
     // When all animations have been finished, trigger event and update scrollbar
     if (promises.length > 0) {
-      $.promiseAll(promises).done(this._onAnimationDone.bind(this));
+      $.promiseAll(promises).then(this._onAnimationDone.bind(this));
     } else {
       this._onAnimationDone();
     }

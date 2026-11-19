@@ -67,7 +67,7 @@ export class TableOrganizerForm extends Form {
     this._reloadColumnsTable();
   }
 
-  protected override _load(): JQuery.Promise<any> {
+  protected override _load(): Promise<any> {
     this._reloadProfilesTable();
     this._reloadColumnsTable();
     this._updateColumnMenus();

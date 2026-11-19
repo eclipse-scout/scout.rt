@@ -21,11 +21,11 @@ export class LogoutApp extends App {
   /**
    * No bootstrapping required
    */
-  protected override _defaultBootstrappers(): (() => JQuery.Promise<void>)[] {
+  protected override _defaultBootstrappers(): (() => Promise<void>)[] {
     return [];
   }
 
-  protected override _init(options: InitModelOf<this>): JQuery.Promise<any> {
+  protected override _init(options: InitModelOf<this>): Promise<any> {
     options = options || {} as InitModelOf<this>;
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();

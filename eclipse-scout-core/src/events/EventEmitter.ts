@@ -72,8 +72,8 @@ export class EventEmitter {
    * Adds an event handler using {@link one} and returns a promise.
    * The promise is resolved as soon as the event is triggered.
    */
-  when<K extends string & keyof EventMapOf<this['self']>>(type: K): JQuery.Promise<EventMapOf<this>[K] & Event<this>> {
-    return this.events.when(type) as JQuery.Promise<EventMapOf<this>[K] & Event<this>>;
+  when<K extends string & keyof EventMapOf<this['self']>>(type: K): Promise<EventMapOf<this>[K] & Event<this>> {
+    return this.events.when(type) as Promise<EventMapOf<this>[K] & Event<this>>;
   }
 
   addListener(listener: EventListener) {

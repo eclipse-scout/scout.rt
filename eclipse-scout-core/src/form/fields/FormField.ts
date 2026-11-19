@@ -1783,7 +1783,7 @@ export type ValidationResult = {
   errorStatus?: Status;
   field: FormField;
   label: string;
-  promise?: JQuery.Promise<void>;
+  promise?: Promise<void>;
   reveal: () => void;
   visitResult?: TreeVisitResult;
 };
