@@ -5,10 +5,15 @@
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
  *
- * SPDX-License-Identifier: EPL-2.0
+ * AI Disclosure: This file was partially AI-generated.
+ * The AI-generated portions are made available under CC0-1.0
+ * and not subject to the project's licence.
+ *
+ * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 package org.eclipse.scout.rt.jackson.dataobject;
 
+import static org.eclipse.scout.rt.platform.util.Assertions.assertInstance;
 import static org.eclipse.scout.rt.testing.platform.util.ScoutAssert.assertEqualsWithComparisonFailure;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -2246,6 +2251,67 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
     assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
     assertEquals(Integer.valueOf(42), marshalled.getCount());
+  }
+
+  /**
+   * A {@link DoMapEntity} resolved by its type attribute (deserializer handles {@link DoEntity}) must use the generic
+   * type parameter of its class for the map values (values without type attribute).
+   */
+  @Test
+  public void testDeserialize_DoMapEntityResolvedByTypeName() throws Exception {
+    String json = readResourceAsString("TestDoMapEntityDoWithTypeName.json");
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+
+    TestDoMapEntityDo mapDo = assertInstance(marshalled, TestDoMapEntityDo.class);
+    assertEquals(TestItemDo.class, mapDo.getNode("mapAttribute1").get().getClass());
+    assertEquals(TestItemDo.class, mapDo.getNode("mapAttribute2").get().getClass());
+    assertEquals("value-1", mapDo.get("mapAttribute1").getStringAttribute());
+    assertEquals("value-2", mapDo.get("mapAttribute2").getStringAttribute());
+  }
+
+  /**
+   * Same as {@link #testDeserialize_DoMapEntityResolvedByTypeName()} but with the {@link DoMapEntity} as value of an
+   * untyped attribute of a raw {@link DoEntity}.
+   */
+  @Test
+  public void testDeserialize_DoMapEntityResolvedByTypeNameInUntypedAttribute() throws Exception {
+    String json = readResourceAsString("TestDoMapEntityDoInUntypedAttribute.json");
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+
+    TestDoMapEntityDo mapDo = assertInstance(marshalled.get("untyped"), TestDoMapEntityDo.class);
+    assertEquals(TestItemDo.class, mapDo.getNode("mapAttribute1").get().getClass());
+    assertEquals("value-1", mapDo.get("mapAttribute1").getStringAttribute());
+  }
+
+  /**
+   * Map values of a {@code DoValue<Map<String, TestItemDo>>} without type attribute must be deserialized with the
+   * declared value type.
+   */
+  @Test
+  public void testDeserialize_MapValuesWithoutTypeName() throws Exception {
+    String json = readResourceAsString("TestMapDoWithoutValueTypeNames.json");
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+
+    Map<String, TestItemDo> map = marshalled.getStringDoTestItemMapAttribute();
+    assertEquals(TestItemDo.class, map.get("key1").getClass());
+    assertEquals(TestItemDo.class, map.get("key2").getClass());
+    assertEquals("value-1", map.get("key1").getStringAttribute());
+    assertEquals("value-2", map.get("key2").getStringAttribute());
+  }
+
+  /**
+   * Same as {@link #testDeserialize_MapValuesWithoutTypeName()} but with the {@link TestMapDo} as value of an untyped
+   * attribute of a raw {@link DoEntity}.
+   */
+  @Test
+  public void testDeserialize_MapValuesWithoutTypeNameInUntypedAttribute() throws Exception {
+    String json = readResourceAsString("TestMapDoInUntypedAttribute.json");
+    DoEntity marshalled = s_dataObjectMapper.readValue(json, DoEntity.class);
+
+    TestMapDo mapDo = assertInstance(marshalled.get("untyped"), TestMapDo.class);
+    Map<String, TestItemDo> map = mapDo.getStringDoTestItemMapAttribute();
+    assertEquals(TestItemDo.class, map.get("key1").getClass());
+    assertEquals("value-1", map.get("key1").getStringAttribute());
   }
 
   @Test(expected = ClassCastException.class)
