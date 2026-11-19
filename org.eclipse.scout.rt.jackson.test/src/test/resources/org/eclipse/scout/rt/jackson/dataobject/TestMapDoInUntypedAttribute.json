@@ -1,0 +1,11 @@
+{
+  "untyped" : {
+    "_type" : "TestMap",
+    "stringDoTestItemMapAttribute" : {
+      "key1" : {
+        "id" : "id-1",
+        "stringAttribute" : "value-1"
+      }
+    }
+  }
+}

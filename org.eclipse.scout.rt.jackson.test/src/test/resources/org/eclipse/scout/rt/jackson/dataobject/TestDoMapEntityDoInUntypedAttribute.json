@@ -1,0 +1,9 @@
+{
+  "untyped" : {
+    "_type" : "TestDoMapEntity",
+    "mapAttribute1" : {
+      "id" : "id-1",
+      "stringAttribute" : "value-1"
+    }
+  }
+}

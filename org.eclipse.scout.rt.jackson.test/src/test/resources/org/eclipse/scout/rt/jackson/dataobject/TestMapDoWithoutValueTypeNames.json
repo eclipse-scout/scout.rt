@@ -1,0 +1,13 @@
+{
+  "_type" : "TestMap",
+  "stringDoTestItemMapAttribute" : {
+    "key1" : {
+      "id" : "id-1",
+      "stringAttribute" : "value-1"
+    },
+    "key2" : {
+      "id" : "id-2",
+      "stringAttribute" : "value-2"
+    }
+  }
+}
