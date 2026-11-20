@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,14 +7,15 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {DoEntity} from '../index';
+import {BaseDoEntity, typeName} from '../index';
 
-export interface CalendarResourceDo extends DoEntity {
+@typeName('scout.CalendarResource')
+export class CalendarResourceDo extends BaseDoEntity {
   resourceId: string;
-  name?: string;
-  parentId?: string;
-  visible?: boolean;
-  selectable?: boolean;
-  cssClass?: string;
-  order?: number;
+  name: string;
+  parentId: string;
+  visible: boolean;
+  selectable: boolean;
+  cssClass: string;
+  order: number;
 }

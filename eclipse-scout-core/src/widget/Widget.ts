@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke, KeyStrokeContext,
-  LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter, scout,
-  ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
+  AbortError, Action, arrays, DeferredGlassPaneTarget, Desktop, Device, EnumObject, EventDelegator, EventHandler, filters, FocusOptions, focusUtils, Form, FullModelOf, graphics, HtmlComponent, icons, InitModelOf, inspector, KeyStroke,
+  KeyStrokeContext, LayoutData, LoadingSupport, LogicalGrid, ModelAdapter, objectFactoryHints, ObjectIdProvider, ObjectOrChildModel, ObjectOrType, objects, ObjectWithType, ObjectWithUuid, Predicate, PropertyDecoration, PropertyEventEmitter,
+  scout, ScrollbarInstallOptions, scrollbars, ScrollOptions, ScrollToAlignment, ScrollToOptions, Session, SomeRequired, strings, styles, texts, TreeVisitResult, UuidPathOptions, WidgetEventMap, WidgetModel
 } from '../index';
 import $ from 'jquery';
 
@@ -410,6 +410,15 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
   }
 
   /**
+   * @throws AbortError if the widget is {@link destroyed} or {@link destroying}
+   */
+  throwAbortIfDestroyed() {
+    if (this.destroying || this.destroyed) {
+      throw new AbortError();
+    }
+  }
+
+  /**
    * Creates the UI by creating HTML elements and appending them to the DOM.
    * <p>
    * The actual rendering happens in the methods {@link _render}, which appends the main container to the parent element, and {@link _renderProperties}, which calls the methods for each property that needs to be rendered.
@@ -622,7 +631,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
    */
   protected _removeAnimated() {
     let animateRemovalWhileRemovingParent = this._animateRemovalWhileRemovingParent();
-    if ((this.parent.removing && !animateRemovalWhileRemovingParent) || !Device.get().supportsCssAnimation() || !this.$container || this.$container.isDisplayNone()) {
+    if ((this.parent.removing && !animateRemovalWhileRemovingParent) || !this.$container || this.$container.isDisplayNone()) {
       // Cannot remove animated, remove regularly
       this._removeInternal();
       return;

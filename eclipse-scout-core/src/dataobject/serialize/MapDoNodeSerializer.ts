@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,14 +28,14 @@ export class MapDoNodeSerializer implements DoNodeSerializer<object> {
   }
 
   canDeserialize(value: any, metaData: DoValueMetaData): boolean {
-    return 'Record' === metaData?.typeName
+    return 'Record' === metaData?.objectType
       || (Map === metaData?.type && (!value || objects.isPojo(value)));
   }
 
   deserialize(map: object, metaData: DoValueMetaData, deserializer: DataObjectDeserializer): object {
     const mapKeyType = MapDoNodeSerializer.getMapKeyType(metaData);
     const mapValueType = MapDoNodeSerializer.getMapValueType(metaData);
-    if ('Record' === metaData?.typeName) {
+    if ('Record' === metaData?.objectType) {
       return this._deserializeRecord(map, mapKeyType, mapValueType, deserializer);
     }
     return this._deserializeMap(map as Map<any, any>, mapKeyType, mapValueType, deserializer);
@@ -76,8 +76,12 @@ export class MapDoNodeSerializer implements DoNodeSerializer<object> {
 
     const target = {};
     for (const [key, value] of Object.entries(record)) {
-      const mapKey = deserializer.deserialize(key, recordKeyType);
-      target[mapKey] = deserializer.deserialize(value, recordValueType);
+      if (value !== undefined) {
+        // As Records are no DO classes the properties are not initialized with undefined.
+        // Therefore, only keep existing properties to not pollute Object.keys, etc.
+        const mapKey = deserializer.deserialize(key, recordKeyType);
+        target[mapKey] = deserializer.deserialize(value, recordValueType);
+      }
     }
     return target;
   }

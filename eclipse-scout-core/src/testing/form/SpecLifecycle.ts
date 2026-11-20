@@ -14,7 +14,7 @@ export class SpecLifecycle extends FormLifecycle {
     return super._findElementToReveal(status);
   }
 
-  override _validate(): JQuery.Promise<Status> {
+  override _validate(): Promise<Status> {
     return super._validate();
   }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,9 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AjaxCall, arrays, DoEntity, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout} from '../index';
+import {AbortError, ajax, AjaxCall, arrays, BaseDoEntity, Deferred, InitModelOf, LookupCall, LookupResult, LookupRow, objects, RestLookupCallModel, scout, typeName} from '../index';
 import $ from 'jquery';
-import Deferred = JQuery.Deferred;
 
 /**
  * A lookup call that can load lookup rows from a REST service.
@@ -49,7 +48,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
   protected _restriction: Record<string, any>;
   protected _ajaxCall: AjaxCall;
-  protected _deferred: Deferred<LookupResult<TKey>, { abort: boolean }>;
+  protected _deferred: Deferred<LookupResult<TKey>>;
 
   constructor() {
     super();
@@ -73,6 +72,9 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
   /**
    * Use this function with caution! Added restrictions will be shared among cloned instances
    * and the current instance if this function was also called before cloning!
+   *
+   * @param key The name of the restriction
+   * @param value The value to add as restriction or a function that returns the restriction: `(call: RestLookupCall) => value`;
    */
   addRestriction(key: string, value: any) {
     if (!this._restriction) {
@@ -92,21 +94,21 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
     }
   }
 
-  protected override _getAll(): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getAll(): Promise<LookupResult<TKey>> {
     return this._call();
   }
 
-  protected override _getByText(text: string): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByText(text: string): Promise<LookupResult<TKey>> {
     this.addRestriction('text', text);
     return this._call();
   }
 
-  protected override _getByKey(key: TKey): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByKey(key: TKey): Promise<LookupResult<TKey>> {
     this.addRestriction('ids', arrays.ensure(key));
     return this._call();
   }
 
-  protected override _getByKeys(keys: TKey[]): JQuery.Promise<LookupResult<TKey>> {
+  protected override _getByKeys(keys: TKey[]): Promise<LookupResult<TKey>> {
     this.addRestriction('ids', arrays.ensure(keys));
     return this._call();
   }
@@ -138,55 +140,53 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
   protected _createLookupRowFromDo(lookupRowDo: LookupRowDo<TKey>): LookupRow<TKey> {
     // propagate all properties from lookup row DO to scout lookup row (there might be custom ones on specific lookup row DOs)
-    let clonedLookupRowDo = $.extend({}, lookupRowDo) as LookupRowDo<TKey> & InitModelOf<LookupRow<TKey>>;
+    let lookupRowModel = $.extend({}, lookupRowDo) as LookupRowDo<TKey> & InitModelOf<LookupRow<TKey>>;
 
     // [text, enabled, active, iconId, cssClass, tooltipText, additionalTableRowData] are the same for LookupRow.ts and LookupRowDo.java
     // [backgroundColor, foregroundColor, font] currently not supported by LookupRowDo.java
 
     // id -> key
-    clonedLookupRowDo.key = clonedLookupRowDo.id;
-    delete clonedLookupRowDo.id;
+    lookupRowModel.key = lookupRowModel.id;
+    delete lookupRowModel.id;
 
     // parentId -> parentKey
-    clonedLookupRowDo.parentKey = clonedLookupRowDo.parentId;
-    delete clonedLookupRowDo.parentId;
+    lookupRowModel.parentKey = lookupRowModel.parentId;
+    delete lookupRowModel.parentId;
 
     // unused on Scout LookupRow
-    delete clonedLookupRowDo._type;
+    delete lookupRowModel._type;
+    delete lookupRowModel._typeVersion;
+    delete lookupRowModel._contributions;
 
     if (this.maxTextLength) {
-      let text = clonedLookupRowDo.text;
+      let text = lookupRowModel.text;
       if (text.length > this.maxTextLength) {
-        clonedLookupRowDo.text = text.substr(0, this.maxTextLength) + '...';
-        clonedLookupRowDo.tooltipText = text;
+        lookupRowModel.text = text.substring(0, this.maxTextLength) + '...';
+        lookupRowModel.tooltipText = text;
       }
     }
 
-    return scout.create((LookupRow<TKey>), clonedLookupRowDo);
+    return scout.create((LookupRow<TKey>), lookupRowModel);
   }
 
-  protected _call(): JQuery.Promise<LookupResult<TKey>> {
-    this._deferred = $.Deferred();
+  protected _call(): Promise<LookupResult<TKey>> {
+    this._deferred = new Deferred();
     this._ajaxCall = this._createAjaxCall();
 
     this._ajaxCall.call()
-      .then((data: LookupResponse, textStatus, jqXHR) => {
-        let lookupRows = arrays.ensure(data ? data.rows : null)
+      .then((data: LookupResponse) => {
+        const lookupRows = arrays.ensure(data?.rows)
           .filter(this._acceptLookupRow.bind(this))
           .map(this._createLookupRowFromDo.bind(this));
         this._deferred.resolve(this._createLookupResult(lookupRows));
       })
-      .catch(ajaxError => {
-        this._deferred.resolve(this._createLookupResult([], this.session.text('ErrorWhileLoadingData')));
-      });
+      .catch(ajaxError => this._deferred.resolve(this._createLookupResult([], this.session.text('ErrorWhileLoadingData'))));
 
     return this._deferred.promise();
   }
 
   override abort() {
-    this._deferred?.reject({
-      abort: true
-    });
+    this._deferred?.reject(new AbortError());
     this._ajaxCall?.abort();
     super.abort();
   }
@@ -210,8 +210,7 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
 
     let resolvedRestriction = {};
     let restriction = $.extend({}, this.restriction, this._restriction);
-    Object.keys(restriction).forEach(key => {
-      let value = restriction[key];
+    Object.entries(restriction).forEach(([key, value]) => {
       let newValue;
       if (Array.isArray(value)) {
         // Resolve each array element individually, remove null values
@@ -229,32 +228,18 @@ export class RestLookupCall<TKey> extends LookupCall<TKey> implements RestLookup
   }
 
   protected _createAjaxCall(): AjaxCall {
-    let url = this._getCallUrl();
-    let restriction = this._getRestrictionForAjaxCall();
-    let data = restriction ? JSON.stringify(restriction) : null;
-    let ajaxOptions = {
-      method: 'POST',
-      data: data,
-      dataType: 'json',
-      contentType: 'application/json; charset=UTF-8',
-      cache: false,
-      url: url,
-      timeout: 0
-    };
-    return scout.create(AjaxCall, {
-      ajaxOptions: ajaxOptions,
-      name: 'RestLookupCall',
-      retryIntervals: [100, 500, 500, 500]
-    });
+    const url = this._getCallUrl();
+    const restriction = this._getRestrictionForAjaxCall();
+    return ajax.createCallDataObject({url, timeout: 0}, restriction, {name: 'RestLookupCall', retryIntervals: [100, 500, 500, 500]});
   }
 }
 
 /**
  * @see "AbstractLookupRowDo.java"
  */
-export interface LookupRowDo<Key> extends DoEntity {
-  id: Key;
-  parentId: Key;
+export class LookupRowDo<TKey> extends BaseDoEntity {
+  id: TKey;
+  parentId: TKey;
   text: string;
   tooltipText: string;
   enabled: boolean;
@@ -267,6 +252,7 @@ export interface LookupRowDo<Key> extends DoEntity {
 /**
  * @see "LookupResponse.java"
  */
-export interface LookupResponse<TLookupRow = LookupRowDo<any>> extends DoEntity {
+@typeName('scout.LookupResponse')
+export class LookupResponse<TLookupRow extends LookupRowDo<any> = LookupRowDo<any>> extends BaseDoEntity {
   rows: TLookupRow[];
 }

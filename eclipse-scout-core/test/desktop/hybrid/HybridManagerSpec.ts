@@ -9,7 +9,8 @@
  */
 
 import {
-  Deferred, DisposeWidgetsHybridActionDo, Form, FormAdapter, HybridActionContextElements, HybridActionEvent, HybridManager, HybridManagerAdapter, LabelField, NumberField, scout, StringField, Tree, TreeAdapter, TreeNode, UuidPool, Widget
+  BaseDoEntity, Deferred, DisposeWidgetsHybridActionDo, Form, FormAdapter, HybridActionContextElements, HybridActionEvent, HybridManager, HybridManagerAdapter, LabelField, NumberField, scout, StringField, Tree, TreeAdapter, TreeNode,
+  UuidPool, Widget
 } from '../../../src';
 import {FormSpecHelper, JasmineScoutUtil, TreeSpecHelper} from '../../../src/testing';
 
@@ -18,6 +19,7 @@ describe('HybridManager', () => {
 
   beforeEach(() => {
     setFixtures(sandbox());
+    jasmine.Ajax.install();
     session = sandboxSession({
       desktop: {
         navigationVisible: true,
@@ -32,6 +34,11 @@ describe('HybridManager', () => {
     );
     linkWidgetAndAdapter(HybridManager.get(session), 'HybridManagerAdapter');
     formHelper = new FormSpecHelper(session);
+  });
+
+  afterEach(() => {
+    jasmine.Ajax.uninstall();
+    HybridManager.get(session).destroy(); // Prevent sending dispose widget events after test run
   });
 
   describe('widgets', () => {
@@ -405,9 +412,6 @@ describe('HybridManager', () => {
     let hybridManagerAdapter: HybridManagerAdapter;
 
     beforeEach(() => {
-      jasmine.Ajax.install();
-      jasmine.clock().install();
-
       let formSpecHelper = new FormSpecHelper(session);
       let treeSpecHelper = new TreeSpecHelper(session);
 
@@ -434,17 +438,12 @@ describe('HybridManager', () => {
       expect(jasmine.Ajax.requests.count()).toBe(0);
     });
 
-    afterEach(() => {
-      jasmine.Ajax.uninstall();
-      jasmine.clock().uninstall();
-    });
-
-    it('can send context elements to the server', () => {
-      hybridManager.callActionAndWait('foo', {customData: 123}, scout.create(HybridActionContextElements)
+    it('can send context elements to the server', async () => {
+      hybridManager.callActionAndWait('foo', scout.create(BaseDoEntity, {customData: 123} as any), scout.create(HybridActionContextElements)
         .withElement('form', form)
         .withElement('node', tree, treeNode));
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       let requestData = mostRecentJsonRequest();
 
@@ -459,10 +458,10 @@ describe('HybridManager', () => {
       });
     });
 
-    it('only sends context elements when needed', () => {
-      hybridManager.callActionAndWait('foo', {customData: 123});
+    it('only sends context elements when needed', async () => {
+      hybridManager.callActionAndWait('foo', scout.create(BaseDoEntity, {customData: 123} as any));
 
-      sendQueuedAjaxCalls();
+      await sendQueuedAjaxCallsAsync(session);
       expect(jasmine.Ajax.requests.count()).toBe(1);
       let requestData = mostRecentJsonRequest();
 
@@ -475,11 +474,8 @@ describe('HybridManager', () => {
     });
 
     it('can receive context elements from the server', () => {
-      // Uninstall jasmine clock, since it seems to interfere with promises (spec will not complete without this)
-      jasmine.clock().uninstall();
-
       let promise = hybridManager.when('hybridActionEnd:767676767').then(event => {
-        expect(event.data).toEqual({customData: 123});
+        expect(event.data).toEqual(scout.create(BaseDoEntity, {customData: 123} as any));
         expect(event.contextElements).toBeInstanceOf(HybridActionContextElements);
         expect(event.contextElements.isEmpty()).toBe(false);
         expect(event.contextElements.getList('form').length).toBe(1);

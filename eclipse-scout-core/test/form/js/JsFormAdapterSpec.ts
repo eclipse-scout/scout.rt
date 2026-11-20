@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,8 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {FormSpecHelper} from '../../../src/testing';
-import {AdapterData, BaseDoEntity, DataObjectInventory, Desktop, DesktopAdapter, DisplayHint, Form, FormModel, ObjectFactory, objects, RemoteEvent, typeName} from '../../../src';
-import Deferred = JQuery.Deferred;
+import {AdapterData, BaseDoEntity, DataObjectInventory, Deferred, Desktop, DesktopAdapter, DisplayHint, Form, FormModel, ObjectFactory, objects, RemoteEvent, typeName} from '../../../src';
 
 describe('JsFormAdapter', () => {
   let session: SandboxSession, helper: FormSpecHelper, desktop: Desktop, desktopAdapter: DesktopAdapter;
@@ -43,14 +42,14 @@ describe('JsFormAdapter', () => {
 
     constructor() {
       super();
-      this.deferred = $.Deferred();
+      this.deferred = new Deferred();
     }
 
-    protected override _load(): JQuery.Promise<object> {
+    protected override _load(): Promise<object> {
       return this.deferred.promise();
     }
 
-    protected override _postLoad(): JQuery.Promise<void> {
+    protected override _postLoad(): Promise<void> {
       if (this.closeInPostLoad) {
         // Actually we should use close here but since close just delegates to the server, we keep it simple and directly call destroy
         this.destroy();
@@ -120,7 +119,8 @@ describe('JsFormAdapter', () => {
     expect(dataObject.prop).toBe(3);
 
     let legacyDataObject = form['legacyDataObject'];
-    expect(objects.isPojo(legacyDataObject)).toBe(true);
+    expect(objects.isPojo(legacyDataObject)).toBe(false);
+    expect(legacyDataObject).toBeInstanceOf(BaseDoEntity);
     expect(legacyDataObject.prop).toBe(5);
   });
 
@@ -164,6 +164,7 @@ describe('JsFormAdapter', () => {
       expect(form).toBeDefined();
       await form.whenPostLoad();
 
+      s.destroy();
       return d;
     };
 

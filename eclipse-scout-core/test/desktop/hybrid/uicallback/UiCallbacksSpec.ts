@@ -28,7 +28,7 @@ describe('UiCallbacks', () => {
     DataObjectInventory.get().add(TestDo);
 
     class SimpleUiCallbackHandler implements UiCallbackHandler {
-      handle(param: UiCallbackParam): JQuery.Promise<any> {
+      handle(param: UiCallbackParam): Promise<any> {
         return $.resolvedPromise(scout.create(TestDo, {
           foo: 'bar'
         }));
@@ -48,7 +48,7 @@ describe('UiCallbacks', () => {
 
   it('uses UiCallbackErrorDo returned by handler', done => {
     class UiCallbackHandlerReturningError implements UiCallbackHandler {
-      handle(param: UiCallbackParam): JQuery.Promise<any> {
+      handle(param: UiCallbackParam): Promise<any> {
         let err = scout.create(UiCallbackErrorDo, {
           message: 'Test Error',
           code: 'Test Code'
@@ -68,7 +68,7 @@ describe('UiCallbacks', () => {
 
   it('returns UiCallbackErrorDo if handler rejects', done => {
     class RejectedUiCallbackHandler implements UiCallbackHandler {
-      handle(param: UiCallbackParam): JQuery.Promise<any> {
+      handle(param: UiCallbackParam): Promise<any> {
         return $.rejectedPromise('Test Error');
       }
     }
@@ -84,7 +84,7 @@ describe('UiCallbacks', () => {
 
   it('returns UiCallbackErrorDo if handler throws error', done => {
     class ThrowingUiCallbackHandler implements UiCallbackHandler {
-      handle(param: UiCallbackParam): JQuery.Promise<any> {
+      handle(param: UiCallbackParam): Promise<any> {
         throw 'Test Error';
       }
     }
@@ -103,7 +103,7 @@ describe('UiCallbacks', () => {
     callbackId: string,
     expectedResult: DeepPartial<UiCallbackResult>,
     expectedError: DeepPartial<UiCallbackErrorDo>
-  ): JQuery.Promise<void> {
+  ): Promise<void> {
     const handlerObjectType = 'SpecUiCallbackHandler';
     const desktop = session.desktop;
 
@@ -118,6 +118,6 @@ describe('UiCallbacks', () => {
     });
     uiCallbacks.onCallback(handlerObjectType, callbackId, desktop, null, null);
 
-    return responseAvailable.always(() => objectFactory.unregister(handlerObjectType));
+    return responseAvailable.finally(() => objectFactory.unregister(handlerObjectType));
   }
 });

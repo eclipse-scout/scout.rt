@@ -153,7 +153,7 @@ export class NumberField extends BasicField<number, number | string> implements 
     return typedValue;
   }
 
-  protected override _validateValue(value: number): number | JQuery.Promise<number> {
+  protected override _validateValue(value: number): number | Promise<number> {
     if (objects.isNullOrUndefined(value)) {
       return value;
     }
@@ -180,7 +180,7 @@ export class NumberField extends BasicField<number, number | string> implements 
     throw this.session.text('NumberTooSmallMessageXY', this._formatValue(this.minValue), this._formatValue(this.maxValue));
   }
 
-  protected override _formatValue(value: number): string | JQuery.Promise<string> {
+  protected override _formatValue(value: number): string | Promise<string> {
     if (objects.isNullOrUndefined(value)) {
       return '';
     }

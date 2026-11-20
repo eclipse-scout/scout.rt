@@ -350,7 +350,7 @@ describe('NumberColumn', () => {
   });
 
   describe('errorStatus on cell', () => {
-    it('gets errorStatus from editor', () => {
+    it('gets errorStatus from editor', async () => {
       let model = helper.createModelSingleColumnByValues([3], 'NumberColumn');
       let table = helper.createTable(model);
       table.columns[0].setEditable(true);
@@ -364,16 +364,14 @@ describe('NumberColumn', () => {
       expect(table.rows[0].cells[0].errorStatus).toBe(null);
 
       // set an invalid value
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.cellEditorPopup.cell.field.setValue(5);
       table.completeCellEdit();
       expect(table.rows[0].cells[0].errorStatus instanceof Status).toBe(true);
       expect(column0.cell(table.rows[0]).text).toBe('5');
 
       // set a valid value
-      table.prepareCellEdit(table.columns[0], table.rows[0]);
-      jasmine.clock().tick(0);
+      await table.prepareCellEdit(table.columns[0], table.rows[0]);
       table.cellEditorPopup.cell.field.setValue(2);
       table.completeCellEdit();
       expect(column0.cell(table.rows[0]).text).toBe('2');

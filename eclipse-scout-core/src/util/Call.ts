@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {abortableContext, arrays, CallModel, InitModelOf, objects, ObjectWithType, scout, strings} from '../index';
+import {abortableContext, AbortError, CallModel, Deferred, InitModelOf, objects, ObjectWithType, scout, strings} from '../index';
 import $ from 'jquery';
 
 /**
@@ -24,10 +24,10 @@ export abstract class Call implements CallModel, ObjectWithType {
   retryIntervals: number[];
   maxRetries: number;
   defaultRetryInterval: number;
-  deferred: JQuery.Deferred<any>;
+  deferred: Deferred<any>;
   aborted: boolean;
   initialized: boolean;
-  pendingCall: JQuery.Promise<any>;
+  pendingCall: PromiseLike<any>;
   callTimeoutId: number;
   callStartTimestamp: number;
   type: string;
@@ -47,7 +47,7 @@ export abstract class Call implements CallModel, ObjectWithType {
      * Counts how many times this call was actually performed (normally, only 1 try is expected)
      */
     this.callCounter = 0;
-    this.deferred = $.Deferred();
+    this.deferred = new Deferred();
     this.aborted = false;
     this.pendingCall = null;
     this.callTimeoutId = null;
@@ -94,16 +94,16 @@ export abstract class Call implements CallModel, ObjectWithType {
 
   protected _resolve() {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[RESOLVE]');
-    this.deferred.resolve(...arrays.ensure(this.result));
+    this.deferred.resolve(this.result);
   }
 
   protected _reject() {
     $.log.isTraceEnabled() && $.log.trace(this.logPrefix + '[REJECT]');
-    this.deferred.reject(...arrays.ensure(this.result));
+    this.deferred.reject(this.result);
   }
 
-  protected _setResult(...args: any[]) {
-    this.result = args;
+  protected _setResult(result?: any) {
+    this.result = result;
   }
 
   // ==================================================================================
@@ -119,11 +119,11 @@ export abstract class Call implements CallModel, ObjectWithType {
    *     | (promise)
    *     |   ^
    *     v   |
-   *   +--------+           +---------+           .---------------.  (yes)
-   *   | call() | . . . . . | _call() | ------>  <    success?     > ------> [RESOLVE]
-   *   +--------+           +---------+           '---------------'
-   *                             ^                       |(no)
-   *                             |                       |
+   *   +--------+           +---------+           .---------------.  (yes)            .---------------.  (no)
+   *   | call() | . . . . . | _call() | ------>  <    success?     > ------------->  <    aborted?     > ------> [RESOLVE]
+   *   +--------+           +---------+           '---------------'                   '---------------'
+   *                             ^                       |(no)                              |(yes)
+   *                             |                       |                                  +-------> [REJECT]
    *                             |                       v
    *                             |                .---------------.  (yes)
    *                             |               <    aborted?     > ------> [REJECT]
@@ -138,7 +138,7 @@ export abstract class Call implements CallModel, ObjectWithType {
    *                             |        sleep          |
    *                             +-------- %%% ----------+
    */
-  call(): JQuery.Promise<any> {
+  call(): Promise<any> {
     this._checkInitialized();
     this._call();
     return this.deferred.promise();
@@ -148,7 +148,7 @@ export abstract class Call implements CallModel, ObjectWithType {
    * Aborts the call. If the request is currently running, it is aborted (interrupted).
    * If a retry is scheduled, that retry is cancelled.
    *
-   * The promise returned by call() is REJECTED.
+   * The promise returned by {@link call} is rejected with an {@link AbortError}.
    */
   abort() {
     this._checkInitialized();
@@ -167,44 +167,48 @@ export abstract class Call implements CallModel, ObjectWithType {
     this.callCounter++;
     this._updateLogPrefix();
 
-    this.pendingCall = this._callImpl()
-      .always(() => {
+    this.pendingCall = this._callImpl().then(
+      result => {
         this.pendingCall = null;
-      })
-      .done(this._setResultDone.bind(this))
-      .done(this._onCallDone.bind(this))
-      .fail(this._setResultFail.bind(this))
-      .fail(this._onCallFail.bind(this));
+        this._setResult(result);
+        this._onCallDone(result);
+      }, error => {
+        this.pendingCall = null;
+        this._setResult(error);
+        this._onCallFail(error);
+      }
+    );
   }
 
   /**
    * Performs the actual request.
    */
-  protected abstract _callImpl(): JQuery.Promise<any>;
+  protected abstract _callImpl(): PromiseLike<any>;
 
-  protected _setResultDone(...args: any[]) {
-    this._setResult(...args);
-  }
+  protected _onCallDone(result?: any) {
+    // Aborted after the response arrived -> REJECT
+    if (this.aborted) {
+      $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Call aborted');
+      this._setResult(new AbortError());
+      this._reject();
+      return;
+    }
 
-  protected _setResultFail(...args: any[]) {
-    this._setResult(...args);
-  }
-
-  protected _onCallDone(...args: any[]) {
     // Call successful -> RESOLVE
     this._resolve();
   }
 
-  protected _onCallFail(...args: any[]) {
+  protected _onCallFail(result?: any) {
     // Aborted? -> REJECT
     if (this.aborted) {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Call aborted');
+      this._setResult(new AbortError());
       this._reject();
       return;
     }
 
     // Retry impossible? -> REJECT
-    let nextInterval = this._nextRetryImpl(...args);
+    let nextInterval = this._nextRetryImpl(result);
     if (typeof nextInterval !== 'number') {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'No retries remaining');
       this._reject();
@@ -224,7 +228,7 @@ export abstract class Call implements CallModel, ObjectWithType {
    * All other values indicate that no retry must be performed. (It is recommended to return 'false' or 'null' in this case.)
    * This method MAY be overridden by a subclass.
    */
-  protected _nextRetryImpl(...args: any[]): number | boolean {
+  protected _nextRetryImpl(result?: any): number | boolean {
     if (this.maxRetries >= 0 && this.callCounter > this.maxRetries) {
       return false; // no more retries
     }
@@ -250,6 +254,7 @@ export abstract class Call implements CallModel, ObjectWithType {
       $.log.isTraceEnabled() && $.log.trace(this.logPrefix + 'Cancelled scheduled retry');
       clearTimeout(this.callTimeoutId);
       this.callTimeoutId = null;
+      this._setResult(new AbortError());
       this._reject();
       return;
     }

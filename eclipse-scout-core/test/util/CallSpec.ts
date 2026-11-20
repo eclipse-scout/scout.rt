@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,14 +7,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {Call} from '../../src/index';
+import {AbortError, Call, Deferred} from '../../src/index';
 import {InitModelOf, scout} from '../../src/scout';
 
 describe('Call', () => {
-
-  beforeEach(() => {
-    jasmine.clock().install();
-  });
 
   afterEach(() => {
     jasmine.clock().uninstall();
@@ -28,15 +24,15 @@ describe('Call', () => {
     }
 
     override _callImpl() {
-      let deferred = $.Deferred();
+      let deferred = new Deferred();
       deferred.resolve();
       return deferred.promise();
     }
   }
 
   class TestingCall extends Call {
-    override _nextRetryImpl(...args): number | boolean {
-      return super._nextRetryImpl(...args);
+    override _nextRetryImpl(result?: any): number | boolean {
+      return super._nextRetryImpl(result);
     }
 
     callAndGetRetry() {
@@ -44,7 +40,7 @@ describe('Call', () => {
       return this._nextRetryImpl();
     }
 
-    protected _callImpl(): JQuery.Promise<any> {
+    protected _callImpl(): Promise<any> {
       return $.resolvedPromise();
     }
   }
@@ -60,7 +56,7 @@ describe('Call', () => {
     }
 
     override _callImpl() {
-      let deferred = $.Deferred();
+      let deferred = new Deferred();
       deferred.reject();
       return deferred.promise();
     }
@@ -77,7 +73,7 @@ describe('Call', () => {
     }
 
     override _callImpl() {
-      let deferred = $.Deferred();
+      let deferred = new Deferred();
       if (this.callCounter > 1) {
         deferred.resolve();
       } else {
@@ -87,14 +83,32 @@ describe('Call', () => {
     }
   }
 
+  class ControlledCall extends Call {
+    implDeferred: Deferred<any>;
+    implCalls = 0;
+    abortRunningCall = true;
+
+    override _callImpl() {
+      this.implCalls++;
+      this.implDeferred = new Deferred();
+      return this.implDeferred.promise();
+    }
+
+    protected override _abortImpl() {
+      if (this.abortRunningCall) {
+        this.implDeferred?.reject('aborted');
+      }
+    }
+  }
+
   // ----- Tests -----
 
-  it('calls done on success', () => {
+  it('calls done on success', async () => {
     let call = new SuccessCall();
     call.init();
     let done = false;
-    call.call()
-      .done(() => {
+    await call.call()
+      .then(() => {
         done = true;
       });
 
@@ -102,12 +116,12 @@ describe('Call', () => {
     expect(call.callCounter).toBe(1);
   });
 
-  it('calls fail on failure', () => {
+  it('calls fail on failure', async () => {
     let call = new FailCall();
     call.init();
     let failed = false;
-    call.call()
-      .fail(() => {
+    await call.call()
+      .catch(() => {
         failed = true;
       });
 
@@ -115,20 +129,26 @@ describe('Call', () => {
     expect(call.callCounter).toBe(1);
   });
 
-  it('retries on failure', () => {
+  it('retries on failure', async () => {
+    jasmine.clock().install();
+    jasmine.clock().autoTick();
     let call = new FailOnFirstTryCall();
     call.init();
     let done = false;
     let failed = false;
-    call.call()
-      .done(() => {
+    let promise = call.call()
+      .then(() => {
         done = true;
       })
-      .fail(() => {
+      .catch(() => {
         failed = true;
       });
 
-    jasmine.clock().tick(1000);
+    await sleep(1000);
+
+    // wait for the retried call (started by the sleep above) to settle
+    await promise;
+
     expect(done).toBe(true);
     expect(failed).toBe(false);
     expect(call.callCounter).toBe(2);
@@ -185,5 +205,37 @@ describe('Call', () => {
     expect(call.callAndGetRetry()).toBe(20);
     expect(call.callAndGetRetry()).toBe(20);
     expect(call.callAndGetRetry()).toBe(20);
+  });
+
+  describe('abort', () => {
+    it('rejects with an AbortError if aborted while the request is running', async () => {
+      let call = scout.create(ControlledCall);
+      let promise = call.call();
+      call.abort();
+
+      await expectAsync(promise).toBeRejectedWith(jasmine.any(AbortError));
+    });
+
+    it('rejects with an AbortError if aborted while waiting for a retry', async () => {
+      let call = scout.create(ControlledCall, {retryIntervals: [1000]});
+      let promise = call.call();
+      call.implDeferred.reject('error');
+      await sleep(); // let the failure be processed so the retry gets scheduled
+      expect(call.callTimeoutId).toBeTruthy();
+      call.abort();
+
+      await expectAsync(promise).toBeRejectedWith(jasmine.any(AbortError));
+      expect(call.implCalls).toBe(1);
+    });
+
+    it('rejects with an AbortError if aborted after the request completed', async () => {
+      let call = scout.create(ControlledCall);
+      call.abortRunningCall = false; // aborting a completed request has no effect
+      let promise = call.call();
+      call.abort();
+      call.implDeferred.resolve('data');
+
+      await expectAsync(promise).toBeRejectedWith(jasmine.any(AbortError));
+    });
   });
 });

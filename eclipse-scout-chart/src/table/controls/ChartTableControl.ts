@@ -11,10 +11,9 @@ import {
   Action, arrays, Column, DateColumn, Event, EventListener, IconDesc, icons, InitModelOf, keys, KeyStrokeContext, NumberColumn, objects, scout, scrollbars, strings, styles, TabbableCoordinator, TabbableItem, Table, TableControl,
   TableMatrix, TableMatrixDateGroup, TableMatrixKeyAxis, TableMatrixNumberGroup, TableMatrixResult, tooltips
 } from '@eclipse-scout/core';
-import {Chart, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter, FocusFirstChartTypeKeyStroke} from '../../index';
+import {Chart, ChartConfig, ChartTableControlEventMap, ChartTableControlLayout, ChartTableControlModel, ChartTableUserFilter, ClickObject, FocusFirstChartTypeKeyStroke} from '../../index';
 import $ from 'jquery';
 import {BubbleDataPoint, ChartData, ChartType as ChartJsType} from 'chart.js';
-import {ChartConfig, ClickObject} from '../../chart/Chart';
 
 export class ChartTableControl extends TableControl implements ChartTableControlModel {
   declare model: ChartTableControlModel;

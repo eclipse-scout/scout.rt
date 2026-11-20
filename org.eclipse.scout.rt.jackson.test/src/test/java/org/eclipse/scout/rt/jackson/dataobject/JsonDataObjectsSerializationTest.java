@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.dataobject.DoCollection;
 import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoEntityBuilder;
 import org.eclipse.scout.rt.dataobject.DoList;
+import org.eclipse.scout.rt.dataobject.DoMapEntity;
 import org.eclipse.scout.rt.dataobject.DoSet;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDataObject;
@@ -1909,10 +1910,10 @@ public class JsonDataObjectsSerializationTest {
     dateUUIDMap.put(DATE_TRUNCATED, UUID_2);
     mapDo.withDateUUIDMapAttribute(dateUUIDMap);
 
-    Locale deCh = new Locale("de", "CH");
-    Locale enUs = new Locale("en", "US");
-    Locale frCh = new Locale("fr", "CH");
-    Locale en = new Locale("en");
+    Locale deCh = Locale.of("de", "CH");
+    Locale enUs = Locale.of("en", "US");
+    Locale frCh = Locale.of("fr", "CH");
+    Locale en = Locale.of("en");
     Map<Locale, Locale> localeLocaleMap = new LinkedHashMap<>();
     localeLocaleMap.put(deCh, frCh);
     localeLocaleMap.put(enUs, en);
@@ -2156,6 +2157,21 @@ public class JsonDataObjectsSerializationTest {
     assertEquals("value-named", marshalled.getNamedItem().getStringAttribute());
     assertEquals("value-named", marshalled.get("namedItem").getStringAttribute());
     assertEquals(new BigDecimal("42"), marshalled.getNamedItem3().getBigDecimalAttribute());
+  }
+
+  @Test
+  public void testSerialize_RawDoMapEntity() throws Exception {
+    DoMapEntity<TestBigIntegerDo> doDoMapEntity1 = DoMapEntity.create();
+    doDoMapEntity1.put("attrib", BEANS.get(TestBigIntegerDo.class).withBigIntegerAttribute(new BigInteger("1234")));
+    String serialized1 = s_dataObjectMapper.writeValueAsString(doDoMapEntity1);
+    assertJsonEquals("TestRawDoMapEntity1.json", serialized1);
+
+    Map<String, TestBigIntegerDo> hashMap = new HashMap<>();
+    hashMap.put("attrib1", BEANS.get(TestBigIntegerDo.class).withBigIntegerAttribute(new BigInteger("1234")));
+    hashMap.put("attrib2", BEANS.get(TestBigIntegerDo.class).withBigIntegerAttribute(new BigInteger("5678")));
+    DoMapEntity<TestBigIntegerDo> doDoMapEntity2 = DoMapEntity.of(hashMap);
+    String serialized2 = s_dataObjectMapper.writeValueAsString(doDoMapEntity2);
+    assertJsonEquals("TestRawDoMapEntity2.json", serialized2);
   }
 
   @Test

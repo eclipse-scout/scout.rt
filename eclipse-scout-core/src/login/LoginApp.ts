@@ -14,7 +14,7 @@ export class LoginApp extends App {
 
   declare model: LoginAppModel;
 
-  override init(options?: InitModelOf<this>): JQuery.Promise<any> {
+  override init(options?: InitModelOf<this>): Promise<any> {
     return super.init(options);
   }
 
@@ -25,11 +25,11 @@ export class LoginApp extends App {
   /**
    * No bootstrapping required
    */
-  protected override _defaultBootstrappers(): (() => JQuery.Promise<void>)[] {
+  protected override _defaultBootstrappers(): (() => Promise<void>)[] {
     return [];
   }
 
-  protected override _init(options: InitModelOf<this>): JQuery.Promise<any> {
+  protected override _init(options: InitModelOf<this>): Promise<any> {
     options = options || {} as InitModelOf<this>;
     options.texts = $.extend({}, texts.readFromDOM(), options.texts);
     this._prepareDOM();

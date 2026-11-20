@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -24,15 +24,15 @@ export class HierarchicalLookupResultBuilder<TKey> {
   /**
    * Load all parent nodes of the given lookup rows up to the root.
    */
-  addParentLookupRows(lookupRows: LookupRow<TKey>[]): JQuery.Promise<LookupRow<TKey>[]> {
+  addParentLookupRows(lookupRows: LookupRow<TKey>[]): Promise<LookupRow<TKey>[]> {
     this._fillMap(lookupRows);
 
     let promises = lookupRows.map(this._addParent.bind(this));
-    return $.promiseAll(promises)
+    return Promise.all(promises)
       .then(() => objects.values(this._lookupRowMap));
   }
 
-  protected _addParent(lookupRow: LookupRow<TKey>): JQuery.Promise<void> {
+  protected _addParent(lookupRow: LookupRow<TKey>): Promise<void> {
     let key = lookupRow.parentKey;
 
     if (!key) {
@@ -65,15 +65,15 @@ export class HierarchicalLookupResultBuilder<TKey> {
   /**
    * Load all parent child of the given lookup rows.
    */
-  addChildLookupRows(lookupRows: LookupRow<TKey>[]): JQuery.Promise<LookupRow<TKey>[]> {
+  addChildLookupRows(lookupRows: LookupRow<TKey>[]): Promise<LookupRow<TKey>[]> {
     this._fillMap(lookupRows);
 
     let promises = lookupRows.map(this._addChildren.bind(this));
-    return $.promiseAll(promises)
+    return Promise.all(promises)
       .then(() => objects.values(this._lookupRowMap));
   }
 
-  protected _addChildren(lookupRow: LookupRow<TKey>): JQuery.Promise<LookupRow<TKey>[]> {
+  protected _addChildren(lookupRow: LookupRow<TKey>): Promise<LookupRow<TKey>[]> {
     return this.lookupCall
       .cloneForRec(lookupRow.key)
       .execute()

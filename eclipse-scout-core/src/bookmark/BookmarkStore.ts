@@ -37,28 +37,28 @@ export class BookmarkStore {
    * Saves a bookmark to this bookmark store. The previous version (if any) is overwritten. The stored
    * bookmark is returned afterward (may have been altered while being persisted, e.g. assigned an ID).
    */
-  storeBookmark(bookmark: BookmarkDo): JQuery.Promise<BookmarkDo> {
+  storeBookmark(bookmark: BookmarkDo): Promise<BookmarkDo> {
     throw new Error('Not implemented');
   }
 
   /**
    * Returns the bookmark for the given ID, or `null` if the bookmark could not be found.
    */
-  loadBookmark(bookmarkId: string): JQuery.Promise<BookmarkDo> {
+  loadBookmark(bookmarkId: string): Promise<BookmarkDo> {
     throw new Error('Not implemented');
   }
 
   /**
    * Returns a sorted list of all bookmarks in this store.
    */
-  loadAllBookmarks(): JQuery.Promise<BookmarkDo[]> {
+  loadAllBookmarks(): Promise<BookmarkDo[]> {
     throw new Error('Not implemented');
   }
 
   /**
    * Replaces all bookmarks in this store with the given list.
    */
-  storeAllBookmarks(allBookmarks: BookmarkDo[]): JQuery.Promise<void> {
+  storeAllBookmarks(allBookmarks: BookmarkDo[]): Promise<void> {
     throw new Error('Not implemented');
   }
 }

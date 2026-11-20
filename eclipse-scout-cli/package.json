@@ -33,7 +33,7 @@
     "version:snapshot": "releng-scripts version:snapshot",
     "version:release:dependencies": "releng-scripts version:release:dependencies",
     "version:release": "releng-scripts version:release",
-    "test": "node test/runTests.js"
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "esbuild": "0.27.2",
