@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -37,6 +37,10 @@ public final class UserAgentUtility {
     return getCurrentUserAgent().isTouch();
   }
 
+  /**
+   * @return the current device type. If the device type is enforced to a specific value, that value
+   * is returned. Otherwise, the initially detected device type is returned.
+   */
   public static IUiDeviceType getCurrentUiDeviceType() {
     return getCurrentUserAgent().getUiDeviceType();
   }

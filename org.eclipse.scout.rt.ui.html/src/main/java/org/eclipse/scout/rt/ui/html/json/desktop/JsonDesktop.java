@@ -35,6 +35,8 @@ import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.util.ObjectUtility;
 import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.server.commons.servlet.cache.DownloadHttpResponseInterceptor;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.eclipse.scout.rt.ui.html.IUiSession;
 import org.eclipse.scout.rt.ui.html.json.AbstractJsonWidget;
 import org.eclipse.scout.rt.ui.html.json.IJsonAdapter;
@@ -65,6 +67,7 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   private static final String EVENT_FORM_ACTIVATE = "formActivate";
   private static final String EVENT_LOGO_ACTION = "logoAction";
   private static final String EVENT_CANCEL_FORMS = "cancelForms";
+  private static final String EVENT_RELOAD_SESSION = "reloadSession";
 
   public static final String PROP_OUTLINE = "outline";
   public static final String PROP_DISPLAY_PARENT = "displayParent";
@@ -127,6 +130,9 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
     else if (EVENT_CANCEL_FORMS.equals(event.getType())) {
       handleCancelAllForms(event);
     }
+    else if (EVENT_RELOAD_SESSION.equals(event.getType())) {
+      handleReloadSession(event);
+    }
     else {
       super.handleUiEvent(event);
     }
@@ -180,6 +186,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       addPropertyEventFilterCondition(propertyName, focusedElement);
       getModel().getUIFacade().setFocusedElementFromUI(focusedElement);
     }
+    else if (IDesktop.PROP_DEVICE_TYPE.equals(propertyName)) {
+      String deviceTypeString = data.optString(propertyName);
+      IUiDeviceType deviceType = StringUtility.isNullOrEmpty(deviceTypeString) ? UiDeviceType.AUTOMATIC : UiDeviceType.valueOf(deviceTypeString);
+      addPropertyEventFilterCondition(propertyName, deviceType);
+      getModel().getUIFacade().setDeviceTypeFromUI(deviceType);
+    }
     else {
       super.handleUiPropertyChange(propertyName, data);
     }
@@ -210,6 +222,10 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       }
     }
     getModel().cancelForms(formSet);
+  }
+
+  protected void handleReloadSession(JsonEvent event) {
+    getModel().getUIFacade().reloadSessionFromUI();
   }
 
   protected void handleUiLogoAction(JsonEvent event) {
@@ -396,6 +412,12 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
       @Override
       protected Boolean modelValue() {
         return getModel().isTrackFocus();
+      }
+    });
+    putJsonProperty(new JsonProperty<>(IDesktop.PROP_DEVICE_TYPE, model) {
+      @Override
+      protected IUiDeviceType modelValue() {
+        return getModel().getDeviceType();
       }
     });
   }
