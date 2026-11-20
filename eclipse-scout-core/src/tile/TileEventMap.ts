@@ -17,5 +17,5 @@ export interface TileEventMap extends WidgetEventMap {
   'propertyChange:selectable': PropertyChangeEvent<boolean>;
   'propertyChange:selected': PropertyChangeEvent<boolean>;
   'propertyChange:autoReloadRate': PropertyChangeEvent<number>;
-  'propertyChange:load': Event<Tile>;
+  'load': Event<Tile>;
 }
