@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -9,7 +9,9 @@
  */
 package org.eclipse.scout.rt.ui.html.res;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
+
+import java.nio.charset.StandardCharsets;
 
 import org.eclipse.scout.rt.platform.resource.BinaryResource;
 import org.eclipse.scout.rt.platform.resource.BinaryResourceUtility;
@@ -24,7 +26,6 @@ public class BinaryResourceUrlUtilityTest {
 
   // Required because utility makes an instanceof IBinaryResourceProvider check
   interface IMockJsonAdapter extends IJsonAdapter<Long>, IBinaryResourceProvider {
-
   }
 
   private final BinaryResource m_binaryResource = new BinaryResource("foo.txt", new byte[]{1, 2, 3});
@@ -106,6 +107,56 @@ public class BinaryResourceUrlUtilityTest {
     assertEquals("\"binref/test/some/123\"", BinaryResourceUrlUtility.replaceBinaryRefHandlerWithUrl("\"binref:/test/some/123\""));
     assertEquals("\"binref/test/some/123\"", BinaryResourceUrlUtility.replaceBinaryRefHandlerWithUrl("\"binref:test/some/123\""));
     assertEquals("\"binref/test/f%C3%A4%C3%A9/123\"", BinaryResourceUrlUtility.replaceBinaryRefHandlerWithUrl("\"binref:/test/fäé/123\""));
+  }
+
+  @Test
+  public void testExtractBinaryResource_BinaryResourceWithFileNameWithContent() {
+    Object raw = new BinaryResource("föó.txt", "sample content".getBytes(StandardCharsets.UTF_8));
+    BinaryResource binaryResource = BinaryResourceUrlUtility.extractBinaryResource(raw, "foo", "txt");
+    assertNotNull(binaryResource);
+    assertEquals("föó.txt", binaryResource.getFilename());
+    assertNotNull(binaryResource.getContent());
+  }
+
+  @Test
+  public void testExtractBinaryResource_BinaryResourceWithFileNameWithoutContent() {
+    Object raw = new BinaryResource("föó.txt", null);
+    BinaryResource binaryResource = BinaryResourceUrlUtility.extractBinaryResource(raw, "foo", "txt");
+    assertNotNull(binaryResource);
+    assertEquals("föó.txt", binaryResource.getFilename());
+    assertNull(binaryResource.getContent());
+  }
+
+  @Test
+  public void testExtractBinaryResource_BinaryResourceWithoutFileNameWithContent() {
+    Object raw = new BinaryResource(null, "sample content".getBytes(StandardCharsets.UTF_8));
+    BinaryResource binaryResource = BinaryResourceUrlUtility.extractBinaryResource(raw, "foo", "txt");
+    assertNotNull(binaryResource);
+    assertEquals("foo-700056990-14.txt", binaryResource.getFilename());
+    assertNotNull(binaryResource.getContent());
+  }
+
+  @Test
+  public void testExtractBinaryResource_BinaryResourceWithoutFileNameWithoutContent() {
+    Object raw = new BinaryResource(null, null);
+    BinaryResource binaryResource = BinaryResourceUrlUtility.extractBinaryResource(raw, "foo", "txt");
+    assertNull(binaryResource);
+  }
+
+  @Test
+  public void testExtractBinaryResource_ByteArray() {
+    Object raw = "sample content".getBytes(StandardCharsets.UTF_8);
+    BinaryResource binaryResource = BinaryResourceUrlUtility.extractBinaryResource(raw, "foo", "txt");
+    assertNotNull(binaryResource);
+    assertEquals("foo-700056990-14.txt", binaryResource.getFilename());
+    assertNotNull(binaryResource.getContent());
+  }
+
+  @Test
+  public void testExtractBinaryResource_UnsupportedRawData() {
+    Object raw = Long.MAX_VALUE;
+    BinaryResource binaryResource = BinaryResourceUrlUtility.extractBinaryResource(raw, "foo", "txt");
+    assertNull(binaryResource);
   }
 
   protected IJsonAdapter<Long> createJsonAdapterMock(String adapterId, String uiSessionId) {
