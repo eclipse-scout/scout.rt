@@ -26,7 +26,7 @@ command -v pnpm >/dev/null 2>&1 || { echo >&2 "pnpm cannot be found. Make sure p
 # Install all JavaScript dependencies => creates the node_modules folders
 cd ..
 echo "Running 'pnpm install' in ${symbol_dollar}{PWD}"
-pnpx @eclipse-scout/releng@~26.2.0 install
+pnpx "@eclipse-scout/releng@>=27.1.0-snapshot <27.1.0" install
 echo "pnpm install finished successfully!\n"
 
 # Build the JavaScript and CSS bundles and start the watcher => creates the dist folder

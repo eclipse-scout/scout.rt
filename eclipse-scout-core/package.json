@@ -64,7 +64,7 @@
   },
   "devDependencies": {
     "@eclipse-scout/cli": ">=27.1.0-snapshot <27.1.0",
-    "@eclipse-scout/releng": "~26.2.0",
+    "@eclipse-scout/releng": ">=27.1.0-snapshot <27.1.0",
     "jasmine-core": "7.0.2",
     "jasmine-ajax": "5.0.0",
     "jasmine-jquery": "2.1.1",

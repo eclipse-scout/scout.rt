@@ -28,7 +28,7 @@ if %errorlevel% neq 0 (
 :: Install all JavaScript dependencies => creates the node_modules folders
 cd ..
 echo Running 'pnpm install' in %cd%
-call pnpx @eclipse-scout/releng@~26.2.0 install
+call pnpx "@eclipse-scout/releng@>=27.1.0-snapshot <27.1.0" install
 if %errorlevel% neq 0 exit /b %errorlevel%
 echo pnpm install finished successfully!
 echo.

@@ -64,7 +64,7 @@
     "@cyclonedx/webpack-plugin": "5.2.4"
   },
   "devDependencies": {
-    "@eclipse-scout/releng": "~26.2.0"
+    "@eclipse-scout/releng": ">=27.1.0-snapshot <27.1.0"
   },
   "bin": {
     "scout-scripts": "./bin/scout-scripts.js"
