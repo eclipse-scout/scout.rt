@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -16,7 +16,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 
 public class DefaultTextPostProcessor implements ITextPostProcessor {
 
-  protected static final Locale DE_CH = new Locale("de", "CH");
+  protected static final Locale DE_CH = Locale.of("de", "CH");
 
   @Override
   public String apply(Locale textLocale, @NlsKey String textKey, String text, String... messageArguments) {

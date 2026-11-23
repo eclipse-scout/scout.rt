@@ -628,16 +628,16 @@ public class JsonTableTest {
   public void testTextualSortingWithCollator() throws JSONException {
     String[] data = {"Österreich", "Italien", "Zypern"};
 
-    Arrays.sort(data, new TextSortComparator(true, new Locale("de")));
+    Arrays.sort(data, new TextSortComparator(true, Locale.of("de")));
     Assert.assertArrayEquals(new String[]{"Italien", "Österreich", "Zypern"}, data);
 
-    Arrays.sort(data, new TextSortComparator(false, new Locale("de")));
+    Arrays.sort(data, new TextSortComparator(false, Locale.of("de")));
     Assert.assertArrayEquals(new String[]{"Zypern", "Österreich", "Italien"}, data);
 
-    Arrays.sort(data, new TextSortComparator(true, new Locale("sv")));
+    Arrays.sort(data, new TextSortComparator(true, Locale.of("sv")));
     Assert.assertArrayEquals(new String[]{"Italien", "Zypern", "Österreich"}, data);
 
-    Arrays.sort(data, new TextSortComparator(false, new Locale("sv")));
+    Arrays.sort(data, new TextSortComparator(false, Locale.of("sv")));
     Assert.assertArrayEquals(new String[]{"Österreich", "Zypern", "Italien"}, data);
   }
 

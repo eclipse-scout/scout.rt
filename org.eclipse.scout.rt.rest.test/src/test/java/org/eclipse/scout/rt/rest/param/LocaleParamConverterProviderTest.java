@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -36,7 +36,7 @@ public class LocaleParamConverterProviderTest {
 
     assertNull(conv.fromString(null));
 
-    Locale expectedLocale = new Locale("de", "CH");
+    Locale expectedLocale = Locale.of("de", "CH");
     Locale locale = conv.fromString(expectedLocale.toLanguageTag());
     assertNotNull(locale);
     assertEquals(expectedLocale, locale);
@@ -48,7 +48,7 @@ public class LocaleParamConverterProviderTest {
 
     assertNull(conv.toString(null));
 
-    Locale expectedLocale = new Locale("de", "CH");
+    Locale expectedLocale = Locale.of("de", "CH");
     assertEquals(expectedLocale.toLanguageTag(), conv.toString(expectedLocale));
   }
 }

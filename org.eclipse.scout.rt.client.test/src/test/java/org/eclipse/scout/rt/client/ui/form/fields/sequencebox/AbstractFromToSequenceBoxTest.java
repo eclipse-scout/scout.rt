@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -38,7 +38,7 @@ public class AbstractFromToSequenceBoxTest {
 
   @Before
   public void setUp() {
-    NlsLocale.set(new Locale("en", "CH"));
+    NlsLocale.set(Locale.of("en", "CH"));
   }
 
   @After

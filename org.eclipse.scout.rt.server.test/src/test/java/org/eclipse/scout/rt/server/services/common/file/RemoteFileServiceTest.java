@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -70,7 +70,7 @@ public class RemoteFileServiceTest {
 
   @Test
   public void testMaxLocaleNameLength() {
-    checkAddLocaleToFileName("test.txt", "test.txt", new Locale("locale-with-name-longer-than-64-characters_123456789abcdefghijklmnopqrstuvwxyz"), 0);
+    checkAddLocaleToFileName("test.txt", "test.txt", Locale.of("locale-with-name-longer-than-64-characters_123456789abcdefghijklmnopqrstuvwxyz"), 0);
   }
 
   @Test
@@ -91,11 +91,11 @@ public class RemoteFileServiceTest {
 
   @Test
   public void testFallbackFilenameWhenTemplateMissing() {
-    checkAddLocaleToFileName("Example.txt", "Example.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example.txt"));
-    checkAddLocaleToFileName("Example.txt", "Example_de.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example.txt", "Example_de.txt"));
-    checkAddLocaleToFileName("Example.txt", "Example_de.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example_de.txt"));
-    checkAddLocaleToFileName("Example.txt", "Example_de_CH.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example.txt", "Example_de_CH.txt"));
-    checkAddLocaleToFileName("Example.txt", "Example_de_CH.txt", new Locale("de", "CH"), CollectionUtility.arrayList("Example_de_CH.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example.txt", Locale.of("de", "CH"), CollectionUtility.arrayList("Example.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de.txt", Locale.of("de", "CH"), CollectionUtility.arrayList("Example.txt", "Example_de.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de.txt", Locale.of("de", "CH"), CollectionUtility.arrayList("Example_de.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de_CH.txt", Locale.of("de", "CH"), CollectionUtility.arrayList("Example.txt", "Example_de_CH.txt"));
+    checkAddLocaleToFileName("Example.txt", "Example_de_CH.txt", Locale.of("de", "CH"), CollectionUtility.arrayList("Example_de_CH.txt"));
   }
 
   protected void checkAddLocaleToFileName(String initialName, String expectedFileNameAfterTest, Locale locale, List<String> existingFilenames) {
@@ -105,26 +105,26 @@ public class RemoteFileServiceTest {
 
   @Test(expected = SecurityException.class)
   public void testInvalidCharacterSlash() {
-    service.tryAddLocaleToFileName("test.txt", new Locale("de-DE/"), "", file -> true);
+    service.tryAddLocaleToFileName("test.txt", Locale.of("de-DE/"), "", file -> true);
   }
 
   @Test(expected = SecurityException.class)
   public void testInvalidCharacterColon() {
-    service.tryAddLocaleToFileName("test.txt", new Locale("de-DE:"), "", file -> true);
+    service.tryAddLocaleToFileName("test.txt", Locale.of("de-DE:"), "", file -> true);
   }
 
   @Test(expected = SecurityException.class)
   public void testInvalidCharactersPath() {
-    service.tryAddLocaleToFileName("test.txt", new Locale("ls //C:temp/"), "", file -> true);
+    service.tryAddLocaleToFileName("test.txt", Locale.of("ls //C:temp/"), "", file -> true);
   }
 
   @Test(expected = SecurityException.class)
   public void testInvalidCharacterUTF8() {
-    service.tryAddLocaleToFileName("test.txt", new Locale("de-DE퀀팀"), "", file -> true);
+    service.tryAddLocaleToFileName("test.txt", Locale.of("de-DE퀀팀"), "", file -> true);
   }
 
   @Test(expected = SecurityException.class)
   public void testInvalidCharacterDot() {
-    service.tryAddLocaleToFileName("test.txt", new Locale(".de-DE"), "", file -> true);
+    service.tryAddLocaleToFileName("test.txt", Locale.of(".de-DE"), "", file -> true);
   }
 }

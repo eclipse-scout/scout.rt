@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,7 +45,7 @@ public class DynamicNlsTest {
     when(nls.getTextInternal(any(), anyString())).thenReturn(streetGerman);
 
     assertEquals(streetGerman, nls.getText(Locale.GERMAN, "whatever"));
-    assertEquals("Strasse", nls.getText(new Locale("de", "CH"), "whatever"));
+    assertEquals("Strasse", nls.getText(Locale.of("de", "CH"), "whatever"));
   }
 
   @Test

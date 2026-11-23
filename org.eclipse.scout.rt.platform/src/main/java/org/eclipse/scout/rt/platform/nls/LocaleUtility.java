@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,12 +32,12 @@ public final class LocaleUtility {
     int a = s.indexOf('_');
     int b = (a >= 0 && a + 1 < s.length() ? s.indexOf('_', a + 1) : -1);
     if (a >= 0 && b >= 0) {
-      return new Locale(s.substring(0, a), s.substring(a + 1, b), s.substring(b + 1));
+      return Locale.of(s.substring(0, a), s.substring(a + 1, b), s.substring(b + 1));
     }
     if (a >= 0) {
-      return new Locale(s.substring(0, a), s.substring(a + 1));
+      return Locale.of(s.substring(0, a), s.substring(a + 1));
     }
-    return new Locale(s);
+    return Locale.of(s);
   }
 
   /**
