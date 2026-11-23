@@ -30,6 +30,10 @@ describe('Widget', () => {
     override _remove() {
       super._remove();
     }
+
+    override _addChild(child: Widget) {
+      super._addChild(child);
+    }
   }
 
   class SubTestWidget extends TestWidget {
@@ -89,7 +93,7 @@ describe('Widget', () => {
   function appendAnimateRemoveStyle() {
     $(`<style>
       @keyframes nop { 0% { opacity: 1; } 100% { opacity: 1; } }
-      .animate-remove { animation: nop; animation-duration: 1s;}
+      .animate-remove { animation: nop; animation-duration: 50ms;}
       </style>`).appendTo($('#sandbox'));
   }
 
@@ -1092,6 +1096,59 @@ describe('Widget', () => {
       expect(child.parent).toBe(another);
       expect(child.owner).toBe(another);
       expect(widget.children.length).toBe(0);
+    });
+
+    it('does not relink a child that was destroyed while its parent change was deferred', async () => {
+      appendAnimateRemoveStyle();
+      let widget = createWidget({
+        parent: parent,
+        animateRemoval: true
+      });
+      let newParent = createWidget({
+        parent: parent
+      });
+      let child = createWidget({
+        parent: widget
+      });
+
+      widget.render(session.$entryPoint);
+      widget.remove();
+
+      // Parent change is deferred while the removal of the old parent is pending
+      child.setParent(newParent);
+      expect(child.parent).toBe(widget); // Still the old parent
+
+      // Child is destroyed before the removal of the old parent finishes
+      child.destroy();
+      expect(child.destroyed).toBe(true);
+      expect(child.owner).toBe(null);
+      expect(child.parent).toBe(null);
+
+      // Removal finishes -> deferred parent change must not link the destroyed child to the new parent
+      await widget.when('remove');
+      expect(child.parent).toBe(null);
+      expect(newParent.children.length).toBe(0);
+
+      // Destroying the new parent must not fail
+      expect(() => newParent.destroy()).not.toThrow();
+      expect(newParent.destroyed).toBe(true);
+    });
+
+    it('does not relink children that are already destroyed', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      let child = createWidget({
+        parent: widget
+      });
+      child.destroy();
+      // Simulate a stale link to the destroyed child
+      widget._addChild(child);
+
+      // Relinking the child to its owner would throw in setParent because child.owner is null
+      expect(() => widget.destroy()).not.toThrow();
+      expect(widget.destroyed).toBe(true);
+      expect(child.parent).toBe(null);
     });
   });
 

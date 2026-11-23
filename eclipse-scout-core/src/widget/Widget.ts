@@ -372,7 +372,8 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     // Only the foreign children remain (where `this` is not the owner)
     for (const child of this._children) {
       // Disconnect child from parent and re-connect to owner
-      if (child.owner !== this) {
+      // Skip children that are already destroyed (owner is null), they must not be relinked
+      if (child.owner !== this && !child.destroyed) {
         child.setParent(child.owner);
       }
     }
@@ -754,6 +755,10 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
       // This may lead to an "Already rendered" exception if the new parent wants to render its children.
       if (this.parent.isRemovalPending()) {
         this.parent.one('remove', () => {
+          if (this.destroyed || parent.destroyed) {
+            // Widget or new parent was destroyed in the meantime -> don't link anymore
+            return;
+          }
           this.setParent(parent);
         });
         return;
