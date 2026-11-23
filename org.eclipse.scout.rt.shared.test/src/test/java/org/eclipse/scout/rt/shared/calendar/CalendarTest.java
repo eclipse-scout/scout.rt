@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -50,7 +50,7 @@ public class CalendarTest {
   @Test
   public void testBuddhistDateTransfer() throws Exception {
     //Buddhist Calendar
-    Locale.setDefault(new Locale("th", "TH"));
+    Locale.setDefault(Locale.of("th", "TH"));
 
     Date buddhistDate = new Date();
     Integer buddhistYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(buddhistDate));
@@ -58,7 +58,7 @@ public class CalendarTest {
     byte[] outArray = write(buddhistDate);
 
     //Gregorian Calendar
-    Locale.setDefault(new Locale("de", "CH"));
+    Locale.setDefault(Locale.of("de", "CH"));
 
     Date transferredDate = (Date) read(outArray);
     Integer transferredYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(transferredDate));
@@ -73,7 +73,7 @@ public class CalendarTest {
   @Test
   public void testBuddhistUTCDateTransfer() throws Exception {
     //Buddhist Calendar
-    Locale.setDefault(new Locale("th", "TH"));
+    Locale.setDefault(Locale.of("th", "TH"));
 
     UTCDate buddhistDate = new UTCDate();
     Integer buddhistYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(buddhistDate));
@@ -81,7 +81,7 @@ public class CalendarTest {
     byte[] outArray = write(buddhistDate);
 
     //Gregorian Calendar
-    Locale.setDefault(new Locale("de", "CH"));
+    Locale.setDefault(Locale.of("de", "CH"));
 
     UTCDate transferredDate = (UTCDate) read(outArray);
     Integer transferredYear = Integer.valueOf(new SimpleDateFormat("yyyy").format(transferredDate));

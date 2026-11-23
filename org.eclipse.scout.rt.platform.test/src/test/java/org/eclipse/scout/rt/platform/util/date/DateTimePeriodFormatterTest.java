@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -125,7 +125,7 @@ public class DateTimePeriodFormatterTest {
 
     Locale backup = NlsLocale.get();
     try {
-      NlsLocale.set(new Locale("de", "CH"));
+      NlsLocale.set(Locale.of("de", "CH"));
       Date date = DateUtility.parse("20220928 123456.789", "yyyyMMdd HHmmss.SSS");
       assertEquals("28.09.22, 12:34:56", m_formatter.formatDateTimeWithSeconds(date));
     }
@@ -140,7 +140,7 @@ public class DateTimePeriodFormatterTest {
 
     Locale backup = NlsLocale.get();
     try {
-      NlsLocale.set(new Locale("de", "CH"));
+      NlsLocale.set(Locale.of("de", "CH"));
       Date date = DateUtility.parse("20220928 123456.789", "yyyyMMdd HHmmss.SSS");
       assertEquals("28.09.22, 12:34:56.789", m_formatter.formatDateTimeWithMilliSeconds(date));
     }

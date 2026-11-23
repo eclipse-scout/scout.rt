@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -73,19 +73,19 @@ public class MatrixUtilityTest {
 
   @Test
   public void testSortUsingDeChLocale() {
-    MatrixUtility.sort(new Locale("de", "CH"), m_array, 1);
+    MatrixUtility.sort(Locale.of("de", "CH"), m_array, 1);
     assertArrayEquals(new Object[][]{E1, E5, E2, E4, E3}, m_array);
   }
 
   @Test
   public void testSortUsingEnUsLocale() {
-    MatrixUtility.sort(new Locale("en", "US"), m_array, 1);
+    MatrixUtility.sort(Locale.of("en", "US"), m_array, 1);
     assertArrayEquals(new Object[][]{E1, E5, E2, E4, E3}, m_array);
   }
 
   @Test
   public void testSortTwoSortColumns() {
-    MatrixUtility.sort(new Locale("de", "CH"), m_array, 2, 1);
+    MatrixUtility.sort(Locale.of("de", "CH"), m_array, 2, 1);
     assertArrayEquals(new Object[][]{E5, E4, E3, E2, E1}, m_array);
   }
 
@@ -110,7 +110,7 @@ public class MatrixUtilityTest {
         {"A"},
         {"Ü"}};
 
-    MatrixUtility.sort(new Locale("sv", "SE"), data, 0);
+    MatrixUtility.sort(Locale.of("sv", "SE"), data, 0);
 
     String[][] expected = {
         {"A"},
@@ -131,8 +131,8 @@ public class MatrixUtilityTest {
   @Test
   public void testSortComparator() {
     MatrixUtility.sortWithComparators(m_array,
-        new ArrayComparator.ColumnComparator(2, new ArrayComparator.DefaultObjectComparator(new Locale("de", "CH"))),
-        new ArrayComparator.ColumnComparator(1, Collections.reverseOrder(new ArrayComparator.DefaultObjectComparator(new Locale("de", "CH")))));
+        new ArrayComparator.ColumnComparator(2, new ArrayComparator.DefaultObjectComparator(Locale.of("de", "CH"))),
+        new ArrayComparator.ColumnComparator(1, Collections.reverseOrder(new ArrayComparator.DefaultObjectComparator(Locale.of("de", "CH")))));
     assertArrayEquals(new Object[][]{E3, E4, E5, E2, E1}, m_array);
   }
 

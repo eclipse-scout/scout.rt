@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -762,27 +762,27 @@ public class DateUtilityTest {
     Calendar thursdayCalendar = Calendar.getInstance();
     thursdayCalendar.set(2014, Calendar.OCTOBER, 2, 0, 0);
 
-    assertTrue(DateUtility.isWeekend(thursdayCalendar.getTime(), new Locale("ar", "AF")));
-    assertFalse(DateUtility.isWeekend(thursdayCalendar.getTime(), new Locale("ar", "GQ")));
+    assertTrue(DateUtility.isWeekend(thursdayCalendar.getTime(), Locale.of("ar", "AF")));
+    assertFalse(DateUtility.isWeekend(thursdayCalendar.getTime(), Locale.of("ar", "GQ")));
 
     assertFalse(DateUtility.isWeekend(fridayCalendar.getTime(), Locale.US));
-    assertTrue(DateUtility.isWeekend(fridayCalendar.getTime(), new Locale("ar", "AE")));
+    assertTrue(DateUtility.isWeekend(fridayCalendar.getTime(), Locale.of("ar", "AE")));
 
     assertTrue(DateUtility.isWeekend(sundayCalendar.getTime(), Locale.UK));
-    assertFalse(DateUtility.isWeekend(sundayCalendar.getTime(), new Locale("ar", "AE")));
+    assertFalse(DateUtility.isWeekend(sundayCalendar.getTime(), Locale.of("ar", "AE")));
 
-    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "BN")));
-    assertTrue(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "AE")));
-    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "AF")));
-    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), new Locale("ar", "IN")));
+    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), Locale.of("ar", "BN")));
+    assertTrue(DateUtility.isWeekend(saturdayCalendar.getTime(), Locale.of("ar", "AE")));
+    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), Locale.of("ar", "AF")));
+    assertFalse(DateUtility.isWeekend(saturdayCalendar.getTime(), Locale.of("ar", "IN")));
 
     assertTrue(DateUtility.isWeekend(sundayCalendar.getTime(), Locale.UK));
-    assertFalse(DateUtility.isWeekend(sundayCalendar.getTime(), new Locale("ar", "AE")));
+    assertFalse(DateUtility.isWeekend(sundayCalendar.getTime(), Locale.of("ar", "AE")));
 
-    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "AE")));
-    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "AF")));
-    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "IN")));
-    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), new Locale("ar", "BN")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.of("ar", "AE")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.of("ar", "AF")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.of("ar", "IN")));
+    assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.of("ar", "BN")));
     assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.US));
     assertFalse(DateUtility.isWeekend(mondayCalendar.getTime(), Locale.UK));
 

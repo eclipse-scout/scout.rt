@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -33,23 +33,23 @@ public class CollatorProviderTest {
   @Test
   public void testSVLocales() {
     String[] names = new String[]{"ö", "z"};
-    sort(new Locale("sv"), names);
+    sort(Locale.of("sv"), names);
     assertArrayEquals("Testing sort order", new String[]{"z", "ö"}, names);
   }
 
   @Test
   public void testLocalesCached() {
     String[] names = new String[]{"ö", "z"};
-    sort(new Locale("sv"), names);
-    sort(new Locale("sv"), names);
+    sort(Locale.of("sv"), names);
+    sort(Locale.of("sv"), names);
     assertArrayEquals("Testing sort order", new String[]{"z", "ö"}, names);
   }
 
   @Test
   public void testDifferentLocales() {
     String[] names = new String[]{"ö", "z"};
-    sort(new Locale("de"), names);
-    sort(new Locale("sv"), names);
+    sort(Locale.of("de"), names);
+    sort(Locale.of("sv"), names);
     assertArrayEquals("Testing sort order", new String[]{"z", "ö"}, names);
   }
 

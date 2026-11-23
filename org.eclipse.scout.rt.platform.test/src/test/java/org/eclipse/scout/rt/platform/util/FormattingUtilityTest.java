@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -32,9 +32,9 @@ public class FormattingUtilityTest {
 
   @BeforeClass
   public static void beforeClass() {
-    deChLocale = new Locale("de", "CH");
-    deDeLocale = new Locale("de", "DE");
-    enUsLocale = new Locale("en", "US");
+    deChLocale = Locale.of("de", "CH");
+    deDeLocale = Locale.of("de", "DE");
+    enUsLocale = Locale.of("en", "US");
   }
 
   @Test

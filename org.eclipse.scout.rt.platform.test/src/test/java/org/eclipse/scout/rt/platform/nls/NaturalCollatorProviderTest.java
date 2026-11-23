@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -57,7 +57,7 @@ public class NaturalCollatorProviderTest {
         "abcopp");
 
     List<String> actualResult = new ArrayList<>(input);
-    Collections.sort(actualResult, m_collatorProvider.getInstance(new Locale("en")));
+    Collections.sort(actualResult, m_collatorProvider.getInstance(Locale.of("en")));
 
     assertEquals(expectedResult, actualResult);
   }
@@ -78,7 +78,7 @@ public class NaturalCollatorProviderTest {
         "The dogs bark");
 
     List<String> actualResult = new ArrayList<>(input);
-    Collections.sort(actualResult, m_collatorProvider.getInstance(new Locale("en")));
+    Collections.sort(actualResult, m_collatorProvider.getInstance(Locale.of("en")));
 
     assertEquals(expectedResult, actualResult);
   }

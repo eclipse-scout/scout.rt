@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -81,7 +81,7 @@ public final class JsonTestUtility {
 
   public static HttpServletRequest createHttpServletRequest(HttpSession httpSession, String pathInfo, String jsonData) {
     HttpServletRequest mock = Mockito.mock(HttpServletRequest.class);
-    Mockito.when(mock.getLocale()).thenReturn(new Locale("de_CH"));
+    Mockito.when(mock.getLocale()).thenReturn(Locale.of("de_CH"));
     Mockito.when(mock.getHeader("User-Agent")).thenReturn("dummy");
     Mockito.when(mock.getPathInfo()).thenReturn(pathInfo);
     Mockito.when(mock.getContentType()).thenReturn(MimeType.JSON.getType());
