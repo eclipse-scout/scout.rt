@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {SpecTable, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
-import {HtmlTile, KeyTableFilter, scout, TableTextUserFilter} from '../../src';
+import {Column, HtmlTile, KeyTableFilter, scout, TableRow, TableTextUserFilter, Tile, TileAccordion} from '../../src';
 
 describe('TableTileMode', () => {
   let session: SandboxSession;
@@ -60,6 +60,57 @@ describe('TableTileMode', () => {
 
     table.sort(table.columns[0], 'asc');
     expect(table.tableTileGridMediator.tileAccordion.groups.map(g => g.id)).toEqual(['0_0', '1_0', '2_0', '3_0', '4_0']);
+  });
+
+  it('reorders groups when tiles are reordered', () => {
+    let table = helper.createTable({
+      parent: session.desktop,
+      columns: [
+        {
+          id: 'NameColumn',
+          objectType: Column,
+          summary: true
+        },
+        {
+          id: 'TypeColumn',
+          objectType: Column,
+          grouped: true,
+          sortIndex: 0,
+          sortAscending: false
+        }
+      ],
+      rows: [
+        {id: 'row_a1', cells: ['A1', 'A']},
+        {id: 'row_a2', cells: ['A2', 'A']},
+        {id: 'row_b1', cells: ['B1', 'B']},
+        {id: 'row_b2', cells: ['B2', 'B']},
+        {id: 'row_c1', cells: ['C1', 'C']},
+        {id: 'row_c2', cells: ['C2', 'C']}
+      ]
+    });
+
+    class SpecTile extends Tile {
+      row: TableRow;
+    }
+
+    table.createTileForRow = row => scout.create(SpecTile, {
+      parent: table, row
+    });
+    table.setTileMode(true);
+    table.render();
+    let tileAccordion = table.tableTileGridMediator.tileAccordion as TileAccordion<SpecTile>;
+
+    let tiles = tileAccordion.getTiles();
+    expect(table.rows.map(row => row.id)).toEqual(['row_c1', 'row_c2', 'row_b1', 'row_b2', 'row_a1', 'row_a2']);
+    expect(tiles.map(tile => tile.row.id)).toEqual(['row_c1', 'row_c2', 'row_b1', 'row_b2', 'row_a1', 'row_a2']);
+    expect(tileAccordion.groups.map(group => group.title)).toEqual(['C', 'B', 'A']);
+
+    table.sort(table.columnById('TypeColumn'), 'asc');
+
+    tiles = tileAccordion.getTiles();
+    expect(table.rows.map(row => row.id)).toEqual(['row_a1', 'row_a2', 'row_b1', 'row_b2', 'row_c1', 'row_c2']);
+    expect(tiles.map(tile => tile.row.id)).toEqual(['row_a1', 'row_a2', 'row_b1', 'row_b2', 'row_c1', 'row_c2']);
+    expect(tileAccordion.groups.map(group => group.title)).toEqual(['A', 'B', 'C']);
   });
 
   it('filters data (key filter)', () => {
