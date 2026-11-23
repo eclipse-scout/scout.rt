@@ -1,0 +1,17 @@
+{
+  "_type" : "TestMap",
+  "fixtureUuidTestItemDoLinkedMapAttribute" : {
+    "4f42ca50-04d3-449f-a03a-02251e92865c" : {
+      "_type" : "TestItem",
+      "id" : "one"
+    },
+    "afcc72f6-8c99-4523-9157-92dbc313e205" : {
+      "_type" : "TestItem",
+      "id" : "two"
+    },
+    "22ffac92-cf04-4dd1-8b8b-81528ea74348" : {
+      "_type" : "TestItem",
+      "id" : "three"
+    }
+  }
+}
