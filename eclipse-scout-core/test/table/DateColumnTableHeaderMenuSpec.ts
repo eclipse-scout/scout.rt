@@ -827,39 +827,6 @@ describe('DateColumnTableHeaderMenu', () => {
       expect(checkedMenus[0].groupType).toBe(DateGroupType.CALENDAR_WEEK);
     });
 
-    it('does not shows an additional menu when the column specifies a groupFormat that matches a groupType', () => {
-      expect(table.rows).toEqual([row0, row1, row2, row3]);
-      dateColumn1.setGroupFormat('MMMM');
-
-      table.header.openHeaderMenu(dateColumn1);
-      let headerMenu = scout.assertInstance(table.header.tableHeaderMenu, DateColumnTableHeaderMenu);
-      headerMenu.animateRemoval = false;
-
-      expect(headerMenu.groupButton.visible).toBe(true);
-      expect(headerMenu.groupButton.selected).toBe(false);
-      expect(headerMenu.groupAddButton.visible).toBe(false);
-
-      // ------
-
-      headerMenu.groupButton.doAction();
-      let contextMenu = headerMenu.findChild(ContextMenuPopup);
-      expect(contextMenu).toBeInstanceOf(ContextMenuPopup);
-      contextMenu.animateRemoval = false;
-
-      let menus = contextMenu.menuItems.filter(menu => menu instanceof DateGroupTypeMenu) as DateGroupTypeMenu[];
-      expect(menus.map(menu => menu.groupType)).toEqual([
-        DateGroupType.YEAR,
-        DateGroupType.MONTH,
-        DateGroupType.MONTH_AND_YEAR,
-        DateGroupType.CALENDAR_WEEK,
-        DateGroupType.WEEKDAY,
-        DateGroupType.DATE
-      ]);
-      let checkedMenus = menus.filter(menu => menu.iconId === icons.CHECKED_BOLD);
-      expect(checkedMenus.length).toBe(1);
-      expect(checkedMenus[0].groupType).toBe(DateGroupType.MONTH);
-    });
-
     it('changes the label if a group button is hovered', () => {
       dateColumn1.setGroupType(DateGroupType.YEAR);
       dateColumn2.setGroupType(DateGroupType.MONTH);

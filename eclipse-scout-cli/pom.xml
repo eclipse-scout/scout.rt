@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+  ~ Copyright (c) 2010, 2026 BSI Business Systems Integration AG
   ~
   ~ This program and the accompanying materials are made
   ~ available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@
     <sonar.sources>bin,scripts,pom.xml</sonar.sources>
     <master_skip_npm_build_dev>true</master_skip_npm_build_dev>
     <master_skip_npm_build_prod>true</master_skip_npm_build_prod>
-    <master_skip_karma_test>true</master_skip_karma_test>
+    <master_skip_npm_test>true</master_skip_npm_test>
     <master_skip_copy_webpack_build_output>true</master_skip_copy_webpack_build_output>
   </properties>
 

@@ -86,6 +86,7 @@ describe('SmartFieldMultiline', () => {
       expect(field.$screenReaderStatus).toHaveClass('sr-only');
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').length).toBe(1);
       expect(field.$screenReaderStatus.children('.sr-lookup-row-count').eq(0)).not.toBeEmpty();
+      field.closePopup();
     });
 
     it('has a aria-expanded set correctly if pop up is open/closed', async () => {

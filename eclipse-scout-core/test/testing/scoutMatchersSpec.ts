@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,17 @@ import {RemoteRequestData} from '../../src/index';
 
 describe('JasmineScout', () => {
 
-  let matchersUtil = new jasmine['MatchersUtil']() as jasmine.MatchersUtil;
+  let matchersUtil: jasmine.MatchersUtil;
+
+  beforeEach(() => {
+    jasmine.addMatchers({
+      captureMatchersUtil: util => {
+        matchersUtil = util;
+        return {compare: () => ({pass: true})};
+      }
+    });
+    (expect(null) as unknown as { captureMatchersUtil(): void }).captureMatchersUtil();
+  });
 
   describe('toContainEventTypesExactly', () => {
 

@@ -14,8 +14,8 @@
 const ts = require('typescript');
 const path = require('path');
 const fs = require('fs');
-const DataObjectTransformer = require('../scripts/DataObjectTransformer');
-const ModuleResolver = require('../scripts/ModuleResolver');
+const DataObjectTransformer = require('../scripts/data-object/DataObjectTransformer');
+const ModuleResolver = require('../scripts/data-object/ModuleResolver');
 
 function compile(fileNames, options) {
   const program = ts.createProgram(fileNames, options);

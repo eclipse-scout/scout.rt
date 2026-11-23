@@ -26,7 +26,6 @@ public class ScoutXmlTest extends AbstractScoutXmlTest {
         Path.of("eclipse-scout-releng"),
         Path.of("eclipse-scout-tsconfig"),
         Path.of("eslint-config"),
-        Path.of("karma-jasmine-scout"),
         Path.of("scout-hellojs-app"),
         Path.of("scout-helloworld-app"),
         Path.of("scout-jaxws-module"));

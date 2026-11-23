@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -11,8 +11,8 @@
 const fs = require('fs');
 const path = require('path');
 const themeJsOutFilter = f => /.*theme.*\.js/.test(f);
-const {listFiles} = require('./files');
-const scoutBuild = require('./constants');
+const {listFiles} = require('../files');
+const scoutBuild = require('../constants');
 
 function deleteFile(filename) {
   if (!fs.existsSync(filename)) {
@@ -41,7 +41,6 @@ function fileListFilter(fileName) {
 
 module.exports = {
   createFileList: dir => {
-    const scoutBuild = require('./constants');
     let content = '';
     listFiles(dir)
       .filter(fileName => fileListFilter(fileName))

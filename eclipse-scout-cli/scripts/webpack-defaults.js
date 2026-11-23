@@ -10,13 +10,13 @@
 const fs = require('fs');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
-const DataObjectTransformer = require('./DataObjectTransformer');
-const ModuleResolver = require('./ModuleResolver');
+const DataObjectTransformer = require('./data-object/DataObjectTransformer');
+const ModuleResolver = require('./data-object/ModuleResolver');
 const CopyPlugin = require('copy-webpack-plugin');
 const {CycloneDxWebpackPlugin} = require('@cyclonedx/webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const AfterEmitWebpackPlugin = require('./AfterEmitWebpackPlugin');
-const KeepNonceVariablePlugin = require('./KeepNonceVariablePlugin');
+const AfterEmitWebpackPlugin = require('./webpack-build/AfterEmitWebpackPlugin');
+const KeepNonceVariablePlugin = require('./webpack-build/KeepNonceVariablePlugin');
 const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('webpack');
 const ts = require('typescript');
 

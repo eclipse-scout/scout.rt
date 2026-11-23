@@ -12,7 +12,7 @@
  * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
 
-// Loaded BEFORE jasmine-core (see framework 'jasmine-scout-preload' in index.js), so this listener is registered before
+// Loaded BEFORE jasmine-core (see createJasmineCore in test-runner.js), so this listener is registered before
 // Jasmine's own 'unhandledrejection' listener. Listeners of the same phase run in registration order, which allows
 // stopping the propagation to Jasmine for rejections that should not fail a spec (e.g. expected cancellations).
 // The actual decision is delegated to a filter function that is installed later by the application (e.g. TestingApp),

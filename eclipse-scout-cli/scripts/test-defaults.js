@@ -9,29 +9,58 @@
  */
 const fs = require('fs');
 const path = require('path');
-const jquery = require.resolve('jquery');
 const scoutBuildConstants = require('./constants');
+const KeepNonceVariablePlugin = require('./webpack-build/KeepNonceVariablePlugin');
 const {SourceMapDevToolPlugin} = require('webpack');
-const StatsExtractWebpackPlugin = require('./StatsExtractWebpackPlugin');
-const KeepNonceVariablePlugin = require('./KeepNonceVariablePlugin');
 
+/**
+ * Default test configuration of a Scout module. Call it from the 'test.config.js' of the module:
+ *
+ * <pre>
+ * const baseConfig = require('@eclipse-scout/cli/scripts/test-defaults');
+ * module.exports = config => {
+ *   baseConfig(config, './src/test/js/test-index.ts');
+ *   config.resources['/_res/'] = path.resolve('src/test/resources/_res'); // optional: serve static test resources
+ * };
+ * </pre>
+ *
+ * Properties of the config object:
+ * <ul>
+ *   <li>webpackArgs: webpack arguments (input, may be passed on the command line using --webpackArgs.xy)</li>
+ *   <li>webpack: webpack configuration used to build the spec bundle</li>
+ *   <li>specEntryPoint: absolute path of the spec entry point (e.g. test-index.ts)</li>
+ *   <li>helpers: absolute paths of JS and CSS files loaded in the browser before the spec bundle</li>
+ *   <li>resources: map of URL path prefixes to directories served by the test server</li>
+ *   <li>jasmine: Jasmine environment configuration</li>
+ *   <li>headless: whether Chrome is started headless by test:ci</li>
+ *   <li>openBrowser: whether test-server:start opens Chrome</li>
+ *   <li>port: port of the test server for test-server:start/stop</li>
+ *   <li>junitReportDir: directory of the JUnit report (test-results.xml)</li>
+ * </ul>
+ *
+ * @param {object} config the config object to fill
+ * @param {string} [specEntryPoint] path of the spec entry point. Default: test/test-index.ts or test/test-index.js
+ */
 module.exports = (config, specEntryPoint) => {
   const webpackConfigFilePath = path.resolve('webpack.config.js');
   if (!fs.existsSync(webpackConfigFilePath)) {
-    const message = 'Karma requires a webpack config file at location "' + webpackConfigFilePath + '" but it could not be found.';
+    const message = 'Tests require a webpack config file at location "' + webpackConfigFilePath + '" but it could not be found.';
     console.error(message);
     throw new Error(message);
   }
-  let webpackConfigProvider = require(webpackConfigFilePath);
+  const webpackConfigProvider = require(webpackConfigFilePath);
 
   const webpackArgs = Object.assign({
     mode: scoutBuildConstants.mode.development,
-    watch: true, // by default tests are running in watch mode
+    watch: false,
     tsOptions: {
       compilerOptions: {
         // No need to create declarations for tests
         declaration: false,
-        declarationMap: false
+        declarationMap: false,
+        // The spec bundle (build output of the test-webpack-build) also contains the TypeScript sources of linked packages (e.g. in a monorepo), the file system root contains all of them
+        // Otherwise, TS6059 is thrown on TS emit complaining that these linked sources are not part of rootDir (if set in tsconfig.json).
+        rootDir: path.parse(process.cwd()).root
       }
     }
   }, config.webpackArgs);
@@ -39,116 +68,76 @@ module.exports = (config, specEntryPoint) => {
   if (Array.isArray(webpackConfig)) {
     webpackConfig = webpackConfig[0];
   }
-  delete webpackConfig.entry;
   if (webpackConfig.optimization) {
-    delete webpackConfig.optimization.splitChunks; // disable splitting for tests
+    // create a single spec bundle
+    delete webpackConfig.optimization.splitChunks;
+    delete webpackConfig.optimization.runtimeChunk;
   }
 
-  if (webpackConfig.output) {
-    // Remove output file as Karma uses an in-memory middleware and complains if an output file is present
-    delete webpackConfig.output.filename;
-    // Don't create a library, it would create an error during test run (module not found)
-    delete webpackConfig.output.library;
-    delete webpackConfig.experiments?.outputModule;
-  }
+  // Don't create a library, it would create an error during test run (module not found)
+  delete webpackConfig.output?.library;
+  delete webpackConfig.experiments?.outputModule;
 
   if (webpackConfig.externals) {
-    // Remove externals, so they don't have to be provided
-    // Add jquery as the only external, so it won't be loaded twice because it is provided by @metahub/karma-jasmine-jquery
+    // Remove externals, so they don't have to be provided.
+    // Add jquery as the only external, it is loaded as helper.
     webpackConfig.externals = {
       'jquery': 'global jQuery'
     };
   }
 
-  // specify output directory for webpack (use different from normal output dir so that they are not polluted with test artifacts)
-  webpackConfig.output = webpackConfig.output || {};
-  webpackConfig.output.path = path.resolve(scoutBuildConstants.outDir.target, scoutBuildConstants.outDir.distKarma, scoutBuildConstants.outSubDir.development);
-  fs.mkdirSync(webpackConfig.output.path, {recursive: true});
+  const resolvedSpecEntryPoint = searchSpecEntryPoint(specEntryPoint);
+  webpackConfig.entry = {[scoutBuildConstants.testBundleName]: resolvedSpecEntryPoint};
 
+  // use a separate output directory so that the regular output directories are not polluted with test artifacts
+  webpackConfig.output = webpackConfig.output || {};
+  webpackConfig.output.path = path.resolve(scoutBuildConstants.outDir.target, scoutBuildConstants.outDir.distTest, scoutBuildConstants.outSubDir.testSpec);
+  webpackConfig.output.filename = '[name].js';
+  webpackConfig.output.clean = true;
   webpackConfig.watch = !!webpackArgs.watch;
 
   const sourceMapPlugin = webpackConfig.plugins.find(plugin => plugin instanceof SourceMapDevToolPlugin);
   if (sourceMapPlugin) {
-    // Use inline source maps because external source maps are not supported by karma (https://github.com/webpack-contrib/karma-webpack/issues/224)
+    // inline source maps, used by stackTraceMapper.js
     delete sourceMapPlugin.sourceMapFilename;
   }
-  webpackConfig.plugins.push(new StatsExtractWebpackPlugin()); // used by scout-scripts to access the webpack build result.
 
   // nonce-variable must always be processed as the build-output is used in the browser
   webpackConfig.plugins = webpackConfig.plugins.filter(p => !(p instanceof KeepNonceVariablePlugin));
 
-  // Babel transpile is not necessary for Karma as it is executed with an up-to-date browser.
+  // Babel transpile is not necessary for tests as they are executed with an up-to-date browser.
   removeBabelLoader(webpackConfig);
 
-  const specIndex = searchSpecEntryPoint(specEntryPoint);
-  const preprocessorObj = {};
-  preprocessorObj[specIndex] = ['webpack'];
+  const helpers = [
+    require.resolve('jasmine-ajax'),
+    require.resolve('jquery'),
+    require.resolve('sourcemapped-stacktrace'),
+    path.join(__dirname, 'test-support', 'resources', 'stackTraceMapper.js'),
+    path.join(__dirname, 'test-support', 'resources', 'JasmineScout.css')
+  ];
 
   const scoutExternals = findScoutExternals();
-  if (scoutExternals?.length) {
-    webpackConfig.externals ||= {};
+  if (scoutExternals.length) {
     for (const external of scoutExternals) {
-      // mark scout external as webpack external
+      // mark scout external as webpack external and load the prebuilt file as helper
+      webpackConfig.externals ||= {};
       webpackConfig.externals[external.moduleName] = 'scout';
-      // add source maps for scout external
-      preprocessorObj[external.path] = ['sourcemap'];
+      helpers.push(external.path);
     }
   }
 
-  config.set({
-    browsers: ['Chrome'],
-    files: [
-      {pattern: jquery, watched: false},
-      // include scout external files
-      ...scoutExternals.map(external => ({pattern: external.path, watched: false})),
-      {pattern: specIndex, watched: false}
-    ],
-    frameworks: ['webpack', 'jasmine-scout', 'jasmine-jquery', 'jasmine-ajax', 'jasmine', 'jasmine-scout-preload'], /* order of the frameworks is relevant! */
-    // Reporter for "Jasmine Spec Runner" results in browser
-    // https://www.npmjs.com/package/karma-jasmine-html-reporter
-    reporters: ['kjhtml', 'junit'],
-    junitReporter: {
-      outputDir: './test-results/',
-      outputFile: 'test-results.xml'
-    },
-    plugins: [
-      require('karma-jasmine-html-reporter'),
-      require('karma-junit-reporter'),
-      require('karma-jasmine'),
-      require('@metahub/karma-jasmine-jquery'),
-      require('karma-jasmine-ajax'),
-      require('@eclipse-scout/karma-jasmine-scout'),
-      require('karma-webpack'),
-      require('karma-chrome-launcher'),
-      // add source map loader if scout externals are present
-      ...(
-        scoutExternals?.length
-          ? [require('karma-sourcemap-loader')]
-          : []
-      )
-    ],
-    client: {
-      // Leave "Jasmine Spec Runner" output visible in browser
-      clearContext: false,
-      jasmine: {
-        random: false
-      }
-    },
-    preprocessors: preprocessorObj,
-    // If true, Karma will start and capture all configured browsers, run tests and then exit with an exit code of 0 or 1
-    // depending on whether all tests passed or any tests failed.
-    singleRun: false,
-    // Webpack
+  Object.assign(config, {
     webpack: webpackConfig,
-    webpackServer: {
-      noInfo: true
+    specEntryPoint: resolvedSpecEntryPoint,
+    helpers,
+    resources: {},
+    jasmine: {
+      random: false
     },
-    // add source maps for scout externals if present
-    ...(
-      scoutExternals?.length
-        ? {sourceMapLoader: {onlyWithURL: true}}
-        : {}
-    )
+    headless: true,
+    openBrowser: true,
+    port: 9876,
+    junitReportDir: 'test-results'
   });
 };
 

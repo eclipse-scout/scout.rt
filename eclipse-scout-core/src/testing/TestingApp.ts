@@ -21,7 +21,7 @@ export class TestingApp extends RemoteApp {
     // otherwise, they might overwrite the global error handlers of Jasmine which will then not be notified about failing specs.
 
     // Jasmine registers its 'unhandledrejection' listener before any spec code runs, so a listener added here cannot stop it.
-    // Instead, the listener registered by karma-jasmine-scout (unhandledRejectionFilter.js, loaded before jasmine-core) consults this filter.
+    // Instead, the listener registered by unhandledRejectionFilter.js of @eclipse-scout/cli (loaded before jasmine-core) consults this filter.
     (window as JasmineScoutWindow).jasmineScoutUnhandledRejectionFilter = this._onUnhandledRejection.bind(this);
   }
 

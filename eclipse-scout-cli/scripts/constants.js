@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -20,13 +20,18 @@ const mode = {
 const outDir = {
   target: 'target',
   dist: 'dist',
-  distKarma: 'dist-karma'
+  distTest: 'dist-test'
 };
 
 const outSubDir = {
   production: 'prod',
-  development: 'dev'
+  development: 'dev',
+  testSpec: 'spec',
+  testHelpers: 'helpers'
 };
+
+const testBundleName = 'spec-bundle';
+const testConfigFileName = 'test.config.js';
 
 const jsFilename = {
   production: '[name]-[contenthash].min.js',
@@ -74,6 +79,8 @@ module.exports = {
   mode: mode,
   outDir: outDir,
   outSubDir: outSubDir,
+  testBundleName: testBundleName,
+  testConfigFileName: testConfigFileName,
   fileListName: 'file-list',
   jsFilename: jsFilename,
   cssFilename: cssFilename,

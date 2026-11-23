@@ -101,7 +101,6 @@
 
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>
-    <module>../karma-jasmine-scout</module>
     <module>../eclipse-scout-releng</module>
     <module>../eclipse-scout-migrate</module>
     <module>../eclipse-scout-tsconfig</module>
@@ -615,11 +614,6 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>eslint-config</artifactId>
-        <version>27.1-SNAPSHOT</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.rt</groupId>
-        <artifactId>karma-jasmine-scout</artifactId>
         <version>27.1-SNAPSHOT</version>
       </dependency>
       <dependency>

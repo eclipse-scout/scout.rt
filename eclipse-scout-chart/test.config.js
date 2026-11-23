@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,5 +7,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-let context = require.context('./', true, /[sS]pec\.js$/);
-context.keys().forEach(context);
+const baseConfig = require('@eclipse-scout/cli/scripts/test-defaults');
+
+module.exports = (config, specEntryPoint) => {
+  baseConfig(config, specEntryPoint);
+};

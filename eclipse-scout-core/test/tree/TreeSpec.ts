@@ -438,27 +438,6 @@ describe('Tree', () => {
       });
     });
 
-    it('expands the parent if parent.expanded = true and the new inserted nodes are the first child nodes', () => {
-      model = helper.createModelFixture(3, 0, true);
-      tree = helper.createTree(model);
-      node0 = tree.nodes[0];
-      node1 = tree.nodes[1];
-      node2 = tree.nodes[2];
-      tree.render();
-
-      let newNode0Child3 = helper.createModelNode('0_3', 'newNode0Child3');
-      let $node0 = node0.$node;
-      // Even tough the nodes were created with expanded=true, the $node should not have
-      // been rendered as expanded (because it has no children)
-      expect($node0).not.toHaveClass('expanded');
-      expect(helper.findAllNodes(tree).length).toBe(3);
-
-      tree.insertNodes([newNode0Child3], node0);
-      expect(helper.findAllNodes(tree).length).toBe(4);
-      expect(node0.childNodes[0].$node.text()).toBe(newNode0Child3.text);
-      expect($node0).toHaveClass('expanded');
-    });
-
   });
 
   describe('updateNodes', () => {

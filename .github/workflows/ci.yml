@@ -21,7 +21,7 @@ jobs:
           fail_on_failure: true
           report_paths: |
             **/target/surefire-reports/TEST-*.xml
-            **/target/karma-reports/**/test-results.xml
+            **/target/npm-test-reports/test-results.xml
           check_name: |
             JUnit tests
             Jasmine tests

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -8,9 +8,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {Form, HybridActionContextElement, HybridActionContextElements, Tree, TreeNode} from '../../../src';
+import {Form, HybridActionContextElement, Tree, TreeNode} from '../../../src';
 
-describe('HybridActionContextElements', () => {
+describe('HybridActionContextElement', () => {
   let session: SandboxSession;
 
   beforeEach(() => {

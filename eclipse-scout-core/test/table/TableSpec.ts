@@ -636,6 +636,74 @@ describe('Table', () => {
       });
       table.updateRowOrder([row2, row1, row0]);
     });
+
+    it('correct DOM order for newly inserted rows', () => {
+      table.render();
+      expect(table.rows.length).toBe(3);
+      let newRows = [helper.createModelRow(null, helper.createModelCells(2)), helper.createModelRow(null, helper.createModelCells(2))];
+
+      // Insert new rows and switch rows 0 and 1
+      table.insertRows(newRows);
+      let orderedRows = [table.rows[1], table.rows[0], table.rows[3], table.rows[4], table.rows[2]];
+      table.updateRowOrder(orderedRows);
+
+      // Check if rows were inserted
+      expect(table.rows.length).toBe(5);
+
+      // Check if order in the DOM is correct
+      // Note: in a previous version of this test we checked if an animation was playing for certain DOM nodes,
+      // but we must disable jQuery animations completely during test execution, otherwise test will fail, since
+      // the complete/done function is scheduled and executed to a time when the test that started the animation
+      // is already finished. So this will lead to unpredictable failures.
+      let uiOrderedRows = [],
+        $row;
+      table.$rows().each(function() {
+        $row = $(this);
+        uiOrderedRows.push($row.data('row'));
+      });
+      expect(orderedRows).toEqual(uiOrderedRows);
+    });
+
+    it('removes the cell tooltip', () => {
+      expect(table.rows.length).toBe(3);
+
+      table.rows[0].cells[0].tooltipText = 'My Tooltip';
+      table.render();
+
+      let tooltipSupport = table.$data.data('tooltipSupport');
+      expect(tooltipSupport).toBeTruthy();
+      expect(tooltipSupport.tooltip).toBe(null);
+
+      JQueryTesting.triggerMouseEnter(table.rows[0].$row.find('.table-cell').eq(0));
+      jasmine.clock().tick(2000);
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
+
+      // Set a new order -> rows are re-created and the tooltip is closed
+      let $firstRow = table.rows[0].$row;
+      table.updateRowOrder([table.rows[2], table.rows[1], table.rows[0]]);
+
+      expect(table.rows.length).toBe(3);
+      expect(table.rows[0].$row[0]).not.toBe($firstRow[0]);
+      expect(table.rows[2].$row[0]).not.toBe($firstRow[0]);
+      expect(tooltipSupport.tooltip).toBeFalsy();
+
+      // -----
+
+      JQueryTesting.triggerMouseEnter(table.rows[2].$row.find('.table-cell').eq(0));
+      jasmine.clock().tick(2000);
+      expect(tooltipSupport.tooltip).toBeTruthy();
+      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
+
+      // Set the same order -> should still re-create the rows (because e.g. aggregated rows have changed) and therefore close the tooltip
+      $firstRow = table.rows[0].$row;
+      table.updateRowOrder([table.rows[0], table.rows[1], table.rows[2]]);
+
+      expect(table.rows.length).toBe(3);
+      expect(table.rows[0].$row[0]).not.toBe($firstRow[0]);
+      expect(table.rows[2].$row[0]).not.toBe($firstRow[0]);
+      expect(tooltipSupport.tooltip).toBeFalsy();
+    });
   });
 
   describe('checkRow', () => {
@@ -2731,86 +2799,6 @@ describe('Table', () => {
       expect($cells0.eq(2).text()).toBe('0_0');
     });
 
-  });
-
-  describe('updateRowOrder', () => {
-    let model, table, row0, row1, row2;
-
-    beforeEach(() => {
-      model = helper.createModelFixture(2, 3);
-      table = helper.createTable(model);
-      row0 = model.rows[0];
-      row1 = model.rows[1];
-      row2 = model.rows[2];
-    });
-
-    it('correct DOM order for newly inserted rows', () => {
-      table.render();
-      expect(table.rows.length).toBe(3);
-      let newRows = [helper.createModelRow(null, helper.createModelCells(2)), helper.createModelRow(null, helper.createModelCells(2))];
-
-      // Insert new rows and switch rows 0 and 1
-      table.insertRows(newRows);
-      let orderedRows = [table.rows[1], table.rows[0], table.rows[3], table.rows[4], table.rows[2]];
-      table.updateRowOrder(orderedRows);
-
-      // Check if rows were inserted
-      expect(table.rows.length).toBe(5);
-
-      // Check if order in the DOM is correct
-      // Note: in a previous version of this test we checked if an animation was playing for certain DOM nodes,
-      // but we must disable jQuery animations completely during test execution, otherwise test will fail, since
-      // the complete/done function is scheduled and executed to a time when the test that started the animation
-      // is already finished. So this will lead to unpredictable failures.
-      let uiOrderedRows = [],
-        $row;
-      table.$rows().each(function() {
-        $row = $(this);
-        uiOrderedRows.push($row.data('row'));
-      });
-      expect(orderedRows).toEqual(uiOrderedRows);
-    });
-
-    it('removes the cell tooltip', () => {
-      expect(table.rows.length).toBe(3);
-
-      table.rows[0].cells[0].tooltipText = 'My Tooltip';
-      table.render();
-
-      let tooltipSupport = table.$data.data('tooltipSupport');
-      expect(tooltipSupport).toBeTruthy();
-      expect(tooltipSupport.tooltip).toBe(null);
-
-      JQueryTesting.triggerMouseEnter(table.rows[0].$row.find('.table-cell').eq(0));
-      jasmine.clock().tick(2000);
-      expect(tooltipSupport.tooltip).toBeTruthy();
-      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
-
-      // Set a new order -> rows are re-created and the tooltip is closed
-      let $firstRow = table.rows[0].$row;
-      table.updateRowOrder([table.rows[2], table.rows[1], table.rows[0]]);
-
-      expect(table.rows.length).toBe(3);
-      expect(table.rows[0].$row[0]).not.toBe($firstRow[0]);
-      expect(table.rows[2].$row[0]).not.toBe($firstRow[0]);
-      expect(tooltipSupport.tooltip).toBeFalsy();
-
-      // -----
-
-      JQueryTesting.triggerMouseEnter(table.rows[2].$row.find('.table-cell').eq(0));
-      jasmine.clock().tick(2000);
-      expect(tooltipSupport.tooltip).toBeTruthy();
-      expect(tooltipSupport.tooltip.text).toBe('My Tooltip');
-
-      // Set the same order -> should still re-create the rows (because e.g. aggregated rows have changed) and therefore close the tooltip
-      $firstRow = table.rows[0].$row;
-      table.updateRowOrder([table.rows[0], table.rows[1], table.rows[2]]);
-
-      expect(table.rows.length).toBe(3);
-      expect(table.rows[0].$row[0]).not.toBe($firstRow[0]);
-      expect(table.rows[2].$row[0]).not.toBe($firstRow[0]);
-      expect(tooltipSupport.tooltip).toBeFalsy();
-    });
   });
 
   describe('initColumns', () => {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -10,7 +10,7 @@
 import {DateField, GroupBox, GroupBoxGridConfig, HorizontalGrid, Menu, scout, SmartField, StringField} from '../../../../src/index';
 import {CloneSpecHelper, FormSpecHelper} from '../../../../src/testing/index';
 
-describe('GroupBox', () => {
+describe('GroupBoxClone', () => {
   let session: SandboxSession;
   let helper: FormSpecHelper;
   let cloneHelper: CloneSpecHelper;
