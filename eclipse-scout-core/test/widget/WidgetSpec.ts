@@ -30,6 +30,10 @@ describe('Widget', () => {
     override _remove() {
       super._remove();
     }
+
+    override _addChild(child: Widget) {
+      super._addChild(child);
+    }
   }
 
   class SubTestWidget extends TestWidget {
@@ -1092,6 +1096,63 @@ describe('Widget', () => {
       expect(child.parent).toBe(another);
       expect(child.owner).toBe(another);
       expect(widget.children.length).toBe(0);
+    });
+
+    it('does not relink a child that was destroyed while its parent change was pending', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      let another = createWidget({
+        parent: parent
+      });
+      let newParent = createWidget({
+        parent: parent
+      });
+      let child = createWidget({
+        parent: widget,
+        owner: another
+      });
+
+      // Parent change is deferred while the removal of the old parent is pending
+      widget.removalPending = true;
+      child.setParent(newParent);
+      expect(child.parent).toBe(widget);
+
+      // Child is destroyed before the removal of the old parent finishes
+      child.destroy();
+      expect(child.destroyed).toBe(true);
+      expect(child.owner).toBe(null);
+
+      // Removal finishes -> deferred parent change must not link the destroyed child to the new parent
+      widget.removalPending = false;
+      widget.trigger('remove');
+      expect(child.parent).toBe(null);
+      expect(newParent.children.length).toBe(0);
+
+      // Destroying the new parent must not fail
+      expect(() => newParent.destroy()).not.toThrow();
+      expect(newParent.destroyed).toBe(true);
+    });
+
+    it('does not relink foreign children that are already destroyed', () => {
+      let widget = createWidget({
+        parent: parent
+      });
+      let another = createWidget({
+        parent: parent
+      });
+      let child = createWidget({
+        parent: widget,
+        owner: another
+      });
+      child.destroy();
+      // Simulate a stale link of the destroyed child
+      widget._addChild(child);
+
+      // Would throw in setParent because child.owner is null
+      expect(() => widget.destroy()).not.toThrow();
+      expect(widget.destroyed).toBe(true);
+      expect(child.parent).toBe(null);
     });
   });
 
