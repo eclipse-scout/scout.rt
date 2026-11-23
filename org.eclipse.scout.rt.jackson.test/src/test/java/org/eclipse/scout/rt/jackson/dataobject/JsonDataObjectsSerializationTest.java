@@ -35,6 +35,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -1941,6 +1942,132 @@ public class JsonDataObjectsSerializationTest {
 
     TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
     assertEqualsWithComparisonFailure(mapDo, marshalled);
+  }
+
+  /**
+   * Asserts order of elements of a DoValue-Map attribute retain their order by serialization/deserialization.
+   * NOTE: Attributes are serialized in-order according to LinkedHashMap's iterator. Correct deserialization is a "side effect"
+   * of Jackson using {@link LinkedHashMap} as default map implementation when deserializing a DoValue-Map attribute.
+   */
+  @Test
+  public void testSerializeDeserialize_MapAttributeOrder() throws Exception {
+    Map<String, TestItemDo> map = new LinkedHashMap<>();
+    map.put("003", BEANS.get(TestItemDo.class).withId("three"));
+    map.put("002", BEANS.get(TestItemDo.class).withId("two"));
+    map.put("001", BEANS.get(TestItemDo.class).withId("one"));
+
+    TestMapDo item = BEANS.get(TestMapDo.class).withStringDoTestItemMapAttribute(map);
+    String json = s_dataObjectMapper.writeValueAsString(item);
+    System.out.println(json);
+    assertJsonEquals("TestMapDoAttributeOrder.json", json);
+
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+    assertEqualsWithComparisonFailure(item, marshalled);
+    assertTrue(marshalled.getStringDoTestItemMapAttribute() instanceof LinkedHashMap);
+    assertEquals(List.of("three", "two", "one"), marshalled.getStringDoTestItemMapAttribute().values().stream().map(TestItemDo::getId).toList());
+  }
+
+  /**
+   * Asserts order of elements of a DoValue-LinkedHashMap attribute retain their order by serialization/deserialization.
+   * NOTE: Attributes are serialized in-order according to LinkedHashMap's iterator. Deserialization reads attributes
+   * in order they appear in the JSON document and adds them to the {@link LinkedHashMap}.
+   */
+  @Test
+  public void testSerializeDeserialize_TestMapDoLinkedHashMap() throws Exception {
+    LinkedHashMap<FixtureUuId, TestItemDo> map = new LinkedHashMap<>();
+    map.put(FixtureUuId.of("4f42ca50-04d3-449f-a03a-02251e92865c"), BEANS.get(TestItemDo.class).withId("one"));
+    map.put(FixtureUuId.of("afcc72f6-8c99-4523-9157-92dbc313e205"), BEANS.get(TestItemDo.class).withId("two"));
+    map.put(FixtureUuId.of("22ffac92-cf04-4dd1-8b8b-81528ea74348"), BEANS.get(TestItemDo.class).withId("three"));
+
+    TestMapDo item = BEANS.get(TestMapDo.class).withFixtureUuidTestItemDoLinkedMapAttribute(map);
+    String json = s_dataObjectMapper.writeValueAsString(item);
+    assertJsonEquals("TestMapDoLinkedHashMap.json", json);
+
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+    assertEqualsWithComparisonFailure(item, marshalled);
+    assertTrue(marshalled.getFixtureUuidTestItemDoLinkedMapAttribute() instanceof LinkedHashMap);
+    assertEquals(List.of("one", "two", "three"), marshalled.getFixtureUuidTestItemDoLinkedMapAttribute().values().stream().map(TestItemDo::getId).toList());
+  }
+
+  /**
+   * Asserts order of elements of a DoValue-TreeMap attribute (natural order) retain their order by serialization/deserialization.
+   * NOTE: Attributes are serialized in-order according to TreeMap's iterator. Deserialization reads attributes
+   * in order they appear in the JSON document and adds them to the {@link TreeMap} (which would sort them again).
+   */
+  @Test
+  public void testSerializeDeserialize_TestMapDoTreeMap() throws Exception {
+    TreeMap<FixtureUuId, TestItemDo> map = new TreeMap<>();
+    map.put(FixtureUuId.of("cccccccc-04d3-449f-a03a-02251e92865c"), BEANS.get(TestItemDo.class).withId("one"));
+    map.put(FixtureUuId.of("bbbbbbbb-8c99-4523-9157-92dbc313e205"), BEANS.get(TestItemDo.class).withId("two"));
+    map.put(FixtureUuId.of("aaaaaaaa-cf04-4dd1-8b8b-81528ea74348"), BEANS.get(TestItemDo.class).withId("three"));
+
+    TestMapDo item = BEANS.get(TestMapDo.class).withFixtureUuidTestItemDoTreeMapAttribute(map);
+    String json = s_dataObjectMapper.writeValueAsString(item);
+    assertJsonEquals("TestMapDoTreeMap.json", json);
+    assertReadTestMapDoTreeMap(json, item);
+
+    // Assert order remains the same if input JSON is not ordered
+    json = readResourceAsString("TestMapDoTreeMapUnsorted.json");
+    assertReadTestMapDoTreeMap(json, item);
+  }
+
+  protected void assertReadTestMapDoTreeMap(String json, TestMapDo item) throws JsonProcessingException {
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+    assertEqualsWithComparisonFailure(item, marshalled);
+    assertTrue(marshalled.getFixtureUuidTestItemDoTreeMapAttribute() instanceof TreeMap);
+    assertEquals(List.of("three", "two", "one"), marshalled.getFixtureUuidTestItemDoTreeMapAttribute().values().stream().map(TestItemDo::getId).toList());
+  }
+
+  /**
+   * Asserts Jackson's behavior when deserializing an empty JSON object into a property
+   * declared as {@link Map}. Jackson currently materializes a {@link LinkedHashMap}.
+   */
+  @Test
+  public void testSerializeDeserialize_EmptyMapAttribute() throws Exception {
+    TestMapDo item = BEANS.get(TestMapDo.class).withStringDoTestItemMapAttribute(new HashMap<>());
+    String json = s_dataObjectMapper.writeValueAsString(item);
+
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+
+    assertNotNull(marshalled.getStringDoTestItemMapAttribute());
+    assertTrue(marshalled.getStringDoTestItemMapAttribute() instanceof LinkedHashMap);
+    assertTrue(marshalled.getStringDoTestItemMapAttribute().isEmpty());
+
+    assertEqualsWithComparisonFailure(item, marshalled);
+  }
+
+  /**
+   * Asserts that the declared {@link LinkedHashMap} type is preserved even when the serialized JSON object contains no entries.
+   */
+  @Test
+  public void testSerializeDeserialize_EmptyLinkedHashMap() throws Exception {
+    TestMapDo item = BEANS.get(TestMapDo.class).withFixtureUuidTestItemDoLinkedMapAttribute(new LinkedHashMap<>());
+    String json = s_dataObjectMapper.writeValueAsString(item);
+
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+
+    assertNotNull(marshalled.getFixtureUuidTestItemDoLinkedMapAttribute());
+    assertTrue(marshalled.getFixtureUuidTestItemDoLinkedMapAttribute() instanceof LinkedHashMap);
+    assertTrue(marshalled.getFixtureUuidTestItemDoLinkedMapAttribute().isEmpty());
+
+    assertEqualsWithComparisonFailure(item, marshalled);
+  }
+
+  /**
+   * Asserts that the declared {@link TreeMap} type is preserved even when the serialized JSON object contains no entries.
+   */
+  @Test
+  public void testSerializeDeserialize_EmptyTreeMap() throws Exception {
+    TestMapDo item = BEANS.get(TestMapDo.class).withFixtureUuidTestItemDoTreeMapAttribute(new TreeMap<>());
+    String json = s_dataObjectMapper.writeValueAsString(item);
+
+    TestMapDo marshalled = s_dataObjectMapper.readValue(json, TestMapDo.class);
+
+    assertNotNull(marshalled.getFixtureUuidTestItemDoTreeMapAttribute());
+    assertTrue(marshalled.getFixtureUuidTestItemDoTreeMapAttribute() instanceof TreeMap);
+    assertTrue(marshalled.getFixtureUuidTestItemDoTreeMapAttribute().isEmpty());
+
+    assertEqualsWithComparisonFailure(item, marshalled);
   }
 
   /**

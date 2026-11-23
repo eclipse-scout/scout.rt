@@ -1,0 +1,17 @@
+{
+  "_type" : "TestMap",
+  "stringDoTestItemMapAttribute" : {
+    "003" : {
+      "_type" : "TestItem",
+      "id" : "three"
+    },
+    "002" : {
+      "_type" : "TestItem",
+      "id" : "two"
+    },
+    "001" : {
+      "_type" : "TestItem",
+      "id" : "one"
+    }
+  }
+}

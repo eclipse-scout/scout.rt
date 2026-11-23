@@ -10,9 +10,11 @@
 package org.eclipse.scout.rt.jackson.dataobject.fixture;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import jakarta.annotation.Generated;
@@ -21,6 +23,7 @@ import org.eclipse.scout.rt.dataobject.DoEntity;
 import org.eclipse.scout.rt.dataobject.DoValue;
 import org.eclipse.scout.rt.dataobject.IDoEntity;
 import org.eclipse.scout.rt.dataobject.TypeName;
+import org.eclipse.scout.rt.dataobject.fixture.FixtureUuId;
 
 @TypeName("TestMap")
 public class TestMapDo extends DoEntity {
@@ -73,6 +76,14 @@ public class TestMapDo extends DoEntity {
   // testing a more complex scenario for value serializer determined in DoEntitySerializer#serializeMap
   public DoValue<Map<String, Map<String, List<TestItemDo>>>> stringMapStringMapStringListTestItemDoMapAttribute() {
     return doValue("stringMapStringMapStringListTestItemDoMapAttribute");
+  }
+
+  public DoValue<LinkedHashMap<FixtureUuId, TestItemDo>> fixtureUuidTestItemDoLinkedMapAttribute() {
+    return doValue("fixtureUuidTestItemDoLinkedMapAttribute");
+  }
+
+  public DoValue<TreeMap<FixtureUuId, TestItemDo>> fixtureUuidTestItemDoTreeMapAttribute() {
+    return doValue("fixtureUuidTestItemDoTreeMapAttribute");
   }
 
   /* **************************************************************************
@@ -209,5 +220,27 @@ public class TestMapDo extends DoEntity {
   @Generated("DoConvenienceMethodsGenerator")
   public Map<String, Map<String, List<TestItemDo>>> getStringMapStringMapStringListTestItemDoMapAttribute() {
     return stringMapStringMapStringListTestItemDoMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withFixtureUuidTestItemDoLinkedMapAttribute(LinkedHashMap<FixtureUuId, TestItemDo> fixtureUuidTestItemDoLinkedMapAttribute) {
+    fixtureUuidTestItemDoLinkedMapAttribute().set(fixtureUuidTestItemDoLinkedMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public LinkedHashMap<FixtureUuId, TestItemDo> getFixtureUuidTestItemDoLinkedMapAttribute() {
+    return fixtureUuidTestItemDoLinkedMapAttribute().get();
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TestMapDo withFixtureUuidTestItemDoTreeMapAttribute(TreeMap<FixtureUuId, TestItemDo> fixtureUuidTestItemDoTreeMapAttribute) {
+    fixtureUuidTestItemDoTreeMapAttribute().set(fixtureUuidTestItemDoTreeMapAttribute);
+    return this;
+  }
+
+  @Generated("DoConvenienceMethodsGenerator")
+  public TreeMap<FixtureUuId, TestItemDo> getFixtureUuidTestItemDoTreeMapAttribute() {
+    return fixtureUuidTestItemDoTreeMapAttribute().get();
   }
 }
