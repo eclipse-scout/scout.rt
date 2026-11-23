@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -234,14 +234,31 @@ public final class BinaryResourceUrlUtility {
     return attachment == null ? null : new BinaryResourceHolder(attachment);
   }
 
+  /**
+   * Returns the given data as {@link BinaryResource} with a filename.
+   * <ul>
+   * <li>If the data is of type {@link BinaryResource}, it is returned unchanged. If the binary resource has no filename,
+   * a dummy filename is generated from the given parameters and the content's fingerprint. If the binary resource has no
+   * filename and no content, {@code null} is returned.
+   * <li>If the data is of type {@code byte[]}, a new {@link BinaryResource} is created with this content. The filename is
+   * generated from the given parameters and the content's fingerprint.
+   * <li>Otherwise, {@code null} is returned.
+   * </ul>
+   */
   public static BinaryResource extractBinaryResource(Object raw, String prefix, String fileExtension) {
-    if (raw instanceof BinaryResource) {
-      return (BinaryResource) raw;
+    if (raw instanceof BinaryResource binaryResource) {
+      if (binaryResource.hasFilename()) {
+        return binaryResource;
+      }
+      if (binaryResource.getContent() == null) {
+        return null;
+      }
+      return binaryResource.createAlias(join("-", prefix, binaryResource.getFingerprint(), binaryResource.getContentLength()) + "." + fileExtension);
     }
-    if (raw instanceof byte[]) {
+    if (raw instanceof byte[] content) {
       Adler32 crc = new Adler32();
-      crc.update((byte[]) raw);
-      return new BinaryResource(join("-", prefix, crc.getValue(), ((byte[]) raw).length) + "." + fileExtension, (byte[]) raw);
+      crc.update(content);
+      return new BinaryResource(join("-", prefix, crc.getValue(), content.length) + "." + fileExtension, content);
     }
     return null;
   }
