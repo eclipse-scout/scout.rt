@@ -30,17 +30,20 @@ public class ConnectionErrorDetector {
       return true;
     }
     String simpleName = t.getClass().getSimpleName();
-    return "EofException".equalsIgnoreCase(simpleName)
-        || "ClientAbortException".equalsIgnoreCase(simpleName)
-        || "IOException".equalsIgnoreCase(simpleName)
-        || "H2StreamResetException".equalsIgnoreCase(simpleName)
-        || "ConnectionClosedException".equalsIgnoreCase(simpleName);
+    return "EofException".equalsIgnoreCase(simpleName) // org.eclipse.jetty.io.EofException
+        || "EOFException".equalsIgnoreCase(simpleName) // java.io.EOFException
+        || "HttpEofException".equalsIgnoreCase(simpleName) // org.eclipse.jetty.server.internal.HttpConnection.HttpEofException
+        || "ClientAbortException".equalsIgnoreCase(simpleName) // org.apache.catalina.connector.ClientAbortException
+        || "IOException".equalsIgnoreCase(simpleName) // java.io.IOException
+        || "H2StreamResetException".equalsIgnoreCase(simpleName) // org.apache.hc.core5.http2.H2StreamResetException
+        || "ConnectionClosedException".equalsIgnoreCase(simpleName); // org.apache.http.ConnectionClosedException
   }
 
   protected boolean isConnectionErrorMessage(Throwable t) {
     String message = t.getMessage();
     return message == null
         || StringUtility.containsStringIgnoreCase(message, "reset")
+        || StringUtility.containsStringIgnoreCase(message, "Early EOF")
         || StringUtility.containsStringIgnoreCase(message, "Closed")
         || StringUtility.containsStringIgnoreCase(message, "connection was aborted")
         || StringUtility.containsStringIgnoreCase(message, "cancel_stream_error")

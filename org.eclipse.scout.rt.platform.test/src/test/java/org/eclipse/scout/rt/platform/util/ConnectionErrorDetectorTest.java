@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.platform.util;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.io.Serial;
@@ -49,6 +50,14 @@ public class ConnectionErrorDetectorTest {
     parametersList.add(new ExceptionTestParameter(new EofException("cancel_stream_error"), true));
     parametersList.add(new ExceptionTestParameter(new EofException("unknown error"), false));
     parametersList.add(new ExceptionTestParameter(new EofException("reset"), true));
+    parametersList.add(new ExceptionTestParameter(new EofException("Early EOF"), true));
+
+    parametersList.add(new ExceptionTestParameter(new EOFException(CONNECTION_RESET_MESSAGE), true));
+    parametersList.add(new ExceptionTestParameter(new EOFException(BROKEN_PIPE_MESSAGE), true));
+    parametersList.add(new ExceptionTestParameter(new EOFException("cancel_stream_error"), true));
+    parametersList.add(new ExceptionTestParameter(new EOFException("unknown error"), false));
+    parametersList.add(new ExceptionTestParameter(new EOFException("reset"), true));
+    parametersList.add(new ExceptionTestParameter(new EOFException("Early EOF"), true));
 
     parametersList.add(new ExceptionTestParameter(new ClientAbortException(CONNECTION_RESET_MESSAGE), true));
     parametersList.add(new ExceptionTestParameter(new ClientAbortException(BROKEN_PIPE_MESSAGE), true));
