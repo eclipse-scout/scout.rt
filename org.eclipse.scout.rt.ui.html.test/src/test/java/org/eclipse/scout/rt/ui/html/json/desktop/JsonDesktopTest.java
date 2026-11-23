@@ -45,6 +45,7 @@ import org.eclipse.scout.rt.ui.html.json.form.JsonForm;
 import org.eclipse.scout.rt.ui.html.json.form.fixtures.FormWithOneField;
 import org.eclipse.scout.rt.ui.html.json.menu.JsonMenu;
 import org.eclipse.scout.rt.ui.html.json.testing.JsonTestUtility;
+import org.eclipse.scout.rt.ui.html.res.BinaryResourceHolder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -322,15 +323,29 @@ public class JsonDesktopTest {
     JsonDesktop<IDesktop> jsonDesktop = createJsonDesktop(desktop);
     jsonDesktop.handleModelOpenUri(new BinaryResource("foo.txt", null), OpenUriAction.DOWNLOAD);
     jsonDesktop.handleModelOpenUri(new BinaryResource("TP6 ARL ; Zulassung (UVV) - Bearbeitung elektr. Fax-Eingang [-8874 , ABC-Prüfbericht] (1).pdf", null), OpenUriAction.DOWNLOAD);
+    jsonDesktop.handleModelOpenUri(new BinaryResource("50% a\\b.txt", null), OpenUriAction.DOWNLOAD);
+    jsonDesktop.handleModelOpenUri(new BinaryResource("tab\there\nnew\u007Fline.txt", null), OpenUriAction.DOWNLOAD);
+    jsonDesktop.handleModelOpenUri(new BinaryResource("//leading//a/;/b.txt", null), OpenUriAction.DOWNLOAD);
     List<JsonEvent> events = JsonTestUtility.extractEventsFromResponse(m_uiSession.currentJsonResponse(), "openUri");
-    JSONObject[] data = new JSONObject[2];
+    JSONObject[] data = new JSONObject[5];
     data[0] = events.get(0).getData();
     data[1] = events.get(1).getData();
+    data[2] = events.get(2).getData();
+    data[3] = events.get(3).getData();
+    data[4] = events.get(4).getData();
     assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/0/foo.txt", data[0].getString("uri")); // counter = 0 first for test run
     assertEquals("dynamic/" + m_uiSession.getUiSessionId()
         + "/2/1/TP6%20ARL%20%20Zulassung%20%28UVV%29%20-%20Bearbeitung%20elektr.%20Fax-Eingang%20%5B-8874%20%2C%20ABC-Pr%C3%BCfbericht%5D%20%281%29.pdf", data[1].getString("uri")); // counter = 1 second for test run
     assertEquals("download", data[0].getString("action"));
     assertEquals("download", data[1].getString("action"));
+    assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/2/50_%20a_b.txt", data[2].getString("uri"));
+    assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/3/tabherenewline.txt", data[3].getString("uri"));
+    assertEquals("dynamic/" + m_uiSession.getUiSessionId() + "/2/4/leading/a/b.txt", data[4].getString("uri"));
+
+    // original filename is kept for the download (Content-Disposition)
+    BinaryResourceHolder holder = jsonDesktop.provideBinaryResource("2/50_ a_b.txt");
+    assertNotNull(holder);
+    assertEquals("50% a\\b.txt", holder.get().getFilename());
 
     // cleanup
     Jobs.getJobManager().cancel(Jobs.newFutureFilterBuilder()

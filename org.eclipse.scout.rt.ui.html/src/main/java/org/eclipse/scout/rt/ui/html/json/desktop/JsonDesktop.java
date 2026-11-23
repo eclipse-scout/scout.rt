@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.regex.Pattern;
 
 import org.eclipse.scout.rt.client.job.ModelJobs;
 import org.eclipse.scout.rt.client.ui.IDisplayParent;
@@ -77,6 +78,8 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
   public static final String PROP_BENCH_LAYOUT_DATA = IDesktop.PROP_BENCH_LAYOUT_DATA;
 
   private static final AtomicLong RESOURCE_COUNTER = new AtomicLong();
+  private static final Pattern CONTROL_CHARACTERS = Pattern.compile("[\\x00-\\x1F\\x7F]");
+  private static final Pattern MULTIPLE_SLASHES = Pattern.compile("/{2,}");
 
   private final DownloadHandlerStorage m_downloads;
   private DesktopListener m_desktopListener;
@@ -510,10 +513,26 @@ public class JsonDesktop<DESKTOP extends IDesktop> extends AbstractJsonWidget<DE
    * - <a href="https://serverfault.com/questions/874726/apache-decoding-semicolon-mod-proxy">ServerFault</a>
    * - <a href=
    * "https://security.stackexchange.com/questions/251723/semicolons-relation-with-reverse-proxy">StackExchange</a>
+   *
+   * Percent (%25) and backslash (%5C) are replaced as well: they are rejected by default by servlet containers like
+   * Jetty 12 (ambiguous path encoding / suspicious path character). This only affects the URL, the original filename
+   * is still used for the Content-Disposition header of downloads. Control characters (0x00-0x1F) and DEL (0x7F) are
+   * removed for the same reason.
+   *
+   * Leading slashes are removed and multiple consecutive slashes are collapsed into one: empty path segments (//) are
+   * rejected by Jetty 12 as well (ambiguous empty segment).
    * </pre>
    */
   protected String cleanFilename(String fileName) {
-    return StringUtility.replace(fileName, ";", "");
+    if (fileName == null) {
+      return null;
+    }
+    String cleaned = StringUtility.replace(fileName, ";", "");
+    cleaned = StringUtility.replace(cleaned, "%", "_");
+    cleaned = StringUtility.replace(cleaned, "\\", "_");
+    cleaned = CONTROL_CHARACTERS.matcher(cleaned).replaceAll("");
+    cleaned = MULTIPLE_SLASHES.matcher(cleaned).replaceAll("/");
+    return StringUtility.removePrefixes(cleaned, "/");
   }
 
   @Override

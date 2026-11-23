@@ -129,19 +129,18 @@ public class DownloadResponseHelperTest {
 
   @Test
   public void testContentDispositionResponseHeaderControlCharacters() {
-    String s = "test";
+    StringBuilder s = new StringBuilder("test");
     for (int i = 0x00; i <= 0x1F; i++) {
-      s = s + new String(new byte[]{(byte) i}, StandardCharsets.ISO_8859_1);
+      s.append(new String(new byte[]{(byte) i}, StandardCharsets.ISO_8859_1));
     }
-    s = s + ".pdf";
-    Assert.assertEquals("test.pdf".length() + 32, s.length());
-    Map<String, String> actual = new DownloadResponseHelper().getDownloadHeaders(s);
+    s.append("\u007F.pdf");
+    Assert.assertEquals("test.pdf".length() + 33, s.length());
+    Map<String, String> actual = new DownloadResponseHelper().getDownloadHeaders(s.toString());
 
     assertThat(actual, is(getExpectedHeaders("attachment; filename=\""
         + "test.pdf"
         + "\"; filename*=utf-8''"
-        + "test.pdf"
-        + "")));
+        + "test.pdf")));
   }
 
   protected Map<String, String> getExpectedHeaders(String expectedContentDispositionHeader) {
