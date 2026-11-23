@@ -75,10 +75,11 @@ public class DownloadResponseHelper {
    * @return Returns the constructed header value.
    */
   public String getContentDispositionHeaderValue(String originalFilename) {
-    // Internet Explorer 11 cannot parse names with characters 0x00-0x1F, neither in filename= nor encoded in filename*=
-    // Note: 0x00-0x1F are the same in UTF-16 and ISO-8859-1, thus replacing them here is safe.
+    // Control characters are invalid in HTTP field values (RFC 9110, section 5.5).
+    // Jetty drops HTTP/2 responses containing control characters (except tab) in a header value.
+    // Note: 0x00-0x1F and 0x7F are the same in UTF-16 and ISO-8859-1, thus replacing them here is safe.
     if (originalFilename != null) {
-      originalFilename = originalFilename.replaceAll("[\\x00-\\x1F]", "");
+      originalFilename = originalFilename.replaceAll("[\\x00-\\x1F\\x7F]", "");
     }
 
     if (StringUtility.isNullOrEmpty(originalFilename)) {
