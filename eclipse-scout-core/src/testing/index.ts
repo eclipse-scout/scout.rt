@@ -49,6 +49,8 @@ export * from './form/SpecLifecycle';
 export * from './form/SpecRadioButtonGroup';
 export * from './jqueryExtensions-types';
 export * from './scoutMatchers';
+export * from './jqueryMatchers';
+export * from './specFixtures';
 export * from './table/SpecTable';
 export * from './table/SpecTableAdapter';
 export * from './tree/SpecTree';

@@ -21,7 +21,6 @@ describe('App', () => {
   });
 
   beforeEach(() => {
-    // @ts-expect-error
     setFixtures(sandbox().addClass('scout'));
   });
 

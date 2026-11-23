@@ -11,8 +11,7 @@ import {
   AbortError, AdapterData, AjaxError, App, arrays, Deferred, Desktop, FullModelOf, HtmlEnvironment, InitModelOf, JsonErrorResponse, ModelAdapter, ModelOf, ObjectIdProvider, PermissionCollectionType, RemoteEvent, RemoteRequest,
   RemoteResponse, scout, Session, SessionStartupResponse, uiNotifications, uiPreferences, Widget, WidgetModel
 } from '../index';
-import {jasmineScoutMatchers, JasmineScoutUtil, LocaleSpecHelper, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
-import 'jasmine-jquery';
+import {jasmineScoutMatchers, JasmineScoutUtil, jqueryEqualityTester, jqueryMatchers, LocaleSpecHelper, specFixtures, SpecUiPreferencesStore, TestingApp, UiNotificationsMock} from './index';
 import $ from 'jquery';
 
 declare global {
@@ -182,7 +181,7 @@ window.mostRecentJsonRequest = () => {
 };
 
 window.sandboxDesktop = () => {
-  let $sandbox = sandbox() as unknown as JQuery;
+  let $sandbox = sandbox();
   $sandbox.addClass('scout desktop');
   return $sandbox;
 };
@@ -264,7 +263,9 @@ export const JasmineScout = {
     });
 
     beforeEach(() => {
+      jasmine.addMatchers(jqueryMatchers);
       jasmine.addMatchers(jasmineScoutMatchers);
+      jasmine.addCustomEqualityTester(jqueryEqualityTester);
       SpecUiPreferencesStore.install();
     });
 
@@ -290,6 +291,7 @@ export const JasmineScout = {
       uiNotifications.tearDown();
       uiPreferences.tearDown();
       SpecUiPreferencesStore.uninstall();
+      specFixtures.cleanUp();
     });
 
     context.keys().forEach(context);

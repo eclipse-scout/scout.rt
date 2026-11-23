@@ -16,7 +16,6 @@ describe('RemoteApp', () => {
   let originalApp = App.get();
 
   beforeEach(() => {
-    // @ts-expect-error
     setFixtures(sandbox().addClass('scout'));
     session = sandboxSession({
       renderDesktop: false
