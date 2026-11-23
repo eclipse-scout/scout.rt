@@ -1,12 +1,3 @@
-/*
- * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
- *
- * This program and the accompanying materials are made
- * available under the terms of the Eclipse Public License 2.0
- * which is available at https://www.eclipse.org/legal/epl-2.0/
- *
- * SPDX-License-Identifier: EPL-2.0
- */
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -14,7 +5,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,8 +17,7 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
  *
  * SPDX-License-Identifier: EPL-2.0 and CC0-1.0
  */
-import {BaseDoEntity, ObjectFactory, typeName} from '../../../eclipse-scout-core/src';
-
+import { BaseDoEntity, ObjectFactory, typeName } from '../../../eclipse-scout-core/src';
 let Test2Do = class Test2Do extends BaseDoEntity {
     libDo; // reference to external DO in namespace 'ns' with alias
     lib2Do; // reference to external DO in namespace 'ns' without alias
@@ -61,24 +51,22 @@ TestSpecialTypesDo = __decorate([
     typeName('test.TestSpecialTypes')
 ], TestSpecialTypesDo);
 export { TestSpecialTypesDo };
-
 export class AbstractTestDo extends BaseDoEntity {
-  abstractProp;
+    abstractProp;
 }
-
 __decorate([
-  Reflect.metadata("scout.m.t", String)
+    Reflect.metadata("scout.m.t", String)
 ], AbstractTestDo.prototype, "abstractProp", void 0);
 let DerivedFromAbstractDo = class DerivedFromAbstractDo extends AbstractTestDo {
-  derivedProp;
+    derivedProp;
 };
 __decorate([
-  Reflect.metadata("scout.m.t", Number)
+    Reflect.metadata("scout.m.t", Number)
 ], DerivedFromAbstractDo.prototype, "derivedProp", void 0);
 DerivedFromAbstractDo = __decorate([
-  typeName('test.DerivedFromAbstract')
+    typeName('test.DerivedFromAbstract')
 ], DerivedFromAbstractDo);
-export {DerivedFromAbstractDo};
+export { DerivedFromAbstractDo };
 export var ImportedStringEnum;
 (function (ImportedStringEnum) {
     ImportedStringEnum["A"] = "a";
