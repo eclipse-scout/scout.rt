@@ -102,7 +102,6 @@
     <module>../eclipse-scout-cli</module>
     <module>../eclipse-scout-core</module>
     <module>../eclipse-scout-releng</module>
-    <module>../eclipse-scout-migrate</module>
     <module>../eclipse-scout-tsconfig</module>
     <module>../eslint-config</module>
 
