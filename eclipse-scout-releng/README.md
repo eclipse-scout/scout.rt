@@ -86,13 +86,3 @@ As a consequence, a manual override without parent (e.g. `lodash: 4.17.20`) does
 4. Build using npm script `npm run build`.
 5. Deploy to a local registry to test the new package: `npm publish --registry http://127.0.0.1:4873/`.
 6. If all is fine: Deploy to real registry: `npm publish` (requires corresponding access token in your `.npmrc`).
-
-## Version Update
-
-1. Align the following dependencies with the ones of the new pnpm version (check version by git checkout of the corresponding tag):
-   1. `@pnpm/*`
-   2. `realpath-missing` as specified by pnpm
-   3. `normalize-path` as specified by pnpm
-2. Use the newest compatible version of `typanion` (check version constraint of `@pnpm/npm-lifecycle > @yarnpkg/shell > clipanion` declaring the peer)
-3. Update the `engines` in the package.json
-4. In this module search for `Inspired by https://github.com/pnpm/pnpm` and check the history of the declared files for changes since the last version. Merge them as necessary.

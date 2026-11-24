@@ -8,35 +8,26 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-// Makes the script crash on unhandled rejections instead of silently
-// ignoring them. In the future, promise rejections that are not handled will
-// terminate the Node.js process with a non-zero exit code.
-import {PnpmWorkspaceYaml} from './util/PnpmWorkspaceYaml.ts';
-import {type Dependencies} from '@pnpm/types';
-import {findWorkspacePackagesNoCheck, type Project} from '@pnpm/workspace.find-packages';
+import {PnpmWorkspaceYaml, WORKSPACE_MANIFEST_FILENAME} from './util/PnpmWorkspaceYaml.ts';
+import {type Dependencies, isSnapshotRange, type PackageJson, removeSnapshotSuffix} from './util/PackageJson.ts';
 import path from 'node:path';
 import {promises as fs} from 'node:fs';
 import files from './util/files.ts';
-import {WORKSPACE_MANIFEST_FILENAME} from '@pnpm/constants';
 
-process.on('unhandledRejection', err => {
-  throw err;
-});
+const DEPENDENCY_FIELDS = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'] as const satisfies readonly (keyof PackageJson)[];
 
 /**
  * Generates a timestamp with the pattern yyyyMMddHHmmss
  */
 function generateTimeStamp(): string {
-  let timestamp = new Date().toISOString(); // UTC
-  timestamp = timestamp.replace(/[-:.TZ]/g, '');
-  return timestamp.substring(0, timestamp.length - 3); // remove milliseconds
+  return new Date().toISOString().replace(/\D/g, '').slice(0, 14); // UTC without milliseconds
 }
 
 /**
  * Generates a snapshot-version of the current module version and the timestamp
  */
 function generateSnapshotVersion(moduleVersion: string, timestamp: string, verbose: boolean): string {
-  const cleanedVersion = moduleVersion.replace(/-snapshot(.)*/i, '');
+  const cleanedVersion = removeSnapshotSuffix(moduleVersion);
   const newVersion = `${cleanedVersion}-snapshot.${timestamp}`;
 
   if (verbose) {
@@ -50,7 +41,7 @@ function generateSnapshotVersion(moduleVersion: string, timestamp: string, verbo
  * Searches the matching regex for the module name and returns the corresponding version.
  * @param newModuleVersion the new version to return if useRegexMap is false and updateWorkspaceDependencies is true
  */
-function createReleaseVersionConstraint(moduleName: string, mapping: Mapping, newModuleVersion: string, useRegexMap = false, updateWorkspaceDependencies: boolean, verbose: boolean): string {
+function createReleaseVersionConstraint(moduleName: string, mapping: Mapping, newModuleVersion: string, useRegexMap: boolean, updateWorkspaceDependencies: boolean, verbose: boolean): string {
   // --mapping.0.regex @eclipse-scout --mapping.0.version 10.0.2 creates an object mapping = {0: {regex: @eclipse-scout; version: 10.0.2}}
   if (updateWorkspaceDependencies && !useRegexMap) {
     // all Modules in the repository/workspace get the same version
@@ -74,22 +65,22 @@ function createReleaseVersionConstraint(moduleName: string, mapping: Mapping, ne
   throw new Error(`couldn't find a constraint for ${moduleName}! Please provide a matching regex`);
 }
 
-function updateDependencyConstraints(dependencies: Dependencies, workspaceModuleNames: string[] = [], updateWorkspaceDependencies: boolean, isSnapshot: boolean,
-  mapping: Mapping, newModuleVersion: string, useRegexMap: boolean, verbose: boolean) {
-  if (!dependencies || isSnapshot) {
-    return;
-  }
+type DependencyUpdateOptions = { updateWorkspaceDependencies: boolean; mapping: Mapping; newVersion: string; useRegexMap: boolean; verbose: boolean };
 
-  const regex = new RegExp('-snapshot\\s*<');
-  for (const [moduleName, version] of Object.entries(dependencies)) {
-    if (regex.test(version)) {
-      if ((updateWorkspaceDependencies && workspaceModuleNames.includes(moduleName)) || (!updateWorkspaceDependencies && !workspaceModuleNames.includes(moduleName))) {
-        const versionConstraint = createReleaseVersionConstraint(moduleName, mapping, newModuleVersion, useRegexMap, updateWorkspaceDependencies, verbose);
+/**
+ * Replaces the snapshot ranges of the given dependencies with release versions: of the workspace modules if updateWorkspaceDependencies is `true`, of all other
+ * modules otherwise (see {@link createReleaseVersionConstraint}).
+ */
+function updateDependencyConstraints(dependencies: Dependencies, workspaceModuleNames: Set<string>, {updateWorkspaceDependencies, mapping, newVersion, useRegexMap, verbose}: DependencyUpdateOptions) {
+  for (const [moduleName, version] of Object.entries(dependencies ?? {})) {
+    if (isSnapshotRange(version)) {
+      if (updateWorkspaceDependencies === workspaceModuleNames.has(moduleName)) {
+        const versionConstraint = createReleaseVersionConstraint(moduleName, mapping, newVersion, useRegexMap, updateWorkspaceDependencies, verbose);
         console.log(`dependency ${moduleName} with version ${version} needs to be updated. new constraint: ${versionConstraint}`);
         dependencies[moduleName] = versionConstraint;
       } else {
         if (verbose) {
-          console.log(`dependency ${moduleName} with version ${version} is in the workspace. no update`);
+          console.log(`dependency ${moduleName} with version ${version} is ${updateWorkspaceDependencies ? 'not ' : ''}in the workspace. no update`);
         }
       }
     } else {
@@ -101,48 +92,46 @@ function updateDependencyConstraints(dependencies: Dependencies, workspaceModule
 }
 
 async function updateAllPackageJsons({
-  isSnapshot = true, updateWorkspaceDependencies = false, releaseDependencyMapping = {}, newVersion, useRegexMap = false, verbose = false, dryrun = false, workspaceRoot = null
+  isSnapshot = true, updateWorkspaceDependencies = false, releaseDependencyMapping = {}, timestamp, newVersion, useRegexMap = false, verbose = false, dryrun = false, workspaceRoot = null
 }: {
-  isSnapshot?: boolean; updateWorkspaceDependencies?: boolean; releaseDependencyMapping?: Mapping; newVersion?: string; useRegexMap?: boolean; verbose?: boolean; dryrun?: boolean; workspaceRoot?: string;
+  isSnapshot?: boolean; updateWorkspaceDependencies?: boolean; releaseDependencyMapping?: Mapping; timestamp?: string; newVersion?: string; useRegexMap?: boolean; verbose?: boolean; dryrun?: boolean; workspaceRoot?: string;
 }): Promise<void> {
-  const filename = './package.json';
-  const filePath = path.resolve(filename);
-  const dir = path.dirname(filePath);
-  const workspaceModules = await collectModulesInWorkspace(dir, workspaceRoot);
+  const workspaceModules = await collectModulesInWorkspace(process.cwd(), workspaceRoot);
   if (!workspaceModules?.length) {
     console.log('no modules found');
     return;
   }
 
-  const workspaceModuleNames = workspaceModules.map(module => module.manifest.name);
+  const workspaceModuleNames = new Set(workspaceModules.map(module => module.manifest.name));
   for (const module of workspaceModules) {
     const packageJson = module.manifest;
+    const original = JSON.stringify(packageJson);
     console.log(`updating version/dependency for module: ${packageJson.name}`);
     // update version of this module
-    if (newVersion || useRegexMap) {
+    if (isSnapshot ? timestamp : newVersion || useRegexMap) {
       if (isSnapshot) {
-        packageJson.version = generateSnapshotVersion(packageJson.version, newVersion, verbose);
+        packageJson.version = generateSnapshotVersion(packageJson.version, timestamp, verbose);
+      } else if (!useRegexMap) {
+        packageJson.version = newVersion;
       } else {
-        if (!useRegexMap) {
-          packageJson.version = newVersion;
-        } else {
-          packageJson.version = createReleaseVersionConstraint(packageJson.name, releaseDependencyMapping, newVersion, useRegexMap, updateWorkspaceDependencies, verbose);
-        }
+        packageJson.version = createReleaseVersionConstraint(packageJson.name, releaseDependencyMapping, newVersion, useRegexMap, updateWorkspaceDependencies, verbose);
       }
       if (verbose) {
         console.log(`new version for module: ${packageJson.version}`);
       }
     }
 
-    // update dependencies of this module
-    updateDependencyConstraints(packageJson.dependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, releaseDependencyMapping, newVersion, useRegexMap, verbose);
-    updateDependencyConstraints(packageJson.devDependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, releaseDependencyMapping, newVersion, useRegexMap, verbose);
-    updateDependencyConstraints(packageJson.peerDependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, releaseDependencyMapping, newVersion, useRegexMap, verbose);
-    updateDependencyConstraints(packageJson.optionalDependencies, workspaceModuleNames, updateWorkspaceDependencies, isSnapshot, releaseDependencyMapping, newVersion, useRegexMap, verbose);
+    // update dependencies of this module (snapshot ranges are only replaced on release)
+    if (!isSnapshot) {
+      for (const field of DEPENDENCY_FIELDS) {
+        updateDependencyConstraints(packageJson[field], workspaceModuleNames, {updateWorkspaceDependencies, mapping: releaseDependencyMapping, newVersion, useRegexMap, verbose});
+      }
+    }
 
-    if (!dryrun) {
-      // don't use module.writeProjectManifest as it changes the order of the dependencies in the package.json
-      await fs.writeFile(path.resolve(module.rootDirRealPath, filename), JSON.stringify(packageJson, null, 2) + '\n', 'utf8');
+    if (JSON.stringify(packageJson) === original) {
+      console.log(`no changes for module: ${packageJson.name}`);
+    } else if (!dryrun) {
+      await fs.writeFile(path.join(module.rootDir, 'package.json'), JSON.stringify(packageJson, null, 2) + '\n', 'utf8');
     } else {
       console.log(JSON.stringify(packageJson, null, 2));
     }
@@ -150,24 +139,43 @@ async function updateAllPackageJsons({
 }
 
 /**
- * Collects all modules in the given directory.
- * The workspace root is given is determined using {@link ensureWorkspaceRoot}.
+ * A module (directory containing a `package.json`) of a workspace.
  */
-export async function collectModulesInWorkspace(dir: string, workspaceRoot?: string): Promise<Project[]> {
+export type WorkspaceModule = {
+  /**
+   * Absolute path of the module directory.
+   */
+  rootDir: string;
+  manifest: PackageJson;
+};
+
+/**
+ * Collects the workspace root module and all modules declared in its `pnpm-workspace.yaml` (if present).
+ * The workspace root is determined using {@link ensureWorkspaceRoot}.
+ */
+export async function collectModulesInWorkspace(dir: string, workspaceRoot?: string): Promise<WorkspaceModule[]> {
   // ensure workspace root
   workspaceRoot = await ensureWorkspaceRoot(dir, workspaceRoot);
 
-  let patterns: string[];
-  if (await files.exists(path.resolve(workspaceRoot, WORKSPACE_MANIFEST_FILENAME))) {
-    // return packages as declared in the pnpm-workspace.yaml.
-    const workspaceYaml = await PnpmWorkspaceYaml.parse(workspaceRoot);
-    patterns = (await workspaceYaml.getPackages())
-      .map(absolutePath => path.relative(workspaceRoot, absolutePath).replaceAll('\\', '/'));
-  } else {
-    // return package of current directory only
-    patterns = [''];
+  const rootDirs = new Set<string>();
+  if (await files.exists(path.resolve(workspaceRoot, 'package.json'))) {
+    // real path like the packages, to detect the root also listed as package
+    rootDirs.add(await fs.realpath(workspaceRoot));
   }
-  return await findWorkspacePackagesNoCheck(workspaceRoot, {patterns});
+  if (await files.exists(path.resolve(workspaceRoot, WORKSPACE_MANIFEST_FILENAME))) {
+    // add packages as declared in the pnpm-workspace.yaml.
+    const workspaceYaml = await PnpmWorkspaceYaml.parse(workspaceRoot);
+    for (const packageDir of await workspaceYaml.getPackages()) {
+      rootDirs.add(packageDir);
+    }
+  }
+
+  return await Promise.all([...rootDirs]
+    .sort()
+    .map(async rootDir => ({
+      rootDir,
+      manifest: JSON.parse(await fs.readFile(path.join(rootDir, 'package.json'), 'utf8')) as PackageJson
+    })));
 }
 
 /**
@@ -195,13 +203,12 @@ export async function ensureWorkspaceRoot(dir: string, workspaceRoot?: string): 
   return workspaceRoot;
 }
 
-export async function snapshotDependencies({verbose, dryrun, workspaceRoot = null}) {
-  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: false, verbose, dryrun, workspaceRoot});
+export async function snapshotDependencies({dryrun, workspaceRoot = null}) {
+  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: false, dryrun, workspaceRoot});
 }
 
 export async function snapshot({verbose, dryrun, workspaceRoot = null}) {
-  const timeStamp = generateTimeStamp();
-  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: true, newVersion: timeStamp, verbose, dryrun, workspaceRoot});
+  await updateAllPackageJsons({isSnapshot: true, updateWorkspaceDependencies: true, timestamp: generateTimeStamp(), verbose, dryrun, workspaceRoot});
 }
 
 export async function releaseDependencies({mapping, verbose, dryrun, workspaceRoot = null}) {
