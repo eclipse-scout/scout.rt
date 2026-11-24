@@ -8,10 +8,11 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import {fork as forkNode} from 'node:child_process';
+import {execFile, fork as forkNode} from 'node:child_process';
 import {once} from 'node:events';
 import path from 'node:path';
 import process from 'node:process';
+import {promisify} from 'node:util';
 import files from './files.ts';
 
 /**
@@ -27,6 +28,63 @@ async function fork(workingDir: string, ...args: readonly string[]): Promise<voi
   if (code !== 0) {
     throw new Error(`Child exited with code ${code}${signal ? `, signal ${signal}` : ''}`);
   }
+}
+
+/**
+ * Structure of output of `pnpm list --recursive --json`.
+ * See https://github.com/pnpm/pnpm/blob/main/pnpm/crates/cli/src/cli_args/list/render/structured.rs
+ */
+export type PnpmListOutput = PnpmProject[];
+
+/** A workspace project (package.json) of the pnpm workspace. */
+export interface PnpmProject {
+  /** Absent if the manifest declares no name. */
+  name?: string;
+  /** Absent if the manifest declares no version. */
+  version?: string;
+  /** Absolute path of the project directory. */
+  path: string;
+  private: boolean;
+  dependencies?: PnpmDependencyMap;
+  devDependencies?: PnpmDependencyMap;
+  optionalDependencies?: PnpmDependencyMap;
+  /** Packages present in node_modules but not declared in package.json. */
+  unsavedDependencies?: PnpmDependencyMap;
+}
+
+/** Dependencies keyed by alias (the name under which the dependent declares the package). */
+export type PnpmDependencyMap = Record<string, PnpmDependency>;
+
+export interface PnpmDependency {
+  /** Real package name. Differs from the map key for `npm:` aliases. */
+  from: string;
+  /** Semver version (e.g. `26.2.1`) or a link (e.g. `link:scout.rt/eslint-config`). */
+  version: string;
+  /** Tarball URL. Absent for `link:` versions. */
+  resolved?: string;
+  /** Absolute path of the installed package. */
+  path: string;
+  /** Transitive dependencies. Absent if the package has none or is deduped. */
+  dependencies?: PnpmDependencyMap;
+  /** `true` if the subtree was already listed elsewhere and is omitted here. */
+  deduped?: true;
+  /** Number of dependencies omitted due to deduplication. Only present if `deduped`. */
+  dedupedDependenciesCount?: number;
+}
+
+/**
+ * Runs `pnpm list --recursive --json --depth=Infinity` in the given directory. The stderr output of pnpm is written to the console.
+ * @returns the parsed output.
+ */
+async function list(workingDir: string): Promise<PnpmListOutput> {
+  const {stdout, stderr} = await promisify(execFile)(process.execPath, [await findPnpm(), 'list', '-r', '--json', '--depth=Infinity'], {
+    cwd: workingDir,
+    maxBuffer: Infinity
+  });
+  if (stderr) {
+    process.stderr.write(stderr);
+  }
+  return JSON.parse(stdout) as PnpmListOutput;
 }
 
 /**
@@ -50,4 +108,4 @@ async function findPnpm(): Promise<string> {
   throw new Error(`Cannot find 'pnpm.mjs' in node installation '${process.execPath}'.`);
 }
 
-export default {fork, findPnpm};
+export default {fork, list, findPnpm};

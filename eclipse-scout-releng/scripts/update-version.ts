@@ -161,7 +161,7 @@ export async function collectModulesInWorkspace(dir: string, workspaceRoot?: str
   if (await files.exists(path.resolve(workspaceRoot, WORKSPACE_MANIFEST_FILENAME))) {
     // return packages as declared in the pnpm-workspace.yaml.
     const workspaceYaml = await PnpmWorkspaceYaml.parse(workspaceRoot);
-    patterns = workspaceYaml.getPackages()
+    patterns = (await workspaceYaml.getPackages())
       .map(absolutePath => path.relative(workspaceRoot, absolutePath).replaceAll('\\', '/'));
   } else {
     // return package of current directory only

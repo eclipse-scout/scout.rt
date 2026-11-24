@@ -8,97 +8,110 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import path from 'node:path';
+import files from '../util/files.ts';
 import pnpm from '../util/pnpm.ts';
-import {PnpmWorkspaceYaml} from '../util/PnpmWorkspaceYaml.ts';
+import {PnpmWorkspaceYaml, WORKSPACE_MANIFEST_FILENAME} from '../util/PnpmWorkspaceYaml.ts';
 import {DEFAULT_CONVERGENCE_LOG_LEVEL, dependencyConvergenceLogLevel, type DependencyConvergenceLogLevel} from './overrides/OverridesComputer.ts';
 import {updateAllScoutOverrides} from './overrides/updateScoutOverrides.ts';
 
 /**
  * Installs pnpm dependencies for the given directory and updates scout overrides if necessary.
- * The {@link options.updateMode} determines which dependencies are updated.
+ * The {@link UpdateOptions.updateMode} determines which dependencies are updated.
  */
-export async function scoutInstall(dir: string, options: UpdateOptions = {updateMode: DEFAULT_UPDATE_MODE, convergenceLogLevel: DEFAULT_CONVERGENCE_LOG_LEVEL}): Promise<void> {
-  options.updateMode = options.updateMode || DEFAULT_UPDATE_MODE;
-  options.convergenceLogLevel = options.convergenceLogLevel || DEFAULT_CONVERGENCE_LOG_LEVEL;
-  if (!Object.values(updateMode).includes(options.updateMode)) {
-    throw new Error(`Unknown updateMode '${options.updateMode}'.`);
+export async function scoutInstall(dir: string, {updateMode: mode = DEFAULT_UPDATE_MODE, convergenceLogLevel = DEFAULT_CONVERGENCE_LOG_LEVEL}: UpdateOptions = {}): Promise<void> {
+  if (!Object.values(updateMode).includes(mode)) {
+    throw new Error(`Unknown updateMode '${mode}'.`);
   }
-  if (!Object.values(dependencyConvergenceLogLevel).includes(options.convergenceLogLevel)) {
-    console.warn(`Unknown convergenceLogLevel '${options.convergenceLogLevel}'. Using default level '${DEFAULT_CONVERGENCE_LOG_LEVEL}' instead.`);
-    options.convergenceLogLevel = DEFAULT_CONVERGENCE_LOG_LEVEL;
+  if (!Object.values(dependencyConvergenceLogLevel).includes(convergenceLogLevel)) {
+    console.warn(`Unknown convergenceLogLevel '${convergenceLogLevel}'. Using default level '${DEFAULT_CONVERGENCE_LOG_LEVEL}' instead.`);
+    convergenceLogLevel = DEFAULT_CONVERGENCE_LOG_LEVEL;
   }
 
   console.log();
-  console.log(`Run scout install in '${dir}' (updateMode: '${options.updateMode}', convergenceLogLevel: '${options.convergenceLogLevel}')\n`);
+  console.log(`Run scout install in '${dir}' (updateMode: '${mode}', convergenceLogLevel: '${convergenceLogLevel}')\n`);
   console.time('Scout install');
 
-  const commonPnpmArguments = [
-    '--recursive',
-    '--no-lockfile',
-    '--ignore-scripts',
-    '--config.link-workspace-packages=true',
-    '--config.prefer-workspace-packages=true'
-  ];
-
-  // 'pnpm update' updates all non overridden dependencies to the newest version available that fulfills the required version
+  // 'pnpm update' updates all non overridden dependencies to the newest version available that fulfills the existing specifiers
   // if scout overrides are present, 'pnpm update' will only update dependencies that are not part of the scout overrides, i.e. snapshot dependencies
-  // -> disable scout overrides depending on the updateMode
-  if (options.updateMode === updateMode.ALL) {
-    await disableScoutOverrides(dir);
-  }
-
+  // -> disable scout overrides in ALL mode
+  // in REQUIRED mode, the scout overrides stay enabled: they only apply to dependencies whose range includes the pinned version, so dependencies whose range
+  // was changed in a package.json (and their new transitive dependencies) are resolved anew, while all other dependencies are kept
+  const disableOverrides = mode === updateMode.ALL;
   try {
-    // update
-    console.log('Perform \'pnpm update\'\n');
-    await pnpm.fork(dir, 'update', '--no-save', ...commonPnpmArguments);
-    console.log();
-  } finally {
-    // enable overrides again
-    if (options.updateMode === updateMode.ALL) {
-      await enableScoutOverrides(dir);
+    if (disableOverrides) {
+      await setScoutOverridesEnabled(dir, false);
+    } else if (mode === updateMode.REQUIRED) {
+      // the legacy overrides may force versions outside the declared ranges, the migrated ones apply only where the declared range includes the version
+      await migrateLegacyScoutOverrides(dir);
     }
-  }
 
-  // 'pnpm install' updates all non overridden dependencies that do not fulfill the required version
-  // -> disable scout overrides and call 'pnpm install' depending on the updateMode
-  if (options.updateMode === updateMode.REQUIRED) {
-    await disableScoutOverrides(dir);
-    try {
-      console.log('Perform \'pnpm install\'\n');
-      await pnpm.fork(dir, 'install', ...commonPnpmArguments);
-      console.log();
-    } finally {
-      // enable overrides again
-      await enableScoutOverrides(dir);
+    await pnpmUpdate(dir);
+
+    if (mode !== updateMode.SNAPSHOTS) {
+      // update scout overrides (enables the disabled overrides in ALL mode)
+      const peerDependencyOverrideRemoved = await updateAllScoutOverrides(dir, convergenceLogLevel);
+      if (peerDependencyOverrideRemoved) {
+        // a removed override replaced the range of a peer dependency in the update above: install once more to resolve it without (see isPeerDependencyOverrideRemoved)
+        console.log('An override of a peer dependency was removed: repeat \'pnpm update\' and the update of the scout overrides\n');
+        await pnpmUpdate(dir);
+        if (await updateAllScoutOverrides(dir, convergenceLogLevel)) {
+          console.warn('An override of a peer dependency was removed again: the next scout install may change the installed dependencies.\n');
+        }
+      }
     }
-  }
-
-  if (options.updateMode !== updateMode.SNAPSHOTS) {
-    // update scout overrides if necessary
-    await updateAllScoutOverrides(dir, options.convergenceLogLevel);
+  } catch (error) {
+    if (disableOverrides) {
+      await setScoutOverridesEnabled(dir, true)
+        .catch(restoreError => console.error(`Restoring the scout overrides in '${dir}' failed:`, restoreError)); // a failing restore must not hide the original error
+    }
+    throw error;
   }
 
   console.timeEnd('Scout install');
 }
 
-/**
- * Disables scout overrides of the `pnpm-workspace.yaml` in the given directory (see {@link PnpmWorkspaceYaml.removeScoutOverrides}).
- */
-export async function disableScoutOverrides(dir: string): Promise<void> {
-  console.log(`Disable scout overrides in '${dir}'\n`);
-  const wsYaml = await PnpmWorkspaceYaml.parse(dir);
-  wsYaml.removeScoutOverrides();
-  await wsYaml.flush();
+async function pnpmUpdate(dir: string): Promise<void> {
+  console.log('Perform \'pnpm update\'\n');
+  await pnpm.fork(dir, 'update', '--no-save', '--recursive', '--no-lockfile', '--ignore-scripts', '--config.link-workspace-packages=true', '--config.prefer-workspace-packages=true');
+  console.log();
 }
 
 /**
- * Enables scout overrides of the `pnpm-workspace.yaml` in the given directory (see {@link PnpmWorkspaceYaml.addScoutOverrides}).
+ * Migrates the `pnpm-workspace.yaml` in the given directory if it is in the legacy format (see {@link PnpmWorkspaceYaml.migrateLegacyScoutOverrides}).
  */
-export async function enableScoutOverrides(dir: string): Promise<void> {
-  console.log(`Enable scout overrides in '${dir}'\n`);
+async function migrateLegacyScoutOverrides(dir: string): Promise<void> {
+  if (await files.exists(path.join(dir, WORKSPACE_MANIFEST_FILENAME)) && await changeWorkspaceYaml(dir, wsYaml => wsYaml.migrateLegacyScoutOverrides())) {
+    console.log(`Migrated the legacy scout overrides in '${dir}'\n`);
+  }
+}
+
+/**
+ * Enables or disables the scout overrides of the `pnpm-workspace.yaml` in the given directory (see {@link PnpmWorkspaceYaml.enableScoutOverrides}).
+ */
+async function setScoutOverridesEnabled(dir: string, enabled: boolean): Promise<void> {
+  console.log(`${enabled ? 'Enable' : 'Disable'} scout overrides in '${dir}'\n`);
+  await changeWorkspaceYaml(dir, wsYaml => {
+    if (enabled) {
+      wsYaml.enableScoutOverrides();
+    } else {
+      wsYaml.disableScoutOverrides();
+    }
+    return true;
+  });
+}
+
+/**
+ * Applies the given change to the `pnpm-workspace.yaml` in the given directory and writes it if the change returns `true`.
+ * @returns the result of the change.
+ */
+async function changeWorkspaceYaml(dir: string, change: (wsYaml: PnpmWorkspaceYaml) => boolean): Promise<boolean> {
   const wsYaml = await PnpmWorkspaceYaml.parse(dir);
-  wsYaml.addScoutOverrides();
-  await wsYaml.flush();
+  const changed = change(wsYaml);
+  if (changed) {
+    await wsYaml.flush();
+  }
+  return changed;
 }
 
 export interface UpdateOptions {
