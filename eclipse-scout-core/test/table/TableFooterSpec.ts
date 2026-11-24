@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {scout, Status, Table, TableControl, TableTextUserFilter} from '../../src/index';
+import {scout, Status, Table, TableControl, TableInfoFilterTooltip, TableTextUserFilter} from '../../src/index';
 import {JQueryTesting, TableSpecHelper} from '../../src/testing/index';
 import $ from 'jquery';
 
@@ -369,11 +369,28 @@ describe('TableFooterSpec', () => {
     it('hides filter info and clears text if filters are reset', () => {
       addTextFilterAndAssert();
 
+      // In the normal style, clicking the filter info resets the filters
+      table.footer._compactStyle = false;
       JQueryTesting.triggerClick($filterInfo);
       assertFilterRemoved();
 
       // Ensure filter can be added again
       addTextFilterAndAssert();
+    });
+
+    it('opens the filter info tooltip instead of resetting the filters if the compact style is active', () => {
+      addTextFilterAndAssert();
+
+      table.footer._compactStyle = true;
+      JQueryTesting.triggerClick($filterInfo);
+      expect(table.footer._tableInfoTooltip).toBeInstanceOf(TableInfoFilterTooltip);
+      expect(table.footer.filterText).toBe('text');
+      expect(table.filters.length).toBe(1);
+
+      // Clicking again closes the tooltip
+      JQueryTesting.triggerClick($filterInfo);
+      expect(table.footer._tableInfoTooltip).toBe(null);
+      expect(table.filters.length).toBe(1);
     });
 
     it('updates filter info if table text filter is added or removed programmatically', () => {

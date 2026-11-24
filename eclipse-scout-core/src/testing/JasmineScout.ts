@@ -292,6 +292,9 @@ export const JasmineScout = {
       uiPreferences.tearDown();
       SpecUiPreferencesStore.uninstall();
       specFixtures.cleanUp();
+      // Stops the running jQuery animations without completing them and ends the animation loop of jQuery
+      $($.timers.map(timer => timer.elem)).stop(true);
+      $.fx.stop();
     });
 
     context.keys().forEach(context);
