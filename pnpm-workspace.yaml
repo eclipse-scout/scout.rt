@@ -1,4 +1,14 @@
-ignoreScripts: true # do not execute scripts (see https://pnpm.io/settings#ignorescripts)
+linkWorkspacePackages: true
+preferWorkspacePackages: true
+ignoreScripts: true # do not execute scripts (see https://pnpm.io/settings/build#ignorescripts)
+engineStrict: true
+verifyDepsBeforeRun: false
+
+# Make sure @types/node-dependency is not hoisted to .pnpm/node_modules
+# Relevant if a module has a dependency to @types/node (e.g. @azure/communication-common).
+# If @types/node is hoisted, typechecking with webpack fails because it wrongly uses the node API for various functions like setTimeout instead of the DOM API.
+hoistPattern:
+  - "!@types/node"
 
 packages:
   - 'eclipse-scout-cli'

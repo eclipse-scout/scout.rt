@@ -1,7 +1,17 @@
 #set( $symbol_dollar = '$' )
 #set( $symbol_pound = '#' )
 #set( $symbol_escape = '\' )
-ignoreScripts: true  $symbol_pound do not execute scripts (see https://pnpm.io/settings#ignorescripts)
+linkWorkspacePackages: true
+preferWorkspacePackages: true
+ignoreScripts: true ${symbol_pound} do not execute scripts (see https://pnpm.io/settings/build${symbol_pound}ignorescripts)
+engineStrict: true
+verifyDepsBeforeRun: false
+
+  ${symbol_pound} Make sure @types/node-dependency is not hoisted to .pnpm/node_modules
+  ${symbol_pound} Relevant if a module has a dependency to @types/node (e.g. @azure/communication-common).
+  ${symbol_pound} If @types/node is hoisted, typechecking with webpack fails because it wrongly uses the node API for various functions like setTimeout instead of the DOM API.
+hoistPattern:
+  - "!@types/node"
 
 packages:
 - '.'
