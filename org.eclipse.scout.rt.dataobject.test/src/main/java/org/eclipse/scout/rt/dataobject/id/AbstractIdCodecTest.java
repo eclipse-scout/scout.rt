@@ -378,6 +378,14 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromQualifiedStringIdWrongCharacters() {
+    String s = "scout.FixtureDateId:my-not-contain-a;-semicolon";
+    // StringId which contains a semicolon (;) is not parsable by IdCodec
+    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().fromQualified(s));
+    assertTrue(exception.getMessage().startsWith("Wrong argument size"));
+  }
+
+  @Test
   public void testFromQualifiedDateId() {
     Date date = new Date(123456789);
     FixtureDateId id1 = IIds.create(FixtureDateId.class, date);
@@ -510,6 +518,17 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromQualifiedCompositeIdDuplicatedSemicolon() {
+    FixtureCompositeId id = IIds.create(FixtureCompositeId.class, "foo;bar", TEST_UUID);
+    String idStr = getCodec().toQualified(id);
+    assertEquals("scout.FixtureCompositeId:foo;bar;5833aae1-c813-4d7c-a342-56a53772a3ea", idStr);
+
+    // StringId which contains a semicolon (;) is not parsable by IdCodec
+    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().fromQualified(idStr));
+    assertTrue(exception.getMessage().startsWith("Wrong argument size"));
+  }
+
+  @Test
   public void testFromUnqualifiedRootId() {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     FixtureUuId id2 = getCodec().fromUnqualified(FixtureUuId.class, TEST_UUID.toString());
@@ -597,6 +616,14 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testFromUnqualifiedStringIdWrongCharacters() {
+    String s = "my-not-contain-a;-semicolon";
+    // StringId which contains a semicolon (;) is not parsable by IdCodec
+    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureStringId.class, s));
+    assertTrue(exception.getMessage().startsWith("Wrong argument size"));
+  }
+
+  @Test
   public void testFromUnqualifiedUuIdEmptyValue() {
     FixtureUuId id1 = FixtureUuId.of("");
     assertNull(id1);
@@ -640,6 +667,17 @@ public abstract class AbstractIdCodecTest {
     assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, "foo;" + TEST_UUID + ";foo"));
     assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";"));
     assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeWithAllTypesId.class, ";;;"));
+  }
+
+  @Test
+  public void testFromUnqualifiedCompositeIdDuplicatedSemicolon() {
+    FixtureCompositeId id = IIds.create(FixtureCompositeId.class, "foo;bar", TEST_UUID);
+    String idStr = getCodec().toUnqualified(id);
+    assertEquals("foo;bar;5833aae1-c813-4d7c-a342-56a53772a3ea", idStr);
+
+    // StringId which contains a semicolon (;) is not parsable by IdCodec
+    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, idStr));
+    assertTrue(exception.getMessage().startsWith("Wrong argument size"));
   }
 
   @Test(expected = IdCodecException.class)

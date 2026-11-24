@@ -42,6 +42,8 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 
 /**
  * Codec used to convert between {@link IId} instances and their qualified/unqualified representation as {@link String}.
+ * <p>
+ * <b>NOTE:</b> A semicolon ';' character is not a valid part of a string id and fails to decode.
  */
 @ApplicationScoped
 public class IdCodec {
