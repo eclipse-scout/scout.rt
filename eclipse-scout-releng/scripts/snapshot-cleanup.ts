@@ -8,81 +8,65 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import axios, {type AxiosRequestConfig, type AxiosResponse, type RawAxiosRequestHeaders} from 'axios';
+import {removeSnapshotSuffix} from './util/PackageJson.ts';
 
-// Makes the script crash on unhandled rejections instead of silently
-// ignoring them. In the future, promise rejections that are not handled will
-// terminate the Node.js process with a non-zero exit code.
-process.on('unhandledRejection', err => {
-  throw err;
-});
-
-function constructPath(artifactoryUrl: string, item: SnapshotItem): string {
-  if (item.path === '.') {
-    return `${artifactoryUrl}/${item.repo}/${item.filename}`;
+/**
+ * Sends a request to the given url.
+ * @throws Error if the response status is not 2xx.
+ */
+async function request(method: 'POST' | 'DELETE', url: string, headers: Record<string, string>, body?: string): Promise<Response> {
+  const response = await fetch(url, {method, headers, body});
+  if (!response.ok) {
+    throw new Error(`${method} ${url} failed with status ${response.status}: ${await response.text()}`);
   }
-  return `${artifactoryUrl}/${item.repo}/${item.path}/${item.filename}`;
+  return response;
+}
+
+/**
+ * @param artifactoryUrl URL of the artifactory including trailing slash.
+ */
+function constructPath(artifactoryUrl: string, item: SnapshotItem): string {
+  return artifactoryUrl + [item.repo, item.path, item.filename].filter(part => part !== '.').join('/');
 }
 
 function getScopeName(path: string): string {
-  const SCOPE_REGEX = /^@[\w-]+/g;
+  const SCOPE_REGEX = /^@[\w-]+/;
   return path.match(SCOPE_REGEX)?.[0];
 }
 
+/**
+ * @param itemName file name of a snapshot tarball, e.g. `core-27.1.0-snapshot.20261117202958.tgz`.
+ * @returns the name and version of the package without snapshot suffix, e.g. `core-23.2.0`.
+ */
 function getPackageName(itemName: string): string {
-  const NAME_REGEX = /-snapshot.*/gi;
-  return itemName.replace(NAME_REGEX, '');
+  return removeSnapshotSuffix(itemName.replace(/\.tgz$/i, ''));
 }
 
-async function getSnapshots(artifactoryUrl: string, repoName: string, config: AxiosRequestConfig<string>, verbose: boolean): Promise<Map<string, Set<SnapshotItem>>> {
+async function getSnapshots(artifactoryUrl: string, repoName: string, headers: Record<string, string>, verbose: boolean): Promise<Map<string, SnapshotItem[]>> {
   const AQL_API = 'api/search/aql'; // use aql for search
   const searchUrl = `${artifactoryUrl}${AQL_API}`;
-  const query = `items.find({"repo":"${repoName}","name":{"$match":"*snapshot.*tgz"}})`;
+  const query = `items.find(${JSON.stringify({repo: repoName, name: {$match: '*snapshot.*tgz'}})})`;
 
-  const snapshotMap = new Map<string, Set<SnapshotItem>>();
-  const response: AxiosResponse<SearchData> = await axios.post(searchUrl, query, config);
-  const data = response.data;
+  const response = await request('POST', searchUrl, headers, query);
+  const data = await response.json() as SearchData;
 
   if (verbose) {
     console.log('found items:\n' + JSON.stringify(data, null, 2));
   }
 
-  if (data && data.results) {
-    for (const item of data.results) {
-      // group the snapshots by package and version to ensure that old versions won't be deleted e.g. groupName = @eclipse-scout/eslint-config-22.0.0
-      const groupName = `${getScopeName(item.path)}/${getPackageName(item.name)}`;
-
-      let groupSet = snapshotMap.get(groupName);
-      if (!groupSet) {
-        groupSet = new Set();
-        snapshotMap.set(groupName, groupSet);
-      }
-      const snapshotItem: SnapshotItem = {
-        groupName,
-        filename: item.name,
-        path: item.path,
-        created: new Date(item.created),
-        repo: item.repo
-      };
-      groupSet.add(snapshotItem);
-    }
-  }
-  return snapshotMap;
+  const snapshotItems = (data?.results ?? []).map(item => ({filename: item.name, path: item.path, created: new Date(item.created), repo: item.repo}));
+  // group the snapshots by package and version to ensure that old versions won't be deleted e.g. groupName = @eclipse-scout/eslint-config-22.0.0
+  return Map.groupBy(snapshotItems, item => `${getScopeName(item.path)}/${getPackageName(item.filename)}`);
 }
 
-async function calculateItemsToDelete(itemMap: Map<string, Set<SnapshotItem>>, noToKeep: number): Promise<SnapshotItem[]> {
-  const toDelete: SnapshotItem[] = [];
-  for (const itemSet of itemMap.values()) {
-    // order the snapshots of each package by date and select the oldest items to delete
-    const deleteItems = Array.from(itemSet)
-      .sort((a, b) => b.created.valueOf() - a.created.valueOf())
-      .slice(noToKeep);
-    toDelete.push(...deleteItems);
-  }
-  return toDelete;
+function calculateItemsToDelete(itemMap: Map<string, SnapshotItem[]>, noToKeep: number): SnapshotItem[] {
+  // order the snapshots of each package by date and select the oldest items to delete
+  return [...itemMap.values()].flatMap(items => items
+    .sort((a, b) => b.created.valueOf() - a.created.valueOf())
+    .slice(noToKeep));
 }
 
-async function deleteItems(artifactoryUrl: string, items: SnapshotItem[], config: AxiosRequestConfig<string>, dryrun: boolean): Promise<void> {
+async function deleteItems(artifactoryUrl: string, items: SnapshotItem[], headers: Record<string, string>, dryrun: boolean): Promise<void> {
   let success = true;
   if (!items?.length) {
     console.log('Nothing to cleanup');
@@ -95,7 +79,7 @@ async function deleteItems(artifactoryUrl: string, items: SnapshotItem[], config
       continue;
     }
     try {
-      const response: AxiosResponse = await axios.delete(itemUrl, config);
+      const response = await request('DELETE', itemUrl, headers);
       console.log(response.status);
     } catch (error) {
       success = false;
@@ -110,30 +94,27 @@ async function deleteItems(artifactoryUrl: string, items: SnapshotItem[], config
 }
 
 export async function doCleanup({url, apikey, user, pwd, repoName, keep = 5, dryrun = false, verbose = false}: CleanupArguments): Promise<void> {
-  console.log(`Input arguments: url=${url}; repo-name=${repoName}; number of artifacts to keep=${keep}; dry-run=${dryrun}; verbose=${verbose}`);
+  console.log(`Input arguments: url=${url}; reponame=${repoName}; number of artifacts to keep=${keep}; dry-run=${dryrun}; verbose=${verbose}`);
   if (!repoName || !url) {
-    throw new Error('Please provide arguments for --url and --repo-name');
+    throw new Error('Please provide arguments for --url and --reponame');
+  }
+  if (!Number.isInteger(keep) || keep < 0) {
+    throw new Error(`--keep must be a non-negative integer but is '${keep}'.`);
   }
 
-  const headers: RawAxiosRequestHeaders = {
+  const headers: Record<string, string> = {
     'Content-Type': 'text/plain'
   };
   if (apikey) {
     headers['X-JFrog-Art-Api'] = apikey;
-  }
-  const config: AxiosRequestConfig<string> = {
-    headers: headers
-  };
-  if (!apikey && user && pwd) {
-    config.auth = {
-      username: user,
-      password: pwd
-    };
+  } else if (user && pwd) {
+    headers['Authorization'] = `Basic ${Buffer.from(`${user}:${pwd}`).toString('base64')}`;
   }
 
-  const foundItems = await getSnapshots(url, repoName, config, verbose);
-  const itemsToDelete = await calculateItemsToDelete(foundItems, keep);
-  await deleteItems(url, itemsToDelete, config, dryrun);
+  const artifactoryUrl = url.endsWith('/') ? url : `${url}/`;
+  const foundItems = await getSnapshots(artifactoryUrl, repoName, headers, verbose);
+  const itemsToDelete = calculateItemsToDelete(foundItems, keep);
+  await deleteItems(artifactoryUrl, itemsToDelete, headers, dryrun);
 }
 
 type SearchData = { results: SearchResultItem[] };
@@ -155,7 +136,7 @@ type SearchResultItem = {
    */
   repo: string;
 };
-type SnapshotItem = { groupName: string; filename: string; path: string; created: Date; repo: string };
+type SnapshotItem = { filename: string; path: string; created: Date; repo: string };
 export type CleanupArguments = {
   url: string;
   apikey?: string;
