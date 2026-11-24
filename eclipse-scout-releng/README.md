@@ -1,8 +1,8 @@
-<p align="center">
+<p style="text-align: center;">
   <a href="https://eclipse.dev/scout/" target="_blank" rel="noopener noreferrer"><img src="https://eclipsescout.github.io/assets/img/eclipse-scout-logo.svg"></a>
 </p>
 
-<p align="center">
+<p style="text-align: center;">
   <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-27.1-RT-nightly_pipeline%2F"></a>
   <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-27.1-RT-nightly_pipeline%2F"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/releng" target="_blank" rel="noopener noreferrer"><img alt="npm" src="https://img.shields.io/npm/dm/@eclipse-scout/releng"></a>
@@ -15,6 +15,106 @@
 # Eclipse Scout - Releng
 
 Contains release engineering scripts for the [Eclipse Scout](https://www.npmjs.com/package/@eclipse-scout/core) framework.
+
+## Usage
+
+```
+releng-scripts <command> [options]
+```
+
+There is no `--help` option; this section is the reference for all commands and options.
+
+### Option syntax
+
+- Values may be given as `--name value` or `--name=value`.
+- Option names are case-sensitive and only accepted in camelCase (e.g. `--workspaceRoot`, not `--workspace-root`).
+- Boolean options may be given as `--name`, `--name=true`, `--name=false` or `--name false`.
+- Option names containing dots create nested values, e.g. `--mapping.0.regex @eclipse-scout --mapping.0.version 26.2.0`.
+- Options not listed for a command fail the command (e.g. `--dryRun` instead of `--dryrun`).
+- Number options fail if the value is not a number.
+
+### Commands
+
+#### `version:snapshot`
+
+Changes the version of all modules of the pnpm workspace to a snapshot version with timestamp.
+
+| Option            | Type    | Default | Description                                                                                  |
+|-------------------|---------|---------|----------------------------------------------------------------------------------------------|
+| `--workspaceRoot` | string  |         | Path to the pnpm workspace root directory. Determined from the current directory if not set. |
+| `--dryrun`        | boolean | `false` | Prints the changed `package.json` files instead of writing them.                             |
+| `--verbose`       | boolean | `false` | More logging.                                                                                |
+
+#### `version:snapshot:dependencies`
+
+Currently does nothing, as no update is necessary for snapshot dependencies which are not part of the pnpm workspace. Supports `--workspaceRoot` and `--dryrun` (see `version:snapshot`).
+
+#### `version:release`
+
+Replaces the snapshot versions of the modules of the pnpm workspace with the given version and updates the dependencies to these modules accordingly.
+
+| Option            | Type    | Default | Description                                                                                                         |
+|-------------------|---------|---------|---------------------------------------------------------------------------------------------------------------------|
+| `--newVersion`    | string  |         | New version of the modules. Required unless `--mapping` is given.                                                   |
+| `--useRegexMap`   | boolean | `false` | Use the `--mapping` to determine the version of each module (for workspaces whose modules have different versions). |
+| `--mapping`       |         |         | See `version:release:dependencies`.                                                                                 |
+| `--workspaceRoot` | string  |         | See `version:snapshot`.                                                                                             |
+| `--dryrun`        | boolean | `false` | See `version:snapshot`.                                                                                             |
+| `--verbose`       | boolean | `false` | More logging.                                                                                                       |
+
+#### `version:release:dependencies`
+
+Updates snapshot dependencies that are not part of the pnpm workspace to the release versions of the given mapping.
+
+| Option                                         | Type    | Default | Description                                                                                       |
+|------------------------------------------------|---------|---------|---------------------------------------------------------------------------------------------------|
+| `--mapping.<n>.regex`, `--mapping.<n>.version` | string  |         | One or more mappings. A dependency whose name starts with `regex` gets the corresponding version. |
+| `--workspaceRoot`                              | string  |         | See `version:snapshot`.                                                                           |
+| `--dryrun`                                     | boolean | `false` | See `version:snapshot`.                                                                           |
+| `--verbose`                                    | boolean | `false` | More logging.                                                                                     |
+
+Example:
+
+```
+releng-scripts version:release:dependencies --mapping.0.regex @your-dep --mapping.0.version 1.2.3 --mapping.1.regex @your-dep2 --mapping.1.version 4.5.6
+```
+
+#### `cleanup:snapshots`
+
+Deletes old snapshot modules from an Artifactory repository. Authentication uses `--apikey` (recommended) or, if not set, `--user` and `--pwd`.
+
+| Option       | Type    | Default | Description                                              |
+|--------------|---------|---------|----------------------------------------------------------|
+| `--url`      | string  |         | URL of the Artifactory (with or without trailing slash). |
+| `--reponame` | string  |         | Name of the repository.                                  |
+| `--keep`     | number  | `5`     | Number of snapshots to keep per module and version.      |
+| `--apikey`   | string  |         | API key for authentication.                              |
+| `--user`     | string  |         | Username for authentication.                             |
+| `--pwd`      | string  |         | Password for authentication.                             |
+| `--dryrun`   | boolean | `false` | Logs the snapshots to delete without deleting them.      |
+| `--verbose`  | boolean | `false` | Logs the search result.                                  |
+
+#### `install`
+
+Installs all dependencies using pnpm and updates the Scout overrides if required.
+
+| Option                  | Type   | Default    | Description                                               |
+|-------------------------|--------|------------|-----------------------------------------------------------|
+| `--updateMode`          | string | `required` | Which dependencies are updated (see below).               |
+| `--convergenceLogLevel` | string | `own`      | Which non-convergent dependencies are logged (see below). |
+
+Values of `--updateMode`:
+
+- `required`: snapshots and packages that do not fulfil the specifier in the `package.json`. All other packages keep their version.
+- `all`: all packages for which a newer version exists.
+- `snapshots`: snapshots only. The Scout overrides are not updated.
+
+Values of `--convergenceLogLevel`:
+
+- `all`: all packages with non-unique versions.
+- `single-external`: as `own`, and packages for which a single dependency from outside the pnpm workspace exists. May be used to eliminate duplicate dependencies by adapting the workspace to the external one.
+- `own`: only mixed versions within the pnpm workspace. These may be misconfigured packages.
+- `none`: logging disabled.
 
 ## Scout overrides
 
