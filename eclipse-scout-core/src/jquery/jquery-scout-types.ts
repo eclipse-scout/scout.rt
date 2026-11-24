@@ -614,6 +614,16 @@ declare global {
     oneAnimationEnd(handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, 'animationend' | 'animationcancel'>, triggerOnError?: boolean): JQuery;
 
     /**
+     * Executes the given function which is expected to move the current element in the DOM (e.g. using insertBefore).
+     *
+     * Moving an element cancels the running CSS animations of the element and its descendants and restarts them from the beginning.
+     * To make the move invisible, the restarted animations continue at the position of the cancelled ones.
+     *
+     * @param moveFunc A function that moves the current element. `this` is the current jQuery object.
+     */
+    moveKeepingAnimations(moveFunc: (this: JQuery<TElement>) => void): JQuery<TElement>;
+
+    /**
      * @returns true, if the current element has a class that starts with 'animate-'.
      */
     hasAnimationClass(): boolean;

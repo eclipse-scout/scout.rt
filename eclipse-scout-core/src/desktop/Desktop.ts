@@ -1720,7 +1720,8 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     $targetOverlay = $.ensure($targetOverlay);
     $targetOverlay.nextAll().toArray().forEach(overlay => {
       if (arrays.containsAll(overlaysToMove, [overlay])) {
-        $(overlay).insertBefore($targetOverlay);
+        const $overlay = $(overlay);
+        $overlay.moveKeepingAnimations(() => $overlay.insertBefore($targetOverlay));
       }
     });
 

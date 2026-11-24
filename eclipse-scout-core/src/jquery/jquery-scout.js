@@ -943,6 +943,39 @@ $.fn.oneAnimationEnd = function(handler, triggerOnError = false) {
   return this;
 };
 
+$.fn.moveKeepingAnimations = function(moveFunc) {
+  const element = this[0];
+  if (!element) {
+    moveFunc.call(this);
+    return this;
+  }
+
+  const runningAnimations = element.getAnimations({subtree: true})
+    .filter(animation => animation instanceof CSSAnimation)
+    .map(animation => ({
+      target: animation.effect.target,
+      pseudoElement: animation.effect.pseudoElement,
+      animationName: animation.animationName,
+      currentTime: animation.currentTime
+    }));
+  moveFunc.call(this);
+  if (!runningAnimations.length) {
+    return this;
+  }
+
+  element.getAnimations({subtree: true}).forEach(animation => {
+    if (!(animation instanceof CSSAnimation)) {
+      return;
+    }
+    const runningAnimation = runningAnimations.find(a =>
+      a.target === animation.effect.target && a.pseudoElement === animation.effect.pseudoElement && a.animationName === animation.animationName);
+    if (runningAnimation) {
+      animation.currentTime = runningAnimation.currentTime;
+    }
+  });
+  return this;
+};
+
 $.fn.hasAnimationClass = function() {
   // matches any CSS class that starts with 'animate-'
   return /(^|\s)animate-/.test(this.attr('class'));

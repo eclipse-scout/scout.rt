@@ -417,6 +417,51 @@ describe('jquery-scout', () => {
     });
   });
 
+  describe('moveKeepingAnimations', () => {
+    let $style: JQuery;
+
+    beforeEach(() => {
+      $style = $('<style>@keyframes spec-fade {from {opacity: 0;} to {opacity: 1;}} .spec-animate {animation: spec-fade 1s;}</style>');
+      $style.appendTo($('#sandbox'));
+    });
+
+    afterEach(() => {
+      $style.remove();
+    });
+
+    it('continues running CSS animations of the element and its descendants after the move', () => {
+      let $child = $e.appendDiv('spec-animate');
+      $e.addClass('spec-animate');
+      let [animation] = $e[0].getAnimations();
+      let [childAnimation] = $child[0].getAnimations();
+      animation.currentTime = 500;
+      childAnimation.currentTime = 250;
+
+      $e.moveKeepingAnimations(() => $e.appendTo($('#sandbox'))); // moves it after $style
+      expect($e.prev()[0]).toBe($style[0]);
+
+      // The move restarts the animations -> the new ones continue at the previous position
+      let [newAnimation] = $e[0].getAnimations();
+      let [newChildAnimation] = $child[0].getAnimations();
+      expect(newAnimation).not.toBe(animation);
+      expect(newChildAnimation).not.toBe(childAnimation);
+      expect(newAnimation.currentTime as number).toBeCloseTo(500, -1);
+      expect(newChildAnimation.currentTime as number).toBeCloseTo(250, -1);
+    });
+
+    it('moves the element if there are no running animations', () => {
+      $e.moveKeepingAnimations(() => $e.appendTo($('#sandbox'))); // moves it after $style
+      expect($e.prev()[0]).toBe($style[0]);
+      expect($e[0].getAnimations().length).toBe(0);
+    });
+
+    it('calls the function for an empty jquery object', () => {
+      let moveFunc = jasmine.createSpy('moveFunc');
+      $().moveKeepingAnimations(moveFunc);
+      expect(moveFunc).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('icon', () => {
 
     it('sets and removes icons', () => {
