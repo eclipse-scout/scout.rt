@@ -21,35 +21,35 @@ import pnpm from '../../scripts/util/pnpm.ts';
 
 describe('pnpm', () => {
 
-  describe('findCjs', () => {
+  describe('findPnpm', () => {
 
-    it('returns path to pnpm.cjs at the Linux candidate path', async () => {
-      await withFakeLinuxNodeInstallation(async (nodeExec, linuxPnpmCjs) => {
+    it('returns path to pnpm.mjs at the Linux candidate path', async () => {
+      await withFakeLinuxNodeInstallation(async (nodeExec, linuxPnpmMjs) => {
         await withPatchedExecPath(nodeExec, async () => {
-          const cjs = await pnpm.findCjs();
-          assert.equal(cjs, linuxPnpmCjs);
+          const mjs = await pnpm.findPnpm();
+          assert.equal(mjs, linuxPnpmMjs);
         });
       });
     });
 
-    it('returns path to pnpm.cjs at the Windows candidate path when Linux path does not exist', async () => {
-      await withFakeWindowsNodeInstallation(async (nodeExec, windowsPnpmCjs) => {
+    it('returns path to pnpm.mjs at the Windows candidate path when Linux path does not exist', async () => {
+      await withFakeWindowsNodeInstallation(async (nodeExec, windowsPnpmMjs) => {
         await withPatchedExecPath(nodeExec, async () => {
-          const cjs = await pnpm.findCjs();
-          assert.equal(cjs, windowsPnpmCjs);
+          const mjs = await pnpm.findPnpm();
+          assert.equal(mjs, windowsPnpmMjs);
         });
       });
     });
 
-    it('throws with informative error when pnpm.cjs is not found', async () => {
+    it('throws with informative error when pnpm.mjs is not found', async () => {
       await withTempDir(async dir => {
         const nodeExec = join(dir, 'node');
         await fs.writeFile(nodeExec, '');
 
         await withPatchedExecPath(nodeExec, async () => {
           await assert.rejects(
-            () => pnpm.findCjs(),
-            {message: `Cannot find 'pnpm.cjs' in node installation '${nodeExec}'.`}
+            () => pnpm.findPnpm(),
+            {message: `Cannot find 'pnpm.mjs' in node installation '${nodeExec}'.`}
           );
         });
       });
@@ -57,7 +57,7 @@ describe('pnpm', () => {
   });
 });
 
-async function withFakeLinuxNodeInstallation(callback: (nodeExec: string, linuxPnpmCjs: string) => Promise<void>): Promise<void> {
+async function withFakeLinuxNodeInstallation(callback: (nodeExec: string, linuxPnpmMjs: string) => Promise<void>): Promise<void> {
   await withTempDir(async dir => {
     // typical linux node installation layout
     //   bin/node          <- node executable
@@ -70,16 +70,16 @@ async function withFakeLinuxNodeInstallation(callback: (nodeExec: string, linuxP
     await fs.mkdir(nodeExecDir, {recursive: true});
     await fs.writeFile(nodeExec, '');
 
-    const linuxPnpmCjsDir = join(fakeLinuxNodeDir, 'lib', 'node_modules', 'pnpm', 'bin');
-    const linuxPnpmCjs = join(linuxPnpmCjsDir, 'pnpm.cjs');
-    await fs.mkdir(linuxPnpmCjsDir, {recursive: true});
-    await fs.writeFile(linuxPnpmCjs, '');
+    const linuxPnpmMjsDir = join(fakeLinuxNodeDir, 'lib', 'node_modules', 'pnpm', 'bin');
+    const linuxPnpmMjs = join(linuxPnpmMjsDir, 'pnpm.mjs');
+    await fs.mkdir(linuxPnpmMjsDir, {recursive: true});
+    await fs.writeFile(linuxPnpmMjs, '');
 
-    await callback(nodeExec, linuxPnpmCjs);
+    await callback(nodeExec, linuxPnpmMjs);
   });
 }
 
-async function withFakeWindowsNodeInstallation(callback: (nodeExec: string, windowsPnpmCjs: string) => Promise<void>): Promise<void> {
+async function withFakeWindowsNodeInstallation(callback: (nodeExec: string, windowsPnpmMjs: string) => Promise<void>): Promise<void> {
   await withTempDir(async dir => {
     // typical windows node installation layout
     //   node.exe          <- node executable
@@ -90,12 +90,12 @@ async function withFakeWindowsNodeInstallation(callback: (nodeExec: string, wind
     const nodeExec = join(fakeWindowsNodeDir, 'node.exe');
     await fs.writeFile(nodeExec, '');
 
-    const windowsPnpmCjsDir = join(fakeWindowsNodeDir, 'node_modules', 'pnpm', 'bin');
-    const windowsPnpmCjs = join(windowsPnpmCjsDir, 'pnpm.cjs');
-    await fs.mkdir(windowsPnpmCjsDir, {recursive: true});
-    await fs.writeFile(windowsPnpmCjs, '');
+    const windowsPnpmMjsDir = join(fakeWindowsNodeDir, 'node_modules', 'pnpm', 'bin');
+    const windowsPnpmMjs = join(windowsPnpmMjsDir, 'pnpm.mjs');
+    await fs.mkdir(windowsPnpmMjsDir, {recursive: true});
+    await fs.writeFile(windowsPnpmMjs, '');
 
-    await callback(nodeExec, windowsPnpmCjs);
+    await callback(nodeExec, windowsPnpmMjs);
   });
 }
 

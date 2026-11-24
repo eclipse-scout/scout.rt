@@ -9,6 +9,7 @@
  */
 
 import {fork as forkNode} from 'node:child_process';
+import {once} from 'node:events';
 import path from 'node:path';
 import process from 'node:process';
 import files from './files.ts';
@@ -17,34 +18,24 @@ import files from './files.ts';
  * Forks a pnpm process in the given directory with the given arguments.
  * @returns A promise to wait for the forked process to finish.
  */
-async function fork(workingDir: string, ...args: string[]): Promise<void> {
-  const pnpm = await findCjs();
-  return new Promise((resolve, reject) => {
-    // fork a child process in the working directory
-    const childProcess = forkNode(pnpm, args, {
-      cwd: workingDir,
-      stdio: 'inherit'
-    });
-
-    // resolve or reject promise depending on the result of the child process
-    childProcess.on('error', reject);
-    childProcess.on('exit', (code: number, signal: NodeJS.Signals) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`Child exited with code ${code}${signal ? `, signal ${signal}` : ''}`));
-      }
-    });
+async function fork(workingDir: string, ...args: readonly string[]): Promise<void> {
+  const childProcess = forkNode(await findPnpm(), args, {
+    cwd: workingDir,
+    stdio: 'inherit'
   });
+  const [code, signal] = await once(childProcess, 'exit') as [number, NodeJS.Signals];
+  if (code !== 0) {
+    throw new Error(`Child exited with code ${code}${signal ? `, signal ${signal}` : ''}`);
+  }
 }
 
 /**
- * @returns The location of the `pnpm.cjs`. Throws an error if no `pnpm.cjs` was found.
+ * @returns The location of the `pnpm.mjs` of the running Node.js installation. Throws an error if no `pnpm.mjs` was found.
  */
-async function findCjs(): Promise<string> {
+async function findPnpm(): Promise<string> {
   const candidates = [
-    '../../lib/node_modules/pnpm/bin/pnpm.cjs', // e.g. Linux
-    '../node_modules/pnpm/bin/pnpm.cjs' // e.g. Windows
+    '../../lib/node_modules/pnpm/bin/pnpm.mjs', // e.g. Linux
+    '../node_modules/pnpm/bin/pnpm.mjs' // e.g. Windows
   ];
 
   // find first candidate that exists
@@ -55,8 +46,8 @@ async function findCjs(): Promise<string> {
     }
   }
 
-  // pnpm.cjs not found -> throw error
-  throw new Error(`Cannot find 'pnpm.cjs' in node installation '${process.execPath}'.`);
+  // pnpm.mjs not found -> throw error
+  throw new Error(`Cannot find 'pnpm.mjs' in node installation '${process.execPath}'.`);
 }
 
-export default {fork, findCjs};
+export default {fork, findPnpm};

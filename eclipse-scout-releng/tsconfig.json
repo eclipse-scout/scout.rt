@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
     "target": "ESNext",
     "moduleResolution": "bundler",
     "module": "ESNext",
@@ -12,7 +11,7 @@
     "erasableSyntaxOnly": true,
     "rewriteRelativeImportExtensions": true,
     "lib": [
-      "ES2023"
+      "ES2024"
     ],
     "types": [
       "node"

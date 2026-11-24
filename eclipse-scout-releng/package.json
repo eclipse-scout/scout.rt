@@ -10,9 +10,9 @@
   },
   "license": "EPL-2.0",
   "engines": {
-    "node": ">=24.12.0",
-    "npm": ">=11.6.2",
-    "pnpm": ">=10.26.1"
+    "node": ">=26.13.1",
+    "npm": ">=11.20.0",
+    "pnpm": ">=12.21.0"
   },
   "keywords": [
     "scout",
@@ -32,7 +32,7 @@
   "dependencies": {
     "axios": "1.18.0",
     "yargs": "18.0.0",
-    "yaml": "2.9.0",
+    "yaml": "2.9.1",
     "@pnpm/normalize-registries": "1000.1.8",
     "@pnpm/constants": "1001.3.1",
     "@pnpm/lockfile.detect-dep-types": "1001.0.22",
@@ -49,7 +49,7 @@
     "normalize-path": "^3.0.0"
   },
   "devDependencies": {
-    "@types/node": "24.12.0",
+    "@types/node": "26.6.6",
     "@pnpm/types": "1001.2.0",
     "typescript": "5.9.3"
   },
