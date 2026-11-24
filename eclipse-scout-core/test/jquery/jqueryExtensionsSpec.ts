@@ -249,15 +249,13 @@ describe('jquery-scout', () => {
   });
 
   describe('oneAnimationEnd', () => {
-    let $style: JQuery;
-
     beforeEach(() => {
-      $style = $('<style>@keyframes spec-fade {from {opacity: 0;} to {opacity: 1;}} .spec-animate {animation: spec-fade 50ms;} .spec-animate-short {animation: spec-fade 10ms;}</style>');
-      $style.appendTo($('#sandbox'));
-    });
-
-    afterEach(() => {
-      $style.remove();
+      $(`<style>
+        @keyframes spec-fade {from {opacity: 0;} to {opacity: 1;}}
+          .spec-animate {animation: spec-fade 50ms;}
+          .spec-animate-short {animation: spec-fade 10ms;}
+          .spec-animate-two {animation: spec-fade 50ms, spec-nop 50ms;}
+        @keyframes spec-nop {}</style>`).appendTo($('#sandbox'));
     });
 
     /** Resolves when the browser fires the native animation event of the element itself (not a bubbling one of a child) */
@@ -328,6 +326,36 @@ describe('jquery-scout', () => {
       expect(handler).toHaveBeenCalledTimes(0);
 
       await sleep();
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the handler if the element is moved in the DOM while the animation is running', async () => {
+      let handler = jasmine.createSpy('handler');
+      $e.addClass('spec-animate');
+      $e.oneAnimationEnd(handler);
+
+      await whenNativeAnimationEvent($e, 'animationstart'); // the animation is running
+      let finished = $e[0].getAnimations()[0].finished; // a cancelled animation gets a new finished promise -> get it before
+      $e.prependTo($('#sandbox')); // cancels the animation and starts a new one
+      await expectAsync(finished).toBeRejected();
+      expect(handler).not.toHaveBeenCalled();
+
+      await whenNativeAnimationEvent($e);
+      expect(handler).toHaveBeenCalledTimes(1);
+    });
+
+    it('calls the handler when all animations have ended even if one of them is cancelled', async () => {
+      let handler = jasmine.createSpy('handler');
+      $e.addClass('spec-animate-two');
+      $e.oneAnimationEnd(handler);
+      expect($e[0].getAnimations().length).toBe(2);
+
+      await whenNativeAnimationEvent($e, 'animationstart');
+      $e.css('animation-name', 'spec-fade'); // cancels spec-nop, spec-fade keeps running
+      await sleep();
+      expect(handler).not.toHaveBeenCalled();
+
+      await whenNativeAnimationEvent($e);
       expect(handler).toHaveBeenCalledTimes(1);
     });
 
