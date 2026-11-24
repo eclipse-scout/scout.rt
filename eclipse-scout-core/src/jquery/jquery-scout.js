@@ -914,7 +914,12 @@ $.fn.oneAnimationEnd = function(handler, triggerOnError = false) {
     //   This does not work when using an animationend event because Chrome won't trigger the animationend event even when resuming because the time has already elapsed.
     Promise.all(activeAnimations.map(animation => animation.finished))
       .then(() => handler(new Event('animationend')))
-      .catch(e => {
+      .catch(() => {
+        if (element.getAnimations().length > 0) {
+          // Animation was restarted (e.g. element moved in the DOM) or another one is still running -> wait for them
+          $(element).oneAnimationEnd(handler, triggerOnError);
+          return;
+        }
         if (triggerOnError) {
           handler(new Event('animationcancel'));
         }
