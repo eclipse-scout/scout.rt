@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -65,17 +65,17 @@ describe('tooltips', () => {
     JQueryTesting.triggerMouseEnter(formField.$container);
     jasmine.clock().tick(100);
 
-    let tooltip = $('body').find('.tooltip');
-    let tooltipContent = tooltip.children('.tooltip-content');
-    expect(tooltip).not.toBeUndefined();
-    expect(tooltip.length).toBe(1);
-    expect(tooltipContent.text()).toBe('Test2');
+    let $tooltip = $('body').find('.tooltip');
+    let $tooltipContent = $tooltip.children('.tooltip-content');
+    expect($tooltip).not.toBeUndefined();
+    expect($tooltip.length).toBe(1);
+    expect($tooltipContent.text()).toBe('Test2');
 
     JQueryTesting.triggerMouseLeave(formField.$container);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip).not.toBeUndefined();
-    expect(tooltip.length).toBe(0);
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip).not.toBeUndefined();
+    expect($tooltip.length).toBe(0);
 
     tooltips.uninstall(formField.$container);
   });
@@ -94,9 +94,9 @@ describe('tooltips', () => {
       JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
-      let tooltip = $('body').find('.tooltip');
-      expect(tooltip).not.toBeUndefined();
-      expect(tooltip.length).toBe(0);
+      let $tooltip = $('body').find('.tooltip');
+      expect($tooltip).not.toBeUndefined();
+      expect($tooltip.length).toBe(0);
 
       tooltips.uninstall(formField.$container);
     });
@@ -113,11 +113,11 @@ describe('tooltips', () => {
       JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
-      let tooltip = $('body').find('.tooltip');
-      let tooltipContent = tooltip.children('.tooltip-content');
-      expect(tooltip).not.toBeUndefined();
-      expect(tooltip.length).toBe(1);
-      expect(tooltipContent.text()).toBe('Test3');
+      let $tooltip = $('body').find('.tooltip');
+      let $tooltipContent = $tooltip.children('.tooltip-content');
+      expect($tooltip).not.toBeUndefined();
+      expect($tooltip.length).toBe(1);
+      expect($tooltipContent.text()).toBe('Test3');
 
       tooltips.uninstall(formField.$container);
     });
@@ -134,9 +134,9 @@ describe('tooltips', () => {
       JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
-      let tooltip = $('body').find('.tooltip');
-      expect(tooltip).not.toBeUndefined();
-      expect(tooltip.length).toBe(0);
+      let $tooltip = $('body').find('.tooltip');
+      expect($tooltip).not.toBeUndefined();
+      expect($tooltip.length).toBe(0);
 
       tooltips.uninstall(formField.$container);
     });
@@ -153,11 +153,11 @@ describe('tooltips', () => {
       JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
-      let tooltip = $('body').find('.tooltip');
-      let tooltipContent = tooltip.children('.tooltip-content');
-      expect(tooltip).not.toBeUndefined();
-      expect(tooltip.length).toBe(1);
-      expect(tooltipContent.text()).toBe('Test4');
+      let $tooltip = $('body').find('.tooltip');
+      let $tooltipContent = $tooltip.children('.tooltip-content');
+      expect($tooltip).not.toBeUndefined();
+      expect($tooltip.length).toBe(1);
+      expect($tooltipContent.text()).toBe('Test4');
 
       tooltips.uninstall(formField.$container);
     });
@@ -176,11 +176,11 @@ describe('tooltips', () => {
       JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
-      let tooltip = $('body').find('.tooltip');
-      let tooltipContent = tooltip.children('.tooltip-content');
-      expect(tooltip).not.toBeUndefined();
-      expect(tooltip.length).toBe(1);
-      expect(tooltipContent.text()).toBe('Test5');
+      let $tooltip = $('body').find('.tooltip');
+      let $tooltipContent = $tooltip.children('.tooltip-content');
+      expect($tooltip).not.toBeUndefined();
+      expect($tooltip.length).toBe(1);
+      expect($tooltipContent.text()).toBe('Test5');
 
       tooltips.uninstall(formField.$container);
     });
@@ -198,11 +198,11 @@ describe('tooltips', () => {
       JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
-      let tooltip = $('body').find('.tooltip');
-      let tooltipContent = tooltip.children('.tooltip-content');
-      expect(tooltip).not.toBeUndefined();
-      expect(tooltip.length).toBe(1);
-      expect(tooltipContent.text()).toBe('Test6');
+      let $tooltip = $('body').find('.tooltip');
+      let $tooltipContent = $tooltip.children('.tooltip-content');
+      expect($tooltip).not.toBeUndefined();
+      expect($tooltip.length).toBe(1);
+      expect($tooltipContent.text()).toBe('Test6');
 
       tooltips.uninstall(formField.$container);
     });
@@ -211,8 +211,8 @@ describe('tooltips', () => {
       tooltips.install(formField.$container, {
         parent: session.desktop,
         session: session,
-        text: function(container) {
-          return (formField.$container.is(container) && arguments.length === 1) ? 'Test8' : 'InvalidArguments';
+        text: function($container) {
+          return (formField.$container.is($container) && arguments.length === 1) ? 'Test8' : 'InvalidArguments';
         },
         delay: 0
       });
@@ -221,11 +221,11 @@ describe('tooltips', () => {
       JQueryTesting.triggerMouseEnter(formField.$container);
       jasmine.clock().tick(100);
 
-      let tooltip = $('body').find('.tooltip');
-      let tooltipContent = tooltip.children('.tooltip-content');
-      expect(tooltip).not.toBeUndefined();
-      expect(tooltip.length).toBe(1);
-      expect(tooltipContent.text()).toBe('Test8');
+      let $tooltip = $('body').find('.tooltip');
+      let $tooltipContent = $tooltip.children('.tooltip-content');
+      expect($tooltip).not.toBeUndefined();
+      expect($tooltip.length).toBe(1);
+      expect($tooltipContent.text()).toBe('Test8');
 
       tooltips.uninstall(formField.$container);
     });
@@ -243,40 +243,40 @@ describe('tooltips', () => {
       delay: 123
     });
 
-    let tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(0);
+    let $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(0);
 
     JQueryTesting.triggerMouseEnter($testElement);
     jasmine.clock().tick(100);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(0);
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(0);
 
     jasmine.clock().tick(50);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(1);
-    expect(tooltip.text()).toBe('initial text');
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('initial text');
 
     $testElement.data('tooltipText', 'updated text');
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(1);
-    expect(tooltip.text()).toBe('initial text');
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('initial text');
 
     let support = $testElement.data('tooltipSupport');
     tooltips.update($testElement);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(1);
-    expect(tooltip.text()).toBe('updated text');
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('updated text');
     let support2 = $testElement.data('tooltipSupport');
     expect(support2).toBe(support);
 
     tooltips.uninstall($testElement);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(0);
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(0);
 
     // 2. Test with 'text' property in tooltip support
     $testElement.removeData('tooltipText');
@@ -291,30 +291,30 @@ describe('tooltips', () => {
     JQueryTesting.triggerMouseEnter($testElement);
     jasmine.clock().tick(150);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(1);
-    expect(tooltip.text()).toBe('hard coded text');
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('hard coded text');
 
     tooltips.update($testElement, {
       text: 'my new text',
       delay: 70
     });
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(1);
-    expect(tooltip.text()).toBe('my new text');
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('my new text');
 
     JQueryTesting.triggerMouseLeave($testElement);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(0);
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(0);
 
     JQueryTesting.triggerMouseEnter($testElement);
     jasmine.clock().tick(80);
 
-    tooltip = $('body').find('.tooltip');
-    expect(tooltip.length).toBe(1);
-    expect(tooltip.text()).toBe('my new text');
+    $tooltip = $('body').find('.tooltip');
+    expect($tooltip.length).toBe(1);
+    expect($tooltip.text()).toBe('my new text');
 
     tooltips.uninstall($testElement);
   });

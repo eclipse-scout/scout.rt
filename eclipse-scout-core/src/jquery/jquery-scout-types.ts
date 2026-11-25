@@ -572,7 +572,7 @@ declare global {
      */
     isOrHas(elem: JQuery | Element): boolean;
 
-    animateAVCSD(attr: string, value, complete?: (elem: JQuery) => void, step?: (elem: JQuery) => void, duration?: number): this;
+    animateAVCSD(attr: string, value, complete?: ($elem: JQuery) => void, step?: ($elem: JQuery) => void, duration?: number): this;
 
     /**
      * Animates the attribute to the given end value. When the animation is completed, the given handler will be executed.

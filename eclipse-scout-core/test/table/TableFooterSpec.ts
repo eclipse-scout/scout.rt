@@ -425,9 +425,9 @@ describe('TableFooterSpec', () => {
       model.tableStatusVisible = true;
       let table = helper.createTable(model);
       table.render();
-      let infoItems = table.footer._$info.children('.table-info-item').not('.table-info-status');
-      expect(infoItems.length).toBeGreaterThan(0);
-      infoItems.each((index, infoItem) => {
+      let $infoItems = table.footer._$info.children('.table-info-item').not('.table-info-status');
+      expect($infoItems.length).toBeGreaterThan(0);
+      $infoItems.each((index, infoItem) => {
         expect($(infoItem)).toHaveAttr('role', 'status');
       });
     });

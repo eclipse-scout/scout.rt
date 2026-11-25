@@ -1536,12 +1536,12 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
 
   setPopstateHandler(handler: (event: JQuery.TriggeredEvent) => void) {
     if (this.rendered || this.rendering) {
-      let window = this.$container.window();
+      let $window = this.$container.window();
       if (this._popstateHandler) {
-        window.off('popstate', this._popstateHandler);
+        $window.off('popstate', this._popstateHandler);
       }
       if (handler) {
-        window.on('popstate', handler);
+        $window.on('popstate', handler);
       }
     }
     this._popstateHandler = handler;

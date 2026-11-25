@@ -1168,7 +1168,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
       cancelButtonText: options.cancelButtonText
     };
     const messageBox = scout.create(MessageBox, model);
-    const $entryPoint = options.entryPoint || this.$entryPoint;
+    const $entryPoint = options.$entryPoint || this.$entryPoint;
 
     messageBox.on('action', event => {
       delete this._fatalMessagesOnScreen[errorCode];
@@ -1740,7 +1740,7 @@ export interface FatalMessageOptions {
   body?: string;
   severity?: StatusSeverity;
   iconId?: string;
-  entryPoint?: JQuery;
+  $entryPoint?: JQuery;
 
   hiddenText?: string;
   yesButtonText?: string;

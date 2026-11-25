@@ -134,8 +134,8 @@ export class Carousel extends Widget implements CarouselModel {
     if (!this.$carouselStatus) {
       return;
     }
-    this.$carouselStatusItems.forEach((e: JQuery, i: number) => {
-      e.toggleClass('current-item', i === this.currentItem);
+    this.$carouselStatusItems.forEach(($statusItem: JQuery, i: number) => {
+      $statusItem.toggleClass('current-item', i === this.currentItem);
     });
   }
 

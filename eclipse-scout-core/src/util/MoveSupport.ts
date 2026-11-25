@@ -367,10 +367,10 @@ export class MoveSupport<TElem extends DraggableElement> extends EventEmitter {
     $clone.on('wheel', event => this._moveData.$container.trigger(event));
 
     // Clone canvas contents manually
-    let origCanvases = this._moveData.$draggedElement.find('canvas:visible') as JQuery<HTMLCanvasElement>;
+    let $origCanvases = this._moveData.$draggedElement.find('canvas:visible') as JQuery<HTMLCanvasElement>;
     $clone.find('canvas:visible').each((index, canvas: HTMLCanvasElement) => {
       try {
-        canvas.getContext('2d').drawImage(origCanvases.get(index), 0, 0);
+        canvas.getContext('2d').drawImage($origCanvases.get(index), 0, 0);
       } catch (err) {
         // Drawing on the canvas can throw unexpected errors, for example:
         // "DOMException: Failed to execute 'drawImage' on 'CanvasRenderingContext2D':

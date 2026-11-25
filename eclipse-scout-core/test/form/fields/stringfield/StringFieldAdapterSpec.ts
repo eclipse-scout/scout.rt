@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -45,20 +45,20 @@ describe('StringFieldAdapter', () => {
         let field = createField(createModel());
         linkWidgetAndAdapter(field, 'StringFieldAdapter');
         field.render();
-        let $fieldElement = field.$field[0] as HTMLInputElement;
-        expect($fieldElement.value).toBe('');
+        let fieldElement = field.$field[0] as HTMLInputElement;
+        expect(fieldElement.value).toBe('');
 
         let event = createPropertyChangeEvent(field, {
           insertText: 'hello'
         });
         field.modelAdapter.onModelPropertyChange(event);
-        expect($fieldElement.value).toBe('hello');
+        expect(fieldElement.value).toBe('hello');
 
         event = createPropertyChangeEvent(field, {
           insertText: 'hello'
         });
         field.modelAdapter.onModelPropertyChange(event);
-        expect($fieldElement.value).toBe('hellohello');
+        expect(fieldElement.value).toBe('hellohello');
       });
     });
   });

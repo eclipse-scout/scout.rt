@@ -521,8 +521,8 @@ export class TableHeader extends Widget implements TableHeaderModel {
     let $accessibleState = $state.appendDiv().addClass('text').text(accessibleStateText);
     aria.screenReaderOnly($accessibleState);
     // Contains sort arrow
-    let sortArrow = $state.appendDiv('right');
-    aria.hidden(sortArrow, true);
+    let $sortArrow = $state.appendDiv('right');
+    aria.hidden($sortArrow, true);
 
     this._adjustColumnMinWidth(column);
   }
@@ -785,8 +785,8 @@ export class TableHeader extends Widget implements TableHeaderModel {
       }
 
       // find new position of dragged header
-      let h = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
-      h.each(function(i) {
+      let $headers = (diff < 0) ? $otherHeaders : $($otherHeaders.get().reverse());
+      $headers.each(function(i) {
         if ($(this).css('left') !== '0px') {
           newPos = that._visibleColumns().indexOf(($(this).data('column')));
           return false;

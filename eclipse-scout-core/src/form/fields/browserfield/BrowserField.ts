@@ -32,8 +32,8 @@ export class BrowserField extends FormField implements BrowserFieldModel {
   myWindow: Window;
   protected _messageListener: (event: MessageEvent) => any;
   protected _popupWindow: Window;
-  protected _externalWindowTextField: JQuery;
-  protected _externalWindowButton: JQuery;
+  protected _$externalWindowTextField: JQuery;
+  protected _$externalWindowButton: JQuery;
 
   constructor() {
     super();
@@ -50,8 +50,8 @@ export class BrowserField extends FormField implements BrowserFieldModel {
     this.showInExternalWindow = false;
     this._messageListener = null;
     this._popupWindow = null;
-    this._externalWindowTextField = null;
-    this._externalWindowButton = null;
+    this._$externalWindowTextField = null;
+    this._$externalWindowButton = null;
   }
 
   static WindowStates = {
@@ -86,9 +86,9 @@ export class BrowserField extends FormField implements BrowserFieldModel {
     } else {
       // mode 2: separate window
       this.addField(this.$parent.makeDiv());
-      this._externalWindowTextField = this.$field.appendDiv()
+      this._$externalWindowTextField = this.$field.appendDiv()
         .addClass('alt');
-      this._externalWindowButton = this.$field.appendDiv()
+      this._$externalWindowButton = this.$field.appendDiv()
         .addClass('button')
         .on('click', event => this._openPopupWindow(true));
     }
@@ -152,7 +152,7 @@ export class BrowserField extends FormField implements BrowserFieldModel {
 
   protected _renderExternalWindowButtonText() {
     if (this.showInExternalWindow) {
-      this._externalWindowButton.text(this.externalWindowButtonText || '');
+      this._$externalWindowButton.text(this.externalWindowButtonText || '');
     }
   }
 
@@ -162,7 +162,7 @@ export class BrowserField extends FormField implements BrowserFieldModel {
 
   protected _renderExternalWindowFieldText() {
     if (this.showInExternalWindow) {
-      this._externalWindowTextField.text(this.externalWindowFieldText || '');
+      this._$externalWindowTextField.text(this.externalWindowFieldText || '');
     }
   }
 

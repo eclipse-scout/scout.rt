@@ -4641,16 +4641,16 @@ describe('Table', () => {
 
       let $headerColumns = table.header.$container.find('.table-header-item').not('.filler');
       expect($headerColumns.length).toBeGreaterThan(0);
-      $headerColumns.each((index, $headerColumn) => {
-        expect($headerColumn).toHaveAttr('role', 'columnheader');
-        expect($headerColumn).not.toHaveAttr('role', 'none');
+      $headerColumns.each((index, headerColumn) => {
+        expect(headerColumn).toHaveAttr('role', 'columnheader');
+        expect(headerColumn).not.toHaveAttr('role', 'none');
       });
 
       let $headerColumnSeparators = table.header.$container.find('.table-header-resize');
       expect($headerColumnSeparators.length).toBeGreaterThan(0);
-      $headerColumnSeparators.each((index, $headerColumnSeparator) => {
-        expect($headerColumnSeparator).toHaveAttr('role', 'none');
-        expect($headerColumnSeparator).not.toHaveAttr('role', 'columnheader');
+      $headerColumnSeparators.each((index, headerColumnSeparator) => {
+        expect(headerColumnSeparator).toHaveAttr('role', 'none');
+        expect(headerColumnSeparator).not.toHaveAttr('role', 'columnheader');
       });
     });
 

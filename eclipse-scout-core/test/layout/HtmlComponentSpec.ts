@@ -19,7 +19,7 @@ describe('HtmlComponent', () => {
     session = sandboxSession();
   });
 
-  let jqueryMock = {
+  let $jqueryMock = {
     data: htmlComp => {
       // nop
     }
@@ -69,26 +69,26 @@ describe('HtmlComponent', () => {
   describe('install', () => {
 
     it('does NOT set data \'htmlComponent\' when constructor is called', () => {
-      spyOn(jqueryMock, 'data');
-      new HtmlComponent(jqueryMock, session);
-      expect(jqueryMock.data).not.toHaveBeenCalled();
+      spyOn($jqueryMock, 'data');
+      new HtmlComponent($jqueryMock, session);
+      expect($jqueryMock.data).not.toHaveBeenCalled();
     });
 
     it('sets data \'htmlComponent\' when install() is called', () => {
-      spyOn(jqueryMock, 'data');
-      let htmlComp = HtmlComponent.install(jqueryMock, session);
+      spyOn($jqueryMock, 'data');
+      let htmlComp = HtmlComponent.install($jqueryMock, session);
       // @ts-expect-error
-      expect(jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
+      expect($jqueryMock.data).toHaveBeenCalledWith('htmlComponent', htmlComp);
     });
 
   });
 
   describe('size', () => {
 
-    addWidthHeightMock(jqueryMock);
+    addWidthHeightMock($jqueryMock);
 
     it('returns getBoundingClientRect() of JQuery comp', () => {
-      let htmlComp = HtmlComponent.install(jqueryMock, session);
+      let htmlComp = HtmlComponent.install($jqueryMock, session);
       let size = htmlComp.size();
       expect(size.width).toBe(6);
       expect(size.height).toBe(7);
@@ -100,7 +100,7 @@ describe('HtmlComponent', () => {
     let htmlComp;
 
     // return size(6, 7)
-    addWidthHeightMock(jqueryMock);
+    addWidthHeightMock($jqueryMock);
 
     beforeEach(() => {
       $comp = $('<div>').appendTo(session.$entryPoint);
@@ -129,7 +129,7 @@ describe('HtmlComponent', () => {
   describe('insets', () => {
 
     it('reads padding, margin and border correctly', () => {
-      let jqueryObj = $('<div>').css({
+      let $jqueryObj = $('<div>').css({
         marginTop: '1px',
         marginRight: '2px',
         marginBottom: '3px',
@@ -144,7 +144,7 @@ describe('HtmlComponent', () => {
         borderBottomWidth: '11px',
         borderLeftWidth: '12px'
       });
-      let htmlComp = HtmlComponent.install(jqueryObj, session);
+      let htmlComp = HtmlComponent.install($jqueryObj, session);
       let expected = new Insets(15, 18, 21, 24);
       let actual = htmlComp.insets({
         includeMargin: true

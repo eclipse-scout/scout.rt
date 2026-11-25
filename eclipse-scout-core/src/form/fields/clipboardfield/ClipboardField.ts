@@ -339,7 +339,7 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
 
       if (uploadFunctionTimeoutCount >= this._fileUploadWaitRetryCountTimeout) {
         let boxOptions: FatalMessageOptions = {
-          entryPoint: this.$container.entryPoint(),
+          $entryPoint: this.$container.entryPoint(),
           header: this.session.text('ui.ClipboardTimeoutTitle'),
           body: this.session.text('ui.ClipboardTimeout'),
           yesButtonText: this.session.text('Ok')

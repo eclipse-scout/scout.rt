@@ -4179,8 +4179,8 @@ describe('Tree', () => {
       tree.render();
       let $allNodes = helper.findAllNodes(tree);
       expect($allNodes.length).toBeGreaterThan(0);
-      $allNodes.each((index, $node) => {
-        expect($node).toHaveAttr('role', 'treeitem');
+      $allNodes.each((index, node) => {
+        expect(node).toHaveAttr('role', 'treeitem');
       });
     });
 

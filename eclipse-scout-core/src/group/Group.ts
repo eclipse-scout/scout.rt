@@ -371,8 +371,8 @@ export class Group<TBody extends Widget = Widget> extends Widget implements Grou
     } else if (this.collapseStyle === Group.CollapseStyle.LEFT) {
       this.$collapseIcon.prependTo(this.$header);
     } else if (this.collapseStyle === Group.CollapseStyle.BOTTOM) {
-      let sibling = this.body.$container ? this.body.$container : this.$header;
-      this.$footer.insertAfter(sibling);
+      let $sibling = this.body.$container ? this.body.$container : this.$header;
+      this.$footer.insertAfter($sibling);
       this.$collapseIcon.insertAfter(this.$collapseBorderLeft);
     }
 

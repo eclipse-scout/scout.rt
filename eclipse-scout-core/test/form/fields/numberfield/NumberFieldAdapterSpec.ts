@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -71,8 +71,8 @@ describe('NumberFieldAdapter', () => {
 
     field.$field.val('2.0+3.1');
     field.acceptInput();
-    let $fieldElement = field.$field[0] as HTMLInputElement;
-    expect($fieldElement.value).toBe('5.1');
+    let fieldElement = field.$field[0] as HTMLInputElement;
+    expect(fieldElement.value).toBe('5.1');
   });
 
 });

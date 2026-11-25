@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -104,11 +104,11 @@ export class GlassPaneRenderer {
       right = -$glassPaneTarget.cssBorderRightWidth();
 
     $glassPaneTarget.children().each((idx, elem) => {
-      let element = $(elem);
-      top = Math.min(top, (element.cssTop() || 0) + (element.cssMarginTop() || 0));
-      bottom = Math.min(bottom, (element.cssBottom() || 0) + (element.cssMarginBottom() || 0));
-      left = Math.min(left, (element.cssLeft() || 0) + (element.cssMarginLeft() || 0));
-      right = Math.min(right, (element.cssRight() || 0) + (element.cssMarginRight() || 0));
+      let $element = $(elem);
+      top = Math.min(top, ($element.cssTop() || 0) + ($element.cssMarginTop() || 0));
+      bottom = Math.min(bottom, ($element.cssBottom() || 0) + ($element.cssMarginBottom() || 0));
+      left = Math.min(left, ($element.cssLeft() || 0) + ($element.cssMarginLeft() || 0));
+      right = Math.min(right, ($element.cssRight() || 0) + ($element.cssMarginRight() || 0));
     });
 
     $glassPane.cssTop(top)

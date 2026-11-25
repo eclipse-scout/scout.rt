@@ -5010,7 +5010,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _renderColumnOrderChanges(oldColumnOrder: Column<any>[]) {
-    let $cell: HTMLElement, that = this;
+    let cell: HTMLElement, that = this;
 
     if (this.header) {
       this.header.onOrderChanged(oldColumnOrder);
@@ -5027,11 +5027,11 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
         // Find $cell for given column
         for (let j = 0; j < oldColumnOrder.length; j++) {
           if (oldColumnOrder[j] === column) {
-            $cell = $cells[j];
+            cell = $cells[j];
             break;
           }
         }
-        orderedCells.push($cell);
+        orderedCells.push(cell);
       }
       $row.prepend(orderedCells);
     });

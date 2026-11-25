@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -59,13 +59,13 @@ describe('CompactTree', () => {
       expect(tree.visibleNodesFlat.length).toBe(6);
 
       // check $node
-      let firstNode = tree.nodes[0].$node.children();
-      expect($(firstNode[0]).hasClass('title')).toBe(true);
-      expect($(firstNode[0]).text()).toBe('node 0');
-      expect($(firstNode[1]).hasClass('section-node')).toBe(true);
-      expect($(firstNode[1]).text()).toBe('node 0_0');
-      expect($(firstNode[2]).hasClass('section-node')).toBe(true);
-      expect($(firstNode[2]).text()).toBe('node 0_1');
+      let $firstNode = tree.nodes[0].$node.children();
+      expect($($firstNode[0]).hasClass('title')).toBe(true);
+      expect($($firstNode[0]).text()).toBe('node 0');
+      expect($($firstNode[1]).hasClass('section-node')).toBe(true);
+      expect($($firstNode[1]).text()).toBe('node 0_0');
+      expect($($firstNode[2]).hasClass('section-node')).toBe(true);
+      expect($($firstNode[2]).text()).toBe('node 0_1');
     });
 
     // deletion
@@ -79,11 +79,11 @@ describe('CompactTree', () => {
       expect(tree.visibleNodesFlat.length).toBe(5);
 
       // check $node
-      let firstNode = tree.nodes[0].$node.children();
-      expect($(firstNode[0]).hasClass('title')).toBe(true);
-      expect($(firstNode[0]).text()).toBe('node 0');
-      expect($(firstNode[1]).hasClass('section-node')).toBe(true);
-      expect($(firstNode[1]).text()).toBe('node 0_1');
+      let $firstNode = tree.nodes[0].$node.children();
+      expect($($firstNode[0]).hasClass('title')).toBe(true);
+      expect($($firstNode[0]).text()).toBe('node 0');
+      expect($($firstNode[1]).hasClass('section-node')).toBe(true);
+      expect($($firstNode[1]).text()).toBe('node 0_1');
     });
 
     // insertions
@@ -101,13 +101,13 @@ describe('CompactTree', () => {
       expect(tree.visibleNodesFlat.length).toBe(6);
 
       // check $node
-      let firstNode = parent0.$node.children();
-      expect($(firstNode[0]).hasClass('title')).toBe(true);
-      expect($(firstNode[0]).text()).toBe('node 0');
-      expect($(firstNode[1]).hasClass('section-node')).toBe(true);
-      expect($(firstNode[1]).text()).toBe('node 0_0');
-      expect($(firstNode[2]).hasClass('section-node')).toBe(true);
-      expect($(firstNode[2]).text()).toBe('node 0_1');
+      let $firstNode = parent0.$node.children();
+      expect($($firstNode[0]).hasClass('title')).toBe(true);
+      expect($($firstNode[0]).text()).toBe('node 0');
+      expect($($firstNode[1]).hasClass('section-node')).toBe(true);
+      expect($($firstNode[1]).text()).toBe('node 0_0');
+      expect($($firstNode[2]).hasClass('section-node')).toBe(true);
+      expect($($firstNode[2]).text()).toBe('node 0_1');
     });
 
   });

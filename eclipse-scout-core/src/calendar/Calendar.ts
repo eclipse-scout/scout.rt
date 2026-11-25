@@ -822,10 +822,10 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _onDayColumnMouseDown(withTime: boolean, event: JQuery.MouseDownEvent) {
-    let selectedDayColumn = $(event.delegateTarget),
-      selectedDate = new Date(selectedDayColumn.parent().data('date')),
+    let $selectedDayColumn = $(event.delegateTarget),
+      selectedDate = new Date($selectedDayColumn.parent().data('date')),
       timeChanged = false,
-      selectedResourceId = selectedDayColumn.data('resourceId'),
+      selectedResourceId = $selectedDayColumn.data('resourceId'),
       selectedResourceChanged = selectedResourceId !== this.selectedResource.resourceId;
 
     // Do not apply selection when clicked on calendar component
@@ -1051,14 +1051,14 @@ export class Calendar extends Widget implements CalendarModel {
     if (this.isDay() || this.isWeek() || this.isWorkWeek()) {
       $allWeeks.removeClass('calendar-week-noborder');
       // Parent of selected (Day) is a week
-      let selectedWeek = $selected.parent();
-      $weeksToHide = $allWeeks.not(selectedWeek); // Hide all (other) weeks delayed, height will animate to zero
+      let $selectedWeek = $selected.parent();
+      $weeksToHide = $allWeeks.not($selectedWeek); // Hide all (other) weeks delayed, height will animate to zero
       $weeksToHide.data('new-height', 0);
       $weeksToHide.removeClass('invisible');
-      selectedWeek.data('new-height', this.heightPerDay);
-      selectedWeek.addClass('calendar-week-noborder');
-      selectedWeek.removeClass('hidden invisible'); // Current week must be shown
-      $('.calendar-day', selectedWeek).data('new-height', this.heightPerDay);
+      $selectedWeek.data('new-height', this.heightPerDay);
+      $selectedWeek.addClass('calendar-week-noborder');
+      $selectedWeek.removeClass('hidden invisible'); // Current week must be shown
+      $('.calendar-day', $selectedWeek).data('new-height', this.heightPerDay);
       // Hide the week-number in the lower grid
       $('.calendar-week-name', this.$grid).addClass('invisible'); // Keep the reserved space
       $('.calendar-week-allday-container', this.$topGrid).removeClass('hidden');
@@ -2024,8 +2024,8 @@ export class Calendar extends Widget implements CalendarModel {
     let currWeek = $part.closest('.calendar-day').data('week');
 
     if (component.rendered && (currDay !== this._moveData.virtualX || currWeek !== this._moveData.virtualY)) {
-      let newContainer = this._calculateVirtualComponentContainer();
-      $part.detach().appendTo(newContainer);
+      let $newContainer = this._calculateVirtualComponentContainer();
+      $part.detach().appendTo($newContainer);
 
       if (!this.isMonth()) {
         let topPercentage = (this._moveData.virtualY - this._moveData.virtualOffset) * 100 / 1440;
@@ -2035,19 +2035,19 @@ export class Calendar extends Widget implements CalendarModel {
   }
 
   protected _calculateVirtualComponentContainer(): JQuery {
-    let baseQuery = $('.calendar-week:not(.hidden) > .calendar-day');
+    let $baseQuery = $('.calendar-week:not(.hidden) > .calendar-day');
     let moveData = this._moveData;
 
     if (this.isMonth()) {
       // Filter calendar days by correct x / y position
-      return baseQuery.filter(function() {
+      return $baseQuery.filter(function() {
         return $(this).data('day') === moveData.virtualX &&
           $(this).data('week') === moveData.virtualY;
       }).find('.resource-column.default > .calendar-scrollable-components');
     }
 
     if (this.isDay()) {
-      return baseQuery
+      return $baseQuery
         .filter('.selected')
         .children('.resource-column')
         .filter(function() {
@@ -2056,7 +2056,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // When on work week or week, return default resource column
-    return baseQuery.filter(function() {
+    return $baseQuery.filter(function() {
       return $(this).data('day') === moveData.virtualX;
     }).children('.resource-column.default');
   }

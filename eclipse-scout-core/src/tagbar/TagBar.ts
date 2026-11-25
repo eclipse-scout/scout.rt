@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -208,7 +208,7 @@ export class TagBar extends Widget implements TagBarModel {
     // when overflow popup opens it sets focus to the first tag element, this means:
     // the input field loses focus. In that case we must prevent that the overflow popup is closed.
     let relatedTargetOfCurrentEvent = (event as FocusEvent).relatedTarget as Element;
-    let popupRequestsFocus = this.overflow && this.overflow.$container.has(relatedTargetOfCurrentEvent);
+    let popupRequestsFocus = !!this.overflow && this.overflow.$container.has(relatedTargetOfCurrentEvent).length > 0;
     if (popupRequestsFocus) {
       return;
     }

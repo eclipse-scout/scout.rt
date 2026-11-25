@@ -369,8 +369,8 @@ export class TagField extends ValueField<string[]> implements TagFieldModel {
   }
 
   isInputFocused(): boolean {
-    let ae = this.$fieldContainer.activeElement();
-    return this.$field.is(ae);
+    let $activeElement = this.$fieldContainer.activeElement();
+    return this.$field.is($activeElement);
   }
 
   protected _onValueChange(event: PropertyChangeEvent<any, TagField>) {

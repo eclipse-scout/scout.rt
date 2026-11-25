@@ -581,9 +581,9 @@ export class StringField extends BasicField<string> implements StringFieldModel 
         if (!this.rendered) {
           return;
         }
-        let $field = this.$field[0] as HTMLInputElement;
-        $field.selectionStart = 0;
-        $field.selectionEnd = 0;
+        let field = this.$field[0] as HTMLInputElement;
+        field.selectionStart = 0;
+        field.selectionEnd = 0;
       });
     }
   }

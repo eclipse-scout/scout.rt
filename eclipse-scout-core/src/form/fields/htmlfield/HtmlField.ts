@@ -124,9 +124,9 @@ export class HtmlField extends ValueField<string> implements HtmlFieldModel {
       return;
     }
     if (this.scrollBarEnabled && this.scrollToAnchor) {
-      let anchorElem = this.$field.find('#'.concat(this.scrollToAnchor));
-      if (anchorElem && anchorElem.length > 0) {
-        scrollbars.scrollTo(this.$field, anchorElem);
+      let $anchorElem = this.$field.find('#'.concat(this.scrollToAnchor));
+      if ($anchorElem && $anchorElem.length > 0) {
+        scrollbars.scrollTo(this.$field, $anchorElem);
       }
     }
   }

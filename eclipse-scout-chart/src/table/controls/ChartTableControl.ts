@@ -792,8 +792,8 @@ export class ChartTableControl extends TableControl implements ChartTableControl
   }
 
   protected _getDatasetLabel(): string {
-    let elem = this._aggregationMap[this.chartAggregation.id || 'all'];
-    return (elem ? elem.text() : null) || this.session.text('ui.Value');
+    let $elem = this._aggregationMap[this.chartAggregation.id || 'all'];
+    return ($elem ? $elem.text() : null) || this.session.text('ui.Value');
   }
 
   protected _calculateValues(): TableMatrixResult {

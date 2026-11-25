@@ -63,12 +63,12 @@ describe('Calendar', () => {
 
     describe('expansion of panels', () => {
 
-      const getContainerWidth = (container: JQuery): number => {
-        return container.width();
+      const getContainerWidth = ($container: JQuery): number => {
+        return $container.width();
       };
 
-      const getContainerHeight = (container: JQuery): number => {
-        return container.height();
+      const getContainerHeight = ($container: JQuery): number => {
+        return $container.height();
       };
 
       it('should expand the calendar sidebar when showCalendarSidebar is true', () => {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -960,11 +960,11 @@ export class Planner extends Widget implements PlannerModel {
       if (!opensContextMenu && this.$selectors) {
         // Hide selector otherwise activity may not be resolved (elementFromPoint would return the $selector)
         // This allows selecting an activity which is inside a selection range
-        this.$selectors.forEach(s => s.hide());
+        this.$selectors.forEach($selector => $selector.hide());
       }
       $activity = this.$grid.elementFromPoint(event.pageX, event.pageY);
       if (!opensContextMenu && this.$selectors) {
-        this.$selectors.forEach(s => s.show());
+        this.$selectors.forEach($selector => $selector.show());
       }
       if ($activity.hasClass('planner-activity')) {
         $resource = $activity.parent().parent();
@@ -1489,7 +1489,7 @@ export class Planner extends Widget implements PlannerModel {
 
   protected _removeSelectors() {
     if (this.$selectors) {
-      this.$selectors.forEach(s => s.remove());
+      this.$selectors.forEach($selector => $selector.remove());
     }
     if (this.$highlight) {
       this.$highlight.remove();

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -39,8 +39,8 @@ export class CarouselLayout extends AbstractLayout {
     filmstripSize.width = $carouselItems.length * filmstripSize.width;
     this.carousel.htmlCompFilmstrip.setSize(filmstripSize);
 
-    $carouselItems.forEach(e => {
-      let htmlCarouselItem = HtmlComponent.get(e);
+    $carouselItems.forEach($carouselItem => {
+      let htmlCarouselItem = HtmlComponent.get($carouselItem);
       htmlCarouselItem.setSize(itemSize);
     });
   }
