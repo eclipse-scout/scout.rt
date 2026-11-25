@@ -9,9 +9,9 @@
  */
 import {
   AbstractLayout, Action, arrays, BenchColumnLayoutData, BusyIndicatorOptions, BusySupport, cookies, Deferred, DeferredGlassPaneTarget, DesktopBench, DesktopEventMap, DesktopFormController, DesktopHeader, DesktopLayout, DesktopModel,
-  DesktopNavigation, DesktopNotification, Device, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser, FileChooserController, Form,
-  GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel, objects,
-  OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
+  DesktopNavigation, DesktopNotification, Device, DeviceType, DisableBrowserF5ReloadKeyStroke, DisableBrowserTabSwitchingKeyStroke, DisplayParent, DisplayViewId, EnumObject, Event, EventEmitter, EventHandler, FileChooser,
+  FileChooserController, Form, GlassPaneTarget, HtmlComponent, HtmlEnvironment, InitModelOf, KeyStrokeContext, Menu, MessageBox, MessageBoxController, NativeNotificationVisibility, ObjectIdProvider, ObjectOrChildModel, ObjectOrModel,
+  objects, OfflineDesktopNotification, OpenUriHandler, Outline, OutlineContent, OutlineViewButton, Popup, ReloadPageOptions, ResponsiveHandler, scout, SimpleTabArea, SimpleTabBox, Splitter, SplitterMoveEndEvent, SplitterMoveEvent,
   SplitterPositionChangeEvent, strings, styles, Tooltip, Tree, TreeDisplayStyle, UnsavedFormChangesForm, URL, ViewButton, webstorage, Widget, widgets
 } from '../index';
 import $ from 'jquery';
@@ -64,6 +64,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   openUriHandler: OpenUriHandler;
   theme: string;
   dense: boolean;
+  deviceType: DeviceType;
   animateLayoutChange: boolean;
   url: URL;
   responsiveHandler: ResponsiveHandler;
@@ -81,6 +82,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   protected _selectedViewDestroyHandler: EventHandler<Event<Form>>;
   protected _popstateHandler: (event: JQuery.TriggeredEvent) => void;
   protected _repositionTooltipsHandler: () => void;
+  protected _enforcedDeviceTypeChangeHandler: EventHandler<Event<Device>>;
 
   constructor() {
     super();
@@ -137,6 +139,7 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     this._glassPaneTargetFilters = [];
     this._selectedViewDestroyHandler = this._onSelectedViewDestroy.bind(this);
     this._repositionTooltipsHandler = null;
+    this._enforcedDeviceTypeChangeHandler = this._onEnforcedTypePropertyChanged.bind((this));
   }
 
   static DisplayStyle = {
@@ -224,6 +227,8 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     super._init(model);
     this.url = new URL();
     this._initTheme();
+    Device.get().on('propertyChange:enforcedType', this._enforcedDeviceTypeChangeHandler);
+    this._setDeviceType(this.deviceType || Device.get().enforcedType);
     this.formController = scout.create(DesktopFormController, {
       displayParent: this,
       session: this.session
@@ -1711,6 +1716,22 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
   }
 
   /**
+   * Updates {@link deviceType} and passes this value to the current {@link Device} (see {@link Device.setEnforcedType})
+   */
+  setDeviceType(deviceType: DeviceType) {
+    this.setProperty('deviceType', deviceType);
+  }
+
+  protected _setDeviceType(deviceType: DeviceType) {
+    this._setProperty('deviceType', deviceType);
+    Device.get().setEnforcedType(deviceType);
+  }
+
+  protected _onEnforcedTypePropertyChanged(event: Event<Device>) {
+    event => this.setDeviceType(event.newValue);
+  }
+
+  /**
    * Moves all the given overlays (popups, dialogs, message boxes etc.) before the target overlay and activates the focus context of the target overlay.
    *
    * @param overlaysToMove the overlays which should be moved before the target overlay
@@ -1857,6 +1878,11 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
     let $target = $(event.target);
     let focusedElement = scout.widget($target);
     this.setProperty('focusedElement', focusedElement);
+  }
+
+  override _destroy() {
+    super._destroy();
+    Device.get().off('propertyChange:deviceType', this._enforcedDeviceTypeChangeHandler);
   }
 }
 

@@ -9,12 +9,14 @@
  */
 package org.eclipse.scout.rt.ui.html;
 
+import static java.util.function.Predicate.not;
 import static org.eclipse.scout.rt.platform.util.Assertions.assertNotNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -33,6 +35,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
+import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.IClientSession;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
 import org.eclipse.scout.rt.client.context.ClientRunContexts;
@@ -69,6 +72,7 @@ import org.eclipse.scout.rt.server.commons.servlet.UrlHints;
 import org.eclipse.scout.rt.server.commons.servlet.cache.HttpResourceCache;
 import org.eclipse.scout.rt.server.commons.servlet.cache.IHttpResourceCache;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
+import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.session.SessionId;
 import org.eclipse.scout.rt.shared.session.SessionMetricsHelper;
 import org.eclipse.scout.rt.shared.session.job.filter.event.SessionJobEventFilter;
@@ -576,6 +580,11 @@ public class UiSession implements IUiSession {
     return m_clientSession;
   }
 
+  @Override
+  public int getClientSessionExitCode() {
+    return (m_clientSession == null ? -1 : m_clientSession.getExitCode());
+  }
+
   /**
    * do not use this internal method
    */
@@ -644,6 +653,15 @@ public class UiSession implements IUiSession {
     detachDesktop();
 
     m_sessionMetrics.sessionDestroyed(SESSION_TYPE);
+
+    // inform other sessions to stop + reload
+    if (getClientSession() != null && getClientSessionExitCode() == AbstractClientSession.EXIT_CODE_RELOAD_SESSION) {
+      sessionStore().getUiSessionMap().values().stream()
+          .map(IUiSession::getClientSession)
+          .filter(Objects::nonNull)
+          .filter(not(ISession::isStopping))
+          .forEach(clientSession -> clientSession.stop(AbstractClientSession.EXIT_CODE_RELOAD_SESSION));
+    }
   }
 
   /**
@@ -1134,7 +1152,12 @@ public class UiSession implements IUiSession {
 
   protected JSONObject createLogoutEventData() {
     JSONObject obj = new JSONObject();
-    obj.put("redirectUrl", getLogoutRedirectUrl());
+    if (getClientSessionExitCode() == AbstractClientSession.EXIT_CODE_LOGOUT) {
+      obj.put("redirectUrl", getLogoutRedirectUrl());
+    }
+    if (getClientSessionExitCode() == AbstractClientSession.EXIT_CODE_RELOAD_SESSION) {
+      obj.put("reloadPage", Boolean.TRUE);
+    }
     return obj;
   }
 

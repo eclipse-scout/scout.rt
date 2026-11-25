@@ -89,6 +89,8 @@ public interface IUiSession {
 
   IClientSession getClientSession();
 
+  int getClientSessionExitCode();
+
   /**
    * Same as {@link #touch(RequestType)} with {@code null} as request type.
    */
@@ -102,7 +104,7 @@ public interface IUiSession {
    * Note that {@link HttpSession#getLastAccessedTime()} is also updated on polling requests
    *
    * @param requestType
-   *          type of the current request, may be {@code null} (e.g. for non-JSON requests like file uploads)
+   *     type of the current request, may be {@code null} (e.g. for non-JSON requests like file uploads)
    */
   void touch(RequestType requestType);
 
