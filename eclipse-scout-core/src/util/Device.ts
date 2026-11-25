@@ -703,18 +703,37 @@ export class Device extends PropertyEventEmitter implements DeviceModel, ObjectW
   }
 
   /**
-   * Creates a clone of this {@link Device}.
-   * @see scout.cloneShallow
+   * Creates a clone of this {@link Device}. All properties given in the {@link DeviceModel} are set on the clone.
+   * The cloned {@link Device} will be in a read only state and does not support any property changes.
+   * No events will be synchronised between the original and the cloned {@link Device}.
    */
   clone(model?: DeviceModel): Device {
-    const device = scout.cloneShallow(
-      this,
-      {
-        ...model,
-        features: {...model?.features}
-      },
-      false
-    );
+    // merge properties from this device and given model
+    model = {
+      userAgent: this.userAgent,
+      system: this.system,
+      enforcedType: this.enforcedType,
+      detectedType: this.detectedType,
+      browser: this.browser,
+      browserVersion: this.browserVersion,
+      systemVersion: this.systemVersion,
+      scrollbarWidth: this.scrollbarWidth,
+      ...model,
+      features: {...model?.features}
+    };
+
+    // create new device
+    const device = scout.create(Device, {userAgent: model.userAgent});
+
+    // set all properties from model
+    for (const [propertyName, value] of Object.entries(model)) {
+      if (value === undefined) {
+        continue;
+      }
+      device[propertyName] = value;
+    }
+
+    // freeze object, no more property changes
     Object.freeze(device);
     return device;
   }
