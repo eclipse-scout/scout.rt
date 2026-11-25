@@ -1323,7 +1323,7 @@ describe('DateField', () => {
         dateField.popup['_field'].$dateField.focus();
         dateField.popup['_field'].clear();
         // Selecting a date using the mouse when the focus is still in the input field will normally trigger blur, this seems not to happen here -> do it manually
-        dateField.popup['_field'].$dateField.blur();
+        dateField.popup['_field'].$dateField.trigger('blur');
 
         // Select another date
         let selectedDate = selectFirstDayInPicker(dateField.popup.$container.find('.date-picker'));
@@ -1429,7 +1429,7 @@ describe('DateField', () => {
         dateField.popup['_field'].$timeField.focus();
         dateField.popup['_field'].clear();
         // Selecting a date using the mouse when the focus is still in the input field will normally trigger blur, this seems not to happen here -> do it manually
-        dateField.popup['_field'].$timeField.blur();
+        dateField.popup['_field'].$timeField.trigger('blur');
 
         // Select another time
         let selectedDate = selectFirstTimeInPicker(dateField.popup['_widget'].$container);

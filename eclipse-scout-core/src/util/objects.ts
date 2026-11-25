@@ -466,7 +466,7 @@ export const objects = {
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
   isFunction(obj: any): obj is Function {
-    return $.isFunction(obj);
+    return typeof obj === 'function';
   },
 
   /**

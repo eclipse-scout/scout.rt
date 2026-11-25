@@ -56,8 +56,8 @@ describe('WizardProgressField', () => {
       expect($steps.eq(0).hasClass('action-enabled')).toBe(false);
       expect($steps.eq(1).hasClass('action-enabled')).toBe(true);
 
-      $steps.eq(0).click();
-      $steps.eq(1).click();
+      $steps.eq(0).trigger('click');
+      $steps.eq(1).trigger('click');
       expect(field._onStepClick).toHaveBeenCalledTimes(1);
       expect(_onStepClickSpy.calls.first().args[0].currentTarget).toBe($steps[1]);
 
@@ -66,8 +66,8 @@ describe('WizardProgressField', () => {
       expect($steps.eq(1).hasClass('action-enabled')).toBe(false);
 
       _onStepClickSpy.calls.reset();
-      $steps.eq(0).click();
-      $steps.eq(1).click();
+      $steps.eq(0).trigger('click');
+      $steps.eq(1).trigger('click');
       expect(field._onStepClick).toHaveBeenCalledTimes(1);
       expect(_onStepClickSpy.calls.first().args[0].currentTarget).toBe($steps[0]);
     });

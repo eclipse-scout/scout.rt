@@ -67,12 +67,12 @@
     "@eclipse-scout/releng": ">=27.1.0-snapshot <27.1.0",
     "jasmine-core": "7.0.2",
     "jasmine-ajax": "5.0.0",
-    "@types/jquery": "3.5.33",
+    "@types/jquery": "4.0.1",
     "@types/jasmine": "7.0.0",
     "@types/jasmine-ajax": "3.3.5"
   },
   "dependencies": {
-    "jquery": "3.7.1",
+    "jquery": "4.1.0",
     "reflect-metadata": "0.2.2",
     "sourcemapped-stacktrace": "1.1.11"
   }

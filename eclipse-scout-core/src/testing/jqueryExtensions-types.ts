@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-interface JQuery<TElement = HTMLElement> extends Array<TElement | JQuery> {
+interface JQuery<TElement = HTMLElement> {
   triggerBlur(): JQuery;
 }
 

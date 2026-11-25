@@ -47,7 +47,7 @@ describe('scrollbars', () => {
       let $element = createContent($container);
 
       scrollbars.onScroll($element, handler);
-      $container.scroll();
+      $container.trigger('scroll');
       expect(exec).toBe(true);
       scrollbars.uninstall($container, session);
     });
@@ -68,12 +68,12 @@ describe('scrollbars', () => {
       let $element = createContent($container);
 
       scrollbars.onScroll($element, handler);
-      $container.scroll();
+      $container.trigger('scroll');
       expect(exec).toBe(true);
 
       exec = false;
       scrollbars.offScroll(handler);
-      $container.scroll();
+      $container.trigger('scroll');
       expect(exec).toBe(false);
       scrollbars.uninstall($container, session);
     });
@@ -151,8 +151,7 @@ describe('scrollbars', () => {
         .css('width', '10px')
         .css('position', 'absolute')
         .appendTo($('#sandbox'));
-      $scrollables = $();
-      $scrollables.push($scrollable, $scrollable2);
+      $scrollables = $scrollable.add($scrollable2);
     });
 
     it('returns the intersection of the rectangle and all scrollables', () => {
@@ -285,11 +284,11 @@ describe('scrollbars', () => {
       expect($scrollShadow).not.toHaveClass('top');
 
       $container[0].scrollTop = 10;
-      $container.scroll(); // trigger scroll event
+      $container.trigger('scroll'); // trigger scroll event
       expect($scrollShadow).toHaveClass('top');
 
       $container[0].scrollTop = 0;
-      $container.scroll();
+      $container.trigger('scroll');
       expect($scrollShadow).not.toHaveClass('top');
 
       scrollbars.uninstall($container, session);

@@ -222,7 +222,7 @@ $.injectScript = (url, options) => {
   let scriptTag = myDocument.createElement('script');
   let $scriptTag = $(scriptTag)
     .attr('src', url)
-    .attr('async', true)
+    .attr('async', 'async')
     .attr('fetchpriority', 'high')
     .on('load error', event => {
       if (options.removeTag) {
@@ -802,16 +802,16 @@ $.fn.scrollParent = function(includePseudoScrollParents) {
 };
 
 $.fn.scrollParents = function(includePseudoScrollParents) {
-  let $scrollParents = $();
+  let scrollParents = [];
   let $elem = this;
 
   while ($elem.length > 0) {
     if ($elem.data('scrollable') || (includePseudoScrollParents && $elem.data('pseudo-scrollable'))) {
-      $scrollParents.push($elem[0]);
+      scrollParents.push($elem[0]);
     }
     $elem = $elem.parent();
   }
-  return $scrollParents;
+  return $(scrollParents);
 };
 
 $.fn.findUp = function(predicate, $stop) {
@@ -1289,7 +1289,7 @@ $.fn.copyAttributes = function($other, attributes) {
 };
 
 $.fn.disableSpellcheck = function() {
-  return this.attr('spellcheck', false);
+  return this.attr('spellcheck', 'false');
 };
 
 $.fn.resizable = function(model) {

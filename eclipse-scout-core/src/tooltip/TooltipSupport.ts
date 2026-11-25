@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {InitModelOf, scout, SomeRequired, Tooltip, TooltipModel, tooltips} from '../index';
+import {InitModelOf, objects, scout, SomeRequired, Tooltip, TooltipModel, tooltips} from '../index';
 import $ from 'jquery';
 import MouseEnterEvent = JQuery.MouseEnterEvent;
 import MouseLeaveEvent = JQuery.MouseLeaveEvent;
@@ -119,7 +119,7 @@ export class TooltipSupport {
 
   protected _text($comp: JQuery): string {
     let text = this._options.text || $comp.data('tooltipText');
-    if ($.isFunction(text)) {
+    if (objects.isFunction(text)) {
       text = text($comp);
     }
     return text;
@@ -127,7 +127,7 @@ export class TooltipSupport {
 
   protected _htmlEnabled($comp: JQuery): boolean {
     let htmlEnabled = this._options.htmlEnabled || $comp.data('htmlEnabled');
-    if ($.isFunction(htmlEnabled)) {
+    if (objects.isFunction(htmlEnabled)) {
       htmlEnabled = htmlEnabled($comp);
     }
     return scout.nvl(htmlEnabled, false);

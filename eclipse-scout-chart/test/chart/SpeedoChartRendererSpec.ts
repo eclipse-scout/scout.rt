@@ -84,7 +84,7 @@ describe('SpeedoChartRenderer', () => {
         event = event0;
       });
       let $svg = session.desktop.$container.find('svg');
-      $svg.click();
+      $svg.trigger('click');
       expect(event.data).toEqual({
         xIndex: null,
         dataIndex: null,

@@ -397,7 +397,7 @@ function libraryConfig(config, options = {}) {
   if (options.externalizeOptionalDeps ?? true) {
     toExternals(packageJson.optionalDependencies, packageJsonExternals);
   }
-  packageJsonExternals.jquery = 'commonjs jquery'; // Make synthetic default import work (import $ from 'jquery') by importing jquery as commonjs module
+  packageJsonExternals.jquery = 'module jquery';
   const customExternals = options.externals || {};
   const allExternals = {...packageJsonExternals, ...config.externals, ...customExternals};
 

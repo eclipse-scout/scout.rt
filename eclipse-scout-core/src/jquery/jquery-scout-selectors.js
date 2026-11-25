@@ -39,14 +39,14 @@ function focusable(element, requireTabbable, excludeUnfocusable) {
 }
 
 function visible(element) {
-  return $.expr.filters.visible(element) &&
+  return $.expr.pseudos.visible(element) &&
     !$(element).parents().addBack().filter(function() {
       return $.css(this, 'visibility') === 'hidden';
     }).length;
 }
 
 // Register selectors
-$.extend($.expr[':'], {
+$.extend($.expr.pseudos, {
   'focusable-native': element => focusable(element, false),
   'focusable': element => focusable(element, false, true),
   'tabbable': element => focusable(element, true),

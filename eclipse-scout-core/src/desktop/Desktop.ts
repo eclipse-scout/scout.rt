@@ -1096,11 +1096,10 @@ export class Desktop extends Widget implements DesktopModel, DisplayParent {
         .not('.desktop-bench')
         .not('.desktop-header');
 
-      if (this.header && this.header.toolBox && this.header.toolBox.$container) {
-        $glassPaneTargets.push(this.header.toolBox.$container);
-      }
-
       glassPaneTargets = $.makeArray($glassPaneTargets);
+      if (this.header && this.header.toolBox && this.header.toolBox.$container) {
+        glassPaneTargets.push(this.header.toolBox.$container);
+      }
       arrays.pushAll(glassPaneTargets, this._getBenchGlassPaneTargetsForView(element));
     } else {
       glassPaneTargets = $.makeArray($glassPaneTargets);

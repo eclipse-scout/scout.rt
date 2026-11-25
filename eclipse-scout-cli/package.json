@@ -47,7 +47,7 @@
     "jasmine-ajax": "5.0.0",
     "jasmine-browser-runner": "5.0.0",
     "jasmine-core": "7.0.2",
-    "jquery": "3.7.1",
+    "jquery": "4.1.0",
     "serve-static": "2.2.1",
     "sourcemapped-stacktrace": "1.1.11",
     "@eclipse-scout/tsconfig": ">=27.1.0-snapshot <27.1.0",

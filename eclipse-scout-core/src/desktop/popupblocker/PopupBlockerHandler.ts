@@ -7,7 +7,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {ErrorHandler, Event, EventHandler, InitModelOf, MessageBoxes, ObjectWithType, PopupBlockerDesktopNotification, PopupBlockerHandlerModel, scout, Session, SomeRequired, Status} from '../../index';
+import {ErrorHandler, Event, EventHandler, InitModelOf, MessageBoxes, objects, ObjectWithType, PopupBlockerDesktopNotification, PopupBlockerHandlerModel, scout, Session, SomeRequired, Status} from '../../index';
 import $ from 'jquery';
 
 export class PopupBlockerHandler implements PopupBlockerHandlerModel, ObjectWithType {
@@ -78,7 +78,7 @@ export class PopupBlockerHandler implements PopupBlockerHandlerModel, ObjectWith
       preserveOpener: this.preserveOpener
     });
 
-    if (!linkUrl && $.isFunction(vararg)) {
+    if (!linkUrl && objects.isFunction(vararg)) {
       notification.on('linkClick', vararg);
     }
     notification.show();

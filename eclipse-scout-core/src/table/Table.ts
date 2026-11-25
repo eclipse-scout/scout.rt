@@ -4471,14 +4471,14 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   protected _order$Rows($rows?: JQuery): JQuery {
     // Find rows using jquery because this.filteredRows() may be empty but there may be $rows which are getting removed by animation
     $rows = $rows || this.$rows();
-    return $rows.sort((elem1, elem2) => {
+    return $($rows.toArray().sort((elem1, elem2) => {
       let $row1 = $(elem1),
         $row2 = $(elem2),
         row1 = $row1.data('row') as TableRow,
         row2 = $row2.data('row') as TableRow;
 
       return this.rows.indexOf(row1) - this.rows.indexOf(row2);
-    });
+    }));
   }
 
   protected _order$AggregateRows($rows?: JQuery) {
@@ -5019,7 +5019,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     // move cells
     this.$rows(true).each(function() {
       let $row = $(this);
-      let $orderedCells = $();
+      let orderedCells: HTMLElement[] = [];
       let $cells = $row.children();
       for (let i = 0; i < that.columns.length; i++) {
         let column = that.columns[i];
@@ -5031,9 +5031,9 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
             break;
           }
         }
-        $orderedCells.push($cell);
+        orderedCells.push($cell);
       }
-      $row.prepend($orderedCells);
+      $row.prepend(orderedCells);
     });
   }
 

@@ -223,7 +223,7 @@ declare global {
     isJqXHR(obj: unknown): obj is JQuery.jqXHR;
   }
 
-  interface JQuery<TElement = HTMLElement> extends Array<TElement | JQuery> {
+  interface JQuery<TElement = HTMLElement> {
     /**
      * @param $element returns the given element if the current jquery object does not contain any elements.
      * Otherwise, returns the current jquery object.
