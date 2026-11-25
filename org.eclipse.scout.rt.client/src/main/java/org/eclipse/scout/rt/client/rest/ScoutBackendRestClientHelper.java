@@ -18,6 +18,7 @@ import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.ClientRequestFilter;
 import jakarta.ws.rs.core.Response;
 
+import org.eclipse.scout.rt.client.servicetunnel.ProcessResourceClient;
 import org.eclipse.scout.rt.client.servicetunnel.ServiceTunnelClientConfigProperties.BackendUrlProperty;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
@@ -74,17 +75,23 @@ public class ScoutBackendRestClientHelper extends AbstractRestClientHelper {
   }
 
   /**
-   * Special implementation similar to {@link IdSignatureClientRequestFilter}, however for service-tunnel header is not added by default; only if {@link ServiceTunnelOptions} on {@link RunContext} does request it.
+   * Special implementation similar to {@link IdSignatureClientRequestFilter}, however for service-tunnel requests the ID signautre header is not added by default
+   * but only if {@link ServiceTunnelOptions} on {@link RunContext} does request it.
    */
   @ApplicationScoped
-  public static class ServiceTunnelIdSignatureClientRequestFilter implements ClientRequestFilter {
+  public static class ServiceTunnelIdSignatureClientRequestFilter extends IdSignatureClientRequestFilter {
 
     @Override
     public void filter(ClientRequestContext requestContext) throws IOException {
-      addIdSignatureHeader(requestContext);
+      if (requestContext.getProperty(ProcessResourceClient.SERVICE_TUNNEL_REQUEST_HINT) != null) {
+        addServiceTunnelIdSignatureHeader(requestContext);
+      }
+      else {
+        addIdSignatureHeader(requestContext);
+      }
     }
 
-    protected void addIdSignatureHeader(ClientRequestContext requestContext) {
+    protected void addServiceTunnelIdSignatureHeader(ClientRequestContext requestContext) {
       if (Optional.ofNullable(RunContext.CURRENT.get())
           .map(rc -> rc.getPropertyOrDefault(ServiceTunnelOptions.ID_SIGNATURE_PROP, false))
           .orElse(false)) {

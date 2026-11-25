@@ -11,6 +11,7 @@ package org.eclipse.scout.rt.client.servicetunnel;
 
 import java.io.InputStream;
 
+import jakarta.ws.rs.client.ClientRequestContext;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.Invocation.Builder;
 import jakarta.ws.rs.client.WebTarget;
@@ -28,13 +29,19 @@ import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelConstants;
 
 public class ProcessResourceClient implements IRestResourceClient {
 
+  /**
+   * Hint as property on {@link ClientRequestContext} indicating a service tunnel request to process REST endpoint.
+   */
+  public static final String SERVICE_TUNNEL_REQUEST_HINT = "SERVICE_TUNNEL_REQUEST_HINT";
+
   protected static final String RESOURCE_PATH = ServiceTunnelConstants.PROCESS_PATH;
 
   public Response call(InputStream inputStream) {
-    WebTarget target = helper().target(RESOURCE_PATH);
-
+    WebTarget target = helper()
+        .target(RESOURCE_PATH);
     Builder builder = target
         .request()
+        .property(SERVICE_TUNNEL_REQUEST_HINT, true)
         .accept(MediaType.APPLICATION_OCTET_STREAM);
 
     return builder.post(Entity.entity(
