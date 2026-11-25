@@ -30,7 +30,7 @@ export class OutlineAdapter extends TreeAdapter {
   }
 
   protected _onPageChanged(event: RemoteEvent) {
-    let success = false;
+    let success: boolean;
     let page = this.widget.nodeById(event.nodeId);
     try {
       page.setPageChanging(true);

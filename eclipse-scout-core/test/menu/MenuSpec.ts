@@ -741,7 +741,7 @@ describe('Menu', () => {
       return $('body').find('.tooltip');
     }
 
-    function expectTooltip($element: JQuery, tooltipText: string, htmlEnabled: boolean = false) {
+    function expectTooltip($element: JQuery, tooltipText: string, htmlEnabled = false) {
       // No tooltip initially
       let $tooltips = find$Tooltips();
       expect($tooltips.length).toBe(0);

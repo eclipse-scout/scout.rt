@@ -636,7 +636,7 @@ export class TableFooter extends Widget implements TableFooterModel {
 
   computeControlContainerHeight(table: Table, control: TableControl, growControl?: boolean): number {
     let menuBarHeight = 0,
-      footerHeight = 0,
+      footerHeight: number,
       containerHeight = graphics.size(table.$container).height,
       controlContainerHeight = 0,
       dataMargins = graphics.margins(scout.nvl(table.$data, table.$container)),

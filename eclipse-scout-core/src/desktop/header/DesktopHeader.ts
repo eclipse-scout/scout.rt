@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -324,7 +324,7 @@ export class DesktopHeader extends Widget implements DesktopHeaderModel {
     if (!outlineContent) {
       return;
     }
-    let hasMenuBar = false;
+    let hasMenuBar: boolean;
     if (outlineContent instanceof Form && outlineContent.detailForm) {
       let rootGroupBox = outlineContent.rootGroupBox;
       hasMenuBar = rootGroupBox.menuBar && rootGroupBox.menuBarVisible && rootGroupBox.menuBar.visible;

@@ -566,7 +566,7 @@ export class PageWithTable extends Page implements PageWithTableModel {
       return;
     }
 
-    let success = false;
+    let success: boolean;
     try {
       const rows = arrays.ensure(this._transformTableDataToTableRows(tableData));
       this.detailTable.setResultInfo(this._getLimitedResultInfoDo(tableData)); // apply properties from LimitedResultInfoDo to table (must be before replaceRows as this triggers the TableFooter update which already requires the new values).

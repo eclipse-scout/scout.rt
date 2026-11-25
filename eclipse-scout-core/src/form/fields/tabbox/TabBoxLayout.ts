@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -42,7 +42,7 @@ export class TabBoxLayout extends AbstractLayout {
       htmlContainer = HtmlComponent.get($container),
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
-      headerWidthHint = 0,
+      headerWidthHint: number,
       headerSize = new Dimension(),
       $status = this._tabBox.$status,
       statusPosition = this._tabBox.statusPosition;
@@ -112,7 +112,7 @@ export class TabBoxLayout extends AbstractLayout {
       htmlTabContent = HtmlComponent.get(this._tabBox._$tabContent),
       htmlHeader = HtmlComponent.get(this._tabBox.header.$container),
       headerSize = new Dimension(),
-      tabContentSize = new Dimension(),
+      tabContentSize: Dimension,
       $status = this._tabBox.$status,
       statusPosition = this._tabBox.statusPosition,
       headerWidthHint = htmlContainer.availableSize().subtract(htmlContainer.insets()).width;

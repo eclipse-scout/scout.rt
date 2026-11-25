@@ -12,7 +12,6 @@ import CustomMatcherFactories = jasmine.CustomMatcherFactories;
 import CustomMatcherResult = jasmine.CustomMatcherResult;
 
 declare global {
-  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace jasmine {
     interface Matchers<T> {
       /**

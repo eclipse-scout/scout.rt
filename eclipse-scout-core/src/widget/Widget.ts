@@ -1935,7 +1935,7 @@ export class Widget extends PropertyEventEmitter implements WidgetModel, ObjectW
     for (let property of properties) {
       property = this.adaptPropertyName(property);
       let propertyValue = this[property];
-      let clonedProperty = null;
+      let clonedProperty;
       if (propertyValue === undefined) {
         throw new Error('Property \'' + property + '\' is undefined. Deep copy not possible.');
       }

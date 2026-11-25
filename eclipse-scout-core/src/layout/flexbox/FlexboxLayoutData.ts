@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -60,7 +60,7 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
 
   protected _grow(delta: number, apply?: boolean): number {
     let maxDelta = 0,
-      consumedDelta = 0;
+      consumedDelta: number;
     if (this.grow > 0) {
       maxDelta = delta;
     } else if (this.initialPx > this.sizePx) {
@@ -75,7 +75,7 @@ export class FlexboxLayoutData implements LayoutData, FlexboxLayoutDataModel {
 
   protected _shrink(delta: number, apply?: boolean): number {
     let maxDelta = 0,
-      consumedDelta = 0;
+      consumedDelta: number;
     if (this.shrink > 0) {
       maxDelta = -this.sizePx + 20;
 

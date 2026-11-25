@@ -157,7 +157,7 @@ describe('Table Grouping', () => {
     });
   }
 
-  function assertColumnState(column: Column, expectedState: { sortActive: boolean, sortIndex: number, sortAscending: boolean, grouped: boolean }) {
+  function assertColumnState(column: Column, expectedState: { sortActive: boolean; sortIndex: number; sortAscending: boolean; grouped: boolean }) {
     expect(column.sortActive).toBe(expectedState.sortActive);
     expect(column.sortIndex).toBe(expectedState.sortIndex);
     expect(column.sortAscending).toBe(expectedState.sortAscending);

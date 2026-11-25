@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -83,7 +83,7 @@ export class TabAreaLayout extends AbstractLayout {
 
   override preferredLayoutSize($container: JQuery, options: HtmlCompPrefSizeOptions): Dimension {
     let htmlComp = HtmlComponent.get($container),
-      prefSize = new Dimension(0, 0),
+      prefSize: Dimension,
       prefWidth = Number.MAX_VALUE;
     this.visibleTabs = this.tabArea.visibleTabs();
     let overflowableIndexes = this.visibleTabs.map((tab, index) => {

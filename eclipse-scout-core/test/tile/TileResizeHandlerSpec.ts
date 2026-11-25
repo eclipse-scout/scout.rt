@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -150,7 +150,7 @@ describe('TileResizeHandler', () => {
       grid.render();
       let tile0 = grid.tiles[0];
       let tile1 = grid.tiles[1];
-      let tile2 = grid.tiles[2];
+      let tile2: Tile;
       tile0.setGridDataHints(tile0.gridDataHints.clone({x: 0, y: 0}));
       tile1.setGridDataHints(tile1.gridDataHints.clone({x: 1, y: 0}));
       grid.validateLayout();

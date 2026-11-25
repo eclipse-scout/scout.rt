@@ -269,7 +269,7 @@ export class ClipboardField extends ValueField<string> implements ClipboardField
         contentCount++;
       } else {
         // compatibility workaround
-        additionalOptions['textTransferObject' + additionalOptionsCompatibilityIndex++] = textContent;
+        additionalOptions['textTransferObject' + additionalOptionsCompatibilityIndex] = textContent;
         contentCount++;
       }
     }

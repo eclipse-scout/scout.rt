@@ -1,8 +1,8 @@
-<p align="center">
+<p style="text-align: center;">
   <a href="https://eclipse.dev/scout/" target="_blank" rel="noopener noreferrer"><img src="https://eclipsescout.github.io/assets/img/eclipse-scout-logo.svg"></a>
 </p>
 
-<p align="center">
+<p style="text-align: center;">
   <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins" src="https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
   <a href="https://ci.eclipse.org/scout/job/scout-integration-27.1-RT-nightly_pipeline/" target="_blank" rel="noopener noreferrer"><img alt="Jenkins tests" src="https://img.shields.io/jenkins/tests?jobUrl=https%3A%2F%2Fci.eclipse.org%2Fscout%2Fjob%2Fscout-integration-25.2-RT-nightly_pipeline%2F"></a>
   <a href="https://www.npmjs.com/package/@eclipse-scout/eslint-config" target="_blank" rel="noopener noreferrer"><img alt="npm" src="https://img.shields.io/npm/dm/@eclipse-scout/eslint-config"></a>
@@ -18,14 +18,19 @@ ESLint [shareable config](https://eslint.org/docs/developer-guide/shareable-conf
 
 ## Usage
 
-Once the `@eclipse-scout/eslint-config` package is installed, you can use it by specifying it in the [`extends` section](https://eslint.org/docs/user-guide/configuring#extending-configuration-files) of
-your [ESLint configuration](https://eslint.org/docs/user-guide/configuring).
+Once the `@eclipse-scout/eslint-config` and `eslint` packages are installed, add the config to your
+[ESLint configuration file](https://eslint.org/docs/latest/use/configure/configuration-files) `eslint.config.mjs`.
 
 ```js
-module.exports = {
-  extends: '@eclipse-scout',
-  rules: {
-    // Additional, per-project rules...
+import {defineConfig} from 'eslint/config';
+import scoutConfig from '@eclipse-scout/eslint-config';
+
+export default defineConfig([
+  scoutConfig,
+  {
+    rules: {
+      // Additional, per-project rules...
+    }
   }
-}
+]);
 ```

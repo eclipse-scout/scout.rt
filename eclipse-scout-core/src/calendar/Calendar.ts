@@ -1044,7 +1044,7 @@ export class Calendar extends Widget implements CalendarModel {
     // basic grid width
     this.$grids.data('new-width', containerW);
 
-    let $weeksToHide = $(); // Empty
+    let $weeksToHide: JQuery;
     let $allWeeks = $('.calendar-week', this.$grid);
     // layout week
 
@@ -1103,7 +1103,7 @@ export class Calendar extends Widget implements CalendarModel {
     }
 
     // layout resource columns
-    let columnWidth = 0;
+    let columnWidth: number;
     if (this.isDay()) {
       columnWidth = Math.round(contentW / (this._leafResources.filter(c => c.visible).length + (this._defaultResourceVisible() ? 1 : 0)));
     } else if (this.isWorkWeek()) {
@@ -1391,7 +1391,6 @@ export class Calendar extends Widget implements CalendarModel {
     // Main grid: loop all days and set value and class
     for (w = 0; w < this.monthViewNumberOfWeeks; w++) {
       for (d = 0; d < 7; d++) {
-        cssClass = '';
         if (this.workDayIndices.indexOf(date.getDay()) === -1) {
           cssClass = date.getMonth() !== currentMonth ? ' weekend-out' : ' weekend';
         } else {
@@ -1432,7 +1431,6 @@ export class Calendar extends Widget implements CalendarModel {
       date = dates.firstDayOfWeek(exactDate, 1);
 
       for (d = 0; d < 7; d++) {
-        cssClass = '';
         if (this.workDayIndices.indexOf(date.getDay()) === -1) {
           cssClass = date.getMonth() !== currentMonth ? ' weekend-out' : ' weekend';
         } else {
@@ -1606,7 +1604,7 @@ export class Calendar extends Widget implements CalendarModel {
 
   protected _calculateContextMenuVisible(event: JQuery.ContextMenuEvent): boolean {
     let $target = $(event.currentTarget);
-    let resourceId = this.defaultResource.resourceId;
+    let resourceId: string;
     if ($target.hasClass('calendar-component') && this.selectedComponent) {
       resourceId = this.selectedComponent.getResourceId();
     } else {
@@ -1770,7 +1768,7 @@ export class Calendar extends Widget implements CalendarModel {
    */
   protected _arrange(components: CalendarComponent[], day: Date) {
     let columns: CalendarComponent[] = [],
-      key = day + '';
+      key: string;
 
     // ordered by from, to
     this._sort(components);
@@ -2402,7 +2400,7 @@ export class Calendar extends Widget implements CalendarModel {
       // Component is not attached to div
       return null;
     }
-    let dayShift = null;
+    let dayShift: number;
     let startDate = this._exactRange.from;
     if (this.isDay()) {
       dayShift = 0;

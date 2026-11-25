@@ -72,7 +72,7 @@ export class PageResolver implements PageResolverModel, ObjectWithType {
   }
 
   protected _getPageUuid(PageConstructor: Constructor<Page>): string {
-    let page: Page = null;
+    let page: Page;
     try {
       page = new PageConstructor();
       page.minimalInit();

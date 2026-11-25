@@ -58,10 +58,6 @@ export class TableFooterLayout extends AbstractLayout {
       this._tableFooter._compactStyle = true;
       this._tableFooter._renderInfo();
 
-      infoWidth = graphics.size($info, true).width;
-      if (controlsWidth + infoWidth <= containerWidth) {
-        contentFits = true;
-      }
       // Make sure info section does not overlap controls
       $info.css('max-width', Math.max(containerWidth - controlsWidth - $info.cssMarginX(), 0));
     }

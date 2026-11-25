@@ -47,16 +47,16 @@
   },
   "devDependencies": {
     "@eclipse-scout/releng": ">=27.1.0-snapshot <27.1.0",
-    "eslint": "9.39.2",
-    "@eslint/js": "9.39.2",
-    "globals": "16.5.0"
+    "eslint": "10.15.0"
   },
   "dependencies": {
+    "@eslint/js": "10.0.1",
+    "globals": "17.14.0",
     "typescript": "5.9.3",
-    "typescript-eslint": "8.50.1",
-    "@stylistic/eslint-plugin": "5.6.1"
+    "typescript-eslint": "8.74.0",
+    "@stylistic/eslint-plugin": "5.10.0"
   },
   "peerDependencies": {
-    "eslint": ">=9.39.2"
+    "eslint": "^10.0.0"
   }
 }

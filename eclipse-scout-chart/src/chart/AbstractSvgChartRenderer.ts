@@ -290,7 +290,7 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
     let legend = {} as Legend,
       padding = 5,
       $background,
-      backgroundWidth = 0,
+      backgroundWidth: number,
       lineHeight = 17,
       backgroundHeight = lineHeight;
 
@@ -305,7 +305,7 @@ export class AbstractSvgChartRenderer extends AbstractChartRenderer {
 
     let $legend,
       lengthLegend = 0,
-      horizontalSpace = 0;
+      horizontalSpace: number;
     if (positions.h === -1) {
       horizontalSpace = positions.x2 - 2 * padding;
     } else {

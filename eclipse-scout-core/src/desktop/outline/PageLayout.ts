@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -28,7 +28,7 @@ export class PageLayout extends AbstractLayout {
       nodeMenuBar = this.outline.nodeMenuBar,
       detailMenuBar = this.outline.detailMenuBar,
       detailMenuBarHeight = 0,
-      textWidth = 0;
+      textWidth: number;
 
     let containerSize = htmlContainer.availableSize({exact: true}) // exact is important to calculate text width correctly and to prevent node menubar from wrapping
       .subtract(htmlContainer.insets());
@@ -72,11 +72,11 @@ export class PageLayout extends AbstractLayout {
       detailContentPrefSize = new Dimension(),
       $text = this.page.$text,
       $icon = this.page.$icon(),
-      titlePrefHeight = 0,
+      titlePrefHeight: number,
       detailMenuBar = this.outline.detailMenuBar,
       detailMenuBarPrefSize = new Dimension(),
       nodeMenuBar = this.outline.nodeMenuBar,
-      textWidth = 0;
+      textWidth: number;
 
     textWidth = options.widthHint;
 

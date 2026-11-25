@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -275,7 +275,7 @@ export const dates = {
       minutes = 0,
       seconds = 0,
       milliseconds = 0,
-      utc = false;
+      utc: boolean;
 
     // Date + Time
     let matches = /^\+?(\d{4,5})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2})\.(\d{3})(Z?)$/.exec(jsonDate);

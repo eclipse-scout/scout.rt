@@ -553,7 +553,7 @@ describe('ValueField', () => {
     it('returns a promise if an async validator is used', async () => {
       jasmine.clock().uninstall();
       let field = helper.createField(StringField);
-      field.addValidator(value => $.resolvedPromise(value += ' async'));
+      field.addValidator(value => $.resolvedPromise(value + ' async'));
       let promise = field.parseAndSetValue('Foo');
       expect(field.displayText).toBe('');
       expect(field.value).toBe(null);
@@ -604,7 +604,7 @@ describe('ValueField', () => {
     it('does not catch async errors that are not caught by setValue', async () => {
       jasmine.clock().uninstall();
       let field = helper.createField(StringField);
-      field.addValidator(value => $.resolvedPromise(value += ' async'));
+      field.addValidator(value => $.resolvedPromise(value + ' async'));
       field.on('propertyChange:value', () => {
         throw 'error in value change';
       });
@@ -657,7 +657,7 @@ describe('ValueField', () => {
       field.on('acceptInput', event => {
         displayText = event.displayText;
       });
-      field.addValidator(value => $.resolvedPromise(value += ' async'));
+      field.addValidator(value => $.resolvedPromise(value + ' async'));
       field.$field.val('a value');
       let promise = field.acceptInput();
       expect(displayText).toBeUndefined();

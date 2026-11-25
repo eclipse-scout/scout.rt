@@ -380,7 +380,7 @@ export class TileGridSelectionHandler {
 
     // Adjust existing selection
     let selectedTiles = this.getSelectedTiles();
-    let newSelectedTiles = [];
+    let newSelectedTiles: Tile[];
     if (!newFocusedTile.selected) {
       // Add all tiles between focused tile and newly focused tile to selection
       if (newFocusedTileIndex > focusedTileIndex) {

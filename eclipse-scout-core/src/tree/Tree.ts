@@ -676,11 +676,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
       this.$fillAfter = this.$data.appendDiv('tree-data-fill');
     }
 
-    let fillAfterDimensions = {
-      height: 0,
-      width: 0
-    };
-    fillAfterDimensions = this._calculateFillerDimension(new Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
+    let fillAfterDimensions = this._calculateFillerDimension(new Range(this.viewRangeRendered.to, this.visibleNodesFlat.length));
     this.$fillAfter.cssHeight(fillAfterDimensions.height);
     if (this.isHorizontalScrollingEnabled()) {
       this.$fillAfter.cssWidth(fillAfterDimensions.width);
@@ -861,7 +857,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _heightForNode(node: TreeNode): number {
-    let height = 0;
+    let height: number;
     if (node.height) {
       height = node.height;
     } else {
@@ -871,7 +867,7 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
   }
 
   protected _widthForNode(node: TreeNode): number {
-    let width = 0;
+    let width: number;
     if (node.width) {
       width = node.width;
     } else {
@@ -1800,18 +1796,18 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
         return;
       }
 
-      let insertIndex: number, isAlreadyAdded = this.visibleNodesMap[node.id];
+      let isAlreadyAdded = this.visibleNodesMap[node.id];
       if (isAlreadyAdded) {
         this.insertBatchInVisibleNodes(insertBatch, this._showNodes(insertBatch), animatedRendering);
         // Animate rendering is always false because it would generate a bunch of animation wrappers which stay forever without really starting an animation...
         this.checkAndHandleBatchAnimationWrapper(parentNode, false, insertBatch);
         insertBatch = this.newInsertBatch(insertBatch.nextBatchInsertIndex());
-        insertBatch = this._addChildrenToFlatListIfExpanded(1, node, insertIndex, animatedRendering, insertBatch, forceFilter);
+        insertBatch = this._addChildrenToFlatListIfExpanded(1, node, animatedRendering, insertBatch, forceFilter);
       } else {
         insertBatch.insertNodes.push(node);
         this.visibleNodesMap[node.id] = true;
         insertBatch = this.checkAndHandleBatch(insertBatch, parentNode, animatedRendering);
-        insertBatch = this._addChildrenToFlatListIfExpanded(0, node, insertIndex, animatedRendering, insertBatch, forceFilter);
+        insertBatch = this._addChildrenToFlatListIfExpanded(0, node, animatedRendering, insertBatch, forceFilter);
       }
     });
 
@@ -1829,8 +1825,9 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
    *
    * @param indexOffset either 0 or 1, offset is added to the insert index
    */
-  protected _addChildrenToFlatListIfExpanded(indexOffset: number, node: TreeNode, insertIndex: number, animatedRendering: boolean, insertBatch: InsertBatch, forceFilter: boolean): InsertBatch {
+  protected _addChildrenToFlatListIfExpanded(indexOffset: number, node: TreeNode, animatedRendering: boolean, insertBatch: InsertBatch, forceFilter: boolean): InsertBatch {
     if (node.expanded && node.childNodes.length) {
+      let insertIndex: number;
       if (insertBatch.containsNode(node.parentNode) || insertBatch.length() > 1) {
         // if parent node is already in the batch, do not change the insertIndex,
         // only append child nodes below that parent node
@@ -2329,7 +2326,6 @@ export class Tree extends Widget implements TreeModel, Filterable<TreeNode> {
     let currNode = node;
     let parentNodes = [];
 
-    currNode = node;
     let nodesToInsert: TreeNode[] = [];
     while (currNode.parentNode) {
       parentNodes.push(currNode.parentNode);

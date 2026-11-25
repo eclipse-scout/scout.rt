@@ -1162,7 +1162,7 @@ declare global {
     offPassive<TType extends string>(eventType: TType, handler: JQuery.TypeEventHandler<TElement, undefined, TElement, TElement, TType>): this;
   }
 
-  module JQuery {
+  namespace JQuery {
     interface InjectStyleSheetEvent<
       TDelegateTarget = any,
       TData = any,

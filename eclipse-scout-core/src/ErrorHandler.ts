@@ -172,7 +172,7 @@ export class ErrorHandler implements ErrorHandlerModel, ObjectWithType {
         log: log
       });
     } catch (err) {
-      throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')');
+      throw new Error('Error in global JavaScript error handler: ' + err.message + ' (original error: ' + errorMessage + ' at ' + fileName + ':' + lineNumber + ')', {cause: err});
     }
   }
 

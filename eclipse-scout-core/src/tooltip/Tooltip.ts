@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -327,7 +327,7 @@ export class Tooltip extends Widget implements TooltipModel {
 
     // Render menus
     menus.forEach(menu => {
-      let iconWidth = 0;
+      let iconWidth: number;
       menu.render(this.$menus);
       if (menu.iconId) {
         iconWidth = menu.get$Icon().outerWidth(true);

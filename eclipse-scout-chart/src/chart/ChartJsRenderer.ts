@@ -1824,7 +1824,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
 
     let data = config.data,
       type = config.type,
-      colors: DatasetColors = {};
+      colors: DatasetColors;
 
     if (config.options && config.options.autoColor) {
       colors = this._computeDatasetColorsAutoColor(config, multipleColorsPerDataset);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -262,7 +262,7 @@ export class BrowserField extends FormField implements BrowserFieldModel {
         windowState: BrowserField.WindowStates.WINDOW_OPEN
       });
       let popupInterval = window.setInterval(() => {
-        let popupWindowClosed = false;
+        let popupWindowClosed: boolean;
         try {
           popupWindowClosed = this._popupWindow === null || this._popupWindow.closed;
         } catch (e) {

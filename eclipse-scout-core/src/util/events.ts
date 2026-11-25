@@ -153,8 +153,8 @@ export const events = {
     if (typeof (Event) !== 'function') {
       return;
     }
-    // @ts-expect-error
-    let newEvent: PropagatedEvent = new event.constructor(event.type, event);
+    let EventConstructor = event.constructor as new(type: string, eventInitDict?: EventInit) => PropagatedEvent;
+    let newEvent = new EventConstructor(event.type, event);
     newEvent.sourceEvent = event;
     if (!target.dispatchEvent(newEvent)) {
       event.preventDefault();

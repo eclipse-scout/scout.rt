@@ -2972,7 +2972,6 @@ describe('Table', () => {
       table.render();
       expect(table.viewRangeRendered).toEqual(new Range(0, 1));
 
-      let $colHeaders = table.header.findHeaderItems();
       let $rows = table.$rows();
       let $cells0 = $rows.eq(0).find('.table-cell');
 
@@ -2985,7 +2984,7 @@ describe('Table', () => {
       table.updateColumnOrder([column2, column0, column1]);
 
       // Check column header order
-      $colHeaders = table.header.findHeaderItems();
+      let $colHeaders = table.header.findHeaderItems();
       expect($colHeaders.length).toBe(3);
       expect($colHeaders.eq(0).data('column')).toBe(column2);
       expect($colHeaders.eq(1).data('column')).toBe(column0);
@@ -3127,8 +3126,6 @@ describe('Table', () => {
       column0 = table.columns[0];
       column1 = table.columns[1];
       column2 = table.columns[2];
-      let column3 = table.columns[3];
-
       column0 = helper.createModelColumn('test');
       column0.id = model.columns[0].id;
       column1 = helper.createModelColumn('test');
@@ -3136,7 +3133,7 @@ describe('Table', () => {
       column1.id = model.columns[1].id;
       column2 = helper.createModelColumn('<b>test</b>');
       column2.id = model.columns[2].id;
-      column3 = helper.createModelColumn('<b>test</b>');
+      let column3 = helper.createModelColumn('<b>test</b>');
       column3.headerHtmlEnabled = true;
       column3.id = model.columns[3].id;
       table.updateColumnHeaders([column0, column1, column2, column3]);
@@ -3563,14 +3560,14 @@ describe('Table', () => {
 
         // Move rows C and D up
         rows = [table.rows[1], table.rows[3]];
-        movedRows = table.moveRowsUpOrDown(rows, 'up');
+        table.moveRowsUpOrDown(rows, 'up');
         expect(table.rows[0].cells[0].text).toBe('C');
         expect(table.rows[1].cells[0].text).toBe('B');
         expect(table.rows[2].cells[0].text).toBe('D');
         expect(table.rows[3].cells[0].text).toBe('A');
 
         // Move rows up again (no effect, relative distance between rows should be preserved)
-        movedRows = table.moveRowsUpOrDown(rows, 'up');
+        table.moveRowsUpOrDown(rows, 'up');
         expect(table.rows[0].cells[0].text).toBe('C');
         expect(table.rows[1].cells[0].text).toBe('B');
         expect(table.rows[2].cells[0].text).toBe('D');
@@ -3633,14 +3630,14 @@ describe('Table', () => {
 
         // Move rows A and B down
         rows = [table.rows[0], table.rows[2]];
-        movedRows = table.moveRowsUpOrDown(rows, 'down');
+        table.moveRowsUpOrDown(rows, 'down');
         expect(table.rows[0].cells[0].text).toBe('D');
         expect(table.rows[1].cells[0].text).toBe('A');
         expect(table.rows[2].cells[0].text).toBe('C');
         expect(table.rows[3].cells[0].text).toBe('B');
 
         // Move rows down again (no effect, relative distance between rows should be preserved)
-        movedRows = table.moveRowsUpOrDown(rows, 'down');
+        table.moveRowsUpOrDown(rows, 'down');
         expect(table.rows[0].cells[0].text).toBe('D');
         expect(table.rows[1].cells[0].text).toBe('A');
         expect(table.rows[2].cells[0].text).toBe('C');

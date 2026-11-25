@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -274,7 +274,8 @@ describe('LogicalGridLayoutInfo', () => {
 
         // h = 1 on first col, h = 2 on second -> should lead to same result
         gd1 = new LogicalGridData({gridx: 0, gridy: 0, gridw: 1, gridh: 1, weighty: 1, maxHeight: 80});
-        gd2 = new LogicalGridData({gridx: 1, gridy: 0, gridw: 0, gridh: 2, weighty: 1, maxHeight: 80});
+        gd2 = new LogicalGridData({gridx: 1, gridy: 0, gridw: 1, gridh: 2, weighty: 1, maxHeight: 80});
+        cols = toCols(newLogicalGridLayoutInfo([gd1, gd2]).layoutCellBounds(parentSize, parentInsets));
         expectHeights(cols, 0, [37, 38], 50, 5, 5);
         expectHeights(cols, 1, [37, 38], 50, 5, 5);
       });

@@ -1532,7 +1532,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
    * Sets the sortIndex of the given column and its siblings.
    */
   protected _updateSortIndexForColumn(column: Column<any>, multiSort: boolean) {
-    let sortIndex = -1;
+    let sortIndex: number;
     if (multiSort) {
       // if not already sorted set the appropriate sort index (check for sortIndex necessary if called by _onColumnHeadersUpdated)
       if (!column.sortActive || column.sortIndex === -1) {
@@ -4992,7 +4992,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
     if (visibleNewPos === visibleOldPos) {
       return visibleNewPos;
     }
-    let fixedColumnIndex = -1;
+    let fixedColumnIndex: number;
     if (visibleNewPos > visibleOldPos) {
       // move to right
       fixedColumnIndex = arrays.findIndexFrom(this.visibleColumns(), visibleOldPos, col => col.fixedPosition);
@@ -6003,7 +6003,7 @@ export class Table extends Widget implements TableModel, Filterable<TableRow> {
   }
 
   protected _heightForRow(row: TableRow): number {
-    let height = 0;
+    let height: number;
     let aggregateRow = row.aggregateRowBefore;
     if (this.groupingStyle === Table.GroupingStyle.BOTTOM) {
       aggregateRow = row.aggregateRowAfter;

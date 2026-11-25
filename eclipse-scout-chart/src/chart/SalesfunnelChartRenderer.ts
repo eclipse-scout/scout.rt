@@ -282,8 +282,8 @@ export class SalesfunnelChartRenderer extends AbstractSvgChartRenderer {
   }
 
   protected _calcPolygonPoints(expand: boolean, fxPos: number, xStart: number, yStart: number, width: number, widthBottom: number, height: number): string {
-    let xOffsetTop = 0,
-      xOffsetBottom = 0;
+    let xOffsetTop: number,
+      xOffsetBottom: number;
     if (expand) {
       xOffsetTop = width / 2 * fxPos;
       xOffsetBottom = widthBottom / 2 * fxPos;

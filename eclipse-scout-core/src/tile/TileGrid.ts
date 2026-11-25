@@ -1476,7 +1476,7 @@ export class TileGrid<TTile extends Tile = Tile> extends Widget implements TileG
   }
 
   protected _heightForRow(row: number): number {
-    let height = 0;
+    let height: number;
 
     let layout = this.htmlComp.layout as TileGridLayout;
     height = layout.rowHeight;

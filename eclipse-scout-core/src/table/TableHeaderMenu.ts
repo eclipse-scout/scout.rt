@@ -958,7 +958,7 @@ export class TableHeaderMenu extends Popup implements TableHeaderMenuModel {
     let $filterFieldsText = this.$filterFieldsGroup
       .appendDiv('table-header-menu-group-text')
       .text(this.filter.filterFieldsTitle());
-    htmlComp = HtmlComponent.install($filterFieldsText, this.session);
+    HtmlComponent.install($filterFieldsText, this.session);
     this.filterFieldsGroupBox.render(this.$filterFieldsGroup);
     this.filterFieldsGroupBox.linkFieldsWithTitle($filterFieldsText);
     return this.$filterFieldsGroup;

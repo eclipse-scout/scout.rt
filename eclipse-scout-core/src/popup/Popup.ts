@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -517,7 +517,7 @@ export class Popup extends Widget implements PopupModel {
 
   protected _computeArrowPositionClass(verticalAlignment?: PopupAlignment, horizontalAlignment?: PopupAlignment): string {
     let Alignment = Popup.Alignment;
-    let cssClass = '';
+    let cssClass: string;
     horizontalAlignment = horizontalAlignment || this.horizontalAlignment;
     verticalAlignment = verticalAlignment || this.verticalAlignment;
     switch (horizontalAlignment) {

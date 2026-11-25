@@ -848,7 +848,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       return;
     }
 
-    let delta = 0,
+    let delta: number,
       diffYears = 0,
       diffMonths = 0,
       diffDays = 0,
@@ -1085,7 +1085,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
       return;
     }
 
-    let delta = 0,
+    let delta: number,
       diffHours = 0,
       diffMinutes = 0,
       diffSeconds = 0,
@@ -1387,7 +1387,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
    * - the current date/time
    */
   protected _referenceDate(): Date {
-    let referenceDate: Date = this.autoDate || dates.ceil(dates.newDate(), this.timePickerResolution);
+    let referenceDate: Date;
     if (this.autoDate) {
       referenceDate = this.autoDate;
     } else if (this.hasTime) {
@@ -1641,7 +1641,7 @@ export class DateField extends ValueField<Date, Date | string> implements DateFi
    */
   protected _setErrorStatusPart(property: string, valid: boolean) {
     // check if date/time error exists
-    let status: Status = null;
+    let status: Status;
     let storedStatus: Status = null;
     if (this.errorStatus) {
       storedStatus = arrays.find(this.errorStatus.asFlatList(), DateField.PARSE_ERROR_PREDICATE);

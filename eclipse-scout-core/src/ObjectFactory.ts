@@ -90,7 +90,7 @@ export class ObjectFactory {
     }
     options = options || {};
 
-    let Class = null;
+    let Class;
     let typeDescriptor: TypeDescriptor = null;
     if (typeof objectType === 'string') {
       typeDescriptor = TypeDescriptor.parse(objectType);

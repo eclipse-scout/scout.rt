@@ -1191,14 +1191,14 @@ describe('objects', () => {
       // compile time test, ifs are always false
       expect().nothing(); // suppress warning "spec has no expectations"
 
-      let menuClass: new() => Menu;
+      let menuClass: new() => Menu = null;
       if (objects.isSameOrExtendsClass(menuClass, Action)) {
         // menu is a Menu
         let menu = scout.create(menuClass, {parent: null});
         expect(menu.shrinkable).toBe(false);
       }
 
-      let menuClass2;
+      let menuClass2 = null;
       if (objects.isSameOrExtendsClass(menuClass2, Action)) {
         // menu is an Action
         let menu = scout.create(menuClass2, {parent: null});

@@ -1579,7 +1579,7 @@ describe('Widget', () => {
       let type1ExecCount = 0;
       let type1Type = null;
       let type2ExecCount = 0;
-      let type2Type = null;
+      let type2Type;
       let noTypeExecCount = 0;
       let noTypeType = null;
       let widget = createWidget({
@@ -1605,7 +1605,6 @@ describe('Widget', () => {
       expect(noTypeType).toBe('type1');
 
       type1ExecCount = 0;
-      type1Type = null;
       type2ExecCount = 0;
       type2Type = null;
       noTypeExecCount = 0;
@@ -1618,9 +1617,7 @@ describe('Widget', () => {
       expect(noTypeType).toBe('type2');
 
       type1ExecCount = 0;
-      type1Type = null;
       type2ExecCount = 0;
-      type2Type = null;
       noTypeExecCount = 0;
       noTypeType = null;
       widget.triggerPropertyChange('abc', 'old', 'new');

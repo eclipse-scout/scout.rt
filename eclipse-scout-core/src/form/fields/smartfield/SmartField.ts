@@ -863,7 +863,7 @@ export class SmartField<TValue> extends ValueField<TValue> implements SmartField
     // this avoids unnecessary lookup-calls when a keyboard event has triggered
     // the lookupByTextOrAll function but the search-text has not changed #226643.
     if (!browse && !searchAlways) {
-      let lastSearchText = null;
+      let lastSearchText;
       if (this._lastSearchText) {
         lastSearchText = this._lastSearchText;
       } else {

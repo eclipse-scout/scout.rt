@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -79,7 +79,7 @@ export class MenuBarLayout extends AbstractLayout {
     });
     let notShrunkMenuItems = [...visibleMenuItems];
     let htmlComp = HtmlComponent.get($container);
-    let prefSize = new Dimension(0, 0);
+    let prefSize: Dimension;
     let prefWidth = Number.MAX_VALUE;
 
     // consider avoid falsy 0 in tab-boxes a 0 withHint will be used to calculate the minimum width
@@ -120,7 +120,7 @@ export class MenuBarLayout extends AbstractLayout {
       }
     });
 
-    let overflowIndex = -1;
+    let overflowIndex: number;
     this._setFirstLastMenuMarker(visibleMenuItems);
     let prefSize = this._prefSize(visibleMenuItems);
     while (prefSize.width > prefWidth && overflowableIndexes.length > 0) {

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -109,7 +109,7 @@ export class ViewButtonBox extends Widget implements ViewButtonBoxModel {
   protected _updateViewButtons() {
     let viewButtons = this.viewButtons.filter(b => b.visible);
     let menuButtons = viewButtons.filter(b => b.displayStyle === 'MENU');
-    let tabButtons = null;
+    let tabButtons;
     // render as tab if length is < 1
     if (menuButtons.length > 1) {
       tabButtons = viewButtons.filter(b => b.displayStyle === 'TAB');

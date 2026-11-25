@@ -337,7 +337,7 @@ export class SplitBox extends CompositeField {
         splitterPosition = this.splitterPosition,
         splitterSize = graphics.size(this._$splitter, true),
         minSplitterPosition = this.minSplitterPosition,
-        totalSize = 0;
+        totalSize: number;
       if (this.splitHorizontal) { // "|"
         totalSize = splitAreaSize.width - splitterSize.width;
       } else { // "--"

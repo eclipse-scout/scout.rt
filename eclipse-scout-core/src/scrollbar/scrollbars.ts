@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -174,7 +174,7 @@ export const scrollbars = {
   },
 
   removeScrollable(session: Session, $container: JQuery) {
-    let initLength = 0;
+    let initLength: number;
     let key = session + '';
     if (scrollbars._$scrollables[key]) {
       initLength = scrollbars._$scrollables[key].length;

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -27,7 +27,7 @@ export class MenuBoxLayout extends AbstractLayout {
     let htmlContainer = this.menuBox.htmlComp,
       containerSize = htmlContainer.size(),
       menus = this.visibleMenus(),
-      menusWidth = 0;
+      menusWidth: number;
 
     // Make sure open popups are at the correct position after layouting
     this.menuBox.session.layoutValidator.schedulePostValidateFunction(() => {

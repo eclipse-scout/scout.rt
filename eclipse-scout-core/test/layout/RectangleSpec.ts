@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -125,10 +125,8 @@ describe('Rectangle', () => {
       expect(rect.add(new Insets(1, 2, 3, 4))).toEqual(new Rectangle(6, 19, 16, 9));
 
       rect = new Rectangle(10, 20, 10, 5);
-      rect = new Rectangle(10, 20, 10, 5);
       expect(rect.add(new Insets(0, 0, 0, 0))).toEqual(new Rectangle(10, 20, 10, 5));
 
-      rect = new Rectangle(10, 20, 10, 5);
       rect = new Rectangle(10, 20, 10, 5);
       expect(rect.add(new Insets(-1, -2, -3, -4))).toEqual(new Rectangle(14, 21, 4, 1));
     });
