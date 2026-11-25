@@ -10,11 +10,27 @@
 package org.eclipse.scout.rt.rest.jersey.server.chunked;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
+import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
+import jakarta.ws.rs.container.ConnectionCallback;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.Response;
 
 import org.eclipse.scout.rt.platform.BEANS;
@@ -34,6 +50,12 @@ import org.eclipse.scout.rt.rest.chunked.IChunkedDataWriter;
 import org.eclipse.scout.rt.testing.platform.BeanTestingHelper;
 import org.eclipse.scout.rt.testing.platform.runner.JUnitExceptionHandler;
 import org.eclipse.scout.rt.testing.platform.runner.PlatformTestRunner;
+import org.glassfish.jersey.message.MessageBodyWorkers;
+import org.glassfish.jersey.process.internal.RequestContext;
+import org.glassfish.jersey.process.internal.RequestScope;
+import org.glassfish.jersey.server.ChunkedOutput;
+import org.glassfish.jersey.server.ContainerRequest;
+import org.glassfish.jersey.server.ContainerResponse;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -91,6 +113,117 @@ public class ChunkedDataWriterTest {
     finally {
       BeanTestingHelper.get().unregisterBean(fixtureRunCtxFactoryBean);
     }
+  }
+
+  @Test
+  public void testCloseWaitsForContainerFlush() throws Exception {
+    @SuppressWarnings("resource")
+    ChunkedDataWriter<String> writer = new ChunkedDataWriter<>();
+    writer.init(String.class, "\r\n", 100);
+    writer.write("a");
+    writer.write("b");
+    writer.write("c");
+
+    CountDownLatch flushStarted = new CountDownLatch(1);
+    CountDownLatch continueFlush = new CountDownLatch(1);
+    ByteArrayOutputStream received = new ByteArrayOutputStream();
+    OutputStream entityStream = new OutputStream() {
+      private boolean m_firstWrite = true;
+
+      @Override
+      public void write(int b) {
+        received.write(b);
+      }
+
+      @Override
+      public void write(byte[] b, int off, int len) {
+        if (m_firstWrite) {
+          m_firstWrite = false;
+          flushStarted.countDown();
+          await(continueFlush);
+        }
+        received.write(b, off, len);
+      }
+    };
+
+    RequestScope requestScope = mock(RequestScope.class);
+    doAnswer(invocation -> ((Callable<?>) invocation.getArgument(1)).call())
+        .when(requestScope).runInScope(any(RequestContext.class), (Callable<?>) any(Callable.class));
+    ContainerRequest requestContext = mock(ContainerRequest.class);
+    MessageBodyWorkers workers = mock(MessageBodyWorkers.class);
+    when(requestContext.getWorkers()).thenReturn(workers);
+    doAnswer(invocation -> {
+      String chunk = invocation.getArgument(0);
+      OutputStream output = invocation.getArgument(7);
+      output.write(chunk.getBytes(StandardCharsets.UTF_8));
+      return output;
+    }).when(workers).writeTo(any(), any(), any(), any(), any(), any(), any(), any(), any());
+    ContainerResponse responseContext = mock(ContainerResponse.class);
+    when(responseContext.getEntityStream()).thenReturn(entityStream);
+    when(responseContext.getEntityAnnotations()).thenReturn(new Annotation[0]);
+    when(responseContext.getMediaType()).thenReturn(MediaType.TEXT_PLAIN_TYPE);
+    when(responseContext.getHeaders()).thenReturn(new MultivaluedHashMap<>());
+
+    AtomicReference<Throwable> failure = new AtomicReference<>();
+    Thread containerThread = new Thread(() -> {
+      try {
+        Method setContext = ChunkedOutput.class.getDeclaredMethod("setContext", RequestScope.class, RequestContext.class,
+            ContainerRequest.class, ContainerResponse.class, ConnectionCallback.class);
+        setContext.setAccessible(true);
+        setContext.invoke(writer.m_output, requestScope, mock(RequestContext.class), requestContext, responseContext, mock(ConnectionCallback.class));
+      }
+      catch (Throwable t) {
+        failure.compareAndSet(null, t);
+      }
+    });
+    containerThread.start();
+    assertTrue("Container flush did not start", flushStarted.await(5, TimeUnit.SECONDS));
+
+    CountDownLatch closeStarted = new CountDownLatch(1);
+    Thread closeThread = new Thread(() -> {
+      closeStarted.countDown();
+      try {
+        writer.close();
+      }
+      catch (Throwable t) {
+        failure.compareAndSet(null, t);
+      }
+    });
+    closeThread.start();
+    assertTrue(closeStarted.await(5, TimeUnit.SECONDS));
+    awaitBlocked(closeThread);
+    assertTrue("close should wait for the container flush", closeThread.isAlive());
+
+    continueFlush.countDown();
+    containerThread.join(TimeUnit.SECONDS.toMillis(5));
+    closeThread.join(TimeUnit.SECONDS.toMillis(5));
+
+    assertFalse("Container flush did not complete", containerThread.isAlive());
+    assertFalse("close did not complete", closeThread.isAlive());
+    assertNull(failure.get());
+    assertEquals("a\r\nb\r\nc\r\n", received.toString(StandardCharsets.UTF_8));
+    assertTrue(writer.isClosed());
+    verify(responseContext, atLeastOnce()).close();
+  }
+
+  private static void await(CountDownLatch latch) {
+    try {
+      if (!latch.await(5, TimeUnit.SECONDS)) {
+        throw new AssertionError("Timed out waiting for flush release");
+      }
+    }
+    catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new AssertionError("Interrupted while waiting for flush release", e);
+    }
+  }
+
+  private static void awaitBlocked(Thread thread) throws InterruptedException {
+    long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(5);
+    while (thread.getState() != Thread.State.BLOCKED && thread.isAlive() && System.nanoTime() < deadline) {
+      Thread.yield();
+    }
+    assertEquals("close did not block on the in-progress flush", Thread.State.BLOCKED, thread.getState());
   }
 
   protected FixtureIterator fetchData() {
