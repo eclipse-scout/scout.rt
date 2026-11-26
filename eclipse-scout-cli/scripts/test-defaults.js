@@ -105,9 +105,6 @@ module.exports = (config, specEntryPoint) => {
   // nonce-variable must always be processed as the build-output is used in the browser
   webpackConfig.plugins = webpackConfig.plugins.filter(p => !(p instanceof KeepNonceVariablePlugin));
 
-  // Babel transpile is not necessary for tests as they are executed with an up-to-date browser.
-  removeBabelLoader(webpackConfig);
-
   const helpers = [
     require.resolve('jasmine-ajax'),
     require.resolve('jquery'),
@@ -140,22 +137,6 @@ module.exports = (config, specEntryPoint) => {
     junitReportDir: 'test-results'
   });
 };
-
-function removeBabelLoader(webpackConfig) {
-  const babelLoader = require.resolve('babel-loader');
-  const rules = [];
-  for (let rule of webpackConfig.module.rules) {
-    if (Array.isArray(rule.use)) {
-      rule.use = rule.use.filter(u => u?.loader !== babelLoader);
-      if (rule.use.length) {
-        rules.push(rule);
-      }
-    } else {
-      rules.push(rule);
-    }
-  }
-  webpackConfig.module.rules = rules;
-}
 
 function searchSpecEntryPoint(specEntryPoint) {
   if (specEntryPoint) {

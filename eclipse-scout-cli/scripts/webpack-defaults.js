@@ -68,22 +68,6 @@ module.exports = (env, args) => {
 
   // browser min. requirements for full ES2023 feature set
   const minimizerTarget = ['firefox146', 'chrome110', 'safari16.4'];
-  const babelOptions = {
-    compact: false,
-    cacheDirectory: true,
-    cacheCompression: false,
-    presets: [
-      [require.resolve('@babel/preset-env'), {
-        debug: false,
-        targets: {
-          firefox: '146',
-          chrome: '110',
-          safari: '16.4'
-        }
-      }]
-    ]
-  };
-
   const transpileOnly = typeCheck === 'fork' ? true : !typeCheck;
   const moduleResolver = new ModuleResolver();
   const getCustomTransformers = program => ({
@@ -196,17 +180,8 @@ module.exports = (env, args) => {
         test: /\.[c|m]?tsx?$/,
         exclude: /node_modules/,
         use: [{
-          loader: require.resolve('babel-loader'),
-          options: babelOptions
-        }, {
           loader: require.resolve('ts-loader'),
           options: tsOptions
-        }]
-      }, {
-        test: /\.[c|m]?jsx?$/,
-        use: [{
-          loader: require.resolve('babel-loader'),
-          options: babelOptions
         }]
       }],
       // Use 'fetchpriority=high' for dynamic imports
