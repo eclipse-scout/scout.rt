@@ -152,9 +152,7 @@ module.exports = (env, args) => {
             sourceMap: devMode,
             lessOptions: {
               relativeUrls: false,
-              rewriteUrls: 'off',
-              math: 'always',
-              quiet: true // no deprecation warnings
+              rewriteUrls: 'off'
             }
           }
         }]

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2024 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -75,8 +75,8 @@
         height: 100%;
         width: @temp-splitter-line-size;
         border-left: @temp-splitter-line-size dashed @focus-border-color;
-        margin-left: @split-box-x-splitter-padding + ceil((@split-box-splitter-line-size - @temp-splitter-line-size) / 2);
-        margin-right: @split-box-x-splitter-padding + floor((@split-box-splitter-line-size - @temp-splitter-line-size) / 2) - @mandatory-indicator-width;
+        margin-left: @split-box-x-splitter-padding + ceil(((@split-box-splitter-line-size - @temp-splitter-line-size) / 2));
+        margin-right: @split-box-x-splitter-padding + floor(((@split-box-splitter-line-size - @temp-splitter-line-size) / 2)) - @mandatory-indicator-width;
       }
 
       // "--"
@@ -85,8 +85,8 @@
         width: calc(~'100% - ' @mandatory-indicator-width);
         height: @temp-splitter-line-size;
         border-top: @temp-splitter-line-size dashed @focus-border-color;
-        margin-top: @split-box-y-splitter-padding + ceil((@split-box-splitter-line-size - @temp-splitter-line-size) / 2);
-        margin-bottom: @split-box-y-splitter-padding + floor((@split-box-splitter-line-size - @temp-splitter-line-size) / 2);
+        margin-top: @split-box-y-splitter-padding + ceil(((@split-box-splitter-line-size - @temp-splitter-line-size) / 2));
+        margin-bottom: @split-box-y-splitter-padding + floor(((@split-box-splitter-line-size - @temp-splitter-line-size) / 2));
       }
     }
   }

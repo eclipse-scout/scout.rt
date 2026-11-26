@@ -9,12 +9,12 @@
  */
 #scout {
 
-  .vendor(@property, @value) {
-  -webkit-@{property}: @value;
-  -moz-@{property}: @value;
-  -o-@{property}: @value;
-    @{property}: @value;
-}
+  .vendor(@name, @value) {
+    -webkit-@{name}: @value;
+    -moz-@{name}: @value;
+    -o-@{name}: @value;
+      @{name}: @value;
+  }
 
   .glow(@color, @radius: 5px) {
     box-shadow: 0 0 @radius @color;
