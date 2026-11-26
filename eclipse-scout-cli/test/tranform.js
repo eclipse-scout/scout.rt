@@ -54,18 +54,19 @@ function compile(fileNames, options) {
 // console.log(`Process exiting with code '${exitCode}'.`);
 // process.exit(exitCode);
 
-const compilerOptions = {
-  target: ts.ScriptTarget.ESNext,
-  moduleResolution: ts.ModuleResolutionKind.Bundler,
-  module: ts.ModuleKind.ESNext,
-  skipLibCheck: true,
-  alwaysStrict: true,
-  strictBindCallApply: true,
-  noImplicitOverride: true,
-  useDefineForClassFields: true,
-  allowSyntheticDefaultImports: true,
-  experimentalDecorators: true
-};
+function readCompilerOptions() {
+  const configFileName = path.resolve(__dirname, '../tsconfig.json');
+  const overrides = {noEmit: false, sourceMap: false, allowJs: false};
+  const parsed = ts.getParsedCommandLineOfConfigFile(configFileName, overrides, {
+    ...ts.sys,
+    onUnRecoverableConfigFileDiagnostic: diagnostic => {
+      throw new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n'));
+    }
+  });
+  return parsed.options;
+}
+
+const compilerOptions = readCompilerOptions();
 
 /**
  * Transpiles a single file without type information like ts-loader does if types are not checked (transpileOnly).
