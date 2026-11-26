@@ -26,6 +26,8 @@ import org.eclipse.scout.rt.platform.BEANS;
 @ApplicationScoped
 public class LookupClientHelper {
 
+  // FIXME PBZ deps move this class out of scout? never used
+
   /**
    * Performs lookup call to specified {@code resourcePath} using context path {@code path} and specified
    * {@code restriction} object.
@@ -37,14 +39,10 @@ public class LookupClientHelper {
    * @param <RESTRICTION>
    *     Restriction object type
    */
-  // FIXME PBZ DEPS remove this method
-  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>> LookupResponse<LOOKUP_ROW> lookup(Class<? extends IRestClientHelper> clientHelperType, String resourcePath,
-      String path, RESTRICTION restriction) {
-    IRestClientHelper clientHelper = BEANS.get(clientHelperType);
-    return lookup(clientHelper, resourcePath, path, restriction);
-  }
-
-  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>> LookupResponse<LOOKUP_ROW> lookup(IRestClientHelper clientHelper, String resourcePath, String path,
+  public <LOOKUP_ROW extends AbstractLookupRowDo<ID>, ID, RESTRICTION extends AbstractLookupRestrictionDo<ID>> LookupResponse<LOOKUP_ROW> lookup(
+      IRestClientHelper clientHelper,
+      String resourcePath,
+      String path,
       RESTRICTION restriction) {
 
     WebTarget target = clientHelper.target(resourcePath)
