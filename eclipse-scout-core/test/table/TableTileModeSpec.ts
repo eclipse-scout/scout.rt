@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {SpecTable, SpecTableModel, TableSpecHelper} from '../../src/testing/index';
-import {HtmlTile, KeyTableFilter, scout, TableTextUserFilter} from '../../src';
+import {HtmlTile, KeyTableFilter, scout, TableTextUserFilter, Tile} from '../../src';
 
 describe('TableTileMode', () => {
   let session: SandboxSession;
@@ -172,5 +172,48 @@ describe('TableTileMode', () => {
 
     table.setTileMode(false);
     expect($input).toBeFocused();
+  });
+
+  it('links tiles correctly', () => {
+    table.setTileMode(true);
+    const mediator = table.tableTileGridMediator;
+    let tileGrid = mediator.tileAccordion.groups[0].body;
+    expect(mediator.tiles.length).toBe(5);
+    expect(mediator.children.length).toBe(0);
+    expect(tileGrid.children.filter(t => t instanceof Tile)).toEqual(mediator.tiles);
+    expect(table.children.filter(t => t instanceof Tile)).toEqual(mediator.tiles);
+    expect(mediator.tiles.every(t => t.parent === tileGrid && t.owner === table)).toBeTrue();
+
+    table.replaceRows([{
+      cells: ['5_0', '5_1']
+    }]);
+    tileGrid = mediator.tileAccordion.groups[0].body;
+    expect(mediator.tiles.length).toBe(1);
+    expect(mediator.children.length).toBe(0);
+    expect(tileGrid.children.filter(t => t instanceof Tile)).toEqual(mediator.tiles);
+    expect(table.children.filter(t => t instanceof Tile)).toEqual(mediator.tiles);
+    expect(mediator.tiles.every(t => t.parent === tileGrid && t.owner === table)).toBeTrue();
+  });
+
+  it('links tiles correctly when grouped', () => {
+    table.setTileMode(true);
+    const mediator = table.tableTileGridMediator;
+    expect(mediator.tiles.length).toBe(5);
+
+    table.group(table.columns[0], 'asc');
+    expect(mediator.tileAccordion.groups.map(g => g.id)).toEqual(['0_0', '1_0', '2_0', '3_0', '4_0']);
+    expect(mediator.children.length).toBe(0);
+    expect(table.children.filter(t => t instanceof Tile)).toEqual(mediator.tiles);
+    for (const group of mediator.tileAccordion.groups) {
+      expect(group.body.children.filter(t => t instanceof Tile).length).toBe(1);
+    }
+
+    table.replaceRows([{
+      cells: ['5_0', '5_1']
+    }]);
+    expect(mediator.tileAccordion.groups.map(g => g.id)).toEqual(['5_0']);
+    expect(mediator.children.length).toBe(0);
+    expect(table.children.filter(t => t instanceof Tile)).toEqual(mediator.tiles);
+    expect(mediator.tileAccordion.groups[0].body.children.filter(t => t instanceof Tile).length).toBe(1);
   });
 });
