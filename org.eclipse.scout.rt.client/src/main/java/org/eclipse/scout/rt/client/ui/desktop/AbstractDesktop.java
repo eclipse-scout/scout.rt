@@ -23,6 +23,7 @@ import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ModelContextProxy;
 import org.eclipse.scout.rt.client.ModelContextProxy.ModelContext;
 import org.eclipse.scout.rt.client.context.ClientRunContext;
@@ -83,6 +84,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.IButton;
 import org.eclipse.scout.rt.client.ui.messagebox.IMessageBox;
 import org.eclipse.scout.rt.client.ui.messagebox.MessageBoxes;
 import org.eclipse.scout.rt.client.ui.popup.PopupManager;
+import org.eclipse.scout.rt.dataobject.enumeration.EnumResolver;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.Order;
 import org.eclipse.scout.rt.platform.OrderedComparator;
@@ -110,7 +112,6 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 import org.eclipse.scout.rt.platform.util.TypeCastUtility;
 import org.eclipse.scout.rt.platform.util.collection.OrderedCollection;
 import org.eclipse.scout.rt.platform.util.concurrent.IRunnable;
-import org.eclipse.scout.rt.shared.session.ISession;
 import org.eclipse.scout.rt.shared.deeplink.DeepLinkUrlParameter;
 import org.eclipse.scout.rt.shared.extension.AbstractExtension;
 import org.eclipse.scout.rt.shared.extension.ContributionComposite;
@@ -119,8 +120,11 @@ import org.eclipse.scout.rt.shared.extension.IContributionOwner;
 import org.eclipse.scout.rt.shared.extension.IExtensibleObject;
 import org.eclipse.scout.rt.shared.extension.IExtension;
 import org.eclipse.scout.rt.shared.extension.ObjectExtensions;
-import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
 import org.eclipse.scout.rt.shared.services.common.bookmark.Bookmark;
+import org.eclipse.scout.rt.shared.session.ISession;
+import org.eclipse.scout.rt.shared.session.job.filter.future.SessionFutureFilter;
+import org.eclipse.scout.rt.shared.ui.IUiDeviceType;
+import org.eclipse.scout.rt.shared.ui.UiDeviceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -2157,6 +2161,8 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     String geolocationServiceAvailableStr = params.get(IDesktop.PROP_GEOLOCATION_SERVICE_AVAILABLE);
     boolean geolocationServiceAvailable = TypeCastUtility.castValue(geolocationServiceAvailableStr, boolean.class);
     setGeolocationServiceAvailable(geolocationServiceAvailable);
+    IUiDeviceType deviceType = BEANS.get(EnumResolver.class).resolve(UiDeviceType.class, params.get(IDesktop.PROP_DEVICE_TYPE));
+    setDeviceType(deviceType);
 
     boolean handleDeepLink = params.getOrDefault(DeepLinkUrlParameter.HANDLE_DEEP_LINK, true);
     if (handleDeepLink) {
@@ -2621,6 +2627,11 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     }
 
     @Override
+    public void setDeviceTypeFromUI(IUiDeviceType deviceType) {
+      setDeviceType(deviceType);
+    }
+
+    @Override
     public void setNavigationVisibleFromUI(boolean visible) {
       setNavigationVisible(visible);
     }
@@ -2663,6 +2674,12 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
     @Override
     public void removedNotificationFromUI(IDesktopNotification notification) {
       AbstractDesktop.this.removeNotificationInternal(notification, false);
+    }
+
+    @Override
+    public void reloadSessionFromUI() {
+      AbstractDesktop.this.setForcedClosing(true);
+      ClientSessionProvider.currentSession().stop(AbstractClientSession.EXIT_CODE_RELOAD_SESSION);
     }
   }
 
@@ -2829,6 +2846,30 @@ public abstract class AbstractDesktop extends AbstractWidget implements IDesktop
   @Override
   public void setNativeNotificationDefaults(NativeNotificationDefaults nativeNotificationDefaults) {
     propertySupport.setProperty(PROP_NATIVE_NOTIFICATION_DEFAULTS, nativeNotificationDefaults);
+  }
+
+  @Override
+  public IUiDeviceType getDeviceType() {
+    return TypeCastUtility.castValue(propertySupport.getProperty(PROP_DEVICE_TYPE), IUiDeviceType.class);
+  }
+
+  @Override
+  public void setDeviceType(IUiDeviceType deviceType) {
+    propertySupport.setProperty(PROP_DEVICE_TYPE, deviceType);
+  }
+
+  @Override
+  public boolean continueReloadingSessionConsideringUnsavedForms(String formId) {
+    if (MessageBoxes.create()
+        .withYesButtonText(TEXTS.get("ReloadSession"))
+        .withCancelButtonText(TEXTS.get("CancelButton"))
+        .withBody(TEXTS.get("ReloadSessionHint")).show() == IMessageBox.CANCEL_OPTION) {
+      return false;
+    }
+    List<IForm> forms = getUnsavedForms().stream()
+        .filter(form -> ObjectUtility.notEquals(form.getFormId(), formId))
+        .toList();
+    return continueClosingConsideringUnsavedForms(forms, true);
   }
 
   /**

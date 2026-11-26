@@ -8,10 +8,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import {
-  AbortError, ajax, AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, Event, EventEmitter, EventHandler, FileInput, files as fileUtil,
-  FocusManager, fonts, icons, InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory, ObjectFactoryOptions,
-  objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor, URL, UrlAjaxSettings,
-  UserAgent, webstorage, Widget
+  AbortError, ajax, AjaxCall, AjaxCallModel, AjaxError, App, arrays, BackgroundJobPollingStatus, BackgroundJobPollingSupport, BusyIndicator, config, Deferred, Desktop, Device, DeviceType, Event, EventEmitter, EventHandler, FileInput,
+  files as fileUtil, FocusManager, fonts, icons, InitModelOf, JsonErrorResponse, KeyStrokeManager, LayoutValidator, Locale, LocaleModel, LogLevel, MessageBox, ModelAdapter, ModelAdapterLike, ModelAdapterModel, NullWidget, ObjectFactory,
+  ObjectFactoryOptions, objects, ObjectWithType, Reconnector, RemoteEvent, ResponseQueue, scout, SessionAdapter, SessionEventMap, SessionModel, SharedVariables, SomeRequired, Status, StatusSeverity, strings, TextMap, texts, TypeDescriptor,
+  URL, UrlAjaxSettings, UserAgent, webstorage, Widget
 } from '../index';
 import $ from 'jquery';
 
@@ -403,6 +403,8 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
    *   browser URL (without query and hash part)
    * "geolocationServiceAvailable":
    *   true if browser supports geolocation services
+   * "deviceType":
+   *   initial value for the deviceType property of the remote desktop
    *
    * Additionally, all query parameters from the URL are put in the resulting object.
    */
@@ -410,6 +412,7 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     let params: SessionStartupParams = {
       url: this.url.baseUrlRaw,
       geolocationServiceAvailable: Device.get().supportsGeolocation(),
+      deviceType: Device.get().enforcedType,
       scoutNonce: App.get().nonce
     };
 
@@ -923,6 +926,9 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
         // session invalidation will receive a dedicated logout event, redirect is handled there).
         if (!this.loggedOut && data.redirectUrl) {
           this.logout(data.redirectUrl);
+        }
+        if (!this.loggedOut && data.sessionReload) {
+          this.logoutWithReload();
         }
       } else {
         try {
@@ -1562,6 +1568,14 @@ export class Session extends EventEmitter implements SessionModel, ModelAdapterL
     }
   }
 
+  logoutWithReload() {
+    $.log.info('Session reloading...');
+    this.loggedOut = true;
+    setTimeout(() => {
+      scout.reloadPage();
+    });
+  }
+
   protected _onDisposeAdapter(event: RemoteEvent & { adapter?: string }) {
     // Model adapter was disposed on server -> dispose it on the UI, too
     let adapter = this.getModelAdapter(event.adapter);
@@ -1710,6 +1724,7 @@ export interface RemoteResponse {
   events?: RemoteEvent[];
   error?: JsonErrorResponse;
   redirectUrl?: string;
+  sessionReload?: boolean;
   sessionTerminated?: boolean;
   combined?: boolean;
 }
@@ -1730,6 +1745,7 @@ export interface SessionStartupResponse extends RemoteResponse {
 export interface SessionStartupParams {
   url?: string;
   geolocationServiceAvailable?: boolean;
+  deviceType?: DeviceType;
   scoutNonce?: string;
 
   [p: string]: any; // all URL parameters

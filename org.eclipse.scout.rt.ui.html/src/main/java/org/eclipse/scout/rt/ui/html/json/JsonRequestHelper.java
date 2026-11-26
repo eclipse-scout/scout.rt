@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -18,6 +18,7 @@ import java.util.List;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 
+import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.platform.ApplicationScoped;
 import org.eclipse.scout.rt.platform.BEANS;
 import org.eclipse.scout.rt.platform.util.CollectionUtility;
@@ -138,11 +139,14 @@ public class JsonRequestHelper {
    *     termination, but no redirection happens.
    * @return {@link JSONObject} to indicate that the session was terminated.
    */
-  public JSONObject createSessionTerminatedResponse(final String redirectUrl) {
+  public JSONObject createSessionTerminatedResponse(final String redirectUrl, int exitCode) {
     final JSONObject json = new JSONObject();
     json.put("sessionTerminated", Boolean.TRUE);
-    if (StringUtility.hasText(redirectUrl)) {
+    if (exitCode == AbstractClientSession.EXIT_CODE_LOGOUT && StringUtility.hasText(redirectUrl)) {
       json.put("redirectUrl", redirectUrl);
+    }
+    if (exitCode == AbstractClientSession.EXIT_CODE_RELOAD_SESSION) {
+      json.put("sessionReload", Boolean.TRUE);
     }
     return json;
   }
