@@ -67,11 +67,10 @@ function getConstantsForMode(buildMode) {
 
 function getOutputDir(mode) {
   const outSubDir = getConstantsForMode(mode).outSubDir;
-  const isMavenModule = this.isMavenModule();
-  if (isMavenModule) {
-    return path.resolve(this.outDir.target, this.outDir.dist, outSubDir);
+  if (isMavenModule()) {
+    return path.resolve(outDir.target, outDir.dist, outSubDir);
   }
-  return path.resolve(this.outDir.dist);
+  return path.resolve(outDir.dist);
 }
 
 module.exports = {

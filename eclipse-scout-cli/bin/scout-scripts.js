@@ -85,17 +85,34 @@ switch (script) {
 }
 
 function runBuilds(args) {
-  const execSync = require('child_process').execSync;
-  let argStr = '';
-  for (let [key, value] of Object.entries(args)) {
-    if (key !== 'run' && key !== '_') {
-      argStr += `--${key} ${value} `;
+  const {execFileSync} = require('child_process');
+  const forwardedArgs = removeRunArgs(argv);
+  for (let type of args.run) {
+    console.log(`Starting ${type} build` + (forwardedArgs.length ? ` with args ${forwardedArgs.join(' ')}` : ''));
+    execFileSync(process.execPath, [__filename, script, '--run', type, ...forwardedArgs], {stdio: 'inherit'});
+  }
+}
+
+/**
+ * @returns {string[]} the given command line arguments without the --run argument and its values
+ */
+function removeRunArgs(args) {
+  const result = [];
+  let isRunValue = false;
+  for (const arg of args) {
+    if (arg === '--run') {
+      isRunValue = true;
+      continue;
+    }
+    if (isRunValue && !arg.startsWith('-')) {
+      continue;
+    }
+    isRunValue = false;
+    if (!arg.startsWith('--run=')) {
+      result.push(arg);
     }
   }
-  for (let type of args.run) {
-    console.log(`Starting ${type} build` + (argStr ? ` with args ${argStr}` : ''));
-    execSync(`scout-scripts ${script} --run ${type} ${argStr}`, {stdio: 'inherit'});
-  }
+  return result;
 }
 
 function runWebpack(args) {
@@ -143,20 +160,23 @@ function logWebpack(err, stats, statsConfig) {
     process.exitCode = 2; // let the webpack build fail on errors
     return;
   }
-  const info = stats.toJson();
   if (stats.hasErrors()) {
-    console.error(info.errors);
     process.exitCode = 1; // let the webpack build fail on errors
   }
-  if (info.warnings && info.warnings.length > 0) {
-    console.warn(info.warnings);
+  console.log(stats.toString(toStatsOptions(statsConfig)) + '\n\n');
+}
+
+/**
+ * @returns {object} the stats options for the given stats config (preset, boolean or options object). Errors are always shown.
+ */
+function toStatsOptions(statsConfig) {
+  let options = statsConfig;
+  if (typeof options === 'string') {
+    options = {preset: options};
+  } else if (typeof options === 'boolean') {
+    options = {preset: options ? 'normal' : 'none'};
   }
-  statsConfig = statsConfig || {};
-  if (typeof statsConfig === 'string') {
-    statsConfig = stats.compilation.createStatsOptions(statsConfig);
-  }
-  statsConfig.colors = true;
-  console.log(stats.toString(statsConfig) + '\n\n');
+  return {...options, errors: true, colors: true};
 }
 
 /**

@@ -21,7 +21,7 @@ const ts = require('typescript');
 /**
  * @param {string} args.mode development or production
  * @param {boolean} args.clean true, to clean the dist folder before each build. Default is false.
- * @param {boolean} args.progress true, to show build progress in percentage. Default is true.
+ * @param {boolean} args.progress true, to show build progress in percentage. Default is true if the output is a terminal.
  * @param {boolean} args.profile true, to show timing information for each build step. Default is false.
  * @param {boolean} args.watch true, if webpack runs in watch mode. Default is false.
  * @param {boolean} args.cyclonedxSkip true, if no CycloneDX SBOM should be created. Default is false.
@@ -60,7 +60,8 @@ module.exports = (env, args) => {
     copyPluginConfig.push(
       {
         from: resDir,
-        to: copyTarget
+        to: copyTarget,
+        info: {minimized: true} // the minimizers skip the static resources
       });
   }
 
@@ -88,17 +89,18 @@ module.exports = (env, args) => {
   const config = {
     mode: buildMode,
     devtool: false, // disabled because SourceMapDevToolPlugin is used (see below)
-    ignoreWarnings: [(webpackError, compilation) => isWarningIgnored(devMode, webpackError, compilation)],
+    ignoreWarnings: [webpackError => isWarningIgnored(devMode, webpackError)],
     resolve: {
       // no automatic polyfills. clients must add the desired polyfills themselves.
       fallback: {
         assert: false,
         buffer: false,
+        canvas: false,
         console: false,
         constants: false,
-        crypto: false,
         domain: false,
         events: false,
+        fs: false,
         http: false,
         https: false,
         os: false,
@@ -116,17 +118,11 @@ module.exports = (env, args) => {
         vm: false,
         zlib: false
       },
-      extensions: ['.ts', '.js', '.json', '.wasm', '.tsx', '.jsx']
+      extensions: ['.ts', '.js', '.json']
     },
-    // expect these apis in the browser
     externals: {
-      'crypto': 'crypto',
-      'canvas': 'canvas',
-      'fs': 'fs',
-      'http': 'http',
-      'https': 'https',
-      'url': 'url',
-      'zlib': 'zlib'
+      // Web Crypto API of the browser
+      'crypto': 'crypto'
     },
     output: {
       filename: jsFilename,
@@ -158,12 +154,12 @@ module.exports = (env, args) => {
               relativeUrls: false,
               rewriteUrls: 'off',
               math: 'always',
-              quiet: true // Disable deprecation warnings so they don't spam the log because of bug https://github.com/less/less.js/issues/4339
+              quiet: true // no deprecation warnings
             }
           }
         }]
       }, {
-        test: /\.[c|m]?tsx?$/,
+        test: /\.[cm]?tsx?$/,
         exclude: /node_modules/,
         use: [{
           loader: require.resolve('ts-loader'),
@@ -190,11 +186,7 @@ module.exports = (env, args) => {
         filename: '[file].map',
 
         // No source maps for CSS in production mode (the minimized CSS has no source maps, see CSS minimizer below).
-        test: devMode ? /\.((c|m)?js|css)($|\?)/i : /\.(c|m)?js($|\?)/i,
-
-        // Don't create maps for static resources.
-        // They may already have maps which could lead to "multiple assets emit different content to the same file" exception.
-        exclude: /\/res\/.*/,
+        test: devMode ? /\.([cm]?js|css)($|\?)/i : /\.[cm]?js($|\?)/i,
 
         // In production mode create external source maps without source code to map stack traces.
         // Otherwise, stack traces would point to the minified source code which makes it quite impossible to analyze productive issues.
@@ -216,7 +208,7 @@ module.exports = (env, args) => {
   }
 
   // Shows progress information in the console in dev mode
-  if (nvl(args.progress, true)) {
+  if (nvl(args.progress, !!process.stdout.isTTY)) {
     config.plugins.push(new ProgressPlugin({profile: args.profile}));
   }
 
@@ -225,11 +217,11 @@ module.exports = (env, args) => {
     const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
     let forkTsCheckerConfig = {
+      ...args.forkTypeCheckOptions,
       typescript: {
         memoryLimit: 4096,
         ...args.forkTypeCheckOptions?.typescript
-      },
-      ...args.forkTypeCheckOptions
+      }
     };
     if (!fs.existsSync('./tsconfig.json')) {
       // if the module has no tsconfig: use default from Scout.
@@ -259,12 +251,11 @@ module.exports = (env, args) => {
       // minify css
       new MinimizerPlugin({
         test: /\.min\.css$/i, // only minimize required files
-        exclude: /res[\\/]/i, // exclude resources output directory from minimizing as these files are copied
         parallel: 4, // best ratio between memory consumption and performance on most systems
         minify: {
           implementation: MinimizerPlugin.esbuildMinifyCss,
           options: {
-            logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+            logLevel: 'error', // prints errors with all details to the console. Warnings are ignored, see isWarningIgnored
             sourcemap: false, // no sourcemaps for css in prod build (needs more heap memory instead)
             charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
             target: minimizerTarget
@@ -274,13 +265,12 @@ module.exports = (env, args) => {
       // minify js
       new MinimizerPlugin({
         test: /\.min\.js$/i, // only minimize required files
-        exclude: [/log4javascript-1\.4\.9[\\/]/i, /res[\\/]/i], // exclude resources output directory from minimizing as these files are copied
         parallel: 4, // best ratio between memory consumption and performance on most systems
         minify: {
           implementation: MinimizerPlugin.esbuildMinify,
           options: {
             legalComments: 'none',
-            logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+            logLevel: 'error', // prints errors with all details to the console. Warnings are ignored, see isWarningIgnored
             charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
             target: minimizerTarget
           }
@@ -534,10 +524,8 @@ function isWarningIgnored(devMode, webpackError) {
   if (devMode || !webpackError) {
     return false;
   }
-  // Ignore warnings from esbuild minifier.
-  // One warning is 'Converting "require" to "esm" is currently not supported' which is not of interest.
-  // Others may be created by third party libs which are not of interest as well.
-  return webpackError.name === 'Warning';
+  // Ignore warnings of the minimizers, e.g. 'Converting "require" to "esm" is currently not supported' caused by third party libs.
+  return webpackError.name === 'Warning' && !!webpackError.file;
 }
 
 /**

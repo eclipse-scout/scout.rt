@@ -8,7 +8,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 const pluginName = 'KeepNonceVariablePlugin';
-const {toConstantDependency} = require('webpack/lib/javascript/JavascriptParserHelpers');
+const webpackNonce = '__webpack_nonce__';
 
 /**
  * Plugin that instructs webpack to NOT replace '__webpack_nonce__' with '__webpack_require__.nc'.
@@ -17,16 +17,21 @@ const {toConstantDependency} = require('webpack/lib/javascript/JavascriptParserH
  */
 module.exports = class KeepNonceVariablePlugin {
   apply(compiler) {
-    // see https://github.com/webpack/webpack/blob/v5.104.1/lib/APIPlugin.js#L207
+    // see https://github.com/webpack/webpack/blob/v5.113.0/lib/javascript/APIPlugin.js
     // see https://webpack.js.org/api/parser/#expression
-    compiler.hooks.normalModuleFactory.tap(pluginName, factory => {
-      factory.hooks.parser.for('javascript/auto').tap(pluginName, (parser, options) => {
-        const webpackNonce = '__webpack_nonce__';
-        parser.hooks.expression.for(webpackNonce).tap(pluginName, expression => {
-          const dep = toConstantDependency(parser, webpackNonce, [webpackNonce]);
-          return dep(expression);
-        });
+    const {ConstDependency} = compiler.webpack.dependencies;
+    const handler = parser => {
+      parser.hooks.expression.for(webpackNonce).tap(pluginName, expression => {
+        const dep = new ConstDependency(webpackNonce, expression.range);
+        dep.loc = parser.getLocation(expression);
+        parser.state.module.addPresentationalDependency(dep);
+        return true;
       });
+    };
+    compiler.hooks.normalModuleFactory.tap(pluginName, factory => {
+      for (const type of ['javascript/auto', 'javascript/dynamic', 'javascript/esm']) {
+        factory.hooks.parser.for(type).tap(pluginName, handler);
+      }
     });
   }
 };

@@ -22,18 +22,16 @@ function fileListFilter(fileName) {
 
 module.exports = {
   createFileList: dir => {
-    let content = '';
-    listFiles(dir)
+    const content = listFiles(dir)
       .filter(fileName => fileListFilter(fileName))
-      .map(file => file.substring(dir.length + 1))
-      .map(path => path.replace(/\\/g, '/'))
+      .map(file => path.relative(dir, file).replace(/\\/g, '/'))
       .map(fileName => `${fileName}\n`)
-      .forEach(line => {
-        content += line;
-      });
+      .join('');
+    const fileListPath = path.join(dir, scoutBuild.fileListName);
     if (content.length < 1) {
+      fs.rmSync(fileListPath, {force: true});
       return;
     }
-    fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, {flag: 'w'});
+    fs.writeFileSync(fileListPath, content);
   }
 };
