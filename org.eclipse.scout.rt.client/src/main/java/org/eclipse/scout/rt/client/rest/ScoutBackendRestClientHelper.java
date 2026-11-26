@@ -31,6 +31,7 @@ import org.eclipse.scout.rt.rest.client.AbstractRestClientHelper;
 import org.eclipse.scout.rt.rest.client.cancellation.CancellationResourceClient;
 import org.eclipse.scout.rt.rest.client.proxy.ErrorDoRestClientExceptionTransformer;
 import org.eclipse.scout.rt.rest.id.IdSignatureClientRequestFilter;
+import org.eclipse.scout.rt.shared.TunnelToServer;
 import org.eclipse.scout.rt.shared.servicetunnel.ServiceTunnelOptions;
 
 @ApplicationScoped
@@ -90,6 +91,10 @@ public class ScoutBackendRestClientHelper extends AbstractRestClientHelper {
         addIdSignatureHeader(requestContext);
       }
     }
+
+    // FIXME PBZ deps: Pages mit DataModel Lookups  -> smartcolum via DatenModell  -> UID/Keys auflösen
+    // Raw-DOs mit untypisierten Ids   -> lesen der response noch roh
+    // Kacheln & Prozesse @TunnelToServer(idSignature = true)
 
     protected void addServiceTunnelIdSignatureHeader(ClientRequestContext requestContext) {
       if (Optional.ofNullable(RunContext.CURRENT.get())
