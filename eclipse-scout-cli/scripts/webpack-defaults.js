@@ -12,12 +12,10 @@ const path = require('path');
 const scoutBuildConstants = require('./constants');
 const DataObjectTransformer = require('./data-object/DataObjectTransformer');
 const ModuleResolver = require('./data-object/ModuleResolver');
-const CopyPlugin = require('copy-webpack-plugin');
 const {CycloneDxWebpackPlugin} = require('@cyclonedx/webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const AfterEmitWebpackPlugin = require('./webpack-build/AfterEmitWebpackPlugin');
 const KeepNonceVariablePlugin = require('./webpack-build/KeepNonceVariablePlugin');
-const {SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('webpack');
+const {CopyPlugin, SourceMapDevToolPlugin, WatchIgnorePlugin, ProgressPlugin} = require('webpack');
 const ts = require('typescript');
 
 /**
@@ -35,7 +33,7 @@ const ts = require('typescript');
  *    true: let the TypeScript compiler check the types.
  *    false: let the TypeScript compiler only transpile the TypeScript code without checking types, which makes it faster.
  *    fork: starts a separate process to run the type checks so that the build won't be blocked until type check completes.
- *          Also shows a notification if type check fails. This mode needs more memory.
+ *          This mode needs more memory.
  *    auto:
  *    - In prod mode, types won't be checked (typeCheck is false).
  *    - In dev mode, types will be checked (typeCheck is true).
@@ -132,7 +130,11 @@ module.exports = (env, args) => {
     },
     output: {
       filename: jsFilename,
+      cssFilename: cssFilename,
+      cssChunkFilename: cssFilename,
       path: outDir,
+      // Maven modules copy their resources next to the output folder. Declaration files of linked modules are written outside as well.
+      allowOutside: isMavenModule ? true : undefined,
       clean: nvl(args.clean, false)
     },
     performance: {
@@ -142,27 +144,11 @@ module.exports = (env, args) => {
     module: {
       rules: [{
         // LESS
+        // The compiled CSS is processed and extracted into separate files by webpack (native CSS, global scope, no CSS modules).
+        // see: https://webpack.js.org/guides/native-css/
         test: /\.less$/,
+        type: 'css',
         use: [{
-          // Extracts CSS into separate files. It creates a CSS file per JS file which contains CSS.
-          // It supports On-Demand-Loading of CSS and SourceMaps.
-          // see: https://webpack.js.org/plugins/mini-css-extract-plugin/
-          //
-          // Note: this creates some useless *.js files, like dark-theme.js
-          // This seems to be an issue in webpack, workaround is to remove the files later
-          // see: https://github.com/webpack-contrib/mini-css-extract-plugin/issues/151
-          // seems to be fixed in webpack 5, workaround to manually delete js files can be removed as soon as webpack 5 is released
-          loader: MiniCssExtractPlugin.loader
-        }, {
-          // Interprets @import and url() like import/require() and will resolve them.
-          // see: https://webpack.js.org/loaders/css-loader/
-          loader: require.resolve('css-loader'),
-          options: {
-            sourceMap: devMode,
-            modules: false, // We don't want to work with CSS modules
-            url: false // Don't resolve URLs in LESS, because relative path does not match /res/fonts
-          }
-        }, {
           // Compiles Less to CSS.
           // see: https://webpack.js.org/loaders/less-loader/
           loader: require.resolve('less-loader'),
@@ -189,18 +175,22 @@ module.exports = (env, args) => {
       parser: {
         javascript: {
           dynamicImportFetchPriority: 'high'
+        },
+        css: {
+          url: false // Don't resolve URLs in LESS, because relative path does not match /res/fonts
         }
       }
     },
     plugins: [
       new WatchIgnorePlugin({paths: [/\.d\.ts$/]}),
-      // see: extracts css into separate files
-      new MiniCssExtractPlugin({filename: cssFilename}),
       // run post-build script hook
       new AfterEmitWebpackPlugin({outDir: outDir}),
       new SourceMapDevToolPlugin({
         // Use external source maps in all modes because the browser is very slow in displaying a file containing large lines which is the case if source maps are inlined
         filename: '[file].map',
+
+        // No source maps for CSS in production mode (the minimized CSS has no source maps, see CSS minimizer below).
+        test: devMode ? /\.((c|m)?js|css)($|\?)/i : /\.(c|m)?js($|\?)/i,
 
         // Don't create maps for static resources.
         // They may already have maps which could lead to "multiple assets emit different content to the same file" exception.
@@ -233,7 +223,6 @@ module.exports = (env, args) => {
   if (typeCheck === 'fork') {
     // perform type checks asynchronously in a separate process
     const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
-    const ForkTsCheckerNotifierWebpackPlugin = require('fork-ts-checker-notifier-webpack-plugin');
 
     let forkTsCheckerConfig = {
       typescript: {
@@ -260,41 +249,41 @@ module.exports = (env, args) => {
       };
     }
     config.plugins.push(new ForkTsCheckerWebpackPlugin(forkTsCheckerConfig));
-    config.plugins.push(new ForkTsCheckerNotifierWebpackPlugin({
-      title: getModuleName(),
-      skipSuccessful: true, // no notification for successful builds
-      excludeWarnings: true // no notification for warnings
-    }));
   }
 
   if (!devMode) {
-    const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-    const TerserPlugin = require('terser-webpack-plugin');
+    const MinimizerPlugin = require('minimizer-webpack-plugin');
+    // CSS is minified by esbuild (see below) instead of the built-in CSS minimizer of webpack
+    config.optimization.minimize = {css: false};
     config.optimization.minimizer = [
       // minify css
-      new CssMinimizerPlugin({
+      new MinimizerPlugin({
         test: /\.min\.css$/i, // only minimize required files
         exclude: /res[\\/]/i, // exclude resources output directory from minimizing as these files are copied
         parallel: 4, // best ratio between memory consumption and performance on most systems
-        minify: CssMinimizerPlugin.esbuildMinify,
-        minimizerOptions: {
-          logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
-          sourcemap: false, // no sourcemaps for css in prod build (needs more heap memory instead)
-          charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
-          target: minimizerTarget
+        minify: {
+          implementation: MinimizerPlugin.esbuildMinifyCss,
+          options: {
+            logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+            sourcemap: false, // no sourcemaps for css in prod build (needs more heap memory instead)
+            charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
+            target: minimizerTarget
+          }
         }
       }),
       // minify js
-      new TerserPlugin({
+      new MinimizerPlugin({
         test: /\.min\.js$/i, // only minimize required files
         exclude: [/log4javascript-1\.4\.9[\\/]/i, /res[\\/]/i], // exclude resources output directory from minimizing as these files are copied
         parallel: 4, // best ratio between memory consumption and performance on most systems
-        minify: TerserPlugin.esbuildMinify,
-        terserOptions: {
-          legalComments: 'none',
-          logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
-          charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
-          target: minimizerTarget
+        minify: {
+          implementation: MinimizerPlugin.esbuildMinify,
+          options: {
+            legalComments: 'none',
+            logLevel: 'error', // show messages directly to see the details. The message passed to webpack is only an object which is ignored in isWarningIgnored
+            charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
+            target: minimizerTarget
+          }
         }
       })
     ];
@@ -572,17 +561,6 @@ function prodDevtoolModuleFilenameTemplate(info) {
   if (result) {
     return result[1];
   }
-}
-
-function getModuleName() {
-  let packageJsonFile = path.resolve('./package.json');
-  if (fs.existsSync(packageJsonFile)) {
-    let name = require(packageJsonFile).name;
-    if (name) {
-      return name;
-    }
-  }
-  return path.basename(process.cwd());
 }
 
 /**

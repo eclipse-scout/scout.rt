@@ -10,31 +10,12 @@
 
 const fs = require('fs');
 const path = require('path');
-const themeJsOutFilter = f => /.*theme.*\.js/.test(f);
 const {listFiles} = require('../files');
 const scoutBuild = require('../constants');
 
-function deleteFile(filename) {
-  if (!fs.existsSync(filename)) {
-    return;
-  }
-  try {
-    fs.accessSync(filename, fs.constants.W_OK);
-  } catch (err) {
-    console.error(`No right to delete ${filename}.`, err);
-    return;
-  }
-  fs.unlink(filename, unlinkErr => {
-    if (unlinkErr) {
-      throw unlinkErr;
-    }
-  });
-}
-
 function fileListFilter(fileName) {
-  return fileName !== scoutBuild.fileListName
+  return path.basename(fileName) !== scoutBuild.fileListName
     && !fileName.endsWith('.LICENSE')
-    && !themeJsOutFilter(fileName)
     && !fileName.endsWith('d.ts')
     && !fileName.endsWith('d.ts.map');
 }
@@ -54,13 +35,5 @@ module.exports = {
       return;
     }
     fs.writeFileSync(path.join(dir, scoutBuild.fileListName), content, {flag: 'w'});
-  },
-  cleanOutDir: dir => {
-    if (!fs.existsSync(dir)) {
-      return;
-    }
-    listFiles(dir)
-      .filter(themeJsOutFilter)
-      .forEach(f => deleteFile(f));
   }
 };

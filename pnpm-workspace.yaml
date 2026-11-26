@@ -27,13 +27,13 @@ overrides:
   "@cacheable/memory>keyv@5.6.0": 5.6.0
   "@cacheable/utils@2.5.0": 2.5.0
   "@cacheable/utils>keyv@5.6.0": 5.6.0
-  "@colordx/core@5.8.0": 5.8.0
-  "@cyclonedx/cyclonedx-library@9.5.0": 9.5.0
-  "@cyclonedx/cyclonedx-library>spdx-expression-parse@4.0.0": 4.0.0
+  "@cyclonedx/cyclonedx-library@10.5.1": 10.5.1
   "@cyclonedx/webpack-plugin>ajv-formats-draft2019@1.6.1": 1.6.1
   "@cyclonedx/webpack-plugin>ajv-formats@3.0.1": 3.0.1
   "@cyclonedx/webpack-plugin>ajv@8.20.0": 8.20.0
   "@cyclonedx/webpack-plugin>libxmljs2@0.37.0": 0.37.0
+  "@cyclonedx/webpack-plugin>packageurl-js@2.0.1": 2.0.1
+  "@cyclonedx/webpack-plugin>spdx-expression-parse@4.0.0": 4.0.0
   "@cyclonedx/webpack-plugin>xmlbuilder2@4.0.3": 4.0.3
   "@eslint-community/eslint-utils@4.10.1": 4.10.1
   "@eslint-community/eslint-utils>eslint-visitor-keys@3.4.3": 3.4.3
@@ -67,34 +67,25 @@ overrides:
   "@oozcitak/url@3.0.0": 3.0.0
   "@oozcitak/util@10.0.0": 10.0.0
   "@pkgjs/parseargs@0.11.0": 0.11.0
-  "@sinclair/typebox@0.34.52": 0.34.52
   "@stylistic/eslint-plugin>eslint-visitor-keys@4.2.1": 4.2.1
   "@stylistic/eslint-plugin>picomatch@4.0.7": 4.0.7
-  "@types/eslint-scope@3.7.7": 3.7.7
-  "@types/eslint@9.6.1": 9.6.1
   "@types/esrecurse@4.3.1": 4.3.1
   "@types/estree@1.0.11": 1.0.11
-  "@types/istanbul-lib-coverage@2.0.6": 2.0.6
-  "@types/istanbul-lib-report@3.0.3": 3.0.3
-  "@types/istanbul-reports@3.0.4": 3.0.4
   "@types/json-schema@7.0.15": 7.0.15
+  "@types/less@3.0.8": 3.0.8
   "@types/node@26.6.10": 26.6.10
-  "@types/yargs-parser@21.0.3": 21.0.3
-  "@types/yargs@17.0.35": 17.0.35
   "@typescript-eslint/eslint-plugin>ignore@7.0.16": 7.0.16
   "@typescript-eslint/tsconfig-utils@8.74.0": 8.74.0
   "@typescript-eslint/types@8.74.0": 8.74.0
-  "@ungap/structured-clone@1.4.0": 1.4.0
   "@webassemblyjs/ast@1.14.1": 1.14.1
   "@webassemblyjs/wasm-edit@1.14.1": 1.14.1
   "@webassemblyjs/wasm-parser@1.14.1": 1.14.1
   "@xtuc/ieee754@1.2.0": 1.2.0
   abbrev@3.0.1: 3.0.1
-  acorn-import-phases@1.0.4: 1.0.4
   acorn-jsx@5.3.2: 5.3.2
   agent-base@7.1.4: 7.1.4
   ajv-formats>ajv@8.20.0: 8.20.0
-  ajv-keywords@3.5.2: 3.5.2
+  ajv-keywords@5.1.0: 5.1.0
   ajv@8.20.0>json-schema-traverse@1.0.0: 1.0.0
   ansi-regex@5.0.1: 5.0.1
   ansi-styles@4.3.0: 4.3.0
@@ -104,45 +95,29 @@ overrides:
   baseline-browser-mapping@2.11.39: 2.11.39
   bindings@1.5.0: 1.5.0
   bl@4.1.0: 4.1.0
-  boolbase@1.0.0: 1.0.0
   brace-expansion@5.1.0: 5.1.0
   brace-expansion@5.1.0>balanced-match@4.0.4: 4.0.4
-  braces@3.0.3: 3.0.3
   buffer-from@1.1.2: 1.1.2
   buffer@5.7.1: 5.7.1
   cacache@19.0.1: 19.0.1
   cacheable@2.5.0: 2.5.0
   cacheable>keyv@5.6.0: 5.6.0
   callsites@3.1.0: 3.1.0
-  caniuse-api@3.0.0: 3.0.0
-  caniuse-api>browserslist@4.29.6: 4.29.6
   caniuse-lite@1.0.30001828: 1.0.30001828
   chalk@4.1.2: 4.1.2
   chalk>supports-color@7.2.0: 7.2.0
   chokidar@4.0.3: 4.0.3
   chownr@1.1.4: 1.1.4
   chrome-trace-event@1.0.4: 1.0.4
-  ci-info@4.5.0: 4.5.0
   color-convert@2.0.1: 2.0.1
   color-name@1.1.4: 1.1.4
   commander@2.20.3: 2.20.3
   content-type@2.1.0: 2.1.0
-  copy-anything@2.0.6: 2.0.6
+  copy-anything@3.0.5: 3.0.5
   core-util-is@1.0.3: 1.0.3
-  cosmiconfig@8.3.6: 8.3.6
+  cosmiconfig@9.0.2: 9.0.2
   cross-spawn@7.0.6: 7.0.6
-  css-declaration-sorter@7.4.0: 7.4.0
-  css-loader>postcss@8.5.33: 8.5.33
-  css-minimizer-webpack-plugin>jest-worker@30.5.1: 30.5.1
-  css-minimizer-webpack-plugin>postcss@8.5.33: 8.5.33
-  css-select@6.0.0: 6.0.0
-  css-tree@2.2.1: 2.2.1
-  css-what@7.0.0: 7.0.0
-  cssesc@3.0.0: 3.0.0
-  cssnano-preset-default@7.0.17: 7.0.17
-  cssnano-preset-default>browserslist@4.29.6: 4.29.6
-  cssnano-utils@5.0.3: 5.0.3
-  cssnano@7.1.9: 7.1.9
+  debug@3.2.7>supports-color@10.2.2: 10.2.2
   debug@4.4.3: 4.4.3
   decompress-response@6.0.0: 6.0.0
   deep-extend@0.6.0: 0.6.0
@@ -150,10 +125,6 @@ overrides:
   deepmerge@4.3.1: 4.3.1
   depd@2.0.0: 2.0.0
   detect-libc@2.1.2: 2.1.2
-  dom-serializer@2.0.0: 2.0.0
-  domelementtype@2.3.0: 2.3.0
-  domhandler@5.0.3: 5.0.3
-  domutils@3.2.2: 3.2.2
   eastasianwidth@0.2.0: 0.2.0
   ejs@6.0.1: 6.0.1
   electron-to-chromium@1.5.494: 1.5.494
@@ -162,19 +133,16 @@ overrides:
   encoding@0.1.14: 0.1.14
   end-of-stream@1.4.5: 1.4.5
   enhanced-resolve@5.27.0: 5.27.0
-  entities@4.5.0: 4.5.0
   env-paths@2.2.1: 2.2.1
   err-code@2.0.3: 2.0.3
   errno@0.1.8: 0.1.8
   error-ex@1.3.4: 1.3.4
-  es-module-lexer@2.3.2: 2.3.2
   escalade@3.2.0: 3.2.0
   escape-html@1.0.3: 1.0.3
   escape-string-regexp@4.0.0: 4.0.0
-  eslint-scope@5.1.1>estraverse@4.3.0: 4.3.0
+  eslint-scope@9.1.2: 9.1.2
   eslint-visitor-keys@5.0.1: 5.0.1
   eslint>ajv@6.15.0: 6.15.0
-  eslint>eslint-scope@9.1.2: 9.1.2
   eslint>espree@11.2.0: 11.2.0
   espree@10.4.0: 10.4.0
   espree@10.4.0>acorn@8.19.0: 8.19.0
@@ -195,26 +163,22 @@ overrides:
   fast-uri@3.1.9: 3.1.9
   fdir@6.5.0: 6.5.0
   file-entry-cache@11.1.5: 11.1.5
-  fill-range@7.1.1: 7.1.1
   find-up@5.0.0: 5.0.0
   flat-cache@6.1.23: 6.1.23
   flatted@3.4.4: 3.4.4
   foreground-child@3.3.1: 3.3.1
-  fork-ts-checker-webpack-plugin>minimatch@3.1.5: 3.1.5
-  fork-ts-checker-webpack-plugin>schema-utils@3.3.0: 3.3.0
+  fork-ts-checker-webpack-plugin>minimatch@9.0.9: 9.0.9
   fresh@2.0.0: 2.0.0
   fs-constants@1.0.0: 1.0.0
-  fs-extra@10.1.0: 10.1.0
+  fs-extra@11.4.1: 11.4.1
   fs-minipass@3.0.3: 3.0.3
   fs-monkey@1.1.0: 1.1.0
   glob-parent@6.0.2: 6.0.2
-  glob-to-regexp@0.4.1: 0.4.1
   glob@10.5.0: 10.5.0
   glob@10.5.0>minimatch@9.0.9: 9.0.9
   glob@13.0.7>minimatch@10.2.6: 10.2.6
   glob@13.0.7>path-scurry@2.0.2: 2.0.2
   graceful-fs@4.2.12: 4.2.12
-  growly@1.3.0: 1.3.0
   has-flag@4.0.0: 4.0.0
   hashery@1.5.1: 1.5.1
   hookified@1.15.1: 1.15.1
@@ -224,11 +188,9 @@ overrides:
   http-errors@2.0.1: 2.0.1
   http-proxy-agent@7.0.2: 7.0.2
   https-proxy-agent@7.0.6: 7.0.6
-  iconv-lite@0.6.3: 0.6.3
-  icss-utils@5.1.0: 5.1.0
+  iconv-lite@0.4.24: 0.4.24
   ieee754@1.2.1: 1.2.1
   ignore@5.3.2: 5.3.2
-  image-size@0.5.4: 0.5.4
   immediate@3.0.6: 3.0.6
   import-fresh@3.3.1: 3.3.1
   imurmurhash@0.1.4: 0.1.4
@@ -236,21 +198,16 @@ overrides:
   ini@1.3.8: 1.3.8
   ip-address@10.7.6: 10.7.6
   is-arrayish@0.2.1: 0.2.1
-  is-docker@2.2.1: 2.2.1
   is-extglob@2.1.1: 2.1.1
   is-fullwidth-code-point@3.0.0: 3.0.0
   is-glob@4.0.3: 4.0.3
-  is-number@7.0.0: 7.0.0
-  is-what@3.14.1: 3.14.1
-  is-wsl@2.2.0: 2.2.0
+  is-what@4.1.16: 4.1.16
   isarray@1.0.0: 1.0.0
   isexe@2.0.0: 2.0.0
   jackspeak@3.4.3: 3.4.3
   jasmine-browser-runner>glob@13.0.7: 13.0.7
-  jest-util>picomatch@4.0.7: 4.0.7
   jest-worker@27.5.1: 27.5.1
-  jest-worker@27.5.1>supports-color@8.1.1: 8.1.1
-  jest-worker@30.5.1>supports-color@8.1.1: 8.1.1
+  jest-worker>supports-color@8.1.1: 8.1.1
   js-tokens@4.0.0: 4.0.0
   js-yaml@4.3.2: 4.3.2
   json-parse-even-better-errors@2.3.1: 2.3.1
@@ -259,30 +216,25 @@ overrides:
   jsonfile@6.2.1: 6.2.1
   jszip@3.10.2: 3.10.2
   jszip>readable-stream@2.3.8: 2.3.8
+  less>needle@3.5.0: 3.5.0
   levn@0.4.1: 0.4.1
   lie@3.3.0: 3.3.0
-  lilconfig@3.1.5: 3.1.5
   lines-and-columns@1.2.4: 1.2.4
-  loader-runner@4.3.2: 4.3.2
   locate-path@6.0.0: 6.0.0
-  lodash.memoize@4.1.2: 4.1.2
-  lodash.uniq@4.5.0: 4.5.0
+  lodash.merge@4.6.2: 4.6.2
   lru-cache@10.4.3: 10.4.3
-  make-dir@2.1.0: 2.1.0
-  make-dir>semver@5.7.3: 5.7.3
+  make-dir@5.1.0: 5.1.0
   make-fetch-happen@14.0.3: 14.0.3
-  memfs@3.5.3: 3.5.3
+  memfs@3.6.0: 3.6.0
   merge-stream@2.0.0: 2.0.0
-  micromatch@4.0.8: 4.0.8
-  micromatch>picomatch@2.3.2: 2.3.2
-  mime-types@2.1.35: 2.1.35
-  mime-types@3.0.2>mime-db@1.54.0: 1.54.0
+  mime-db@1.54.0: 1.54.0
+  mime-types@3.0.2: 3.0.2
   mime@1.6.0: 1.6.0
   mimic-response@3.1.0: 3.1.0
   minimatch@11.0.9: 11.0.9
-  minimatch@3.1.5>brace-expansion@1.1.22: 1.1.22
   minimatch@9.0.9>brace-expansion@2.1.8: 2.1.8
   minimist@1.2.8: 1.2.8
+  minimizer-webpack-plugin@5.14.1: 5.14.1
   minipass-collect@2.0.1: 2.0.1
   minipass-fetch@4.0.1: 4.0.1
   minipass-flush@1.0.7: 1.0.7
@@ -297,23 +249,20 @@ overrides:
   moo@0.5.3: 0.5.3
   ms@2.1.3: 2.1.3
   nan@2.22.2: 2.22.2
-  nanoid@3.3.20: 3.3.20
   napi-build-utils@2.0.0: 2.0.0
   natural-compare@1.4.0: 1.4.0
   nearley@2.20.1: 2.20.1
-  needle@3.5.0: 3.5.0
+  needle@2.9.1: 2.9.1
+  needle@2.9.1>debug@3.2.7: 3.2.7
+  needle@3.5.0>iconv-lite@0.6.3: 0.6.3
   negotiator@1.1.0: 1.1.0
-  neo-async@2.6.2: 2.6.2
   node-abi@3.104.0: 3.104.0
   node-abort-controller@3.1.0: 3.1.0
   node-gyp@11.5.0: 11.5.0
   node-gyp>which@5.0.0: 5.0.0
-  node-notifier@10.0.1: 10.0.1
   node-releases@2.0.65: 2.0.65
   nopt@8.1.0: 8.1.0
   normalize-package-data@8.0.0: 8.0.0
-  normalize-path@3.0.0: 3.0.0
-  nth-check@2.1.1: 2.1.1
   on-finished@2.4.2: 2.4.2
   once@1.4.0: 1.4.0
   optionator@0.9.4: 0.9.4
@@ -321,7 +270,6 @@ overrides:
   p-locate@5.0.0: 5.0.0
   p-map@7.1.1: 7.1.1
   package-json-from-dist@1.0.1: 1.0.1
-  packageurl-js@2.0.1: 2.0.1
   pako@1.0.11: 1.0.11
   parent-module@1.0.1: 1.0.1
   parse-json@5.2.0: 5.2.0
@@ -331,51 +279,10 @@ overrides:
   path-key@3.1.1: 3.1.1
   path-scurry@1.11.1: 1.11.1
   path-scurry@2.0.2>lru-cache@11.5.3: 11.5.3
-  path-type@4.0.0: 4.0.0
   picocolors@1.1.1: 1.1.1
-  pify@4.0.1: 4.0.1
-  postcss-calc@10.1.1: 10.1.1
-  postcss-colormin@7.0.10: 7.0.10
-  postcss-colormin>browserslist@4.29.6: 4.29.6
-  postcss-convert-values@7.0.12: 7.0.12
-  postcss-convert-values>browserslist@4.29.6: 4.29.6
-  postcss-discard-comments@7.0.8: 7.0.8
-  postcss-discard-duplicates@7.0.4: 7.0.4
-  postcss-discard-empty@7.0.3: 7.0.3
-  postcss-discard-overridden@7.0.3: 7.0.3
-  postcss-merge-longhand@7.0.7: 7.0.7
-  postcss-merge-rules@7.0.11: 7.0.11
-  postcss-merge-rules>browserslist@4.29.6: 4.29.6
-  postcss-minify-font-values@7.0.3: 7.0.3
-  postcss-minify-gradients@7.0.5: 7.0.5
-  postcss-minify-params@7.0.9: 7.0.9
-  postcss-minify-params>browserslist@4.29.6: 4.29.6
-  postcss-minify-selectors@7.1.2: 7.1.2
-  postcss-minify-selectors>browserslist@4.29.6: 4.29.6
-  postcss-modules-extract-imports@3.1.0: 3.1.0
-  postcss-modules-local-by-default@4.2.0: 4.2.0
-  postcss-modules-scope@3.2.1: 3.2.1
-  postcss-modules-values@4.0.0: 4.0.0
-  postcss-normalize-charset@7.0.3: 7.0.3
-  postcss-normalize-display-values@7.0.3: 7.0.3
-  postcss-normalize-positions@7.0.4: 7.0.4
-  postcss-normalize-repeat-style@7.0.4: 7.0.4
-  postcss-normalize-string@7.0.3: 7.0.3
-  postcss-normalize-timing-functions@7.0.3: 7.0.3
-  postcss-normalize-unicode@7.0.9: 7.0.9
-  postcss-normalize-unicode>browserslist@4.29.6: 4.29.6
-  postcss-normalize-url@7.0.3: 7.0.3
-  postcss-normalize-whitespace@7.0.3: 7.0.3
-  postcss-ordered-values@7.0.4: 7.0.4
-  postcss-reduce-initial@7.0.9: 7.0.9
-  postcss-reduce-initial>browserslist@4.29.6: 4.29.6
-  postcss-reduce-transforms@7.0.3: 7.0.3
-  postcss-selector-parser@7.2.1: 7.2.1
-  postcss-svgo@7.1.3: 7.1.3
-  postcss-unique-selectors@7.0.7: 7.0.7
-  postcss-value-parser@4.2.0: 4.2.0
   prebuild-install@7.1.3: 7.1.3
   prelude-ls@1.2.1: 1.2.1
+  probe-image-size@7.5.0: 7.5.0
   proc-log@5.0.0: 5.0.0
   process-nextick-args@2.0.1: 2.0.1
   promise-retry@2.0.1: 2.0.1
@@ -385,10 +292,8 @@ overrides:
   qified@0.10.1: 0.10.1
   qified>hookified@2.2.0: 2.2.0
   railroad-diagrams@1.0.0: 1.0.0
-  randombytes@2.1.0: 2.1.0
   range-parser@1.3.0: 1.3.0
   rc@1.2.8: 1.2.8
-  readable-stream@2.3.8>safe-buffer@5.1.2: 5.1.2
   readable-stream@3.6.2: 3.6.2
   readable-stream@3.6.2>string_decoder@1.3.0: 1.3.0
   readdirp@4.1.2: 4.1.2
@@ -396,26 +301,21 @@ overrides:
   resolve-from@4.0.0: 4.0.0
   ret@0.1.15: 0.1.15
   retry@0.12.0: 0.12.0
-  safe-buffer@5.2.1: 5.2.1
+  safe-buffer@5.1.2: 5.1.2
   safer-buffer@2.1.2: 2.1.2
   sax@1.6.1: 1.6.1
-  schema-utils@3.3.0>ajv@6.15.0: 6.15.0
   schema-utils@4.8.5: 4.8.5
-  schema-utils@4.8.5>ajv-formats@3.0.1: 3.0.1
-  schema-utils@4.8.5>ajv-keywords@5.1.0: 5.1.0
-  schema-utils@4.8.5>ajv@8.20.0: 8.20.0
+  schema-utils>ajv-formats@3.0.1: 3.0.1
+  schema-utils>ajv@8.20.0: 8.20.0
   schemes@1.4.0: 1.4.0
   selenium-webdriver@4.54.0: 4.54.0
   semver@7.8.6: 7.8.6
   send@1.2.1: 1.2.1
-  send>mime-types@3.0.2: 3.0.2
-  serialize-javascript@6.0.2: 6.0.2
   serve-static@2.2.1: 2.2.1
   setimmediate@1.0.5: 1.0.5
   setprototypeof@1.2.0: 1.2.0
   shebang-command@2.0.0: 2.0.0
   shebang-regex@3.0.0: 3.0.0
-  shellwords@0.1.1: 0.1.1
   signal-exit@4.1.0: 4.1.0
   simple-concat@1.0.1: 1.0.1
   simple-get@4.0.1: 4.0.1
@@ -423,17 +323,16 @@ overrides:
   smtp-address-parser@1.1.1: 1.1.1
   socks-proxy-agent@8.0.5: 8.0.5
   socks@2.8.11: 2.8.11
-  source-map-js@1.2.4: 1.2.4
   source-map-support@0.5.21: 0.5.21
   source-map@0.6.1: 0.6.1
   spdx-correct@3.2.0: 3.2.0
+  spdx-correct>spdx-expression-parse@3.0.1: 3.0.1
   spdx-exceptions@2.5.0: 2.5.0
-  spdx-expression-parse@3.0.1: 3.0.1
   spdx-license-ids@3.0.24: 3.0.24
   ssri@12.0.0: 12.0.0
   statuses@2.0.2: 2.0.2
   string_decoder@1.1.1: 1.1.1
-  string_decoder@1.1.1>safe-buffer@5.1.2: 5.1.2
+  string_decoder@1.3.0>safe-buffer@5.2.1: 5.2.1
   string-width-cjs: npm:string-width@4.2.3
   string-width@4.2.3>strip-ansi@6.0.1: 6.0.1
   string-width@5.1.2: 5.1.2
@@ -442,30 +341,23 @@ overrides:
   strip-ansi@7.2.0: 7.2.0
   strip-ansi@7.2.0>ansi-regex@6.6.0: 6.6.0
   strip-json-comments@2.0.1: 2.0.1
-  stylehacks@7.0.11: 7.0.11
-  stylehacks>browserslist@4.29.6: 4.29.6
-  svgo@4.1.0: 4.1.0
-  svgo>commander@11.1.0: 11.1.0
-  svgo>css-tree@3.2.1: 3.2.1
-  svgo>csso@5.0.5: 5.0.5
   tapable@2.3.4: 2.3.4
   tar-fs@2.1.6: 2.1.6
   tar-stream@2.2.0: 2.2.0
   tar@7.5.23: 7.5.23
   tar>chownr@3.0.0: 3.0.0
   tar>yallist@5.0.0: 5.0.0
-  terser-webpack-plugin@5.3.16: 5.3.16
   terser@5.51.4: 5.51.4
   terser>acorn@8.19.0: 8.19.0
   tinyglobby@0.2.17: 0.2.17
   tinyglobby>picomatch@4.0.7: 4.0.7
   tmp@0.2.7: 0.2.7
-  to-regex-range@5.0.1: 5.0.1
   toidentifier@1.0.1: 1.0.1
   ts-api-utils@2.5.0: 2.5.0
+  ts-loader>picomatch@4.0.7: 4.0.7
   ts-loader>source-map@0.7.6: 0.7.6
-  tslib@2.9.1: 2.9.1
   tunnel-agent@0.6.0: 0.6.0
+  tunnel-agent>safe-buffer@5.2.1: 5.2.1
   type-check@0.4.0: 0.4.0
   undici-types@8.9.0: 8.9.0
   unique-filename@4.0.0: 4.0.0
@@ -474,11 +366,10 @@ overrides:
   update-browserslist-db@1.4.0: 1.4.0
   uri-js@4.4.1: 4.4.1
   util-deprecate@1.0.2: 1.0.2
-  uuid@8.3.2: 8.3.2
   validate-npm-package-license@3.0.4: 3.0.4
+  validate-npm-package-license>spdx-expression-parse@3.0.1: 3.0.1
   watchpack@2.6.4: 2.6.4
   webpack-sources@3.7.1: 3.7.1
-  webpack>acorn@8.19.0: 8.19.0
   webpack>browserslist@4.29.6: 4.29.6
   which@2.0.2: 2.0.2
   which@5.0.0>isexe@3.1.5: 3.1.5
