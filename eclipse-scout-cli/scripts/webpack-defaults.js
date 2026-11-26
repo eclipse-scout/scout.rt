@@ -89,7 +89,6 @@ module.exports = (env, args) => {
   const config = {
     mode: buildMode,
     devtool: false, // disabled because SourceMapDevToolPlugin is used (see below)
-    ignoreWarnings: [webpackError => isWarningIgnored(devMode, webpackError)],
     resolve: {
       // no automatic polyfills. clients must add the desired polyfills themselves.
       fallback: {
@@ -253,7 +252,6 @@ module.exports = (env, args) => {
         minify: {
           implementation: MinimizerPlugin.esbuildMinifyCss,
           options: {
-            logLevel: 'error', // prints errors with all details to the console. Warnings are ignored, see isWarningIgnored
             sourcemap: false, // no sourcemaps for css in prod build (needs more heap memory instead)
             charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
             target: minimizerTarget
@@ -268,7 +266,6 @@ module.exports = (env, args) => {
           implementation: MinimizerPlugin.esbuildMinify,
           options: {
             legalComments: 'none',
-            logLevel: 'error', // prints errors with all details to the console. Warnings are ignored, see isWarningIgnored
             charset: 'utf8', // default is ASCII which requires more escaping. UTF-8 allows for more compact code.
             target: minimizerTarget
           }
@@ -516,14 +513,6 @@ function nvl(arg, defaultValue) {
     return defaultValue;
   }
   return arg;
-}
-
-function isWarningIgnored(devMode, webpackError) {
-  if (devMode || !webpackError) {
-    return false;
-  }
-  // Ignore warnings of the minimizers, e.g. 'Converting "require" to "esm" is currently not supported' caused by third party libs.
-  return webpackError.name === 'Warning' && !!webpackError.file;
 }
 
 /**
