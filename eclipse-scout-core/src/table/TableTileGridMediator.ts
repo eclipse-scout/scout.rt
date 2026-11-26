@@ -284,7 +284,7 @@ export class TableTileGridMediator extends Widget implements TableTileGridMediat
         this._adaptTileGrid(group.body);
         this.tileAccordion.insertGroup(group);
       }
-      tile.parent = group;
+      tile.setParent(group.body); // Necessary so the corresponding group can be found when a tile is inserted using this.tileAccordion.setTiles in this._setTilesInternal
     });
   }
 

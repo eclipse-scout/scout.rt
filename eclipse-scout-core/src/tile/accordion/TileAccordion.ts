@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -248,7 +248,7 @@ export class TileAccordion<TTile extends Tile = Tile> extends Accordion implemen
   }
 
   /**
-   * Distribute the tiles to the corresponding groups and returns an object with group id as key and array of tiles as value.
+   * Distributes the tiles to the corresponding groups and returns an object with group id as key and array of tiles as value.
    * Always returns all current groups even if the given tiles may not be distributed to all groups.
    */
   protected _groupTiles(tiles: TTile[]): Record<string, TTile[]> {
