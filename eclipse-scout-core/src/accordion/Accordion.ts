@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2025 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,10 +7,14 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AccordionLayout, AccordionModel, arrays, Comparator, EventHandler, Group, GroupCollapseStyle, HtmlComponent, InitModelOf, LoadingSupport, ObjectOrChildModel, objects, PropertyChangeEvent, Widget, widgets} from '../index';
+import {
+  AccordionEventMap, AccordionLayout, AccordionModel, arrays, Comparator, EventHandler, Group, GroupCollapseStyle, HtmlComponent, InitModelOf, LoadingSupport, ObjectOrChildModel, objects, PropertyChangeEvent, Widget, widgets
+} from '../index';
 
 export class Accordion extends Widget implements AccordionModel {
   declare model: AccordionModel;
+  declare eventMap: AccordionEventMap;
+  declare self: Accordion;
   comparator: Comparator<Group>;
   collapseStyle: GroupCollapseStyle;
   exclusiveExpand: boolean;

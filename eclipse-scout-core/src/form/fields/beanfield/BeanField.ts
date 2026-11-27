@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010, 2023 BSI Business Systems Integration AG
+ * Copyright (c) 2010, 2026 BSI Business Systems Integration AG
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -7,16 +7,17 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import {AppLinkKeyStroke, BeanFieldModel, events, ValueField} from '../../../index';
+import {AppLinkKeyStroke, BeanFieldEventMap, BeanFieldModel, events, ValueField} from '../../../index';
 
 /**
  * Base class for fields where the value should be visualized.
  */
 export class BeanField<TValue extends object> extends ValueField<TValue> implements BeanFieldModel<TValue> {
+  declare eventMap: BeanFieldEventMap<TValue>;
+  declare self: BeanField<any>;
 
   constructor() {
     super();
-
     this.preventInitialFocus = true;
   }
 

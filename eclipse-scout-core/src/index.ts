@@ -1260,8 +1260,6 @@ import './jquery/jquery-scout-selectors';
 import {scout} from './scout';
 import * as self from './index';
 
-export default self;
-
 // Add all functions from the scout object to the scout object on the window
 // Note: the scout object on the window still needs its own scout object (window.scout.scout).
 // It is required when the eclipse-core/scout is mapped as external webpack library to window.scout

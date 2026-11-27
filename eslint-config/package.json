@@ -52,7 +52,7 @@
   "dependencies": {
     "@eslint/js": "10.0.1",
     "globals": "17.14.0",
-    "typescript": "5.9.3",
+    "typescript": "6.0.3",
     "typescript-eslint": "8.74.0",
     "@stylistic/eslint-plugin": "5.10.0"
   },

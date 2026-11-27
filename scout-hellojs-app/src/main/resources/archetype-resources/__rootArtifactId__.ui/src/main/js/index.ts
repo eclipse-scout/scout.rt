@@ -1,4 +1,5 @@
 import {ObjectFactory} from '@eclipse-scout/core';
+import * as self from './index';
 
 export * from './App';
 export * from './objectFactories';
@@ -14,6 +15,4 @@ export * from './person/PersonRestrictionDo';
 export * from './person/PersonSearchForm';
 export * from './person/PersonTablePage';
 
-import * as self from './index';
-export default self;
 ObjectFactory.get().registerNamespace('${simpleArtifactName}', self);

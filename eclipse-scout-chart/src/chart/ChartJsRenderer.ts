@@ -2511,7 +2511,7 @@ export class ChartJsRenderer extends AbstractChartRenderer {
     }
 
     if (config.options.handleResize) {
-      config.options.onResize = this._resizeHandler;
+      config.options.onResize = (chart, size) => this._resizeHandler(chart, size);
     }
   }
 

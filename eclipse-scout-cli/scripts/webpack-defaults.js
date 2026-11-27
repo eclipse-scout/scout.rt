@@ -81,6 +81,11 @@ module.exports = (env, args) => {
     transpileOnly: transpileOnly,
     compilerOptions: {
       noEmit: false,
+      // Applications may bundle the TypeScript sources of linked packages: the file system root contains all of them.
+      // Declarations are only emitted by library builds (see libraryConfig).
+      rootDir: path.parse(process.cwd()).root,
+      declaration: false,
+      declarationMap: false,
       ...args.tsOptions?.compilerOptions
     },
     getCustomTransformers
@@ -310,11 +315,14 @@ function toExternals(src, dest) {
  * @param namespace The namespace of this module.
  */
 function setDoTransformerOwnModuleNamespace(config, namespace) {
-  config.module.rules
+  findTsLoaderOptions(config).getCustomTransformers.moduleResolver.ownModuleNamespace = namespace;
+}
+
+function findTsLoaderOptions(config) {
+  return config.module.rules
     .flatMap(r => r.use || [])
     .find(l => l.loader?.indexOf('ts-loader') >= 0)
-    .options.getCustomTransformers.moduleResolver
-    .ownModuleNamespace = namespace;
+    ?.options;
 }
 
 /**
@@ -364,6 +372,15 @@ function libraryConfig(config, options = {}) {
   // Otherwise, the final build targeting the browser cannot find '__webpack_nonce__' (as it has already been replaced in the first run).
   // If it is not replaced in the final build, the nonce is set to the wrong '__webpack_require__' instance which lets all dynamic import() statements fail.
   plugins.push(new KeepNonceVariablePlugin());
+
+  // Libraries only compile their own sources. The declarations (if enabled in the tsconfig.json) are emitted relative to the module directory.
+  const tsLoaderOptions = findTsLoaderOptions(config);
+  if (tsLoaderOptions) {
+    const compilerOptions = {...tsLoaderOptions.compilerOptions, rootDir: process.cwd()};
+    delete compilerOptions.declaration;
+    delete compilerOptions.declarationMap;
+    tsLoaderOptions.compilerOptions = compilerOptions;
+  }
 
   return {
     ...config,
@@ -591,4 +608,5 @@ module.exports.addThemes = addThemes;
 module.exports.libraryConfig = libraryConfig;
 module.exports.markExternals = markExternals;
 module.exports.setDoTransformerOwnModuleNamespace = setDoTransformerOwnModuleNamespace;
+module.exports.findTsLoaderOptions = findTsLoaderOptions;
 module.exports.rewriteIndexImports = rewriteIndexImports;

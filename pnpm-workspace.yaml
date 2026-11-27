@@ -260,7 +260,7 @@ overrides:
   node-abort-controller@3.1.0: 3.1.0
   node-gyp@11.5.0: 11.5.0
   node-gyp>which@5.0.0: 5.0.0
-  node-releases@2.0.65: 2.0.65
+  node-releases@2.0.66: 2.0.66
   nopt@8.1.0: 8.1.0
   normalize-package-data@8.0.0: 8.0.0
   on-finished@2.4.2: 2.4.2
@@ -344,7 +344,7 @@ overrides:
   tapable@2.3.4: 2.3.4
   tar-fs@2.1.6: 2.1.6
   tar-stream@2.2.0: 2.2.0
-  tar@7.5.23: 7.5.23
+  tar@7.5.24: 7.5.24
   tar>chownr@3.0.0: 3.0.0
   tar>yallist@5.0.0: 5.0.0
   terser@5.51.4: 5.51.4

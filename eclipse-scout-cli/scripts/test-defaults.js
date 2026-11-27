@@ -11,6 +11,7 @@ const fs = require('fs');
 const path = require('path');
 const scoutBuildConstants = require('./constants');
 const KeepNonceVariablePlugin = require('./webpack-build/KeepNonceVariablePlugin');
+const {findTsLoaderOptions} = require('./webpack-defaults');
 const {SourceMapDevToolPlugin} = require('webpack');
 
 /**
@@ -52,22 +53,25 @@ module.exports = (config, specEntryPoint) => {
 
   const webpackArgs = Object.assign({
     mode: scoutBuildConstants.mode.development,
-    watch: false,
-    tsOptions: {
-      compilerOptions: {
-        // No need to create declarations for tests
-        declaration: false,
-        declarationMap: false,
-        // The spec bundle (build output of the test-webpack-build) also contains the TypeScript sources of linked packages (e.g. in a monorepo), the file system root contains all of them
-        // Otherwise, TS6059 is thrown on TS emit complaining that these linked sources are not part of rootDir (if set in tsconfig.json).
-        rootDir: path.parse(process.cwd()).root
-      }
-    }
+    watch: false
   }, config.webpackArgs);
   let webpackConfig = webpackConfigProvider(null, webpackArgs);
   if (Array.isArray(webpackConfig)) {
     webpackConfig = webpackConfig[0];
   }
+
+  const tsLoaderOptions = findTsLoaderOptions(webpackConfig);
+  if (tsLoaderOptions) {
+    tsLoaderOptions.compilerOptions = {
+      ...tsLoaderOptions.compilerOptions,
+      // No need to create declarations for tests
+      declaration: false,
+      declarationMap: false,
+      // The spec bundle also contains the TypeScript sources of linked packages (e.g. in a monorepo), the file system root contains all of them
+      rootDir: path.parse(process.cwd()).root
+    };
+  }
+
   if (webpackConfig.optimization) {
     // create a single spec bundle
     delete webpackConfig.optimization.splitChunks;

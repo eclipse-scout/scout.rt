@@ -8,20 +8,16 @@
     "module": "ESNext",
     "skipLibCheck": true,
     "sourceMap": true,
-    "alwaysStrict": true,
+    "strict": false,
     "strictBindCallApply": true,
     "noImplicitOverride": true,
     "useDefineForClassFields": true,
     // Emitting is enabled by the webpack build, no need to emit anything during development
     "noEmit": true,
-    // For jquery imports, see https://www.typescriptlang.org/tsconfig#allowSyntheticDefaultImports
-    "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "lib": [
       "dom",
-      "dom.iterable",
       "ES2023"
-    ],
-    "types": []
+    ]
   }
 }
