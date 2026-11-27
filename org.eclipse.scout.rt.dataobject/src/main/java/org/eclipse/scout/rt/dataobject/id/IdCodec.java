@@ -43,7 +43,7 @@ import org.eclipse.scout.rt.platform.util.StringUtility;
 /**
  * Codec used to convert between {@link IId} instances and their qualified/unqualified representation as {@link String}.
  * <p>
- * <b>NOTE:</b> A semicolon ';' character is not a valid part of a string id and fails to decode.
+ * <b>NOTE:</b> A semicolon ';' character is not a valid part of a string id and fails to encode and decode.
  */
 @ApplicationScoped
 public class IdCodec {
@@ -83,13 +83,23 @@ public class IdCodec {
   @PostConstruct
   protected void initialize() {
     // setup default type mappings between raw type <--> string
-    registerRawTypeMapper(String.class, s -> s, Object::toString);
+    registerRawTypeMapper(String.class, s -> s, this::stringRawTypeMapper);
     registerRawTypeMapper(UUID.class, UUID::fromString, Object::toString);
     registerRawTypeMapper(Long.class, Long::parseLong, Object::toString);
     registerRawTypeMapper(Integer.class, Integer::parseInt, Object::toString);
     registerRawTypeMapper(Date.class, d -> new Date(Long.parseLong(d)), d -> String.valueOf(d.getTime()));
     registerRawTypeMapper(Locale.class, Locale::forLanguageTag, Locale::toLanguageTag);
     registerRawTypeMapper(Boolean.class, Boolean::valueOf, Object::toString);
+  }
+
+  /**
+   * Default raw type mapper function for {@link String}, checking for invalid {@link #COMPOSITE_ID_DELIMITER} character within string keys.
+   */
+  protected String stringRawTypeMapper(String s) {
+    if (StringUtility.containsString(s, COMPOSITE_ID_DELIMITER)) {
+      throw new IdCodecException("Invalid character {} in string id", COMPOSITE_ID_DELIMITER);
+    }
+    return Objects.toString(s);
   }
 
   protected IdFactory idFactory() {

@@ -92,6 +92,14 @@ public abstract class AbstractIdCodecTest {
   }
 
   @Test
+  public void testToQualifiedStringIdWrongCharacters() {
+    FixtureStringId id1 = FixtureStringId.of("my-not-contain-a;-semicolon");
+    // StringId which contains a semicolon (;) is not encode-able by IdCodec
+    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().toQualified(id1));
+    assertTrue(exception.getMessage().startsWith("Invalid character"));
+  }
+
+  @Test
   public void testToQualifiedDateId() {
     Date date = new Date(123456789);
     FixtureDateId id1 = IIds.create(FixtureDateId.class, date);
@@ -233,6 +241,14 @@ public abstract class AbstractIdCodecTest {
     FixtureUuId id1 = IIds.create(FixtureUuId.class, TEST_UUID);
     String ext1 = getCodec().toUnqualified(id1);
     assertEquals(TEST_UUID.toString(), ext1);
+  }
+
+  @Test
+  public void testToUnqualifiedStringIdWrongCharacters() {
+    FixtureStringId id1 = FixtureStringId.of("my-not-contain-a;-semicolon");
+    // StringId which contains a semicolon (;) is not encode-able by IdCodec
+    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().toUnqualified(id1));
+    assertTrue(exception.getMessage().startsWith("Invalid character"));
   }
 
   @Test
@@ -519,13 +535,14 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromQualifiedCompositeIdDuplicatedSemicolon() {
+    // StringId which contains a semicolon (;) is not encode-able by IdCodec
     FixtureCompositeId id = IIds.create(FixtureCompositeId.class, "foo;bar", TEST_UUID);
-    String idStr = getCodec().toQualified(id);
-    assertEquals("scout.FixtureCompositeId:foo;bar;5833aae1-c813-4d7c-a342-56a53772a3ea", idStr);
+    IdCodecException encodeException = assertThrows(IdCodecException.class, () -> getCodec().toQualified(id));
+    assertTrue(encodeException.getMessage().startsWith("Invalid character"));
 
     // StringId which contains a semicolon (;) is not parsable by IdCodec
-    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().fromQualified(idStr));
-    assertTrue(exception.getMessage().startsWith("Wrong argument size"));
+    IdCodecException decodeException = assertThrows(IdCodecException.class, () -> getCodec().fromQualified("scout.FixtureCompositeId:foo;bar;5833aae1-c813-4d7c-a342-56a53772a3ea"));
+    assertTrue(decodeException.getMessage().startsWith("Wrong argument size"));
   }
 
   @Test
@@ -671,13 +688,14 @@ public abstract class AbstractIdCodecTest {
 
   @Test
   public void testFromUnqualifiedCompositeIdDuplicatedSemicolon() {
+    // StringId which contains a semicolon (;) is not encode-able by IdCodec
     FixtureCompositeId id = IIds.create(FixtureCompositeId.class, "foo;bar", TEST_UUID);
-    String idStr = getCodec().toUnqualified(id);
-    assertEquals("foo;bar;5833aae1-c813-4d7c-a342-56a53772a3ea", idStr);
+    IdCodecException encodeException = assertThrows(IdCodecException.class, () -> getCodec().toUnqualified(id));
+    assertTrue(encodeException.getMessage().startsWith("Invalid character"));
 
     // StringId which contains a semicolon (;) is not parsable by IdCodec
-    IdCodecException exception = assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, idStr));
-    assertTrue(exception.getMessage().startsWith("Wrong argument size"));
+    IdCodecException decodeException = assertThrows(IdCodecException.class, () -> getCodec().fromUnqualified(FixtureCompositeId.class, "foo;bar;5833aae1-c813-4d7c-a342-56a53772a3ea"));
+    assertTrue(decodeException.getMessage().startsWith("Wrong argument size"));
   }
 
   @Test(expected = IdCodecException.class)
