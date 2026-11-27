@@ -278,6 +278,58 @@ export const scout = {
   },
 
   /**
+   * Throws an error if the given value is not `true`. Otherwise, the value is returned.
+   *
+   * @param value value to check
+   * @param msg optional error message when the assertion fails
+   */
+  assertTrue<T>(value: T, msg?: string): T {
+    if (value === true) {
+      return value;
+    }
+    throw new Error(msg || 'Value is not true');
+  },
+
+  /**
+   * Throws an error if the given value is not truthy. Otherwise, the value is returned.
+   *
+   * @param value value to check
+   * @param msg optional error message when the assertion fails
+   */
+  assertTruthy<T>(value: T, msg?: string): T {
+    if (value) {
+      return value;
+    }
+    throw new Error(msg || 'Value is not truthy');
+  },
+
+  /**
+   * Throws an error if the given value is not `false`. Otherwise, the value is returned.
+   *
+   * @param value value to check
+   * @param msg optional error message when the assertion fails
+   */
+  assertFalse<T>(value: T, msg?: string): T {
+    if (value === false) {
+      return value;
+    }
+    throw new Error(msg || 'Value is not false');
+  },
+
+  /**
+   * Throws an error if the given value is not falsy. Otherwise, the value is returned.
+   *
+   * @param value value to check
+   * @param msg optional error message when the assertion fails
+   */
+  assertFalsy<T>(value: T, msg?: string): T {
+    if (!value) {
+      return value;
+    }
+    throw new Error(msg || 'Value is not falsy');
+  },
+
+  /**
    * Checks if one of the arguments from 1-n is equal to the first argument.
    * @param args to check against the value, may be an array or a variable argument list.
    */
