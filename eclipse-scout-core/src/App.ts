@@ -314,6 +314,8 @@ export class App extends EventEmitter {
       // Json errors (normally processed by Session.js) are returned with http status 200
       url = jsonError.url;
       message = `${jsonError.error.message} [Code ${jsonError.error.code}]`;
+    } else {
+      throw vararg;
     }
     return {url, message};
   }
