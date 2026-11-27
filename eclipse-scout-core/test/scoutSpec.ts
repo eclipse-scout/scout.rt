@@ -296,6 +296,106 @@ describe('scout', () => {
     });
   });
 
+  describe('assertTrue', () => {
+
+    it('passes for true', () => {
+      expect(scout.assertTrue(true)).toBe(true);
+    });
+
+    it('fails for non-true', () => {
+      expect(() => scout.assertTrue(undefined)).toThrowError();
+      expect(() => scout.assertTrue(null)).toThrowError();
+      expect(() => scout.assertTrue(false)).toThrowError();
+      expect(() => scout.assertTrue('')).toThrowError();
+      expect(() => scout.assertTrue('foo')).toThrowError();
+      expect(() => scout.assertTrue(0)).toThrowError();
+      expect(() => scout.assertTrue(42)).toThrowError();
+      expect(() => scout.assertTrue([])).toThrowError();
+      expect(() => scout.assertTrue(['foo'])).toThrowError();
+      expect(() => scout.assertTrue({})).toThrowError();
+      expect(() => scout.assertTrue({foo: 'bar'})).toThrowError();
+      expect(() => scout.assertTrue(void 0)).toThrowError();
+      let testValue = () => {
+      };
+      expect(() => scout.assertTrue(testValue)).toThrowError();
+    });
+  });
+
+  describe('assertTruthy', () => {
+
+    it('passes for truthy', () => {
+      expect(scout.assertTruthy(true)).toBe(true);
+      expect(scout.assertTruthy('foo')).toBe('foo');
+      expect(scout.assertTruthy(42)).toBe(42);
+      expect(scout.assertTruthy([])).toEqual([]);
+      expect(scout.assertTruthy(['foo'])).toEqual(['foo']);
+      expect(scout.assertTruthy({})).toEqual({});
+      expect(scout.assertTruthy({foo: 'bar'})).toEqual({foo: 'bar'});
+      let testValue = () => {
+      };
+      expect(scout.assertTruthy(testValue)).toBe(testValue);
+    });
+
+    it('fails for non-truthy', () => {
+      expect(() => scout.assertTruthy(undefined)).toThrowError();
+      expect(() => scout.assertTruthy(null)).toThrowError();
+      expect(() => scout.assertTruthy(false)).toThrowError();
+      expect(() => scout.assertTruthy(0)).toThrowError();
+      expect(() => scout.assertTruthy('')).toThrowError();
+      expect(() => scout.assertTruthy(void 0)).toThrowError();
+    });
+  });
+
+  describe('assertFalse', () => {
+
+    it('passes for false', () => {
+      expect(scout.assertFalse(false)).toBe(false);
+    });
+
+    it('fails for non-false', () => {
+      expect(() => scout.assertFalse(undefined)).toThrowError();
+      expect(() => scout.assertFalse(null)).toThrowError();
+      expect(() => scout.assertFalse(true)).toThrowError();
+      expect(() => scout.assertFalse('')).toThrowError();
+      expect(() => scout.assertFalse('foo')).toThrowError();
+      expect(() => scout.assertFalse(0)).toThrowError();
+      expect(() => scout.assertFalse(42)).toThrowError();
+      expect(() => scout.assertFalse([])).toThrowError();
+      expect(() => scout.assertFalse(['foo'])).toThrowError();
+      expect(() => scout.assertFalse({})).toThrowError();
+      expect(() => scout.assertFalse({foo: 'bar'})).toThrowError();
+      expect(() => scout.assertFalse(void 0)).toThrowError();
+      let testValue = () => {
+      };
+      expect(() => scout.assertFalse(testValue)).toThrowError();
+    });
+  });
+
+  describe('assertFalsy', () => {
+
+    it('passes for falsy', () => {
+      expect(scout.assertFalsy(false)).toBe(false);
+      expect(scout.assertFalsy(undefined)).toBe(undefined);
+      expect(scout.assertFalsy(null)).toBe(null);
+      expect(scout.assertFalsy('')).toBe('');
+      expect(scout.assertFalsy(0)).toBe(0);
+      expect(scout.assertFalsy(void 0)).toBe(void 0);
+    });
+
+    it('fails for non-falsy', () => {
+      expect(() => scout.assertFalsy(true)).toThrowError();
+      expect(() => scout.assertFalsy('foo')).toThrowError();
+      expect(() => scout.assertFalsy(42)).toThrowError();
+      expect(() => scout.assertFalsy([])).toThrowError();
+      expect(() => scout.assertFalsy(['foo'])).toThrowError();
+      expect(() => scout.assertFalsy({})).toThrowError();
+      expect(() => scout.assertFalsy({foo: 'bar'})).toThrowError();
+      let testValue = () => {
+      };
+      expect(() => scout.assertFalsy(testValue)).toThrowError();
+    });
+  });
+
   describe('isOneOf', () => {
 
     it('can check if value is one of multiple values', () => {
